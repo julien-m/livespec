@@ -1,0 +1,759 @@
+{
+  "schema_version": "1",
+  "feature": "085-localiser-ai-ressources-sans-chemin-en-dur",
+  "reviewer_model": "claude-opus-5-5",
+  "review_max_chars": 100000,
+  "review_receipt_path": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping-review-receipt.json",
+  "bindings": [
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-001",
+      "test_id": "tests.test_ai_resources::test_env_wins_over_recorded_existing_paths",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 59,
+      "end_line": 59,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "env value wins with source env over existing recorded manifest and index paths"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-001",
+      "test_id": "tests.test_ai_resources::test_env_is_used_without_existence_check_or_reading_conventions",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 74,
+      "end_line": 74,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "nonexistent padded env value returned stripped and absolute, .conventions never read (reader patched to fail)"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-001",
+      "test_id": "tests.test_ai_resources::test_env_is_used_without_existence_check_or_reading_conventions",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 75,
+      "end_line": 75,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "no existence check on the environment root"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-001",
+      "test_id": "tests.test_ai_resources::test_relative_and_tilde_env_values_become_absolute",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 83,
+      "end_line": 83,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "relative env value made absolute against cwd"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-001",
+      "test_id": "tests.test_ai_resources::test_relative_and_tilde_env_values_become_absolute",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 85,
+      "end_line": 85,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "~ expanded in env value"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-002",
+      "test_id": "tests.test_ai_resources::test_blank_env_falls_back_to_manifest_path[spaces]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 106,
+      "end_line": 106,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "blank env counts as unset; manifest path with source manifest"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-002",
+      "test_id": "tests.test_ai_resources::test_index_declaration_used_when_manifest_path_missing",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 119,
+      "end_line": 119,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "rejected manifest path falls back to index declaration with source index"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-002",
+      "test_id": "tests.test_ai_resources::test_relative_and_tilde_recorded_paths",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 136,
+      "end_line": 136,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "relative recorded path anchored on project root"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-002",
+      "test_id": "tests.test_ai_resources::test_relative_and_tilde_recorded_paths",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "~ expanded in recorded path"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-002",
+      "test_id": "tests.test_ai_resources::test_manifest_wins_when_manifest_and_index_disagree",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 129,
+      "end_line": 129,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "manifest wins over a different existing index declaration"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-003",
+      "test_id": "tests.test_ai_resources::test_nonexistent_recorded_paths_raise_explicit_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 173,
+      "end_line": 176,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "exact one-line message: project root, rejected path with source file, fix sentence"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-003",
+      "test_id": "tests.test_ai_resources::test_every_rejected_path_is_listed_in_order",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 192,
+      "end_line": 195,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "nonexistent and non-directory recorded paths listed in order with their source files"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-003",
+      "test_id": "tests.test_ai_resources::test_unusable_manifest_falls_back_to_index[malformed]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 162,
+      "end_line": 162,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "malformed manifest is not a source of recorded path"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-003",
+      "test_id": "tests.test_ai_resources::test_nothing_recorded_raises_explicit_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 205,
+      "end_line": 209,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "no .conventions files: explicit error naming project and fix"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-003",
+      "test_id": "tests.test_ai_resources::test_without_project_root_only_environment_applies",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 216,
+      "end_line": 216,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "without project root an absent AIRESOURCES raises the same error type and fix"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-004",
+      "test_id": "tests.test_ai_resources::test_no_home_or_livespec_sibling_fallback",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 237,
+      "end_line": 237,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "corpora at temporary ~/projects/ai-ressources and next to patched LIVESPEC_ROOT never used; corpus manifest stays unresolved"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-004",
+      "test_id": "tests.test_ai_resources::test_no_home_or_livespec_sibling_fallback",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 238,
+      "end_line": 238,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "corpus manifest carries the resolution error instead of a fallback"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[ast-catalog-env]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "ast-catalog observably used the expected corpus in situation env"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[ast-catalog-recorded]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "ast-catalog observably used the expected corpus in situation recorded"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[ast-catalog-both]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "ast-catalog observably used the expected corpus in situation both"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[corpus-manifest-env]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "corpus-manifest observably used the expected corpus in situation env"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[corpus-manifest-recorded]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "corpus-manifest observably used the expected corpus in situation recorded"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[corpus-manifest-both]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "corpus-manifest observably used the expected corpus in situation both"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[rule-decisions-env]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "rule-decisions observably used the expected corpus in situation env"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[rule-decisions-recorded]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "rule-decisions observably used the expected corpus in situation recorded"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[rule-decisions-both]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "rule-decisions observably used the expected corpus in situation both"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[conventions-compile-env]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "conventions-compile observably used the expected corpus in situation env"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[conventions-compile-recorded]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "conventions-compile observably used the expected corpus in situation recorded"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[conventions-compile-both]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "conventions-compile observably used the expected corpus in situation both"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[r7.3-env]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "r7.3 observably used the expected corpus in situation env"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[r7.3-recorded]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "r7.3 observably used the expected corpus in situation recorded"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[r7.3-both]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "r7.3 observably used the expected corpus in situation both"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[conventions-validity-env]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "conventions-validity observably used the expected corpus in situation env"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[conventions-validity-recorded]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "conventions-validity observably used the expected corpus in situation recorded"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[conventions-validity-both]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "conventions-validity observably used the expected corpus in situation both"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[init-from-code-env]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "init-from-code observably used the expected corpus in situation env"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[init-from-code-recorded]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "init-from-code observably used the expected corpus in situation recorded"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[init-from-code-both]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "init-from-code observably used the expected corpus in situation both"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_compile_text_reports_rulebook_error_exit_2",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 71,
+      "end_line": 71,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "compile text exits 2"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_compile_text_reports_rulebook_error_exit_2",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 72,
+      "end_line": 72,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "compile text reports rulebook_error with the message, provider never called"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_compile_json_reports_rulebook_error_exit_2",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 86,
+      "end_line": 90,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "compile --json reports rulebook_error with the message"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_ast_catalog_raises_catalog_error_with_message",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 99,
+      "end_line": 99,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "AstCatalogError carries the resolution message"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_corpus_manifest_is_empty_with_resolution_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 105,
+      "end_line": 105,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "empty corpus manifest with root text empty string"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_corpus_manifest_is_empty_with_resolution_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 106,
+      "end_line": 106,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "corpus manifest resolution_error holds the message"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_rule_decisions_are_zero_with_resolution_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 114,
+      "end_line": 114,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "zero decisions without raising"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_rule_decisions_are_zero_with_resolution_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 116,
+      "end_line": 116,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "decision manifest copies resolution_error"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_r7_3_silent_without_rulebook",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "R7.3 silent without rulebook"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_r7_3_reports_one_explicit_error_with_rulebook",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 135,
+      "end_line": 135,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "exactly one R7.3 violation with a rulebook"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_r7_3_reports_one_explicit_error_with_rulebook",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 137,
+      "end_line": 139,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "R7.3 ERROR message contains the resolution message"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_conventions_validity_is_false",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 143,
+      "end_line": 143,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "conventions_are_valid false"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_init_from_code_prints_error_exits_2_and_writes_nothing[dry-run]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 164,
+      "end_line": 164,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "init --dry-run exits 2"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_init_from_code_prints_error_exits_2_and_writes_nothing[dry-run]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 165,
+      "end_line": 165,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "init --dry-run prints ERROR with the message"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_init_from_code_prints_error_exits_2_and_writes_nothing[force]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "init --force writes no project file"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "test_id": "tests.test_ai_resources_failures::test_init_from_code_prints_error_exits_2_and_writes_nothing[plain]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_failures.py",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+      "justification": "init writes no project file"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-007",
+      "test_id": "tests.test_ai_resources_consumers::test_other_machine_recorded_path_is_valid_with_local_env_clone",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 190,
+      "end_line": 190,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "another machine's recorded path alone is invalid"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-007",
+      "test_id": "tests.test_ai_resources_consumers::test_other_machine_recorded_path_is_valid_with_local_env_clone",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 194,
+      "end_line": 194,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "valid with AIRESOURCES pointing to a complete local clone, manifest and index differing"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-007",
+      "test_id": "tests.test_ai_resources_consumers::test_consumer_uses_the_shared_root[conventions-validity-recorded]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "valid with recorded root only, routed sources checked under it"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-008",
+      "test_id": "tests.test_ai_resources_consumers::test_compile_needs_no_index_declaration_with_env",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 210,
+      "end_line": 213,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "compile without index declaration when AIRESOURCES set; display paths unchanged"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-008",
+      "test_id": "tests.test_ai_resources_consumers::test_compile_still_rejects_escaping_source",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 227,
+      "end_line": 229,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "escaping display path still rejected by compile"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-008",
+      "test_id": "tests.test_ai_resources_consumers::test_r7_3_still_rejects_escaping_display_path",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_consumers.py",
+      "start_line": 243,
+      "end_line": 245,
+      "source_sha256": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+      "justification": "escaping display path still reported stale by R7.3"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-009",
+      "test_id": "tests.test_ai_resources_guard::test_validator_has_no_forbidden_fallback",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_guard.py",
+      "start_line": 42,
+      "end_line": 42,
+      "source_sha256": "feb0cda5af01c62979ddb15de1892861349dcd423e2d9ba7198b17b579165038",
+      "justification": "validator tree has no forbidden fallback"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-009",
+      "test_id": "tests.test_ai_resources_guard::test_reintroduced_fallback_is_reported_with_file_and_line",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_guard.py",
+      "start_line": 58,
+      "end_line": 61,
+      "source_sha256": "feb0cda5af01c62979ddb15de1892861349dcd423e2d9ba7198b17b579165038",
+      "justification": "reintroduced fallback reported as file:line"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-009",
+      "test_id": "tests.test_ai_resources_guard::test_logical_catalog_identifiers_do_not_match",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_guard.py",
+      "start_line": 65,
+      "end_line": 67,
+      "source_sha256": "feb0cda5af01c62979ddb15de1892861349dcd423e2d9ba7198b17b579165038",
+      "justification": "logical ai-ressources/ identifiers do not match"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "test_id": "tests.test_ai_resources_docs::test_readme_documents_airesources_role_order_and_fix",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 47,
+      "end_line": 47,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "README resolution order env, manifest, index"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "test_id": "tests.test_ai_resources_docs::test_readme_documents_airesources_role_order_and_fix",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 49,
+      "end_line": 49,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "README fix sentence"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "test_id": "tests.test_ai_resources_docs::test_readme_documents_airesources_role_order_and_fix",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 40,
+      "end_line": 40,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "README links ai-ressources"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "test_id": "tests.test_ai_resources_docs::test_readme_no_longer_mentions_a_default_sibling_directory",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "no default sibling directory"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "test_id": "tests.test_ai_resources_docs::test_documents_reference_the_variable_path[.specs/spec-system.md]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 63,
+      "end_line": 63,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "spec-system references $AIRESOURCES protocol path"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "test_id": "tests.test_ai_resources_docs::test_documents_reference_the_variable_path[.agent-sync/skills/spec-specify/SKILL.md]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 64,
+      "end_line": 64,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "spec-specify skill no longer cites the private path"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "test_id": "tests.test_ai_resources_docs::test_documents_reference_the_variable_path[system/templates/spec-template.md]",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 63,
+      "end_line": 63,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "spec template references $AIRESOURCES protocol path"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "test_id": "tests.test_ai_resources_docs::test_spec_specify_expectations_were_reviewed",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 72,
+      "end_line": 72,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "spec-specify expectations last_reviewed bumped"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-004",
+      "test_id": "tests.test_ai_resources::test_no_home_or_livespec_sibling_fallback",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources.py",
+      "start_line": 237,
+      "end_line": 237,
+      "source_sha256": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+      "justification": "HOME and LiveSpec-sibling corpora exist yet the corpus manifest root stays empty"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-004",
+      "test_id": "tests.test_ai_resources_docs::test_request_grep_scope_has_no_forbidden_location",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_docs.py",
+      "start_line": 90,
+      "end_line": 90,
+      "source_sha256": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+      "justification": "request grep scope (validator, docs) names no ~/projects or sibling ai-ressources location"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-011",
+      "test_id": "tests.test_ai_resources_isolation::test_feature_tests_pass_without_any_real_corpus",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_isolation.py",
+      "start_line": 52,
+      "end_line": 52,
+      "source_sha256": "25dee1e928648b062754ec28e295ea224afb17e39eb0355962162b13538d0bd6",
+      "justification": "resolution, consumer and failure modules pass in a child pytest with AIRESOURCES unset and an empty HOME, so they only use fake corpora they build"
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-011",
+      "test_id": "tests.test_ai_resources_isolation::test_real_corpus_ast_tests_do_not_use_fake_corpora",
+      "expected": "passed",
+      "assertion_path": "tests/test_ai_resources_isolation.py",
+      "start_line": 63,
+      "end_line": 63,
+      "source_sha256": "25dee1e928648b062754ec28e295ea224afb17e39eb0355962162b13538d0bd6",
+      "justification": "real-corpus AST modules import none of the feature fake-corpus helpers, so they keep using the CI corpus"
+    }
+  ]
+}

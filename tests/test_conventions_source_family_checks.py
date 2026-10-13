@@ -33,6 +33,7 @@ EXPECTED_GENERATED_FAMILIES = {
 }
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_generated_sources_use_real_family_backends_not_generic_contract(tmp_path: Path) -> None:
     manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
     generated = [
@@ -54,6 +55,7 @@ def test_generated_sources_use_real_family_backends_not_generic_contract(tmp_pat
     assert family_ids <= EXPECTED_GENERATED_FAMILIES
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_csv_generated_sources_use_ars_rule_level_backends(tmp_path: Path) -> None:
     manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
     csv_sources = {rule.source_path for rule in load_ars_executable_rules(Path.cwd())}

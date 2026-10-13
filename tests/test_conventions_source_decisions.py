@@ -49,6 +49,7 @@ def corpus_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return project
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_rule_decision_manifest_decides_every_classified_source(tmp_path: Path) -> None:
     ai_root = tmp_path / "ai-ressources"
     _write_ai_resources_fixture(ai_root)
@@ -104,6 +105,7 @@ def test_named_source_decision_has_anchored_reason(corpus_project: Path) -> None
     )
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_catalog_load_failure_is_manifest_blocker(
     tmp_path: Path,
     monkeypatch,
@@ -120,6 +122,7 @@ def test_catalog_load_failure_is_manifest_blocker(
     assert f"catalog_load_error:{errors[0]}" in validate_rule_decision_manifest(manifest)
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_validate_rejects_incomplete_non_blocking_metadata(tmp_path: Path) -> None:
     project = _enforce_project(tmp_path)
     manifest = build_rule_decision_manifest(project)
@@ -152,6 +155,7 @@ def test_validate_rejects_generated_executable_without_generator_evidence(
     assert any(issue.startswith("missing_generator:") for issue in issues)
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_taxonomy_fields_expose_rule_decision_manifest(tmp_path: Path) -> None:
     project = _enforce_project(tmp_path)
 

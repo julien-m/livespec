@@ -9,6 +9,8 @@ from __future__ import annotations
 from hashlib import sha256
 from pathlib import Path
 
+import pytest
+
 from validator.coherence.graph_builder import FeatureInfo, RoadmapItem, SpecGraph
 from validator.coherence.rules.r1_roadmap_features import (
     R1_1_RoadmapFeatureMissing,
@@ -819,6 +821,7 @@ scope: repo
         assert "src/**" in violations[0].message
 
 
+@pytest.mark.usefixtures("without_airesources")
 class TestR7_3_ConventionsRulebookSourcesStale:
     def test_rulebook_source_hash_stale(self, tmp_path: Path) -> None:
         specs_root = tmp_path / ".specs"
@@ -858,3 +861,22 @@ waivers: []
         assert len(violations) == 1
         assert violations[0].severity == Severity.ERROR
         assert "$AIRESOURCES/code-conventions/general.md" in violations[0].message
+
+    def test_rulebook_without_sources_needs_no_root(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        specs_root.mkdir(parents=True)
+        (specs_root / "conventions-rulebook.yaml").write_text(
+            """\
+schema_version: 1
+compiled_at: "2026-06-13T00:00:00+00:00"
+sources: []
+rules: []
+unenforceable: []
+waivers: []
+""",
+            encoding="utf-8",
+        )
+
+        violations = R7_3_ConventionsRulebookSourcesStale().check(SpecGraph(), specs_root)
+
+        assert violations == []

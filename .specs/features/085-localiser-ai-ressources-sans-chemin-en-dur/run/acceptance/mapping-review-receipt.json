@@ -1,0 +1,654 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "ad25ec59ed22478a27cf8c7fa83f8748e503b4b9bd831d41bb74a5d2cc837dd5",
+  "source_hashes": {
+    ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json": "71f04e1b90fe28db0c8944334c9fe15ab6aefffad340e17f286f2fd0635fcb72",
+    ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md": "b097d70fe78c077cb4e08cc76bd85bec86368ab20cd6bca3e9658809b6d90155",
+    "tests/test_ai_resources.py": "ba9d1cfe7f3b45a5e10e06e33d669f3cf150a72bb4f8a8801a08b187a31e2055",
+    "tests/test_ai_resources_consumers.py": "008d6be5562b69cdf06628ead80d7bfc04ea3ae253c370e1886786cf87342945",
+    "tests/test_ai_resources_docs.py": "d28b2009b63c385dacaada12fd2f372405110f152a925a2221cc21afb97b6e30",
+    "tests/test_ai_resources_failures.py": "717c2a2fc539426e98179a346a8a21c3b44f561a0853f45fa646a281fd2755f2",
+    "tests/test_ai_resources_guard.py": "feb0cda5af01c62979ddb15de1892861349dcd423e2d9ba7198b17b579165038",
+    "tests/test_ai_resources_isolation.py": "25dee1e928648b062754ec28e295ea224afb17e39eb0355962162b13538d0bd6"
+  },
+  "reviewer_model": "claude-opus-5-5",
+  "complete": true,
+  "ready": true,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-001",
+      "disposition": "covered",
+      "rationale": "Batch-001 assertions prove it: env wins with source env over existing recorded manifest/index paths, a padded nonexistent value is returned stripped and absolute while the .conventions reader is patched to fail (no existence check, no read), and relative/~ values become absolute. Batch-002's 'missing' only reflects that its files hold no resolution tests; settled by batch-001.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231",
+          "excerpt": "returns that value expanded and made absolute with source `env`, without checking that it exists and without reading `.conventions/`"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231",
+          "excerpt": "returns that value expanded and made absolute with source `env`"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert (resolved.path, resolved.source) == (env_corpus, \"env\")"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "monkeypatch.setattr(ai_resources, \"_recorded_values\", fail_if_read)"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert not resolved.path.exists()"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert resolve_ai_resources_root(None).path == (empty_home / \"corpus\").resolve()"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert (resolved.path, resolved.source) == (missing.resolve(), \"env\")"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert resolve_ai_resources_root(None).path == (tmp_path / \"relative-corpus\").resolve()"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-002",
+      "disposition": "covered",
+      "rationale": "Batch-001 proves blank env (empty/spaces/tab) falls back to the manifest with source manifest, a rejected manifest path falls back to the index with source index, the manifest wins on disagreement, and relative/~ recorded paths are anchored on the project root and home. Batch-002 'missing' is a partitioning artifact settled by batch-001.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235",
+          "excerpt": "returns the Manifest path with source `manifest` when it designates an existing directory; otherwise it returns the Index declaration with source `index`"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235",
+          "excerpt": "returns the Manifest path with source `manifest` when it designates an existing directory"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert (resolved.path, resolved.source) == (recorded, \"manifest\")"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert (resolved.path, resolved.source) == (index_corpus, \"index\")"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert resolve_ai_resources_root(project).path == relative"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert resolve_ai_resources_root(project).path == home_corpus"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert resolve_ai_resources_root(project).source == \"manifest\""
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-003",
+      "disposition": "covered",
+      "rationale": "Batch-002's 'ambiguous' (one rejection variant seen) is settled by batch-001: exact-equality messages cover nonexistent and non-directory paths listed in order with source files, no .conventions files, and the no-project-root case with the same fix sentence; batch-002 adds the exact failure message. Unusable manifests are shown to be ignored as a source, which per the spec's edge case falls through to the error; the lack of a direct 'unusable manifest and no index raises' case is kept as info.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239",
+          "excerpt": "the Shared resolution raises the Resolution error whose message names the Project root, each rejected Recorded path with its source file"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239",
+          "excerpt": "without a Project root, an absent `AIRESOURCES` raises the same error type with the same fix sentence"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml). {FIX}"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "f\"{a_file.resolve()} (from .conventions/index.md). {FIX}\""
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert str(caught.value) == f\"ai-ressources root not resolved: AIRESOURCES is not set. {FIX}\""
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "ids=[\"malformed\", \"non-mapping\", \"missing-key\", \"non-string\", \"blank\"]"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert message == (\n        f\"ai-ressources root not resolved for project {project}: AIRESOURCES is not set; \"\n        f\"rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml). {FIX}\"\n    )"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert (\n        f\"rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml); \"\n        f\"{a_file.resolve()} (from .conventions/index.md). {FIX}\"\n    ) in str(caught.value)"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert (resolved.path, resolved.source) == (index_corpus, \"index\")"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert str(caught.value) == (\n        f\"ai-ressources root not resolved for project {project.resolve()}: \"\n        \"AIRESOURCES is not set; no path recorded in .conventions/manifest.yaml or \"\n        f\".conventions/index.md. {FIX}\"\n    )"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "f\"rejected recorded paths: {missing} (from .conventions/manifest.yaml). {FIX}\""
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert str(caught.value) == _expected_message(unresolved)"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-004",
+      "disposition": "covered",
+      "rationale": "Batch-002's 'ambiguous' (no poisoned-HOME test in its files) is settled by batch-001: test_no_home_or_livespec_sibling_fallback writes corpora under the temporary HOME's projects/ai-ressources and next to the patched LIVESPEC_ROOT and still gets the Resolution error from resolution, an empty corpus manifest carrying the fix, AstCatalogError and InitError; the AC-009 guard and the request-grep test (now bound here) exclude the forbidden forms statically. That compile, R7.3, validity and rule decisions are not run under the poisoned setup is kept as a warning.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L240-L243",
+          "excerpt": "a test with `HOME` and the LiveSpec parent pointing to temporary directories that contain an `ai-ressources` corpus still raises the Resolution error"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "write_corpus(empty_home / \"projects\" / \"ai-ressources\", \"home\")"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "monkeypatch.setattr(init_from_code, \"LIVESPEC_ROOT\", checkout / \"livespec\")"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert manifest[\"ai_resources_root\"] == \"\""
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "assert FIX in manifest.get(\"resolution_error\", \"\")"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "request grep scope (validator, docs) names no ~/projects or sibling ai-ressources location"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "monkeypatch.setenv(\"HOME\", str(tmp_path / \"empty-home\"))"
+        },
+        {
+          "section_id": "tests/test_ai_resources_guard.py:L17-L68",
+          "excerpt": "assert forbidden_fallbacks(REPO / \"validator\") == []"
+        },
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert findings == []"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-005",
+      "disposition": "covered",
+      "rationale": "Batch-001's 7x3 consumer matrix asserts each consumer's observed root equals the expected corpus in env, recorded and both situations, with _matching rejecting zero or both matches, so environment priority and recorded-only use are observed. Batch-002 'missing' is settled by batch-001.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L244-L247",
+          "excerpt": "use the same Resolved root in each of the three situations"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "@pytest.mark.parametrize(\"situation\", [\"env\", \"recorded\", \"both\"])"
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "return matches[0] if len(matches) == 1 else None"
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "assert observed == scenario.expected"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "test_consumer_uses_the_shared_root[init-from-code-both]"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-006",
+      "disposition": "covered",
+      "rationale": "Both batches agree; batch-002 holds the exact spans: compile text and --json exit 2 with rulebook_error and the message, AstCatalogError with the message, empty corpus manifest with empty root and resolution_error, zero rule decisions, R7.3 silent without rulebook and exactly one ERROR with it, conventions_are_valid False, and init (dry-run/force/plain) exit 2 with ERROR and an unchanged tree.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L248-L251",
+          "excerpt": "`livespec conventions compile` exits 2 with status `rulebook_error` and the Resolution error message (text and `--json`)"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "compile --json reports rulebook_error with the message"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "exactly one R7.3 violation with a rulebook"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "init --dry-run prints ERROR with the message"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "\"reason\": \"rulebook_error\","
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert manifest[\"ai_resources_root\"] == \"\""
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert len(violations) == 1"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert conventions_are_valid(unresolved) is False"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert _tree(unresolved) == before"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert result.exit_code == 2"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert f\"BLOCKED: rulebook_error: {_expected_message(unresolved)}\" in result.output"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert payload == {\n        \"verdict\": \"BLOCKED\",\n        \"reason\": \"rulebook_error\",\n        \"blockers\": [_expected_message(unresolved)],\n    }"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert str(caught.value) == _expected_message(unresolved)"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert manifest.get(\"resolution_error\") == _expected_message(unresolved)"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert manifest[\"decisions\"] == [] and manifest[\"excluded_sources\"] == []"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert rule.check(SpecGraph(), unresolved / \".specs\") == []"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert violations[0].message == (\n        f\"conventions rulebook sources cannot be verified: {_expected_message(unresolved)}\"\n    )"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert status == 2"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "assert f\"ERROR: {_expected_message(unresolved)}\" in capsys.readouterr().err"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-007",
+      "disposition": "covered",
+      "rationale": "Batch-001 proves another machine's recorded path is invalid without env and valid once AIRESOURCES points to a complete local clone with differing manifest/index, and the validity matrix cells show routed sources checked under the resolved root; batch-002 adds the false branch on resolution failure. The indirect coverage of zero-route/missing-route false branches is kept as info.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255",
+          "excerpt": "a project whose committed files record another machine's path is valid when `AIRESOURCES` points to a complete local clone"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "assert not conventions_are_valid(project)"
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "assert conventions_are_valid(project)"
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "(corpus / \"code-conventions/expected-only.md\").is_file()"
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "assert observed == scenario.expected"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-008",
+      "disposition": "covered",
+      "rationale": "Batch-001 proves compile succeeds without an index declaration when AIRESOURCES is set with unchanged $AIRESOURCES display paths, compile and R7.3 still reject ../outside.md with exact messages, and matrix hashes show display paths resolve against the resolved root. Batch-002 'missing' is settled by batch-001.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259",
+          "excerpt": "keep rejecting a display path that escapes it; the `index.md` declaration is no longer required when `AIRESOURCES` is set"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259",
+          "excerpt": "keep rejecting a display path that escapes it"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "\"conventions source escapes $AIRESOURCES: $AIRESOURCES/../outside.md\""
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "\"conventions rulebook source stale: $AIRESOURCES/../outside.md\""
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "\"$AIRESOURCES/code-conventions/general.md\","
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "assert {source.path for source in rulebook.sources} == {\n        \"$AIRESOURCES/code-conventions/general.md\",\n        \"$AIRESOURCES/code-conventions/python.md\",\n    }"
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "assert (\n        str(caught.value) == \"conventions source escapes $AIRESOURCES: $AIRESOURCES/../outside.md\"\n    )"
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "assert [violation.message for violation in violations] == [\n        \"conventions rulebook source stale: $AIRESOURCES/../outside.md\"\n    ]"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-009",
+      "disposition": "covered",
+      "rationale": "Both batches agree; the guard uses exactly the three patterns over validator/*.py, asserts the tree clean, reports reintroduced fallbacks as file:line and asserts logical ai-ressources/ identifiers do not match.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263",
+          "excerpt": "fails, naming file and line, when it finds `projects/ai-ressources`"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263",
+          "excerpt": "fails, naming file and line, when it finds `projects/ai-ressources`, `\"projects\" / \"ai-ressources\"` or `parent / \"ai-ressources\"`"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "reintroduced fallback reported as file:line"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "logical ai-ressources/ identifiers do not match"
+        },
+        {
+          "section_id": "tests/test_ai_resources_guard.py:L17-L68",
+          "excerpt": "r'projects/ai-ressources|\"projects\" / \"ai-ressources\"|parent / \"ai-ressources\"'"
+        },
+        {
+          "section_id": "tests/test_ai_resources_guard.py:L17-L68",
+          "excerpt": "\"conventions_ast/corpus.py:4\","
+        },
+        {
+          "section_id": "tests/test_ai_resources_guard.py:L17-L68",
+          "excerpt": "assert not FORBIDDEN_FALLBACK_RE.search("
+        },
+        {
+          "section_id": "tests/test_ai_resources_guard.py:L17-L68",
+          "excerpt": "assert forbidden_fallbacks(REPO / \"validator\") == []"
+        },
+        {
+          "section_id": "tests/test_ai_resources_guard.py:L17-L68",
+          "excerpt": "assert forbidden_fallbacks(tmp_path / \"validator\") == [\n        \"conventions_ast/corpus.py:4\",\n        \"conventions_ast/corpus.py:7\",\n    ]"
+        },
+        {
+          "section_id": "tests/test_ai_resources_guard.py:L17-L68",
+          "excerpt": "assert not FORBIDDEN_FALLBACK_RE.search(\n        'source_path: \"ai-ressources/code-conventions/general.md\"'\n    )"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-010",
+      "disposition": "covered",
+      "rationale": "Both batches judge covered: README link, setup.sh, ordered env/manifest/index wording, existing-directory condition, fix sentence, absence of the default-sibling wording, and the three documents' $AIRESOURCES protocol path without the private path are asserted. last_reviewed is asserted >= 2026-10-13, the change date, and the file holds 2026-10-13; this proves the bump and stays valid under a later legitimate review, which an equality assertion would wrongly break, so batch-002's warning is downgraded to info.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267",
+          "excerpt": "the spec-specify `expectations.md` has `last_reviewed` equal to the change date"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "README resolution order env, manifest, index"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "spec-specify expectations last_reviewed bumped"
+        },
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert order == sorted(order)"
+        },
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert f\"**Read** {PROTOCOL}\" in text"
+        },
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert date.fromisoformat(match.group(1)) >= date(2026, 10, 13)"
+        },
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert \"https://github.com/julien-m/ai-ressources\" in section"
+        },
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert FIX in section"
+        },
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert \"default sibling\" not in readme"
+        },
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert PRIVATE_PATH not in text"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "085-localiser-ai-ressources-sans-chemin-en-dur:AC-011",
+      "disposition": "covered",
+      "rationale": "Both batches judge covered with the new isolation tests: the resolution, consumer and failure modules pass in a child pytest with AIRESOURCES removed and an empty HOME, so they use only corpora they build under tmp_path with monkeypatch. 'Existing real-corpus AST tests unchanged' is supported only by the import-absence proxy plus the reported empty git diff; kept as info.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271",
+          "excerpt": "they pass without any real ai-ressources checkout, and the existing AST tests that use the real corpus through CI are unchanged"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271",
+          "excerpt": "All resolution and consumer tests build fake corpora in temporary directories and control `AIRESOURCES` with `monkeypatch`"
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "monkeypatch.delenv(\"AIRESOURCES\", raising=False)"
+        },
+        {
+          "section_id": "tests/test_ai_resources_consumers.py:L2-L245",
+          "excerpt": "env_corpus = write_corpus(tmp_path / \"corpus-env\", \"env\")"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "test_feature_tests_pass_without_any_real_corpus"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "real-corpus AST modules import none of the feature fake-corpus helpers"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "monkeypatch.delenv(\"AIRESOURCES\", raising=False)"
+        },
+        {
+          "section_id": "tests/test_ai_resources_failures.py:L2-L166",
+          "excerpt": "write_corpus(tmp_path / \"unused-corpus\", \"unused\")"
+        },
+        {
+          "section_id": "tests/test_ai_resources_isolation.py:L2-L63",
+          "excerpt": "env = {key: value for key, value in os.environ.items() if key != \"AIRESOURCES\"}"
+        },
+        {
+          "section_id": "tests/test_ai_resources_isolation.py:L2-L63",
+          "excerpt": "assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]"
+        },
+        {
+          "section_id": "tests/test_ai_resources_isolation.py:L2-L63",
+          "excerpt": "assert offenders == []"
+        }
+      ],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [
+    {
+      "category": "acceptance-mapping",
+      "severity": "warning",
+      "description": "AC-004 assertion bindings remain the corpus-manifest asserts (line 237 bound twice, plus 238) and a static grep of three literal forms; the resolver/catalog/init raises are unbound pytest.raises blocks, and compile, R7.3, conventions_are_valid and rule decisions never run with the poisoned HOME/sibling corpora, so 'any other location' is unproven for them.",
+      "suggestion": "Extend the poisoned-HOME test to the remaining consumers (asserting their AC-006 failure reactions) and bind those asserts.",
+      "citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "HOME and LiveSpec-sibling corpora exist yet the corpus manifest root stays empty"
+        },
+        {
+          "section_id": "tests/test_ai_resources.py:L2-L242",
+          "excerpt": "with pytest.raises(AiResourcesResolutionError):"
+        }
+      ]
+    },
+    {
+      "category": "acceptance-mapping",
+      "severity": "info",
+      "description": "AC-011 'existing AST tests that use the real corpus are unchanged' is proven only by a proxy: the isolation test checks that eight listed real-corpus modules do not mention two helper names, which does not detect other edits to those tests.",
+      "suggestion": "Pin the real-corpus AST test files by hash in the mapping receipt or accept the proxy explicitly.",
+      "citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "real-corpus AST modules import none of the feature fake-corpus helpers, so they keep using the CI corpus"
+        }
+      ]
+    },
+    {
+      "category": "acceptance-mapping",
+      "severity": "info",
+      "description": "AC-003 lists unreadable/non-mapping/missing-key manifests as unresolvable cases, but tests only show them falling back to the index; no assertion raises the error with such a manifest and no index (verified manually that it raises with the fix sentence), and an unreadable manifest is untested.",
+      "suggestion": "Add a parametrized case with an unusable manifest and no index declaration asserting the Resolution error.",
+      "citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1",
+          "excerpt": "malformed manifest is not a source of recorded path"
+        }
+      ]
+    },
+    {
+      "category": "acceptance-mapping",
+      "severity": "info",
+      "description": "AC-007's 'at least one routed source' and 'missing routed source' false branches are only indirectly exercised (verified manually that both return false).",
+      "suggestion": "Add direct assertions that zero routed sources and a missing routed source make conventions_are_valid false.",
+      "citations": [
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255",
+          "excerpt": "the index routes at least one `→ $AIRESOURCES/` source and every routed source exists under the Resolved root"
+        }
+      ]
+    },
+    {
+      "category": "testability",
+      "severity": "info",
+      "description": "AC-010's test asserts last_reviewed >= the change date rather than equality; accepted because the file holds the change date (2026-10-13) and equality would break on a later legitimate review bump, but the assertion alone does not pin the exact date.",
+      "suggestion": "Keep the >= assertion; optionally record the change-date value in the acceptance receipt.",
+      "citations": [
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert date.fromisoformat(match.group(1)) >= date(2026, 10, 13)"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267",
+          "excerpt": "`last_reviewed` equal to the change date"
+        }
+      ]
+    },
+    {
+      "category": "testability",
+      "severity": "info",
+      "description": "The 'no default sibling directory' check is a literal phrase absence test; a reworded sibling-default description would still pass.",
+      "suggestion": "Also assert the README section does not describe a fallback location beside the LiveSpec checkout (e.g. absence of 'next to' / '../ai-ressources').",
+      "citations": [
+        {
+          "section_id": "tests/test_ai_resources_docs.py:L2-L90",
+          "excerpt": "assert \"default sibling\" not in readme"
+        }
+      ]
+    },
+    {
+      "category": "testability",
+      "severity": "info",
+      "description": "AC-011's 'existing real-corpus AST tests are unchanged' cannot be proven by a test: test_real_corpus_ast_tests_do_not_use_fake_corpora only shows those modules do not reference the fake-corpus helpers. Verified out of band: git diff --stat origin/main over tests/test_conventions_ast_*.py and the five gate/verify/baseline/diffguard modules is empty.",
+      "suggestion": "Record the empty git diff as P1 evidence (e.g. in the spec-test receipt) rather than relying on the import-absence assertion.",
+      "citations": [
+        {
+          "section_id": "tests/test_ai_resources_isolation.py:L2-L63",
+          "excerpt": "assert offenders == []"
+        },
+        {
+          "section_id": ".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271",
+          "excerpt": "the existing AST tests that use the real corpus through CI are unchanged"
+        }
+      ]
+    }
+  ],
+  "confidence": 4,
+  "raw_results": [
+    "{\"batch_id\":\"batch-001\",\"reviewed_section_ids\":[\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L1-L9\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L10-L18\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L19-L36\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L37-L43\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L44-L56\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L57-L58\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L59-L98\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L99-L111\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L112-L139\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L140-L155\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L156-L178\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L179-L188\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L189-L211\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L212-L225\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L226-L227\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L240-L243\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L244-L247\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L248-L251\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L272-L281\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L282-L290\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L291-L301\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L302-L310\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L311-L319\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L320-L327\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"tests/test_ai_resources.py:L1-L1\",\"tests/test_ai_resources.py:L2-L242\",\"tests/test_ai_resources_consumers.py:L1-L1\",\"tests/test_ai_resources_consumers.py:L2-L245\",\"tests/test_ai_resources_docs.py:L1-L1\"],\"conclusions\":[{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-001\",\"disposition\":\"covered\",\"rationale\":\"Env value wins over existing recorded manifest/index paths with source env, a padded nonexistent value is returned stripped and absolute while _recorded_values is patched to fail, and relative/~ values are made absolute.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231\",\"excerpt\":\"returns that value expanded and made absolute with source `env`, without checking that it exists and without reading `.conventions/`\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (env_corpus, \\\"env\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"monkeypatch.setattr(ai_resources, \\\"_recorded_values\\\", fail_if_read)\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert not resolved.path.exists()\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(None).path == (empty_home / \\\"corpus\\\").resolve()\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (missing.resolve(), \\\"env\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(None).path == (tmp_path / \\\"relative-corpus\\\").resolve()\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-002\",\"disposition\":\"covered\",\"rationale\":\"Blank env (empty/spaces/tab) falls back to the manifest with source manifest, a rejected manifest path falls back to the index with source index, manifest wins on disagreement, and relative/~ recorded paths are anchored on the project root and home.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235\",\"excerpt\":\"returns the Manifest path with source `manifest` when it designates an existing directory; otherwise it returns the Index declaration with source `index`\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (recorded, \\\"manifest\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (index_corpus, \\\"index\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(project).path == relative\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(project).path == home_corpus\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(project).source == \\\"manifest\\\"\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-003\",\"disposition\":\"covered\",\"rationale\":\"Exact-equality assertions prove the message names the project root, each rejected path with its source file (nonexistent and non-directory, in order) and the exact fix sentence, plus the no-project-root variant; unusable manifests are only shown to be ignored (fallback to index), not to raise on their own.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239\",\"excerpt\":\"the Shared resolution raises the Resolution error whose message names the Project root, each rejected Recorded path with its source file\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml). {FIX}\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"f\\\"{a_file.resolve()} (from .conventions/index.md). {FIX}\\\"\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert str(caught.value) == f\\\"ai-ressources root not resolved: AIRESOURCES is not set. {FIX}\\\"\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"ids=[\\\"malformed\\\", \\\"non-mapping\\\", \\\"missing-key\\\", \\\"non-string\\\", \\\"blank\\\"]\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert message == (\\n        f\\\"ai-ressources root not resolved for project {project}: AIRESOURCES is not set; \\\"\\n        f\\\"rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml). {FIX}\\\"\\n    )\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (\\n        f\\\"rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml); \\\"\\n        f\\\"{a_file.resolve()} (from .conventions/index.md). {FIX}\\\"\\n    ) in str(caught.value)\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (index_corpus, \\\"index\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert str(caught.value) == (\\n        f\\\"ai-ressources root not resolved for project {project.resolve()}: \\\"\\n        \\\"AIRESOURCES is not set; no path recorded in .conventions/manifest.yaml or \\\"\\n        f\\\".conventions/index.md. {FIX}\\\"\\n    )\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-004\",\"disposition\":\"covered\",\"rationale\":\"With HOME and the patched LIVESPEC_ROOT sibling both holding a corpus, resolution, corpus manifest, AST catalog and init still fail with the resolution error, and the request-grep test statically excludes the forbidden forms; compile, R7.3, validity and rule decisions are still not run under the poisoned setup.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L240-L243\",\"excerpt\":\"a test with `HOME` and the LiveSpec parent pointing to temporary directories that contain an `ai-ressources` corpus still raises the Resolution error\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"write_corpus(empty_home / \\\"projects\\\" / \\\"ai-ressources\\\", \\\"home\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"monkeypatch.setattr(init_from_code, \\\"LIVESPEC_ROOT\\\", checkout / \\\"livespec\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert manifest[\\\"ai_resources_root\\\"] == \\\"\\\"\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert FIX in manifest.get(\\\"resolution_error\\\", \\\"\\\")\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"request grep scope (validator, docs) names no ~/projects or sibling ai-ressources location\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-005\",\"disposition\":\"covered\",\"rationale\":\"The 7x3 matrix asserts each consumer's observed root (via content hashes, reported root, routed-only file or rendered declaration) equals the expected corpus, with _matching rejecting zero or both matches, so env priority and recorded-only use are observed rather than inferred.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L244-L247\",\"excerpt\":\"use the same Resolved root in each of the three situations\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"@pytest.mark.parametrize(\\\"situation\\\", [\\\"env\\\", \\\"recorded\\\", \\\"both\\\"])\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"return matches[0] if len(matches) == 1 else None\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert observed == scenario.expected\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"test_consumer_uses_the_shared_root[init-from-code-both]\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-006\",\"disposition\":\"covered\",\"rationale\":\"Mapped failure tests (assertion spans supplied in another batch) bind compile text/JSON exit 2 with rulebook_error, AstCatalogError message, empty corpus manifest with resolution_error, zero rule decisions, silent/one-ERROR R7.3, validity false and init exit 2 with no write including --dry-run; inspected file asserts exact messages.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L248-L251\",\"excerpt\":\"`livespec conventions compile` exits 2 with status `rulebook_error` and the Resolution error message (text and `--json`)\"}],\"plan_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"compile --json reports rulebook_error with the message\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"exactly one R7.3 violation with a rulebook\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"init --dry-run prints ERROR with the message\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-007\",\"disposition\":\"covered\",\"rationale\":\"Another machine's recorded paths are invalid without env and valid once AIRESOURCES points to a complete local clone with differing manifest/index, and the validity matrix cells observe that routed sources are checked under the resolved root; the zero-route branch is not directly asserted.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255\",\"excerpt\":\"a project whose committed files record another machine's path is valid when `AIRESOURCES` points to a complete local clone\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert not conventions_are_valid(project)\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert conventions_are_valid(project)\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"(corpus / \\\"code-conventions/expected-only.md\\\").is_file()\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert observed == scenario.expected\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-008\",\"disposition\":\"covered\",\"rationale\":\"Compile succeeds with no index declaration when AIRESOURCES is set and keeps $AIRESOURCES display paths, compile and R7.3 still reject the ../outside.md escape with exact messages, and matrix hashes show display paths resolve against the resolved root.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259\",\"excerpt\":\"keep rejecting a display path that escapes it; the `index.md` declaration is no longer required when `AIRESOURCES` is set\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"\\\"conventions source escapes $AIRESOURCES: $AIRESOURCES/../outside.md\\\"\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"\\\"conventions rulebook source stale: $AIRESOURCES/../outside.md\\\"\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"\\\"$AIRESOURCES/code-conventions/general.md\\\",\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert {source.path for source in rulebook.sources} == {\\n        \\\"$AIRESOURCES/code-conventions/general.md\\\",\\n        \\\"$AIRESOURCES/code-conventions/python.md\\\",\\n    }\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert (\\n        str(caught.value) == \\\"conventions source escapes $AIRESOURCES: $AIRESOURCES/../outside.md\\\"\\n    )\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert [violation.message for violation in violations] == [\\n        \\\"conventions rulebook source stale: $AIRESOURCES/../outside.md\\\"\\n    ]\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-009\",\"disposition\":\"covered\",\"rationale\":\"Mapped guard tests (spans in another batch) assert the validator tree is clean, a reintroduced home/sibling fallback is reported as file:line, and logical ai-ressources/ identifiers do not match the patterns.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263\",\"excerpt\":\"fails, naming file and line, when it finds `projects/ai-ressources`\"}],\"plan_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"reintroduced fallback reported as file:line\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"logical ai-ressources/ identifiers do not match\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-010\",\"disposition\":\"covered\",\"rationale\":\"Mapped doc tests (spans in another batch) check README link, setup.sh, order, existing-directory and fix sentence, absence of default sibling, the three documents' $AIRESOURCES protocol reference without the private path, and expectations last_reviewed; the inspected date assertion is >= the change date rather than equal.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267\",\"excerpt\":\"the spec-specify `expectations.md` has `last_reviewed` equal to the change date\"}],\"plan_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"README resolution order env, manifest, index\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"spec-specify expectations last_reviewed bumped\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-011\",\"disposition\":\"covered\",\"rationale\":\"The new isolation bindings (spans in another batch) re-run the resolution, consumer and failure modules in a child pytest with AIRESOURCES unset and an empty HOME, and the supplied fixtures build every corpus under tmp_path with monkeypatch; 'existing AST tests unchanged' is only approximated by asserting they import no fake-corpus helper.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\"excerpt\":\"they pass without any real ai-ressources checkout, and the existing AST tests that use the real corpus through CI are unchanged\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"monkeypatch.delenv(\\\"AIRESOURCES\\\", raising=False)\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"env_corpus = write_corpus(tmp_path / \\\"corpus-env\\\", \\\"env\\\")\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"test_feature_tests_pass_without_any_real_corpus\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"real-corpus AST modules import none of the feature fake-corpus helpers\"}]}],\"ambiguities\":[],\"extra_scope\":[],\"findings\":[{\"category\":\"acceptance-mapping\",\"severity\":\"info\",\"description\":\"AC-011 'existing AST tests that use the real corpus are unchanged' is proven only by a proxy: the isolation test checks that eight listed real-corpus modules do not mention two helper names, which does not detect other edits to those tests.\",\"suggestion\":\"Pin the real-corpus AST test files by hash in the mapping receipt or accept the proxy explicitly.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"real-corpus AST modules import none of the feature fake-corpus helpers, so they keep using the CI corpus\"}]},{\"category\":\"acceptance-mapping\",\"severity\":\"warning\",\"description\":\"AC-004 assertion bindings remain the corpus-manifest asserts (line 237 bound twice, plus 238) and a static grep of three literal forms; the resolver/catalog/init raises are unbound pytest.raises blocks, and compile, R7.3, conventions_are_valid and rule decisions never run with the poisoned HOME/sibling corpora, so 'any other location' is unproven for them.\",\"suggestion\":\"Extend the poisoned-HOME test to the remaining consumers (asserting their AC-006 failure reactions) and bind those asserts.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"HOME and LiveSpec-sibling corpora exist yet the corpus manifest root stays empty\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"with pytest.raises(AiResourcesResolutionError):\"}]},{\"category\":\"acceptance-mapping\",\"severity\":\"info\",\"description\":\"AC-003 lists unreadable/non-mapping/missing-key manifests as unresolvable cases, but tests only show them falling back to the index; no assertion raises the error with such a manifest and no index (verified manually that it raises with the fix sentence), and an unreadable manifest is untested.\",\"suggestion\":\"Add a parametrized case with an unusable manifest and no index declaration asserting the Resolution error.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"malformed manifest is not a source of recorded path\"}]},{\"category\":\"acceptance-mapping\",\"severity\":\"info\",\"description\":\"AC-007's 'at least one routed source' and 'missing routed source' false branches are only indirectly exercised (verified manually that both return false).\",\"suggestion\":\"Add direct assertions that zero routed sources and a missing routed source make conventions_are_valid false.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255\",\"excerpt\":\"the index routes at least one `→ $AIRESOURCES/` source and every routed source exists under the Resolved root\"}]}],\"confidence\":4}",
+    "{\"batch_id\":\"batch-002\",\"reviewed_section_ids\":[\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L1-L9\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L10-L18\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L19-L36\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L37-L43\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L44-L56\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L57-L58\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L59-L98\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L99-L111\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L112-L139\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L140-L155\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L156-L178\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L179-L188\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L189-L211\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L212-L225\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L226-L227\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L240-L243\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L244-L247\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L248-L251\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L272-L281\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L282-L290\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L291-L301\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L302-L310\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L311-L319\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L320-L327\",\"tests/test_ai_resources_docs.py:L2-L90\",\"tests/test_ai_resources_failures.py:L1-L1\",\"tests/test_ai_resources_failures.py:L2-L166\",\"tests/test_ai_resources_guard.py:L1-L1\",\"tests/test_ai_resources_guard.py:L2-L16\",\"tests/test_ai_resources_guard.py:L17-L68\",\"tests/test_ai_resources_isolation.py:L1-L1\",\"tests/test_ai_resources_isolation.py:L2-L63\"],\"conclusions\":[{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-001\",\"disposition\":\"missing\",\"rationale\":\"No section of this batch (docs, failures, guard tests) asserts env-priority resolution; the evidence must come from tests/test_ai_resources.py outside this batch.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231\",\"excerpt\":\"returns that value expanded and made absolute with source `env`\"}],\"plan_citations\":[],\"searched_plan_sections\":[\"tests/test_ai_resources_docs.py:L2-L90\",\"tests/test_ai_resources_failures.py:L1-L1\",\"tests/test_ai_resources_failures.py:L2-L166\",\"tests/test_ai_resources_guard.py:L1-L1\",\"tests/test_ai_resources_guard.py:L2-L16\",\"tests/test_ai_resources_guard.py:L17-L68\",\"tests/test_ai_resources_isolation.py:L1-L1\",\"tests/test_ai_resources_isolation.py:L2-L63\"]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-002\",\"disposition\":\"missing\",\"rationale\":\"No assertion in this batch exercises a successful manifest/index resolution or relative/tilde recorded paths; evidence lies outside this batch.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235\",\"excerpt\":\"returns the Manifest path with source `manifest` when it designates an existing directory\"}],\"plan_citations\":[],\"searched_plan_sections\":[\"tests/test_ai_resources_docs.py:L2-L90\",\"tests/test_ai_resources_failures.py:L1-L1\",\"tests/test_ai_resources_failures.py:L2-L166\",\"tests/test_ai_resources_guard.py:L1-L1\",\"tests/test_ai_resources_guard.py:L2-L16\",\"tests/test_ai_resources_guard.py:L17-L68\",\"tests/test_ai_resources_isolation.py:L1-L1\",\"tests/test_ai_resources_isolation.py:L2-L63\"]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-003\",\"disposition\":\"ambiguous\",\"rationale\":\"The failures tests prove by exact string equality that the message names the project root, the rejected manifest path with its source file and the exact fix sentence, but only for one rejection variant; the no-.conventions, malformed-manifest, non-directory and no-project-root cases are not asserted in this batch.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239\",\"excerpt\":\"without a Project root, an absent `AIRESOURCES` raises the same error type with the same fix sentence\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"f\\\"rejected recorded paths: {missing} (from .conventions/manifest.yaml). {FIX}\\\"\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert str(caught.value) == _expected_message(unresolved)\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-004\",\"disposition\":\"ambiguous\",\"rationale\":\"The guard proves no forbidden fallback expression remains in validator/ and the docs grep proves none remains in the request grep scope, and failure tests use an empty temporary HOME, but no assertion in this batch places an ai-ressources corpus under HOME or next to the LiveSpec checkout and shows the Resolution error is still raised.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L240-L243\",\"excerpt\":\"a test with `HOME` and the LiveSpec parent pointing to temporary directories that contain an `ai-ressources` corpus still raises the Resolution error\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"monkeypatch.setenv(\\\"HOME\\\", str(tmp_path / \\\"empty-home\\\"))\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert forbidden_fallbacks(REPO / \\\"validator\\\") == []\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert findings == []\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-005\",\"disposition\":\"missing\",\"rationale\":\"The seven-consumer by three-situation agreement matrix is not asserted anywhere in this batch; it belongs to tests/test_ai_resources_consumers.py outside this batch.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L244-L247\",\"excerpt\":\"use the same Resolved root in each of the three situations\"}],\"plan_citations\":[],\"searched_plan_sections\":[\"tests/test_ai_resources_docs.py:L2-L90\",\"tests/test_ai_resources_failures.py:L1-L1\",\"tests/test_ai_resources_failures.py:L2-L166\",\"tests/test_ai_resources_guard.py:L1-L1\",\"tests/test_ai_resources_guard.py:L2-L16\",\"tests/test_ai_resources_guard.py:L17-L68\",\"tests/test_ai_resources_isolation.py:L1-L1\",\"tests/test_ai_resources_isolation.py:L2-L63\"]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-006\",\"disposition\":\"covered\",\"rationale\":\"Each consumer reaction is asserted exactly: compile text and --json exit 2 with rulebook_error and the full message, AstCatalogError for an ai-ressources/ source path, empty corpus manifest with empty root and resolution_error, zero rule decisions without raising, R7.3 silent without rulebook and exactly one ERROR with it, validity false, and init (dry-run/force/plain) exit 2 with ERROR line and an unchanged file tree.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L248-L251\",\"excerpt\":\"`livespec conventions compile` exits 2 with status `rulebook_error` and the Resolution error message (text and `--json`)\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"\\\"reason\\\": \\\"rulebook_error\\\",\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert manifest[\\\"ai_resources_root\\\"] == \\\"\\\"\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert len(violations) == 1\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert conventions_are_valid(unresolved) is False\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert _tree(unresolved) == before\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert result.exit_code == 2\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert f\\\"BLOCKED: rulebook_error: {_expected_message(unresolved)}\\\" in result.output\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert payload == {\\n        \\\"verdict\\\": \\\"BLOCKED\\\",\\n        \\\"reason\\\": \\\"rulebook_error\\\",\\n        \\\"blockers\\\": [_expected_message(unresolved)],\\n    }\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert str(caught.value) == _expected_message(unresolved)\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert manifest.get(\\\"resolution_error\\\") == _expected_message(unresolved)\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert manifest[\\\"decisions\\\"] == [] and manifest[\\\"excluded_sources\\\"] == []\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert rule.check(SpecGraph(), unresolved / \\\".specs\\\") == []\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert violations[0].message == (\\n        f\\\"conventions rulebook sources cannot be verified: {_expected_message(unresolved)}\\\"\\n    )\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert status == 2\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert f\\\"ERROR: {_expected_message(unresolved)}\\\" in capsys.readouterr().err\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-007\",\"disposition\":\"missing\",\"rationale\":\"This batch only asserts conventions_are_valid is False on failure; the true-validity conditions and the dropped agreement requirement are not asserted here.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255\",\"excerpt\":\"a project whose committed files record another machine's path is valid when `AIRESOURCES` points to a complete local clone\"}],\"plan_citations\":[],\"searched_plan_sections\":[\"tests/test_ai_resources_docs.py:L2-L90\",\"tests/test_ai_resources_failures.py:L1-L1\",\"tests/test_ai_resources_failures.py:L2-L166\",\"tests/test_ai_resources_guard.py:L1-L1\",\"tests/test_ai_resources_guard.py:L2-L16\",\"tests/test_ai_resources_guard.py:L17-L68\",\"tests/test_ai_resources_isolation.py:L1-L1\",\"tests/test_ai_resources_isolation.py:L2-L63\"]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-008\",\"disposition\":\"missing\",\"rationale\":\"No assertion in this batch covers display-path resolution against the Resolved root, escape rejection or compiling without an index declaration.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259\",\"excerpt\":\"keep rejecting a display path that escapes it\"}],\"plan_citations\":[],\"searched_plan_sections\":[\"tests/test_ai_resources_docs.py:L2-L90\",\"tests/test_ai_resources_failures.py:L1-L1\",\"tests/test_ai_resources_failures.py:L2-L166\",\"tests/test_ai_resources_guard.py:L1-L1\",\"tests/test_ai_resources_guard.py:L2-L16\",\"tests/test_ai_resources_guard.py:L17-L68\",\"tests/test_ai_resources_isolation.py:L1-L1\",\"tests/test_ai_resources_isolation.py:L2-L63\"]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-009\",\"disposition\":\"covered\",\"rationale\":\"The guard scans every *.py under validator/ with exactly the three patterns, asserts the current tree is clean, reports a reintroduced home and sibling fallback as file:line, and asserts logical ai-ressources/ identifiers do not match.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263\",\"excerpt\":\"fails, naming file and line, when it finds `projects/ai-ressources`, `\\\"projects\\\" / \\\"ai-ressources\\\"` or `parent / \\\"ai-ressources\\\"`\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"r'projects/ai-ressources|\\\"projects\\\" / \\\"ai-ressources\\\"|parent / \\\"ai-ressources\\\"'\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"\\\"conventions_ast/corpus.py:4\\\",\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert not FORBIDDEN_FALLBACK_RE.search(\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert forbidden_fallbacks(REPO / \\\"validator\\\") == []\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert forbidden_fallbacks(tmp_path / \\\"validator\\\") == [\\n        \\\"conventions_ast/corpus.py:4\\\",\\n        \\\"conventions_ast/corpus.py:7\\\",\\n    ]\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert not FORBIDDEN_FALLBACK_RE.search(\\n        'source_path: \\\"ai-ressources/code-conventions/general.md\\\"'\\n    )\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-010\",\"disposition\":\"covered\",\"rationale\":\"The README section is asserted for link, setup.sh, ordered env/manifest/index wording, existing-directory condition and exact fix sentence; the three documents for the $AIRESOURCES protocol path and absence of the private path; and last_reviewed is checked, though only as >= the change date rather than equal.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267\",\"excerpt\":\"the spec-specify `expectations.md` has `last_reviewed` equal to the change date\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert order == sorted(order)\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert f\\\"**Read** {PROTOCOL}\\\" in text\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert date.fromisoformat(match.group(1)) >= date(2026, 10, 13)\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert \\\"https://github.com/julien-m/ai-ressources\\\" in section\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert FIX in section\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert \\\"default sibling\\\" not in readme\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert PRIVATE_PATH not in text\"}]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-011\",\"disposition\":\"covered\",\"rationale\":\"The isolation test re-runs the resolution, consumer and failure modules in a child pytest with AIRESOURCES removed and an empty HOME and asserts it passes, and the failure fixture builds corpora under tmp_path with monkeypatch; the 'real-corpus AST tests unchanged' clause is a diff property (git diff against origin/main is empty), which the import-absence assertion only supports indirectly.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\"excerpt\":\"All resolution and consumer tests build fake corpora in temporary directories and control `AIRESOURCES` with `monkeypatch`\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"monkeypatch.delenv(\\\"AIRESOURCES\\\", raising=False)\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"write_corpus(tmp_path / \\\"unused-corpus\\\", \\\"unused\\\")\"},{\"section_id\":\"tests/test_ai_resources_isolation.py:L2-L63\",\"excerpt\":\"env = {key: value for key, value in os.environ.items() if key != \\\"AIRESOURCES\\\"}\"},{\"section_id\":\"tests/test_ai_resources_isolation.py:L2-L63\",\"excerpt\":\"assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]\"},{\"section_id\":\"tests/test_ai_resources_isolation.py:L2-L63\",\"excerpt\":\"assert offenders == []\"}]}],\"ambiguities\":[],\"extra_scope\":[],\"findings\":[{\"category\":\"testability\",\"severity\":\"warning\",\"description\":\"AC-010 requires last_reviewed equal to the change date, but the test accepts any later date, so it does not prove the bump matched the change date.\",\"suggestion\":\"Assert equality with date(2026, 10, 13) or document that >= is the intended invariant.\",\"citations\":[{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert date.fromisoformat(match.group(1)) >= date(2026, 10, 13)\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267\",\"excerpt\":\"`last_reviewed` equal to the change date\"}]},{\"category\":\"testability\",\"severity\":\"info\",\"description\":\"The 'no default sibling directory' check is a literal phrase absence test; a reworded sibling-default description would still pass.\",\"suggestion\":\"Also assert the README section does not describe a fallback location beside the LiveSpec checkout (e.g. absence of 'next to' / '../ai-ressources').\",\"citations\":[{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert \\\"default sibling\\\" not in readme\"}]},{\"category\":\"coverage\",\"severity\":\"info\",\"description\":\"AC-001, AC-002, AC-005, AC-007, AC-008 and the variant/HOME-corpus parts of AC-003/AC-004 have no evidence in this batch; they rest on tests/test_ai_resources.py and tests/test_ai_resources_consumers.py in batch-001.\",\"suggestion\":\"Resolve in synthesis against the other batch's assertion spans; not a blocking gap here.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L302-L310\",\"excerpt\":\"consumer matrix tests of AC-005 to AC-008\"}]},{\"category\":\"testability\",\"severity\":\"info\",\"description\":\"AC-011's 'existing real-corpus AST tests are unchanged' cannot be proven by a test: test_real_corpus_ast_tests_do_not_use_fake_corpora only shows those modules do not reference the fake-corpus helpers. Verified out of band: git diff --stat origin/main over tests/test_conventions_ast_*.py and the five gate/verify/baseline/diffguard modules is empty.\",\"suggestion\":\"Record the empty git diff as P1 evidence (e.g. in the spec-test receipt) rather than relying on the import-absence assertion.\",\"citations\":[{\"section_id\":\"tests/test_ai_resources_isolation.py:L2-L63\",\"excerpt\":\"assert offenders == []\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\"excerpt\":\"the existing AST tests that use the real corpus through CI are unchanged\"}]}],\"confidence\":4}"
+  ],
+  "synthesis": "{\"batch_id\":\"synthesis\",\"reviewed_section_ids\":[\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L1-L9\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L10-L18\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L19-L36\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L37-L43\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L44-L56\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L57-L58\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L59-L98\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L99-L111\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L112-L139\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L140-L155\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L156-L178\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L179-L188\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L189-L211\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L212-L225\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L226-L227\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L240-L243\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L244-L247\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L248-L251\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L272-L281\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L282-L290\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L291-L301\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L302-L310\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L311-L319\",\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L320-L327\",\"tests/test_ai_resources.py:L1-L1\",\"tests/test_ai_resources.py:L2-L242\",\"tests/test_ai_resources_consumers.py:L1-L1\",\"tests/test_ai_resources_consumers.py:L2-L245\",\"tests/test_ai_resources_docs.py:L1-L1\",\"tests/test_ai_resources_docs.py:L2-L90\",\"tests/test_ai_resources_failures.py:L1-L1\",\"tests/test_ai_resources_failures.py:L2-L166\",\"tests/test_ai_resources_guard.py:L1-L1\",\"tests/test_ai_resources_guard.py:L2-L16\",\"tests/test_ai_resources_guard.py:L17-L68\",\"tests/test_ai_resources_isolation.py:L1-L1\",\"tests/test_ai_resources_isolation.py:L2-L63\"],\"conclusions\":[{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-001\",\"disposition\":\"covered\",\"rationale\":\"Batch-001 assertions prove it: env wins with source env over existing recorded manifest/index paths, a padded nonexistent value is returned stripped and absolute while the .conventions reader is patched to fail (no existence check, no read), and relative/~ values become absolute. Batch-002's 'missing' only reflects that its files hold no resolution tests; settled by batch-001.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231\",\"excerpt\":\"returns that value expanded and made absolute with source `env`, without checking that it exists and without reading `.conventions/`\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L228-L231\",\"excerpt\":\"returns that value expanded and made absolute with source `env`\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (env_corpus, \\\"env\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"monkeypatch.setattr(ai_resources, \\\"_recorded_values\\\", fail_if_read)\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert not resolved.path.exists()\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(None).path == (empty_home / \\\"corpus\\\").resolve()\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (missing.resolve(), \\\"env\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(None).path == (tmp_path / \\\"relative-corpus\\\").resolve()\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-002\",\"disposition\":\"covered\",\"rationale\":\"Batch-001 proves blank env (empty/spaces/tab) falls back to the manifest with source manifest, a rejected manifest path falls back to the index with source index, the manifest wins on disagreement, and relative/~ recorded paths are anchored on the project root and home. Batch-002 'missing' is a partitioning artifact settled by batch-001.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235\",\"excerpt\":\"returns the Manifest path with source `manifest` when it designates an existing directory; otherwise it returns the Index declaration with source `index`\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L232-L235\",\"excerpt\":\"returns the Manifest path with source `manifest` when it designates an existing directory\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (recorded, \\\"manifest\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (index_corpus, \\\"index\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(project).path == relative\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(project).path == home_corpus\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert resolve_ai_resources_root(project).source == \\\"manifest\\\"\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-003\",\"disposition\":\"covered\",\"rationale\":\"Batch-002's 'ambiguous' (one rejection variant seen) is settled by batch-001: exact-equality messages cover nonexistent and non-directory paths listed in order with source files, no .conventions files, and the no-project-root case with the same fix sentence; batch-002 adds the exact failure message. Unusable manifests are shown to be ignored as a source, which per the spec's edge case falls through to the error; the lack of a direct 'unusable manifest and no index raises' case is kept as info.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239\",\"excerpt\":\"the Shared resolution raises the Resolution error whose message names the Project root, each rejected Recorded path with its source file\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L236-L239\",\"excerpt\":\"without a Project root, an absent `AIRESOURCES` raises the same error type with the same fix sentence\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml). {FIX}\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"f\\\"{a_file.resolve()} (from .conventions/index.md). {FIX}\\\"\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert str(caught.value) == f\\\"ai-ressources root not resolved: AIRESOURCES is not set. {FIX}\\\"\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"ids=[\\\"malformed\\\", \\\"non-mapping\\\", \\\"missing-key\\\", \\\"non-string\\\", \\\"blank\\\"]\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert message == (\\n        f\\\"ai-ressources root not resolved for project {project}: AIRESOURCES is not set; \\\"\\n        f\\\"rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml). {FIX}\\\"\\n    )\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (\\n        f\\\"rejected recorded paths: {missing.resolve()} (from .conventions/manifest.yaml); \\\"\\n        f\\\"{a_file.resolve()} (from .conventions/index.md). {FIX}\\\"\\n    ) in str(caught.value)\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert (resolved.path, resolved.source) == (index_corpus, \\\"index\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert str(caught.value) == (\\n        f\\\"ai-ressources root not resolved for project {project.resolve()}: \\\"\\n        \\\"AIRESOURCES is not set; no path recorded in .conventions/manifest.yaml or \\\"\\n        f\\\".conventions/index.md. {FIX}\\\"\\n    )\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"f\\\"rejected recorded paths: {missing} (from .conventions/manifest.yaml). {FIX}\\\"\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert str(caught.value) == _expected_message(unresolved)\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-004\",\"disposition\":\"covered\",\"rationale\":\"Batch-002's 'ambiguous' (no poisoned-HOME test in its files) is settled by batch-001: test_no_home_or_livespec_sibling_fallback writes corpora under the temporary HOME's projects/ai-ressources and next to the patched LIVESPEC_ROOT and still gets the Resolution error from resolution, an empty corpus manifest carrying the fix, AstCatalogError and InitError; the AC-009 guard and the request-grep test (now bound here) exclude the forbidden forms statically. That compile, R7.3, validity and rule decisions are not run under the poisoned setup is kept as a warning.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L240-L243\",\"excerpt\":\"a test with `HOME` and the LiveSpec parent pointing to temporary directories that contain an `ai-ressources` corpus still raises the Resolution error\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"write_corpus(empty_home / \\\"projects\\\" / \\\"ai-ressources\\\", \\\"home\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"monkeypatch.setattr(init_from_code, \\\"LIVESPEC_ROOT\\\", checkout / \\\"livespec\\\")\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert manifest[\\\"ai_resources_root\\\"] == \\\"\\\"\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"assert FIX in manifest.get(\\\"resolution_error\\\", \\\"\\\")\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"request grep scope (validator, docs) names no ~/projects or sibling ai-ressources location\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"monkeypatch.setenv(\\\"HOME\\\", str(tmp_path / \\\"empty-home\\\"))\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert forbidden_fallbacks(REPO / \\\"validator\\\") == []\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert findings == []\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-005\",\"disposition\":\"covered\",\"rationale\":\"Batch-001's 7x3 consumer matrix asserts each consumer's observed root equals the expected corpus in env, recorded and both situations, with _matching rejecting zero or both matches, so environment priority and recorded-only use are observed. Batch-002 'missing' is settled by batch-001.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L244-L247\",\"excerpt\":\"use the same Resolved root in each of the three situations\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"@pytest.mark.parametrize(\\\"situation\\\", [\\\"env\\\", \\\"recorded\\\", \\\"both\\\"])\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"return matches[0] if len(matches) == 1 else None\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert observed == scenario.expected\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"test_consumer_uses_the_shared_root[init-from-code-both]\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-006\",\"disposition\":\"covered\",\"rationale\":\"Both batches agree; batch-002 holds the exact spans: compile text and --json exit 2 with rulebook_error and the message, AstCatalogError with the message, empty corpus manifest with empty root and resolution_error, zero rule decisions, R7.3 silent without rulebook and exactly one ERROR with it, conventions_are_valid False, and init (dry-run/force/plain) exit 2 with ERROR and an unchanged tree.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L248-L251\",\"excerpt\":\"`livespec conventions compile` exits 2 with status `rulebook_error` and the Resolution error message (text and `--json`)\"}],\"plan_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"compile --json reports rulebook_error with the message\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"exactly one R7.3 violation with a rulebook\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"init --dry-run prints ERROR with the message\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"\\\"reason\\\": \\\"rulebook_error\\\",\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert manifest[\\\"ai_resources_root\\\"] == \\\"\\\"\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert len(violations) == 1\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert conventions_are_valid(unresolved) is False\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert _tree(unresolved) == before\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert result.exit_code == 2\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert f\\\"BLOCKED: rulebook_error: {_expected_message(unresolved)}\\\" in result.output\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert payload == {\\n        \\\"verdict\\\": \\\"BLOCKED\\\",\\n        \\\"reason\\\": \\\"rulebook_error\\\",\\n        \\\"blockers\\\": [_expected_message(unresolved)],\\n    }\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert str(caught.value) == _expected_message(unresolved)\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert manifest.get(\\\"resolution_error\\\") == _expected_message(unresolved)\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert manifest[\\\"decisions\\\"] == [] and manifest[\\\"excluded_sources\\\"] == []\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert rule.check(SpecGraph(), unresolved / \\\".specs\\\") == []\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert violations[0].message == (\\n        f\\\"conventions rulebook sources cannot be verified: {_expected_message(unresolved)}\\\"\\n    )\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert status == 2\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"assert f\\\"ERROR: {_expected_message(unresolved)}\\\" in capsys.readouterr().err\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-007\",\"disposition\":\"covered\",\"rationale\":\"Batch-001 proves another machine's recorded path is invalid without env and valid once AIRESOURCES points to a complete local clone with differing manifest/index, and the validity matrix cells show routed sources checked under the resolved root; batch-002 adds the false branch on resolution failure. The indirect coverage of zero-route/missing-route false branches is kept as info.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255\",\"excerpt\":\"a project whose committed files record another machine's path is valid when `AIRESOURCES` points to a complete local clone\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert not conventions_are_valid(project)\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert conventions_are_valid(project)\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"(corpus / \\\"code-conventions/expected-only.md\\\").is_file()\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert observed == scenario.expected\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-008\",\"disposition\":\"covered\",\"rationale\":\"Batch-001 proves compile succeeds without an index declaration when AIRESOURCES is set with unchanged $AIRESOURCES display paths, compile and R7.3 still reject ../outside.md with exact messages, and matrix hashes show display paths resolve against the resolved root. Batch-002 'missing' is settled by batch-001.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259\",\"excerpt\":\"keep rejecting a display path that escapes it; the `index.md` declaration is no longer required when `AIRESOURCES` is set\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L256-L259\",\"excerpt\":\"keep rejecting a display path that escapes it\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"\\\"conventions source escapes $AIRESOURCES: $AIRESOURCES/../outside.md\\\"\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"\\\"conventions rulebook source stale: $AIRESOURCES/../outside.md\\\"\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"\\\"$AIRESOURCES/code-conventions/general.md\\\",\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert {source.path for source in rulebook.sources} == {\\n        \\\"$AIRESOURCES/code-conventions/general.md\\\",\\n        \\\"$AIRESOURCES/code-conventions/python.md\\\",\\n    }\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert (\\n        str(caught.value) == \\\"conventions source escapes $AIRESOURCES: $AIRESOURCES/../outside.md\\\"\\n    )\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"assert [violation.message for violation in violations] == [\\n        \\\"conventions rulebook source stale: $AIRESOURCES/../outside.md\\\"\\n    ]\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-009\",\"disposition\":\"covered\",\"rationale\":\"Both batches agree; the guard uses exactly the three patterns over validator/*.py, asserts the tree clean, reports reintroduced fallbacks as file:line and asserts logical ai-ressources/ identifiers do not match.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263\",\"excerpt\":\"fails, naming file and line, when it finds `projects/ai-ressources`\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L260-L263\",\"excerpt\":\"fails, naming file and line, when it finds `projects/ai-ressources`, `\\\"projects\\\" / \\\"ai-ressources\\\"` or `parent / \\\"ai-ressources\\\"`\"}],\"plan_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"reintroduced fallback reported as file:line\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"logical ai-ressources/ identifiers do not match\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"r'projects/ai-ressources|\\\"projects\\\" / \\\"ai-ressources\\\"|parent / \\\"ai-ressources\\\"'\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"\\\"conventions_ast/corpus.py:4\\\",\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert not FORBIDDEN_FALLBACK_RE.search(\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert forbidden_fallbacks(REPO / \\\"validator\\\") == []\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert forbidden_fallbacks(tmp_path / \\\"validator\\\") == [\\n        \\\"conventions_ast/corpus.py:4\\\",\\n        \\\"conventions_ast/corpus.py:7\\\",\\n    ]\"},{\"section_id\":\"tests/test_ai_resources_guard.py:L17-L68\",\"excerpt\":\"assert not FORBIDDEN_FALLBACK_RE.search(\\n        'source_path: \\\"ai-ressources/code-conventions/general.md\\\"'\\n    )\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-010\",\"disposition\":\"covered\",\"rationale\":\"Both batches judge covered: README link, setup.sh, ordered env/manifest/index wording, existing-directory condition, fix sentence, absence of the default-sibling wording, and the three documents' $AIRESOURCES protocol path without the private path are asserted. last_reviewed is asserted >= 2026-10-13, the change date, and the file holds 2026-10-13; this proves the bump and stays valid under a later legitimate review, which an equality assertion would wrongly break, so batch-002's warning is downgraded to info.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267\",\"excerpt\":\"the spec-specify `expectations.md` has `last_reviewed` equal to the change date\"}],\"plan_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"README resolution order env, manifest, index\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"spec-specify expectations last_reviewed bumped\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert order == sorted(order)\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert f\\\"**Read** {PROTOCOL}\\\" in text\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert date.fromisoformat(match.group(1)) >= date(2026, 10, 13)\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert \\\"https://github.com/julien-m/ai-ressources\\\" in section\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert FIX in section\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert \\\"default sibling\\\" not in readme\"},{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert PRIVATE_PATH not in text\"}],\"searched_plan_sections\":[]},{\"requirement_id\":\"085-localiser-ai-ressources-sans-chemin-en-dur:AC-011\",\"disposition\":\"covered\",\"rationale\":\"Both batches judge covered with the new isolation tests: the resolution, consumer and failure modules pass in a child pytest with AIRESOURCES removed and an empty HOME, so they use only corpora they build under tmp_path with monkeypatch. 'Existing real-corpus AST tests unchanged' is supported only by the import-absence proxy plus the reported empty git diff; kept as info.\",\"source_citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\"excerpt\":\"they pass without any real ai-ressources checkout, and the existing AST tests that use the real corpus through CI are unchanged\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\"excerpt\":\"All resolution and consumer tests build fake corpora in temporary directories and control `AIRESOURCES` with `monkeypatch`\"}],\"plan_citations\":[{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"monkeypatch.delenv(\\\"AIRESOURCES\\\", raising=False)\"},{\"section_id\":\"tests/test_ai_resources_consumers.py:L2-L245\",\"excerpt\":\"env_corpus = write_corpus(tmp_path / \\\"corpus-env\\\", \\\"env\\\")\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"test_feature_tests_pass_without_any_real_corpus\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"real-corpus AST modules import none of the feature fake-corpus helpers\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"monkeypatch.delenv(\\\"AIRESOURCES\\\", raising=False)\"},{\"section_id\":\"tests/test_ai_resources_failures.py:L2-L166\",\"excerpt\":\"write_corpus(tmp_path / \\\"unused-corpus\\\", \\\"unused\\\")\"},{\"section_id\":\"tests/test_ai_resources_isolation.py:L2-L63\",\"excerpt\":\"env = {key: value for key, value in os.environ.items() if key != \\\"AIRESOURCES\\\"}\"},{\"section_id\":\"tests/test_ai_resources_isolation.py:L2-L63\",\"excerpt\":\"assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]\"},{\"section_id\":\"tests/test_ai_resources_isolation.py:L2-L63\",\"excerpt\":\"assert offenders == []\"}],\"searched_plan_sections\":[]}],\"ambiguities\":[],\"extra_scope\":[],\"findings\":[{\"category\":\"acceptance-mapping\",\"severity\":\"warning\",\"description\":\"AC-004 assertion bindings remain the corpus-manifest asserts (line 237 bound twice, plus 238) and a static grep of three literal forms; the resolver/catalog/init raises are unbound pytest.raises blocks, and compile, R7.3, conventions_are_valid and rule decisions never run with the poisoned HOME/sibling corpora, so 'any other location' is unproven for them.\",\"suggestion\":\"Extend the poisoned-HOME test to the remaining consumers (asserting their AC-006 failure reactions) and bind those asserts.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"HOME and LiveSpec-sibling corpora exist yet the corpus manifest root stays empty\"},{\"section_id\":\"tests/test_ai_resources.py:L2-L242\",\"excerpt\":\"with pytest.raises(AiResourcesResolutionError):\"}]},{\"category\":\"acceptance-mapping\",\"severity\":\"info\",\"description\":\"AC-011 'existing AST tests that use the real corpus are unchanged' is proven only by a proxy: the isolation test checks that eight listed real-corpus modules do not mention two helper names, which does not detect other edits to those tests.\",\"suggestion\":\"Pin the real-corpus AST test files by hash in the mapping receipt or accept the proxy explicitly.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"real-corpus AST modules import none of the feature fake-corpus helpers, so they keep using the CI corpus\"}]},{\"category\":\"acceptance-mapping\",\"severity\":\"info\",\"description\":\"AC-003 lists unreadable/non-mapping/missing-key manifests as unresolvable cases, but tests only show them falling back to the index; no assertion raises the error with such a manifest and no index (verified manually that it raises with the fix sentence), and an unreadable manifest is untested.\",\"suggestion\":\"Add a parametrized case with an unusable manifest and no index declaration asserting the Resolution error.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/run/acceptance/mapping.json:L1-L1\",\"excerpt\":\"malformed manifest is not a source of recorded path\"}]},{\"category\":\"acceptance-mapping\",\"severity\":\"info\",\"description\":\"AC-007's 'at least one routed source' and 'missing routed source' false branches are only indirectly exercised (verified manually that both return false).\",\"suggestion\":\"Add direct assertions that zero routed sources and a missing routed source make conventions_are_valid false.\",\"citations\":[{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L252-L255\",\"excerpt\":\"the index routes at least one `→ $AIRESOURCES/` source and every routed source exists under the Resolved root\"}]},{\"category\":\"testability\",\"severity\":\"info\",\"description\":\"AC-010's test asserts last_reviewed >= the change date rather than equality; accepted because the file holds the change date (2026-10-13) and equality would break on a later legitimate review bump, but the assertion alone does not pin the exact date.\",\"suggestion\":\"Keep the >= assertion; optionally record the change-date value in the acceptance receipt.\",\"citations\":[{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert date.fromisoformat(match.group(1)) >= date(2026, 10, 13)\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L264-L267\",\"excerpt\":\"`last_reviewed` equal to the change date\"}]},{\"category\":\"testability\",\"severity\":\"info\",\"description\":\"The 'no default sibling directory' check is a literal phrase absence test; a reworded sibling-default description would still pass.\",\"suggestion\":\"Also assert the README section does not describe a fallback location beside the LiveSpec checkout (e.g. absence of 'next to' / '../ai-ressources').\",\"citations\":[{\"section_id\":\"tests/test_ai_resources_docs.py:L2-L90\",\"excerpt\":\"assert \\\"default sibling\\\" not in readme\"}]},{\"category\":\"testability\",\"severity\":\"info\",\"description\":\"AC-011's 'existing real-corpus AST tests are unchanged' cannot be proven by a test: test_real_corpus_ast_tests_do_not_use_fake_corpora only shows those modules do not reference the fake-corpus helpers. Verified out of band: git diff --stat origin/main over tests/test_conventions_ast_*.py and the five gate/verify/baseline/diffguard modules is empty.\",\"suggestion\":\"Record the empty git diff as P1 evidence (e.g. in the spec-test receipt) rather than relying on the import-absence assertion.\",\"citations\":[{\"section_id\":\"tests/test_ai_resources_isolation.py:L2-L63\",\"excerpt\":\"assert offenders == []\"},{\"section_id\":\".specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md:L268-L271\",\"excerpt\":\"the existing AST tests that use the real corpus through CI are unchanged\"}]}],\"confidence\":4,\"synthesized_batch_ids\":[\"batch-001\",\"batch-002\"],\"resolutions\":[]}",
+  "synthesis_transport_version": "3"
+}

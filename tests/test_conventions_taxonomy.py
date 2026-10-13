@@ -98,6 +98,7 @@ def _write_ai_resources_fixture(root: Path) -> None:
     (root / "README.md").write_text("# Repo doc\n", encoding="utf-8")
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_verify_ast_summary_carries_taxonomy(tmp_path: Path) -> None:
     # WHY: taxonomy must ride inside ast_summary so it reaches BOTH the verify
     # JSON and the written receipt. Independent of backend availability.
@@ -109,6 +110,7 @@ def test_verify_ast_summary_carries_taxonomy(tmp_path: Path) -> None:
     assert result.ast_summary["source_manifest"]
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_source_manifest_classifies_fixture_without_unclassified_sources(tmp_path: Path) -> None:
     ai_root = tmp_path / "ai-ressources"
     _write_ai_resources_fixture(ai_root)
@@ -137,6 +139,7 @@ def test_source_manifest_classifies_fixture_without_unclassified_sources(tmp_pat
     assert "sql" in matrix
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_taxonomy_entries_never_emit_blocking_violations(tmp_path: Path) -> None:
     # WHY (anti false-FAIL/PASS): advisory/unsupported are declarations, not scans;
     # they must never become GateViolations.
@@ -147,6 +150,7 @@ def test_taxonomy_entries_never_emit_blocking_violations(tmp_path: Path) -> None
     assert taxonomy_ids.isdisjoint(violation_rules)
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_receipt_serializes_and_round_trips_taxonomy(tmp_path: Path) -> None:
     # WHY: the receipt is the audited artifact; the taxonomy must survive the
     # hash-checked round trip, not just the live JSON.
@@ -177,6 +181,7 @@ def test_receipt_serializes_and_round_trips_taxonomy(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("backend_available", [True, False])
+@pytest.mark.usefixtures("without_airesources")
 def test_verify_cli_json_exposes_taxonomy_top_level(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, backend_available: bool
 ) -> None:
@@ -243,6 +248,7 @@ def _local_taxonomy_catalog(root: Path, monkeypatch: pytest.MonkeyPatch) -> Path
 #   .specs/features/073-conventions-multilang-catalog/spec.md#fr-008
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_root_governance_notices_are_excluded_with_reason(tmp_path: Path) -> None:
     ai_root = tmp_path / "ai-ressources"
     _write_ai_resources_fixture(ai_root)
@@ -263,6 +269,7 @@ def test_root_governance_notices_are_excluded_with_reason(tmp_path: Path) -> Non
     assert "total_source_count_mismatch" not in validate_rule_decision_manifest(decisions)
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_nested_governance_names_keep_existing_classification(tmp_path: Path) -> None:
     ai_root = tmp_path / "ai-ressources"
     _write_ai_resources_fixture(ai_root)
@@ -285,6 +292,7 @@ def test_nested_governance_names_keep_existing_classification(tmp_path: Path) ->
     ]
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_unknown_markdown_remains_unclassified_and_blocks_decision_manifest(tmp_path: Path) -> None:
     ai_root = tmp_path / "ai-ressources"
     _write_ai_resources_fixture(ai_root)

@@ -7,6 +7,20 @@
 
 ---
 
+## 2026-10-13 — 085 ai-ressources located through AIRESOURCES or the recorded project path, without hard-coded fallback
+<!-- finalize:spec-feature:2026-10-13:72cf8076 -->
+
+## 2026-10-13 — [Feature 085] Test: 100% AC covered (11/11), 0 tests generated
+<!-- finalize:spec-test:2026-10-13:477becbc -->
+
+## 2026-10-13 — [Feature 085] Implemented in code: shared ai-ressources resolution (AIRESOURCES, then recorded path, else explicit error) routed through 7 consumers; certification pending
+<!-- finalize:spec-implement:2026-10-13:cedd6521 -->
+
+## 2026-10-13 — [Feature 085] Plan created: Locate ai-ressources Without Hard-Coded Paths — 6 implementation steps, 1 diagram
+<!-- finalize:spec-plan:2026-10-13:5f189e4f -->
+
+## 2026-10-13 — [Feature 085] Spec created: Locate ai-ressources Without Hard-Coded Paths — 4 stories, 11 AC, 7 FR
+<!-- finalize:spec-specify:2026-10-13:e8bcdd29 -->
 ## 2026-10-13 — Feature: Lighter delivery gates (Handy findings)
 
 - [086](features/086-risk-proportional-delivery/changelog.md): `livespec delivery lane` selects a light or full lane from the reviewed QE classification; steps run only tests, lint, format and conventions; one independent native review of the complete diff at the end of the feature (`livespec delivery review prepare|record|verify`), capped at two correction rounds.

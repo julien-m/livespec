@@ -47,8 +47,12 @@ The compiled semantic rulebook is stored as
 ### `source_manifest`
 
 `livespec conventions verify --json` emits `source_manifest` for old v1-gates
-projects and new v2-gates projects. The manifest is built from
-`.conventions/manifest.yaml` `ai_resources_path` and reports:
+projects and new v2-gates projects. The manifest is built from the ai-ressources
+root resolved as described in the README section
+[ai-ressources location (`AIRESOURCES`)](../README.md#ai-ressources-location-airesources)
+(the `AIRESOURCES` variable first, then the recorded `.conventions/` path). When no
+root resolves, the manifest is empty, `ai_resources_root` is `""` and
+`resolution_error` carries the error. Otherwise it reports:
 
 - total, classified, unclassified, and excluded AI-res/ARS convention sources.
 - per-source domains, languages, support status, and support reason.

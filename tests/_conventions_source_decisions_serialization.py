@@ -19,6 +19,7 @@ from validator.conventions_receipt import write_conventions_receipt
 runner = CliRunner()
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_v1_receipt_serializes_rule_decision_manifest(tmp_path: Path) -> None:
     project = _enforce_project(tmp_path)
     generate_conventions_gates(project, ast_mode="off", force=True)
@@ -38,6 +39,7 @@ def test_v1_receipt_serializes_rule_decision_manifest(tmp_path: Path) -> None:
     assert payload["rule_decision_manifest"]["undecided_source_count"] == 0
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_v1_verify_cli_json_serializes_taxonomy_and_rule_decisions(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -67,6 +69,7 @@ def test_v1_verify_cli_json_serializes_taxonomy_and_rule_decisions(
     )
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_v1_verify_cli_blocks_on_broken_catalog(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -90,6 +93,7 @@ def test_v1_verify_cli_blocks_on_broken_catalog(
     assert any("catalog_load_error:" in item["message"] for item in payload["blockers"])
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_receipt_and_cli_json_rule_decision_manifest_parity(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
