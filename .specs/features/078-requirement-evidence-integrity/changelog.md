@@ -233,3 +233,13 @@ Parametrisations reduced to one case per real branch. The tag-legend test now ch
 - **Author:** claude-code (spec-fix, Handy defect 2026-10-13)
 
 `livespec test` rejected the whole capture in Handy with `'<livespec>/.agent-sync/rules/livespec/commands.md' is not in the subpath of '<project>'`. `livespec runtime dev` links the ignored `.agent-sync.local` entries to the LiveSpec checkout, and `.claude`/`.agents` entries link to them. The input manifest now skips untracked paths that git ignores and the agent tooling directories (`.agent-sync.local`, `.claude`, `.agents`, `.codex`). It binds a dangling link, or a link leaving the project, by its link text only, without reading the target. A spec reference that leaves the project is not an input. An internal link to an excluded input is still rejected. Captures made under policy 078.1 must be run again.
+
+## 2026-10-13 — [Bugfix]: Review status no longer stales semantic reviews
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/normative_identity.py, validator/clarify_inventory.py, tests/test_finalize_status_review_identity.py
+- **AC impacted:** AC-004
+- **Author:** claude-code (spec-fix, Handy report 2026-10-13)
+
+The Handy report said `finalize apply --status Planned` made the spec and plan reviews stale. A Handy-shaped spec (extra frontmatter keys, explicit `## Header` band) reproduces it end to end only when the status leaving or entering is `Review`. `Review` is a spec-system status, but Normative Identity v2 did not treat it as lifecycle metadata. Draft, Planned and In Progress transitions were already normalized. `Review` is now normalized like the other lifecycle statuses; an AC change after finalization still makes the review stale. When a review is stale and its reviewer model differs from the gate's model, the gate also reports `spec_review_model_mismatch:<receipt>!=<current>`. That was the cause recorded in Handy's 007 planning evidence, where the progression was prepared without the reviewer model. A different `--review-max-chars` budget also changes the identity; the receipt does not record the budget, so it cannot be named.

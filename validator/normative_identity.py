@@ -53,6 +53,7 @@ def _valid_scalar(key: str, value: str) -> bool:
     if value[:1] in {"'", '"'} and value[-1:] == value[:1]:
         value = value[1:-1]
     if key.lower() == "status":
+        # Every status of the spec-system lifecycle, plus Blocked.
         return value in {
             "Draft",
             "Planned",
@@ -60,6 +61,7 @@ def _valid_scalar(key: str, value: str) -> bool:
             "In Progress",
             "Implemented",
             "Deprecated",
+            "Review",
             "Blocked",
         }
     return bool(

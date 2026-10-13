@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-13 — Bugfix: Review status keeps semantic reviews current
+
+- [078](features/078-requirement-evidence-integrity/changelog.md): a `finalize apply --status` transition to or from `Review` no longer makes spec and plan reviews stale; an AC change still does. A stale review caused by another reviewer model now reports `spec_review_model_mismatch`.
+
 ## 2026-10-13 — Bugfix: Pinned snapshots ship the conventions test evidence
 
 - [083](features/083-pinned-runtime-isolation/changelog.md): `livespec runtime install` keeps `tests/fixtures/conventions_ast/` and the deterministic test files the bundled catalogs cite, so `conventions verify` no longer reports `fixture missing` and is no longer always BLOCKED under a pinned runtime.
