@@ -11,7 +11,7 @@ status: Approved
 - **Feature:** 080-autonomous-from-code-recovery
 - **Date:** 2026-10-09
 - **Status:** Approved
-- **Scope:** M — four FR, seven AC; local bootstrap metadata and subprocess boundaries.
+- **Scope:** M — five FR, eight AC; local bootstrap metadata and subprocess boundaries.
 
 ## Summary
 
@@ -185,6 +185,8 @@ stateDiagram-v2
 
 ### Step 7 — Make the bootstrap pass its own checks
 
+Step 7 is a corrective increment after Step 6; its own evidence below replaces Step 6 results for FR-005/AC-008, and Step 6 artifacts are refreshed with it.
+
 **FR covered:** FR-005.1: Validator-conformant artifacts, FR-005.2: Installer integration preserved, FR-005.3: Archive markers and transcript.
 - `scripts/init.sh` writes the `[Setup]` changelog heading, stack frontmatter, the design inventory (only when absent) and the ignore patterns of the definition of done. `init_documents` adds the stack `title` and the preflight `Tokens` section.
 - `init_from_code` merges `.gitignore`, `AGENTS.md` and `CLAUDE.md` after the installer runs (`_integration_documents`); `merge_integration` renders the skill's LiveSpec block with the source skill commands.
@@ -195,7 +197,7 @@ stateDiagram-v2
 
 | Action | Command | Availability |
 |---|---|---|
-| Unit/integration fixtures | `.venv/bin/pytest -q tests/test_init_profile.py tests/test_init_documents.py tests/test_spec_init_autonomous_bootstrap.py tests/test_init_agent_isolation.py tests/test_init_goal_profiles.py` | pytest 9.1.1 verified; new files planned |
+| Unit/integration fixtures | `.venv/bin/pytest -q tests/test_init_profile.py tests/test_init_documents.py tests/test_spec_init_autonomous_bootstrap.py tests/test_init_agent_isolation.py tests/test_init_goal_profiles.py tests/test_init_recovery.py tests/test_init_bootstrap_closure.py` | pytest 9.1.1 verified; `test_init_bootstrap_closure.py` is the AC-008 evidence |
 | Existing goal regressions | `.venv/bin/pytest -q tests/test_goal_contracts.py` | pytest verified; existing suite |
 | Lint | `.venv/bin/ruff check <changed Python files>` | Ruff 0.15.20 verified; resolve changed paths after implementation |
 | Format | `.venv/bin/ruff format --check <changed Python files>` | Ruff verified |
