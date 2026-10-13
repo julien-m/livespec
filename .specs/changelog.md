@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-13 — Bugfix: Generated eslint gate uses the local binary
+
+- [061](features/061-conventions-gates-engine/changelog.md): `conventions gates init` writes `node_modules/.bin/eslint . --format json` when eslint is installed or declared locally, instead of a bare `eslint` that fails with `command not found`.
+
 ## 2026-10-13 — Bugfix: Finalized changelog entries pass validation
 
 - [058](features/058-deterministic-finalization/changelog.md): `finalize apply` writes `## YYYY-MM-DD — [Tag]: text`, the heading `livespec validate` requires, and the skill and template examples use it too; marked `###` entries from earlier finalizations stay valid.
