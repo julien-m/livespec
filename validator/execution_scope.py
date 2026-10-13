@@ -6,6 +6,7 @@ import hashlib
 import os
 import re
 import stat
+import subprocess
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -23,6 +24,13 @@ _EXCLUDED_DIRS = frozenset(
         ".mypy_cache",
         ".ruff_cache",
         ".pyright",
+        # Agent tooling (skills, rules, settings, agent worktrees) is never an
+        # application input; `livespec runtime dev` links these entries to the
+        # LiveSpec checkout, outside the project.
+        ".agent-sync.local",
+        ".claude",
+        ".agents",
+        ".codex",
     }
 )
 _EXCLUDED_PREFIXES = (
@@ -33,7 +41,8 @@ _EXCLUDED_PREFIXES = (
 )
 _LINK = re.compile(r"\[[^\]]*\]\(<?([^\s)>]+)>?(?:\s+[^)]*)?\)")
 _EXCLUDED_FILES = frozenset({".coverage", ".DS_Store"})
-EXECUTION_SCOPE_POLICY = "078.1"
+EXECUTION_SCOPE_POLICY = "078.2"
+_IGNORED_UNTRACKED = ("--others", "--ignored", "--exclude-standard", "--directory")
 _GENERATED_REGISTRIES = frozenset({".specs/README.md", ".specs/changelog.md", ".specs/roadmap.md"})
 _GENERATED_FEATURE_FILES = frozenset(
     {"pipeline.md", "progress.md", "changelog.md", "implementation.md"}
@@ -81,23 +90,34 @@ def read_from_directory(directory_fd: int, name: str) -> bytes:
 
 
 def source_manifest(project_root: Path, feature: str | None = None) -> dict[str, str]:
-    """Hash conservative inputs; optionally normalize selected lifecycle metadata only."""
+    """Hash conservative inputs; optionally normalize selected lifecycle metadata only.
+
+    The walk never leaves the project: git-ignored untracked paths are skipped and
+    a link whose target lies outside the root is bound by its link text only.
+    """
     root = project_root.resolve(strict=True)
     result: dict[str, str] = {}
     lifecycle = {f".specs/features/{feature}/{name}" for name in ("spec.md", "plan.md")}
+    ignored = _git_ignored(root)
+
+    def skipped(path: Path) -> bool:
+        return _excluded(path, root, feature) or _ignored(path, root, ignored)
+
     for directory, dirs, files in os.walk(root, followlinks=False):
         base = Path(directory)
-        dirs[:] = sorted(name for name in dirs if not _excluded(base / name, root, feature))
+        dirs[:] = sorted(name for name in dirs if not skipped(base / name))
         for name in dirs:
             path = base / name
             if path.is_symlink():
                 _symlink_identity(path, root, result)
         for name in sorted(files):
             path = base / name
-            if _excluded(path, root, feature):
+            if skipped(path):
                 continue
             relative = path.relative_to(root).as_posix()
             target = _symlink_identity(path, root, result) if path.is_symlink() else path
+            if target is None:
+                continue
             data = read_regular(target, root)
             result[relative] = (
                 normative_hash(data.decode(), lifecycle_document=True)
@@ -107,6 +127,34 @@ def source_manifest(project_root: Path, feature: str | None = None) -> dict[str,
     if feature:
         result.update(_referenced_inputs(root, feature))
     return result
+
+
+def _git_ignored(root: Path) -> frozenset[str]:
+    """Return untracked paths git ignores under ``root`` (directories end with ``/``).
+
+    Outside a repository, or without git, nothing is ignored: the conservative
+    scope then still hashes every non-excluded file.
+    """
+    try:
+        # Read-only git contract: NUL-separated paths relative to ``root``; a fully
+        # ignored directory is reported once with a trailing slash.
+        completed = subprocess.run(
+            [*("git", "-C", str(root), "ls-files", "-z"), *_IGNORED_UNTRACKED],
+            capture_output=True,
+            timeout=60,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return frozenset()
+    if completed.returncode != 0:
+        return frozenset()
+    entries = completed.stdout.decode("utf-8", "surrogateescape").split("\0")
+    return frozenset(entry for entry in entries if entry and entry not in {".", "./"})
+
+
+def _ignored(path: Path, root: Path, ignored: frozenset[str]) -> bool:
+    relative = path.relative_to(root).as_posix()
+    return relative in ignored or f"{relative}/" in ignored
 
 
 def _referenced_inputs(root: Path, feature: str) -> dict[str, str]:
@@ -126,10 +174,12 @@ def _referenced_inputs(root: Path, feature: str) -> dict[str, str]:
             target = urlsplit(unquote(match.group(1)))
             if target.scheme or target.netloc or not target.path:
                 continue
-            path = (document.parent / target.path).resolve(strict=True)
-            relative = path.relative_to(root).as_posix()
-            if not path.is_file():
+            path = (document.parent / target.path).resolve()
+            # A reference leaving the project (directly or through a link) is not a
+            # project input; a missing one has no bytes to bind.
+            if not path.is_relative_to(root) or not path.is_file():
                 continue
+            relative = path.relative_to(root).as_posix()
             if any(
                 _excluded(parent, root, feature)
                 for parent in (path, *path.parents)
@@ -165,17 +215,30 @@ def _excluded(path: Path, root: Path, feature: str | None = None) -> bool:
     )
 
 
-def _symlink_identity(path: Path, root: Path, result: dict[str, str]) -> Path:
-    # Internal provider links retain their link identity and refer to canonical
-    # files already in the enumerated scope. External or excluded targets cannot
-    # establish a complete local source snapshot.
-    target = path.resolve(strict=True)
-    target.relative_to(root)
+def _symlink_identity(path: Path, root: Path, result: dict[str, str]) -> Path | None:
+    """Bind a link; return its in-project target to hash, or None for identity only.
+
+    Internal provider links retain their link identity and refer to canonical files
+    already in the enumerated scope; excluded internal targets cannot establish a
+    complete local source snapshot. A dangling link, or one leaving the project, is
+    never followed: only its link text is bound, so retargeting it invalidates the
+    capture while bytes outside the project stay out of scope.
+    """
+    relative = path.relative_to(root).as_posix()
+    text = digest(os.readlink(path).encode())
+    try:
+        target = path.resolve(strict=True)
+    except (OSError, RuntimeError):
+        result[relative + "@symlink"] = text
+        return None
+    if not target.is_relative_to(root):
+        result[relative + "@external-symlink"] = text
+        return None
     if any(
         _excluded(parent, root)
         for parent in (target, *target.parents)
         if parent != root and root in parent.parents
     ):
         raise ValueError(f"Execution source symlink targets excluded inputs: {path}")
-    result[path.relative_to(root).as_posix() + "@symlink"] = digest(os.readlink(path).encode())
+    result[relative + "@symlink"] = text
     return target

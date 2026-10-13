@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-12
+> Last updated: 2026-10-13
 
 ---
+
+## 2026-10-13 — Bugfix: Execution capture stays inside the project
+
+- [078](features/078-requirement-evidence-integrity/changelog.md): `livespec test` no longer follows links that leave the project. Paths that git ignores and agent tooling directories (`.agent-sync.local`, `.claude`, `.agents`, `.codex`) are out of scope, and an external link is bound by its link text instead of invalidating the capture (scope policy 078.2).
 
 ## 2026-10-12 — Bugfix: CI parity on Python 3.12
 

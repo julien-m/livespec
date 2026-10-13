@@ -164,3 +164,7 @@ The explicit user decision supersedes the earlier CI selector descriptions: GitH
 ## 2026-10-12 — Warm-cache regression environment (spec-fix, test only)
 
 The [warm-cache regression](../../../tests/test_execution_bytecode.py) removes `PYTHONDONTWRITEBYTECODE` from its own environment: the scenario needs real bytecode from both the warm-up and the runner subprocess. The production capture is unchanged.
+
+## 2026-10-13 — Project-confined execution scope (spec-fix)
+
+FR-011: read the [source scope](../../../validator/execution_scope.py) and its [link and ignore regressions](../../../tests/test_execution_scope_links.py). The manifest never reads outside the project root. It skips untracked paths that git ignores and the agent tooling directories, and binds external or dangling links by their link text. The scope policy is `078.2`.
