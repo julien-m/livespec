@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from tests.delivery_support import FEATURE, MODEL, DeliveryProject, make_project, spec_text
 from validator.clarify_gate import scan_clarification_opportunities
+from validator.semantic.review_context import PreparedReview
 from validator.semantic.review_contract import (
     ReviewReceipt,
     ScopeFinding,
@@ -33,7 +35,7 @@ def _raw(
     ambiguity: bool | None = None,
     scope: dict[str, object] | None = None,
     finding: str | None = None,
-) -> tuple[object, str]:
+) -> tuple[PreparedReview, str]:
     prepared = prepare_feature_review(project.root, FEATURE, "spec", MODEL)
     sections = {s.section_id: s for s in prepared.sections}
     first = prepared.requirements[0]
@@ -85,9 +87,9 @@ def _raw(
     return prepared, raw
 
 
-def _ready(project: DeliveryProject, **options: object) -> ReviewReceipt:
-    prepared, raw = _raw(project, **options)  # type: ignore[arg-type]
-    receipt = validate_review_result(prepared, [raw])  # type: ignore[arg-type]
+def _ready(project: DeliveryProject, **options: Any) -> ReviewReceipt:
+    prepared, raw = _raw(project, **options)
+    receipt = validate_review_result(prepared, [raw])
     assert receipt.complete, receipt.errors
     return receipt
 
@@ -146,8 +148,8 @@ def test_legacy_scope_without_kind_is_business() -> None:
     assert finding.kind == "business"
 
 
-def _ingest(project: DeliveryProject, **options: object) -> tuple[int, dict[str, object]]:
-    _, raw = _raw(project, **options)  # type: ignore[arg-type]
+def _ingest(project: DeliveryProject, **options: Any) -> tuple[int, dict[str, object]]:
+    _, raw = _raw(project, **options)
     bundle = project.root.parent / "bundle.json"
     bundle.write_text(json.dumps({"raw_results": [raw], "synthesis": None}), encoding="utf-8")
     result = project.run(

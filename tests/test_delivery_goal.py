@@ -18,7 +18,7 @@ from validator.goal_generic_evidence import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _render(command: str, feature: str | None, flags: str) -> dict[str, object]:
+def _render(command: str, feature: str | None, flags: str) -> dict[str, Any]:
     args = ["goal", "render", command, "--flags", flags, "--json"]
     if feature:
         args[3:3] = ["--feature", feature]
@@ -27,7 +27,7 @@ def _render(command: str, feature: str | None, flags: str) -> dict[str, object]:
     return json.loads(result.output)["canonical"]
 
 
-def _task_ids(canonical: dict[str, object]) -> list[str]:
+def _task_ids(canonical: dict[str, Any]) -> list[str]:
     return [str(task["id"]) for task in cast(list[dict[str, Any]], canonical["tasks"])]
 
 
@@ -44,8 +44,8 @@ def test_light_goal_has_lane_rows_and_delivery_task(project: DeliveryProject) ->
     project.review_spec()
     canonical = _render("spec-implement", FEATURE, f"--model={MODEL}")
     runtime = canonical["runtime_context"]
-    assert runtime["delivery_lane"]["lane"] == "light"  # type: ignore[index]
-    rows = " ".join(map(str, canonical["execution_tasks"]))  # type: ignore[call-overload]
+    assert runtime["delivery_lane"]["lane"] == "light"
+    rows = " ".join(map(str, canonical["execution_tasks"]))
     assert "one independent native `combined` reviewer" in rows
     assert "two independent native reviewers" not in rows
     ids = _task_ids(canonical)
@@ -56,8 +56,8 @@ def test_light_goal_has_lane_rows_and_delivery_task(project: DeliveryProject) ->
 
 def test_full_goal_has_full_rows(project: DeliveryProject) -> None:
     canonical = _render("spec-implement", FEATURE, f"--model={MODEL}")
-    assert canonical["runtime_context"]["delivery_lane"]["lane"] == "full"  # type: ignore[index]
-    rows = " ".join(map(str, canonical["execution_tasks"]))  # type: ignore[call-overload]
+    assert canonical["runtime_context"]["delivery_lane"]["lane"] == "full"
+    rows = " ".join(map(str, canonical["execution_tasks"]))
     assert "two independent native reviewers" in rows
     assert "delivery.review" in _task_ids(canonical)
 
@@ -70,7 +70,7 @@ def test_other_goals_are_unchanged(monkeypatch: pytest.MonkeyPatch) -> None:
         ("spec-implement", None, "--model=m"),
     ):
         canonical = _render(command, feature, flags)
-        assert "delivery_lane" not in canonical["runtime_context"]  # type: ignore[operator]
+        assert "delivery_lane" not in canonical["runtime_context"]
         assert "delivery.review" not in _task_ids(canonical)
 
 
