@@ -3,7 +3,7 @@ title: Validator CI Prerequisites
 status: Approved
 priority: P1
 created: 2026-09-07
-updated: 2026-09-08
+updated: 2026-10-13
 visual: false
 ---
 
@@ -31,10 +31,10 @@ Scenario: Repair source validation prerequisites
   Then lint, formatting and typing finish without errors
   And negative fixtures still reject the same malformed data
 Scenario: Provision the actual external authority
-  Given tests require the real compatible Penflow CLI from a private repository
-  When the workflow installs its pinned revision using authorized read-only access
+  Given tests require the real compatible Penflow CLI from its public repository
+  When the workflow installs its immutable pinned commit without any Penflow credential
   Then tests invoke the real CLI
-  And private source and credentials are not published in this public repository
+  And no stub, mutable reference or vendored Penflow copy replaces that commit
 Scenario: Deterministic GitHub policy
   Given pull-request, manual or release validation is requested
   When GitHub runs the workflow
@@ -49,9 +49,9 @@ Scenario: Preserve complete CI proof
   Given local unit, integration and visual coverage checks have passed
   When the exact workflow completes on the reviewed SHA
   Then all required checks remain successful for at least 120 seconds
-  And missing private dependency access produces an explicit failure
+  And missing private normative-corpus access produces an explicit failure
 Scenario: Missing private capability
-  Given private dependency access is unavailable
+  Given private normative-corpus access is unavailable
   When deterministic CI validation requests that capability
   Then that check fails explicitly
   And no successful CI stability claim is recorded
@@ -70,7 +70,7 @@ flowchart TD
 ## Functional Requirements
 
 - **FR-001:** Correct the two RUF036 annotations, formatting violations and all fixture typing errors blocking the exact existing global checks; retain production types and negative-test behavior. Maps to AC-001.
-- **FR-002:** Provision an actual compatible Penflow CLI from an immutable verified source revision through authorized private read access; never substitute a stub, vendor private source publicly or expose credentials. Maps to AC-002.
+- **FR-002:** Provision an actual compatible Penflow CLI from the public julien-m/penflow repository at the immutable verified commit dd356b95f8543d025b85632ce3998eed88fef07c, without any Penflow credential or private-access gate; never substitute a stub, a mutable branch or tag reference, or a vendored copy. Maps to AC-002.
 - **FR-003:** Run the existing unit and integration suites with required Node/Chromium dependencies and isolated test temporary directories; retain all tests and repair remaining causal failures. Maps to AC-003.
 - **FR-004:** Preserve the exact 94 percent branch-coverage threshold and add behavioral regression tests for uncovered baseline-link validation paths. Maps to AC-004.
 - **FR-005:** Keep GitHub validation deterministic: remove automatic real-model generation, provider installation and model-credential requirements while retaining local opt-in generation tools. Privately provision the three normative corpus documents at immutable revision11976242fc5b9ae5f3a574e19339b78ebd18a0c4, preserve source-hash validation and full AST tests, and record success only for the unchanged reviewed SHA after120seconds of stable successful checks. Maps to AC-005 and AC-006.
@@ -82,7 +82,7 @@ flowchart TD
 Given the current repair tree, when existing global checks run, then global ruff check, ruff format --check, pyright validator and mypy . exit zero; the three approval-model fixture diagnostics disappear without ignored errors.
 ### AC-002
 
-Given the pinned actual CLI, when the real authority suites run, then real Penflow positive/negative subprocess tests pass with the verified pinned CLI; missing CLI still rejects certification.
+Given the actual CLI installed from public commit dd356b95f8543d025b85632ce3998eed88fef07c, when the real authority suites run, then real Penflow positive/negative subprocess tests pass with the verified pinned CLI; missing CLI still rejects certification; every workflow Penflow checkout pins that full commit SHA and requests no Penflow credential.
 ### AC-003
 
 Given isolated dependency setup, when existing full suites run, then full unit and level_3a integration commands pass after isolated dependency setup; no test or required check is disabled.
@@ -100,14 +100,15 @@ Given the committed GitHub workflow, when its deterministic policy and dependenc
 ## Key Entities
 
 - Repair SHA: immutable identity shared by review, CI checks and delivery.
-- Dependency revision: verified immutable Penflow and normative-corpus Git commits; access stays private.
+- Dependency revision: verified immutable Git commits; public Penflow is read anonymously, the normative corpus stays private behind its read-only capability.
 - Check receipt: exact argv, cwd, exit code, scope, time and output artifact.
 
 ## Edge Cases
 
 - Nested pytest must not inherit a parent basetemp that contains its cwd.
 - Temporary fixtures must not inherit a parent .specs directory or ESM package.json.
-- Private-source access may be unavailable; no fallback can claim the missing proof. GitHub validation requires no model credential.
+- Private normative-corpus access may be unavailable; no fallback can claim the missing proof. GitHub validation requires no model or Penflow credential.
+- An upstream history rewrite can remove a pinned commit; repin only to a verified content-equivalent commit SHA, never to a branch or tag.
 - A changed SHA invalidates previous CI stability observations.
 
 ## Success Criteria

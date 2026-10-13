@@ -31,25 +31,17 @@ jobs:
           uv export --frozen --no-hashes --no-emit-project --extra dev --extra integration -o "$RUNNER_TEMP/requirements.txt"
           uv pip install --system -r "$RUNNER_TEMP/requirements.txt"
           uv pip install --system --no-deps -e .
-      - name: Require read-only Penflow capability
-        env:
-          PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
-        run: |
-          if [ -z "$PENFLOW_KEY" ]; then
-            echo "Penflow CLI checks require PENFLOW_READONLY_DEPLOY_KEY for the pinned private dependency." >&2
-            exit 1
-          fi
+      # Public Penflow (MIT): commit-map equivalent of retired private revision dcbfea6.
       - name: Checkout pinned Penflow CLI
         uses: actions/checkout@v4
         with:
           repository: julien-m/penflow
-          ref: dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7
-          ssh-key: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+          ref: dd356b95f8543d025b85632ce3998eed88fef07c
           persist-credentials: false
           path: .ci-deps/penflow
       - name: Install pinned Penflow CLI
         run: uv pip install --no-cache --system ./.ci-deps/penflow
-      - name: Remove private dependency checkout
+      - name: Remove Penflow dependency checkout
         if: always()
         run: |
           python - <<'PYTHON'
@@ -147,25 +139,17 @@ jobs:
           uv export --frozen --no-hashes --no-emit-project --extra dev --extra integration -o "$RUNNER_TEMP/requirements.txt"
           uv pip install --system -r "$RUNNER_TEMP/requirements.txt"
           uv pip install --system --no-deps -e .
-      - name: Require read-only Penflow capability
-        env:
-          PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
-        run: |
-          if [ -z "$PENFLOW_KEY" ]; then
-            echo "Penflow CLI checks require PENFLOW_READONLY_DEPLOY_KEY for the pinned private dependency." >&2
-            exit 1
-          fi
+      # Public Penflow (MIT): commit-map equivalent of retired private revision dcbfea6.
       - name: Checkout pinned Penflow CLI
         uses: actions/checkout@v4
         with:
           repository: julien-m/penflow
-          ref: dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7
-          ssh-key: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+          ref: dd356b95f8543d025b85632ce3998eed88fef07c
           persist-credentials: false
           path: .ci-deps/penflow
       - name: Install pinned Penflow CLI
         run: uv pip install --no-cache --system ./.ci-deps/penflow
-      - name: Remove private dependency checkout
+      - name: Remove Penflow dependency checkout
         if: always()
         run: |
           python - <<'PYTHON'
