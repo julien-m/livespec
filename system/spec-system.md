@@ -400,6 +400,12 @@ To prevent changelogs from growing unbounded:
 4. Fix the issue
 5. Update `changelog.md` with a Bugfix entry
 
+### Delivery lanes (risk-proportional implementation)
+
+<!-- @spec FR-008: Delivery lanes in the universal rules — .specs/features/086-risk-proportional-delivery/spec.md#fr-008 -->
+
+`livespec delivery lane --feature <slug>` decides the lane from the reviewed `## Quality Engineering` classification: **light** for Low/Medium criticality with Local/Shared blast radius and a current ready spec review, **full** otherwise (including a missing or conflicting classification). In both lanes an implementation step runs only targeted tests, lint, format and the conventions gate; no reviewer or audit runs per step. The complete feature diff is reviewed once at the end by independent native agents with effort `high` (light: one `combined` report; full: a `review` and an `audit` report), recorded with `livespec delivery review prepare|record|verify` and capped at two correction rounds. **Read** [the delivery review protocol](delivery-review.md) for the procedure. The retired `audit` skill and Codex are never used.
+
 ### Bugfix lane (`/spec-fix <feature> --bugfix`)
 
 <!-- @spec FR-012: Bugfix lane in the universal rules — .specs/features/084-bugfix-lane/spec.md#fr-012 -->

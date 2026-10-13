@@ -61,6 +61,15 @@ def _git(root: Path, *args: str) -> bytes:
     return completed.stdout
 
 
+def resolve_commit(root: Path, base: str) -> str:
+    """Return the full commit id of ``base``.
+
+    Raises:
+        DiffUnavailableError: Not a work tree, or ``base`` resolves to no commit.
+    """
+    return _git(root, "rev-parse", "--verify", "--quiet", f"{base}^{{commit}}").decode().strip()
+
+
 # @spec FR-006: Bugfix diff collection
 #   — .specs/features/084-bugfix-lane/spec.md#fr-006
 def collect_diff(root: Path, base: str) -> list[DiffEntry]:

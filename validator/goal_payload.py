@@ -133,11 +133,14 @@ def _goal_runtime(
         command, project_root, feature, normalized_flags
     )
     has_penflow = _contracts._detect_penflow(project_root)
+    delivery_lane = _delivery_lane(command, project_root, feature, normalized_flags)
+    extra = frozenset({f"lane-{delivery_lane['lane']}"}) if delivery_lane else frozenset()
     execution_tasks = _contracts._extract_execution_tasks(
         skill_path,
         normalized_flags=normalized_flags,
         is_visual=is_visual,
         has_penflow=has_penflow,
+        extra_branches=extra,
     )
     active_branches = _contracts._active_execution_task_branches(
         normalized_flags=normalized_flags,
@@ -147,6 +150,7 @@ def _goal_runtime(
         has_penflow=has_penflow,
         audit_only="--audit-only" in normalized_flags,
         no_generate="--no-generate" in normalized_flags,
+        extra_branches=extra,
     )
     definition_of_done = [
         _contracts.strip_evidence_marker(item)
@@ -159,9 +163,37 @@ def _goal_runtime(
             "is_visual_feature": is_visual,
             "has_penflow": has_penflow,
             "visual_feature_slugs": visual_feature_slugs,
+            **({"delivery_lane": delivery_lane} if delivery_lane else {}),
         },
         execution_tasks,
         definition_of_done,
+    )
+
+
+# @spec FR-007: Delivery lane in the implement goal
+#   — .specs/features/086-risk-proportional-delivery/spec.md#fr-007
+def _delivery_lane(
+    command: str, project_root: Path, feature: str | None, normalized_flags: list[str]
+) -> dict[str, object] | None:
+    """Return the lane decision for an implement goal of an existing feature, else None."""
+    if command != "spec-implement" or not feature:
+        return None
+    from .delivery.lane import DeliveryInputError, evaluate_lane
+
+    model = _flag_value(normalized_flags, "--model") or ""
+    budget = _flag_value(normalized_flags, "--review-max-chars")
+    try:
+        decision = evaluate_lane(
+            project_root, feature, model, int(budget) if budget and budget.isdigit() else None
+        )
+    except DeliveryInputError:
+        return None
+    return decision.to_json()
+
+
+def _flag_value(normalized_flags: list[str], name: str) -> str | None:
+    return next(
+        (flag.split("=", 1)[1] for flag in normalized_flags if flag.startswith(f"{name}=")), None
     )
 
 
@@ -208,6 +240,7 @@ def _compiled_payload_tasks(
         tasks,
         stop=stop,
         conventions_gated=conventions_gated,
+        delivery_reviewed="delivery_lane" in runtime,
     )
     if command == "spec-fix":
         from .fix_acceptance_scope import _bind_fix_acceptance_scope

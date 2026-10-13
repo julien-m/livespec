@@ -45,6 +45,12 @@ def _validate_generic_evidence(
                     task, evidence, contract=contract, project_root=project_root
                 )
             )
+        elif required == "delivery_review_receipt_path":
+            missing.extend(
+                _delivery_review_missing_items(
+                    task, evidence, contract=contract, project_root=project_root
+                )
+            )
         elif not _contracts._required_evidence_satisfied(required, evidence, project_root):
             missing.append(required)
     accepted = not missing
@@ -97,6 +103,50 @@ def _conventions_receipt_missing_items(
     if receipt.verdict != "PASS":
         return ["conventions_receipt_verdict_pass"]
     return []
+
+
+# @spec FR-007: The goal re-verifies the delivery review receipt
+#   — .specs/features/086-risk-proportional-delivery/spec.md#fr-007
+def _delivery_review_missing_items(
+    task: Mapping[str, object],
+    evidence: Mapping[str, object],
+    *,
+    contract: Mapping[str, object],
+    project_root: Path | None,
+) -> list[str]:
+    """Accept the receipt only when `livespec delivery review verify` would pass now."""
+    from .delivery.lane import DeliveryInputError, evaluate_lane
+    from .delivery.review import receipt_path, verify_review
+
+    submitted = evidence.get("delivery_review_receipt_path")
+    if not isinstance(submitted, str) or not submitted.strip():
+        return ["delivery_review_receipt_path"]
+    if project_root is None:
+        return ["project_root_for_receipt_verification"]
+    expected = task.get("expected_evidence")
+    expected_map = cast(dict[str, object], expected) if isinstance(expected, dict) else {}
+    feature = expected_map.get("feature_slug") or contract.get("feature")
+    if not isinstance(feature, str) or not feature:
+        return ["delivery_review_feature"]
+    root = project_root.resolve()
+    try:
+        canonical = receipt_path(root, feature).resolve()
+        given = Path(submitted)
+        resolved = (given if given.is_absolute() else root / given).resolve()
+        if resolved != canonical:
+            return [f"delivery_review_receipt_valid:not_the_feature_receipt:{submitted}"]
+        model = expected_map.get("reviewer_model")
+        budget = expected_map.get("review_max_chars")
+        lane = evaluate_lane(
+            root,
+            feature,
+            model if isinstance(model, str) else "",
+            budget if isinstance(budget, int) else None,
+        ).lane
+        outcome = verify_review(root, feature, lane)
+    except DeliveryInputError as exc:
+        return [f"delivery_review_receipt_valid:{exc}"]
+    return [f"delivery_review_receipt_valid:{reason.code}" for reason in outcome.reasons]
 
 
 def _required_evidence_satisfied(

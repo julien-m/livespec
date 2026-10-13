@@ -54,6 +54,17 @@ Avant tout `PHASE_RESULT`, résoudre le feature slug effectif, puis exécuter `l
 Si verdict `FAIL` ou `BLOCKED`, ou si `receipt_path` est absent/null → `PHASE_RESULT: BLOCKED - conventions_gate_failed` avec `extra.conventions_verdict` et `extra.conventions_receipt_path`.
 Si verdict `PASS`, soumettre `{"conventions_receipt_path":"<receipt_path>"}` au goal et inclure `extra.conventions_verdict: PASS`.
 
+## STEP 0.95 — Delivery lane (risk-proportional, feature 086)
+
+<!-- @spec FR-008: Lane-driven step gate and one final review — .specs/features/086-risk-proportional-delivery/spec.md#fr-008 -->
+
+Resolve the lane once with `livespec delivery lane --feature <slug> --model <actual-model> --json` (the goal records it in `runtime_context.delivery_lane`). The CLI decides from the reviewed QE classification; never declare a lane yourself.
+
+- **Every step, both lanes:** targeted tests, lint and format of the touched files, and the conventions gate. No Spec Reviewer, Code Quality Reviewer, native review or audit runs per step.
+- **End of the feature, light lane** (Low/Medium criticality, Local/Shared blast radius, current spec review): one independent native `combined` review of the complete diff and one certification.
+- **End of the feature, full lane** (every other case): two independent native agents, one `review` (spec compliance, quality) and one `audit` (security, robustness, conventions), on the complete diff, then one certification.
+- **Read** [the delivery review protocol](../../../system/delivery-review.md) for the end-of-feature review (Phase 6.8). The retired `audit` skill, Codex and any external launcher are never used.
+
 # Command: /spec-implement
 
 > APEX-style auto-pipeline: implement → test → visual baselines → map to spec.
@@ -114,7 +125,7 @@ flowchart TD
 >
 > **Hooks — after completing:** Same resolution with `after-implement` at all 3 levels.
 > **Hooks — before each step:** Same resolution with `before-implement-step` at all 3 levels.
-> **Hooks — after each step:** Same resolution with `after-implement-step` at all 3 levels. Read and execute the [native quality review protocol](../../../system/hooks/after-implement-step.md) after tests and both step reviewers pass, even if no user hook is installed. An installed copy of that protocol uses the same scope-bound report; do not dispatch it twice. Custom hooks retain their normal inheritance but cannot waive the native review or require the retired audit skill/launcher. Unresolved blocking findings keep the step Blocked.
+> **Hooks — after each step:** Same resolution with `after-implement-step` at all 3 levels. The [canonical step hook](../../../system/hooks/after-implement-step.md) dispatches no review: steps run only tests, lint, format and conventions (STEP 0.95). Custom hooks retain their normal inheritance but cannot require the retired audit skill/launcher; a historical global copy that dispatches a per-step review is replaced as described in `system/hooks.md`. The single native review of the complete diff runs once in Phase 6.8.
 
 ## Surface-Aware Test Directory Resolution
 
@@ -302,7 +313,7 @@ Règle globale: un step ne peut passer à `Done` que si ses vérifications sont 
 Pour chaque `Step N`:
 
 1. Exécuter les checks ciblés du step (tests unitaires/intégration/E2E selon le scope).
-2. Exécuter les checks transverses impactés (au minimum lint/typecheck sur fichiers touchés).
+2. Exécuter les checks transverses impactés : lint, format et typecheck sur les fichiers touchés, puis le gate conventions (`livespec conventions verify --json --feature <slug>`). Aucune revue ni audit par step (STEP 0.95) : la revue indépendante du diff complet a lieu une seule fois en Phase 6.8.
 3. Si échec: corriger et re-tester dans les limites d'itération.
 4. Si limite atteinte: marquer `Blocked`, enregistrer le contexte, arrêter la progression.
 5. **Écrire le checkpoint dans `.specs/features/NNN-feature-name/progress.md` (BLOCKING — do NOT proceed without writing this).**
@@ -363,7 +374,7 @@ For each step, assemble the following payload:
   Use the comment syntax appropriate to the target language.
 - Description must be < 50 chars, extracted from the FR text in `spec.md`.
 - When a single block implements multiple FRs, combine them: `// @spec FR-001: Fetch count, FR-003: Mark read — .specs/features/NNN-feature-name/spec.md#fr-001`
-- These anchors are **non-negotiable** — the Spec Reviewer must verify their presence and deep-link before approving.
+- These anchors are **non-negotiable** — the Phase 6.8 delivery review verifies their presence and deep-link.
 - Anchors must be placed on the line immediately above the function, class, or block that implements the requirement.
 
 **4. Strict TDD Protocol**
@@ -374,16 +385,18 @@ For each step, assemble the following payload:
 - Visual baselines must be saved to `.specs/features/NNN-feature-name/baselines/`.
 - All commands must pass before the step can be declared `Done`.
 
-**5. Definition of Done (for Superpowers reviewers)**
+**5. Definition of Done (checked by the implementer at each step, reviewed once in Phase 6.8)**
 
-The **Spec Reviewer** must confirm:
+No reviewer is dispatched per step (STEP 0.95). The implementer checks the lists below itself before reporting the step; the end-of-feature delivery review (Phase 6.8) verifies them on the complete diff.
+
+Spec compliance:
 - [ ] All FR/AC assigned to this step are implemented
 - [ ] Every implemented FR has a `@spec FR-NNN: description — path/to/spec.md#fr-nnn` anchor (with deep-link) in the source file
 - [ ] No FR from `spec.md` is implemented partially (all-or-nothing per FR)
 
-The **Code Quality Reviewer** must review the actual acceptance mapping and exact assertion spans using the existing test surface: `livespec test --feature <feature> --acceptance-mapping <path> --prepare-mapping-review`. Return raw JSON matching the returned `response_schema` for every prepared batch, plus actual synthesis when required. The caller ingests that bundle with `--ingest-mapping-review <bundle>` on the same command. Never manufacture covered conclusions from test names or anchors. **Read** [execution evidence](../../../system/testing/execution-rules.md#execution-evidence) for runner capture and certification.
+Acceptance mapping (once, before certification in Phase 6): **Read** [execution evidence](../../../system/testing/execution-rules.md#execution-evidence). A mapping derived from `@spec AC-xxx` test anchors needs no separate mapping review; a hand-written mapping keeps the independent mapping review (`--prepare-mapping-review`, then `--ingest-mapping-review <bundle>`), run within the Phase 6.8 review, never per step. Never manufacture covered conclusions from test names.
 
-The **Code Quality Reviewer** must confirm:
+Code quality:
 - [ ] All resolved test commands pass (unit, integration, E2E, visual as applicable)
 - [ ] Lint and typecheck pass on all touched files
 - [ ] No God files (max 300 lines per file)
@@ -405,12 +418,10 @@ Spawn subagent with prompt:
    <Task Payload from 3.1>"
 ```
 
-The subagent will auto-activate the `superpowers:subagent-driven-development` skill, which will:
+The subagent will auto-activate the `superpowers:subagent-driven-development` skill, restricted by STEP 0.95:
 1. Spin up a fresh **Implementer** subagent to write code and tests (TDD, context-isolated).
-2. Spin up a **Spec Reviewer** subagent to verify FR/AC compliance and `@spec` anchors.
-3. Spin up a **Code Quality Reviewer** subagent to verify test passage and code quality.
-4. Loop back to the Implementer if either review fails (with findings).
-5. Apply `systematic-debugging` if tests fail after the implementation loop.
+2. Run the step checks (tests, lint, format, conventions); do not spin up Spec or Code Quality reviewer subagents for the step.
+3. Apply `systematic-debugging` if tests fail after the implementation loop.
 
 **On Superpowers completion:** receive the list of files created/modified, FR/AC addressed, and test results. Feed these into the Step Gate (Phase 2) to write the `progress.md` checkpoint.
 
@@ -486,6 +497,16 @@ The child `/spec-test` must capture runtime PNGs to `.specs/features/<slug>/run/
 `Visual Gate Verdict: PASS` is required before Phase 7 can create final visual mappings and before Phase 8.5 can mark a visual feature as `Implemented`. A visual feature must never be marked `Implemented` with missing visual tests, missing baselines, unapproved visual diffs, or blocked runner tooling.
 
 **`--no-visual` rule:** `--no-visual` on a visual feature is allowed only for partial implementation runs. It must set Status to `In Progress`, never `Implemented`, and the output must state: "Visual validation skipped by flag." Backend-only features are unaffected by this flag.
+
+### Phase 6.8 — Delivery review (once per feature)
+
+After Phase 6 passes, review the complete feature diff once, following **Read** [the delivery review protocol](../../../system/delivery-review.md):
+
+1. `livespec delivery review prepare --feature <slug> --base <feature-base-rev> --model <actual-model> --json`.
+2. Dispatch the independent native reviewer(s) required by the lane (light: one `combined`; full: one `review` and one `audit`) with effort `high`.
+3. `livespec delivery review record --feature <slug> --kind <kind> --report <report.json>` for each actual report.
+4. On BLOCKED: fix, rerun the affected checks, prepare again and review again; at most two correction rounds, then `round_cap_reached` stops the run for the maintainer.
+5. `livespec delivery review verify --feature <slug> --model <actual-model>` must exit 0; submit `delivery_review_receipt_path` (`.specs/features/<slug>/.reviews/delivery.json`) to the goal.
 
 ### Phase 7 — Update implementation.md
 
@@ -599,9 +620,12 @@ By default, the pipeline is orchestrated by a **supervisor agent** acting as **O
 Supervisor (Orchestrator/Translator — never codes, never tests)
   │
   ├── [Per step] superpowers:subagent-driven-development
-  │     ├── Implementer subagent  (writes code + tests, places @spec anchors)
-  │     ├── Spec Reviewer subagent (verifies FR/AC compliance + @spec presence)
-  │     └── Code Quality Reviewer subagent (verifies tests pass + code quality)
+  │     └── Implementer subagent  (writes code + tests, places @spec anchors,
+  │                                runs tests, lint, format, conventions)
+  │
+  ├── [Once, Phase 6.8] Delivery review of the complete diff
+  │     ├── light lane: one combined native reviewer
+  │     └── full lane: one review + one audit native reviewer
   │
   └── Documenter (updates progress.md, implementation.md, changelogs, README)
 ```
@@ -609,7 +633,7 @@ Supervisor (Orchestrator/Translator — never codes, never tests)
 **Per-step cycle:**
 1. Supervisor builds the Task Payload (FR/AC, instructions, TDD commands, Definition of Done)
 2. Supervisor dispatches to `superpowers:subagent-driven-development`
-3. Superpowers executes: Implementer → Spec Review → Quality Review (with fix loops)
+3. Superpowers executes: Implementer → step checks (tests, lint, format, conventions)
 4. Supervisor receives results, updates `progress.md` via Documenter
 
 **Final phase:**
@@ -687,6 +711,7 @@ For UI certification closures, forward the same independent `--build-manifest <r
 - [always] Run Step 0a behavioral TDD if `## Behavioral AC` present (RED phase required) <!-- evidence:execution applicable:behavioral-ac outcome:red -->
 - [always] Create progress.md before any step transitions to Done <!-- evidence:documentary -->
 - [always] Execute each plan step with code, targeted tests, and step gate verification <!-- evidence:execution -->
+- [always] Run only tests, lint, format and conventions per step; dispatch no per-step reviewer or audit <!-- evidence:documentary -->
 - [always] Write checkpoint to progress.md after every step <!-- evidence:documentary -->
 - [always] Block step advancement on failing tests until iteration limit or Blocked status <!-- evidence:documentary -->
 
@@ -717,6 +742,12 @@ For UI certification closures, forward the same independent `--build-manifest <r
 - [visual] Require child evidence `{"visual_evidence_receipt_path":"<receipt-path>"}` from `livespec visual-gate certify` + `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path>` <!-- evidence:documentary -->
 - [visual] Block Phase 7 on FAIL or BLOCKED visual gate verdict <!-- evidence:documentary -->
 
+### Phase 6.8 — Delivery review
+
+- [lane-light] Review the complete diff once with one independent native `combined` reviewer (effort high) and record it with `livespec delivery review record --kind combined` <!-- evidence:documentary -->
+- [lane-full] Review the complete diff once with two independent native reviewers, `review` then `audit` (effort high), and record both reports <!-- evidence:documentary -->
+- [always] Stop for the maintainer on `round_cap_reached` (initial report plus two corrections) <!-- evidence:documentary -->
+
 ### Phase 7 — Update implementation.md
 
 - [always] Map every FR and AC to source file with `@spec` anchor and status <!-- evidence:documentary -->
@@ -741,6 +772,7 @@ For UI certification closures, forward the same independent `--build-manifest <r
 - [ ] `progress.md` exists with a checkpoint row for every step executed <!-- evidence:documentary -->
 - [ ] Planned FR scope for this run is implemented or explicitly deferred <!-- evidence:documentary -->
 - [ ] Relevant tests pass for touched scope (or blocker documented) <!-- evidence:execution ac-scope:feature -->
+- [ ] `livespec delivery review verify --feature <slug>` passes for the lane's required reviews <!-- evidence:documentary -->
 - [ ] For visual features, `/spec-test <feature> --auto --visual` completed with `Visual Gate Verdict: PASS` and returned `visual_evidence_receipt_path` <!-- evidence:documentary -->
 - [ ] For visual features, every `## Screens` row has a visual test, current baseline artifact, and passing design-fidelity comparison <!-- evidence:documentary -->
 - [ ] If `--no-visual` was used on a visual feature, status is `In Progress` and the skipped gate is documented <!-- evidence:documentary -->

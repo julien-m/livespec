@@ -29,7 +29,7 @@ If `goal render` fails, report `BLOCKED at step 0 - dependency_unmet - livespec 
 
 # Command: /spec-ship
 
-> Batch autopilot — selects features from the roadmap and runs `/spec-feature --auto --branch` for each in an independent native sub-agent, with preflight, audit, merge, and roadmap updates.
+> Batch autopilot — selects features from the roadmap and runs `/spec-feature --auto --branch` for each in an independent native sub-agent, with preflight, one end-of-feature delivery review, merge, and roadmap updates.
 
 ---
 
@@ -78,7 +78,7 @@ flowchart TD
 To avoid context window exhaustion, each feature runs in a **separate spawned agent**:
 
 - **Main context (ship orchestrator):** reads roadmap, manages branches, parses agent results, merges, updates ship.md. Stays under ~10k tokens per feature cycle.
-- **Spawned sub-agent (per feature):** executes `/spec-feature --auto --branch` in an independent native environment with its own goal. Handles specify, review, plan, implement, test, audit, and commit. Returns a structured `SHIP_RESULT` block (see [`../spec-feature/SKILL.md`](../spec-feature/SKILL.md) § Ship Result).
+- **Spawned sub-agent (per feature):** executes `/spec-feature --auto --branch` in an independent native environment with its own goal. Handles specify, review, plan, implement (steps run only tests, lint, format and conventions; one delivery review of the complete diff at the end, see [`system/delivery-review.md`](../../../system/delivery-review.md)), test, and commit. Returns a structured `SHIP_RESULT` block (see [`../spec-feature/SKILL.md`](../spec-feature/SKILL.md) § Ship Result).
 
 The agent commits on its feature branch. The main context merges into the target branch after receiving `SHIP_RESULT: OK`.
 
@@ -253,7 +253,7 @@ Sub-agent prompt:
 > sub-agents (see `.agent-sync/skills/spec-feature/SKILL.md`). Do NOT remove this line. See
 > [`system/integrations.md`](../system/integrations.md) for the contract.
 
-The sub-agent executes the full pipeline autonomously: specify → spec review → plan → plan review → preflight light → implement → audit. Each sub-agent has an independent native environment and its own goal.
+The sub-agent executes the full pipeline autonomously: specify → spec review → plan → plan review → preflight light → implement (one delivery review of the complete diff at the end; the lane from `livespec delivery lane` decides one `combined` or a `review` plus an `audit` reviewer). Each sub-agent has an independent native environment and its own goal.
 
 **Wait for the sub-agent to complete and return its result.**
 
@@ -362,7 +362,7 @@ When `--resume` is provided:
    - If branch exists but ship.md says `In Progress` → the agent may have crashed mid-pipeline
    - If branch is gone but ship.md says `In Progress` → feature was likely completed and merged externally; verify on target branch and mark `Done`
 4. If status is `Blocked`:
-   - Check if the blocking issue is resolved (re-run audit on the feature branch)
+   - Check if the blocking issue is resolved (re-run `livespec delivery review verify --feature <slug>` on the feature branch)
    - If resolved → continue from Step 4 (merge)
    - If `Blocked (merge conflict)` → attempt merge again
    - If not resolved → report still blocked
@@ -378,14 +378,14 @@ If `ship.md` doesn't exist → display "No ship session found. Run `/spec-ship` 
 
 ## Error Handling
 
-When a feature fails (audit fail after 3 retries, test failure, pipeline error):
+When a feature fails (delivery review `round_cap_reached` after two corrections, test failure, pipeline error):
 
 1. Update `ship.md`: feature status → `Blocked`
 2. Do NOT continue to subsequent features
 3. Display:
 
 ```
-✗ Blocked on **004-billing** — audit failed after 3 attempts
+✗ Blocked on **004-billing** — delivery review still BLOCKED after two corrections (round_cap_reached)
 
   Shipped: 1/3 features
   Blocked: 004-billing
