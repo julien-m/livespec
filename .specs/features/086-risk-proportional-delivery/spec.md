@@ -14,7 +14,7 @@ status: Draft
 - **Branch:** `feat/lighten-delivery-gates`
 - **Date:** 2026-10-13
 - **Status:** Draft
-- **Input:** On the Handy program (10 Tauri features, 12-13 October 2026), every one-to-two-hour implementation step required an independent review, an audit through the `audit` skill (Codex, which fails in the sandbox and was refused by the OpenAI platform on a false positive), conventions receipts and an independently reviewed AC-to-test mapping. Feature 008 was 35% done after about four hours. The QE analysis already classifies criticality and blast radius, but no gate reads it. The maintainer decided: (1) a light lane for low or medium risk, a full lane for high risk, eligibility verified by the CLI like the 084 bugfix lane; (2) during steps only tests, lint, format and conventions; one review and one audit of the complete diff at the end, by independent native agents, never imposing Codex.
+- **Input:** On the Handy program (10 Tauri features, 12-13 October 2026), every one-to-two-hour implementation step required an independent review, an audit through the `audit` skill (Codex, which fails in the sandbox and was refused by the OpenAI platform on a false positive), conventions receipts and an independently reviewed AC-to-test mapping. Feature 008 was 35% done after about four hours. The QE analysis already classifies criticality and blast radius, but no gate reads it. The maintainer decided: (1) a light lane for low or medium risk, a full lane for high risk, eligibility verified by the CLI like the 084 bugfix lane; (2) during steps only tests, lint, format and conventions; one review and one audit of the complete diff at the end, by independent native agents, never imposing Codex. Refinement (13 October 2026): a `High` criticality chosen by the spec author can be contested by the spec reviewer, otherwise the light lane stays theoretical.
 
 ## Scope and Source Evidence
 
@@ -159,6 +159,42 @@ flowchart TD
     E --> F
 ```
 
+### Story 4 — Contest a High criticality in the spec review `P2`
+
+**As a** maintainer, **I want** the spec reviewer to be able to contest a `High` criticality chosen by the author, **so that** a feature is not sent to the full lane only because its author classified it cautiously.
+
+**Priority reason:** on the Handy program most specs were classified `High` by default, which kept every feature in the full lane.
+
+**Independent test:** Ingest a spec review with a criticality assessment, then evaluate the lane.
+
+```gherkin
+Feature: Contested criticality
+  Scenario: The reviewer lowers High to Medium
+    Given a spec classified High criticality with Shared blast radius
+    And a current and ready spec review assessing Medium criticality with a cited justification
+    When "livespec delivery lane --feature <feature>" runs
+    Then the lane is light and the output reports the contested criticality
+
+  Scenario: The reviewer raises the criticality
+    Given a spec classified Medium criticality
+    And a current spec review assessing High criticality
+    When the lane is evaluated
+    Then the lane is full with "criticality_high"
+```
+
+#### User Flow
+
+```mermaid
+flowchart TD
+    A[Lane evaluation] --> B[Classify current and reviewed QE, keep the stricter]
+    B --> C{Criticality High and spec review current and ready?}
+    C -- No --> E[Lane from classification]
+    C -- Yes --> D{Reviewer assessed Low or Medium with justification and citation?}
+    D -- No --> E
+    D -- Yes --> F[Drop criticality_high, report criticality_contested]
+    F --> E
+```
+
 ## Acceptance Criteria
 
 ### AC-001
@@ -193,6 +229,10 @@ When the initial report and two correction rounds of the same kind are all BLOCK
 
 The spec-implement step gate requires only targeted tests, lint and format of touched files and the conventions gate per step; `system/hooks/after-implement-step.md` no longer dispatches any review per step; spec-implement, spec-feature and spec-ship run the delivery review once at the end following `system/delivery-review.md`, which forbids the `audit` skill, Codex and other external launchers; both spec-system copies describe the lanes.
 
+### AC-009
+
+A spec review may carry one `qe_assessment` (`criticality` `Low`, `Medium` or `High`, a non-empty `justification` and at least one citation of the reviewed sources), stored in the receipt. When the spec review is current and ready, an assessed `High` adds `criticality_high`, and an assessed `Low` or `Medium` against an author `High` removes `criticality_high` and adds `criticality_contested` (author and reviewer values, justification) to the lane output without making the lane full; the lane classifies both the current QE section and the QE section of the reviewed spec and keeps every reason of either, so a QE edit after the review never lowers the lane.
+
 ## Functional Requirements
 
 - **FR-001:** Add the `livespec delivery` command group with `lane` and the `review` subgroup (`prepare`, `record`, `verify`); usage errors exit 2. **Maps to:** AC-001, AC-003, AC-004, AC-006.
@@ -203,6 +243,7 @@ The spec-implement step gate requires only targeted tests, lint and format of to
 - **FR-006:** Verify the latest rounds against the lane and the current diff. **Maps to:** AC-006.
 - **FR-007:** Integrate the lane and the `delivery.review` task in the spec-implement goal. **Maps to:** AC-007.
 - **FR-008:** Update the skills, hook, protocol and spec-system copies as stated in AC-008. **Maps to:** AC-008.
+- **FR-009:** Add the optional `qe_assessment` to the spec review response and receipt, apply it and the reviewed QE section in the lane, and document it in the spec-specify review instructions. **Maps to:** AC-009.
 
 ## Key Entities
 
@@ -216,7 +257,8 @@ The spec-implement step gate requires only targeted tests, lint and format of to
 ## Edge Cases
 
 - **Spec review absent (a project that skipped spec review):** the lane is full; nothing else changes.
-- **QE re-classified downward after the review:** the spec review becomes stale (normative change), so the lane is full until a new review.
+- **QE re-classified downward after the review:** a QE edit no longer makes the spec review stale (feature 089), so the lane keeps the stricter of the current and the reviewed classification until a new review.
+- **Contested blast radius:** the reviewer assessment covers criticality only; a wide blast radius always keeps the full lane.
 - **Files changed during the Test phase after a PASS:** `verify` reports `scope_changed`; prepare and review again.
 - **Traceability updates after the review** (`implementation.md`, changelogs, README, receipts): excluded from the scope, so they never invalidate the review.
 
