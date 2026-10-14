@@ -3,16 +3,16 @@
 The record names the HEAD commit at opening. A recorded receipt is accepted only while
 that commit is an ancestor of HEAD and the feature review prepared from that commit's
 tree, exactly as a real opening would prepare it, has the receipt's sources, roles and
-stable identity.
+stable identity. The tree is written from raw git objects: no filter, attribute or
+replace object of the local repository changes what the commit holds.
 """
 
 from __future__ import annotations
 
-import io
 import os
+import posixpath
 import re
 import subprocess
-import tarfile
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -21,13 +21,19 @@ if TYPE_CHECKING:
     from ..semantic.review_context import PreparedReview
 
 _OBJECT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
-# Replace objects and grafts would let local refs rewrite history (094 audit).
-_ENV = {**os.environ, "GIT_NO_REPLACE_OBJECTS": "1"}
+# Replace objects would let local refs rewrite history; pathspecs are plain names.
+_CONFIG = ".specs/semantic/config.yaml"
+_ENV = {**os.environ, "GIT_NO_REPLACE_OBJECTS": "1", "GIT_LITERAL_PATHSPECS": "1"}
 
 
-def _git(root: Path, *args: str) -> subprocess.CompletedProcess[bytes]:
+def _git(root: Path, *args: str, stdin: bytes | None = None) -> subprocess.CompletedProcess[bytes]:
     return subprocess.run(
-        ["git", "-C", str(root), *args], capture_output=True, check=False, timeout=60, env=_ENV
+        ["git", "-C", str(root), *args],
+        input=stdin,
+        capture_output=True,
+        check=False,
+        timeout=60,
+        env=_ENV,
     )
 
 
@@ -56,31 +62,86 @@ def is_ancestor(root: Path, commit: str) -> bool:
         return False
 
 
+def _blobs(top: Path, commit: str, paths: list[str]) -> dict[str, tuple[str, bytes]] | None:
+    """Mode and raw content of every blob under ``paths`` (relative to the top) at ``commit``."""
+    listing = _git(top, "ls-tree", "-r", "-z", "--full-tree", commit, "--", *paths)
+    if listing.returncode != 0:
+        return None
+    entries = []
+    for record in listing.stdout.split(b"\0"):
+        if record:
+            meta, _, raw_name = record.partition(b"\t")
+            mode, kind, sha = meta.decode().split()
+            if kind == "blob":
+                entries.append((raw_name.decode("utf-8"), mode, sha))
+    batch = _git(top, "cat-file", "--batch", stdin="".join(f"{e[2]}\n" for e in entries).encode())
+    if batch.returncode != 0:
+        return None
+    blobs: dict[str, tuple[str, bytes]] = {}
+    data = batch.stdout
+    for name, mode, _ in entries:
+        header, _, data = data.partition(b"\n")
+        size = int(header.split()[2])
+        blobs[name], data = (mode, data[:size]), data[size + 1 :]
+    return blobs
+
+
+def _write(into: Path, blobs: dict[str, tuple[str, bytes]]) -> None:
+    """Write blobs under ``into``; a symlink is kept only when it stays inside ``into``."""
+    for name, (mode, content) in blobs.items():
+        if name.startswith("/") or ".." in name.split("/"):
+            continue
+        path = into / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if mode == "120000":
+            target = posixpath.normpath(posixpath.join(posixpath.dirname(name), content.decode()))
+            if not target.startswith("../") and target != ".." and not target.startswith("/"):
+                path.symlink_to(content.decode())
+        else:
+            path.write_bytes(content)
+
+
 def _checkout(root: Path, commit: str, paths: list[str], into: Path) -> Path | None:
-    """Extract ``paths`` of ``commit`` with checkout filters; return the project root in it."""
-    prefix = _output(root, "rev-parse", "--show-prefix")
-    if prefix is None:
+    """Write ``paths`` of the project at ``commit`` and the in-repository targets of its
+    symlinks; return the project root inside ``into``."""
+    top, prefix = (
+        _output(root, "rev-parse", "--show-toplevel"),
+        _output(root, "rev-parse", "--show-prefix"),
+    )
+    if top is None or prefix is None:
         return None
     try:
-        archive = _git(root, "archive", "--format=tar", commit, "--", *paths)
-        if archive.returncode != 0:
+        blobs = _blobs(Path(top), commit, [prefix + p for p in paths])
+        if blobs is None:
             return None
-        with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as tar:
-            tar.extractall(into, filter="data")
-    except (OSError, subprocess.SubprocessError, tarfile.TarError):
+        links = {
+            posixpath.normpath(posixpath.join(posixpath.dirname(n), c.decode()))
+            for n, (m, c) in blobs.items()
+            if m == "120000"
+        }
+        missing = sorted(t for t in links if t not in blobs and not t.startswith(("../", "/")))
+        extra = _blobs(Path(top), commit, missing) if missing else {}
+        _write(into, {**(extra or {}), **blobs})
+    except (OSError, subprocess.SubprocessError, UnicodeError, ValueError, IndexError):
         return None
     return into / prefix
 
 
-def _targets(root: Path, names: dict[str, str]) -> set[str]:
-    """Reviewed sources outside ``.specs`` and the in-project targets of symlinked ones."""
-    base = root.resolve()
-    targets = {name for name in names if not name.startswith(".specs/")}
-    for name in names:
-        resolved = (root / name).resolve()
-        if resolved.is_relative_to(base) and resolved != (base / name):
-            targets.add(resolved.relative_to(base).as_posix())
-    return targets
+def _same_configuration(
+    project: Path, at_commit: PreparedReview, reviewed: PreparedReview
+) -> PreparedReview:
+    """Take the reviewed configuration hash when the committed one differs only in line
+    endings (a CRLF checkout of an LF blob)."""
+    from ..semantic.review_context import content_hash
+
+    config = project / _CONFIG
+    text = config.read_bytes().decode("utf-8") if config.is_file() else ""
+    lf = text.replace("\r\n", "\n")
+    expected = reviewed.dependencies.get("semantic_config")
+    if expected in {content_hash(lf), content_hash(lf.replace("\n", "\r\n"))}:
+        dependencies = {**at_commit.dependencies, "semantic_config": expected}
+        return at_commit.model_copy(update={"dependencies": dependencies})
+    return at_commit
 
 
 # @spec FR-002: Reviewed sources at the opening commit
@@ -100,7 +161,7 @@ def matches_commit(root: Path, commit: str, reviewed: PreparedReview) -> bool:
         stable_identity,
     )
 
-    paths = sorted({".specs", *_targets(root, reviewed.source_hashes)})
+    paths = sorted({".specs", *(n for n in reviewed.source_hashes if not n.startswith(".specs/"))})
     with tempfile.TemporaryDirectory() as tmp:
         project = _checkout(root, commit, paths, Path(tmp))
         if project is None:
@@ -113,7 +174,8 @@ def matches_commit(root: Path, commit: str, reviewed: PreparedReview) -> bool:
                 reviewed.reviewer_model,
                 reviewed.max_chars,
             )
-        except (OSError, ValueError):
+            at_commit = _same_configuration(project, at_commit, reviewed)
+        except (OSError, ValueError, RuntimeError):  # RuntimeError: a symlink loop.
             return False
     return (
         comparable(at_commit)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Literal
@@ -108,11 +109,21 @@ def test_open_accepts_a_committed_symlinked_source(root: Path) -> None:
     assert _open()[0] == 0
 
 
+def test_project_in_a_repository_subdirectory_opens_and_verifies(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = make_root(tmp_path / "sub")
+    shutil.rmtree(root / ".git")
+    commit_all(tmp_path, "monorepo")
+    monkeypatch.chdir(root)
+    assert _open()[0] == 0
+    edit_spec(root, *AC_EDIT)
+    require_progression(root, FEATURE, "implement", model="reviewer/v1")
+
+
 def test_open_outside_git_is_unverified(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     root = make_root(tmp_path)
-    for path in sorted((root / ".git").rglob("*"), reverse=True):
-        path.unlink() if path.is_file() or path.is_symlink() else path.rmdir()
-    (root / ".git").rmdir()
+    shutil.rmtree(root / ".git")
     monkeypatch.chdir(root)
     assert _open()[1]["error"] == "spec_revision_unverified"
 
@@ -151,6 +162,35 @@ def test_hand_written_record_misses_no_linked_document(root: Path) -> None:
     linked = commit_all(root, "link")  # The reviews never saw extra.md.
     _hand_written_record(root, linked)
     with pytest.raises(ProgressionBlocked, match="spec_revision_unverified"):
+        require_progression(root, FEATURE, "implement", model="reviewer/v1")
+
+
+def test_local_filters_and_attributes_do_not_change_the_commit(root: Path) -> None:
+    reviewed = root / "reviewed-spec.md"
+    shutil.copy(root / ".specs/features" / FEATURE / "spec.md", reviewed)
+    edit_spec(root, *AC_EDIT)
+    changed = commit_all(root, "revise")  # The reviews never matched this commit.
+    _git(root, "config", "filter.old.smudge", f"cat {reviewed}")
+    attributes = f".specs/features/{FEATURE}/spec.md filter=old\n"
+    (root / ".git/info/attributes").write_text(attributes)
+    _hand_written_record(root, changed)
+    with pytest.raises(ProgressionBlocked, match="spec_revision_unverified"):
+        require_progression(root, FEATURE, "implement", model="reviewer/v1")
+
+
+def test_export_attributes_do_not_hide_committed_sources(root: Path) -> None:
+    attributes = ".specs/** export-ignore\n.specs/project.md export-subst\n"
+    (root / ".gitattributes").write_text(attributes)
+    commit_all(root, "attributes")
+    assert _open()[0] == 0
+
+
+def test_symlink_loop_at_the_commit_is_refused_without_crashing(root: Path) -> None:
+    (root / ".specs/features" / FEATURE / "loop.md").symlink_to("loop.md")
+    edit_spec(root, "## Scope\n", "## Scope\n\nRead [loop](loop.md).\n")
+    looped = commit_all(root, "loop")
+    _hand_written_record(root, looped)
+    with pytest.raises(ProgressionBlocked):
         require_progression(root, FEATURE, "implement", model="reviewer/v1")
 
 
