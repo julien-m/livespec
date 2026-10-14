@@ -123,6 +123,8 @@ While a revision is open, the `implement` and `test` progressions accept a recor
 - **Record written by hand with an older commit at which the reviews were current:** accepted, as if the revision had been opened then; completion still requires current reviews.
 - **Linked document added at the commit:** the review prepared at the commit has another source set, so the record is refused.
 - **CRLF checkout, symlinked source, local filters or export attributes:** the commit's tree is written from raw objects, so local filters and attributes change nothing; line endings do not change the stable identity or the configuration comparison; a project in a repository subdirectory verifies like one at the top.
+- **Committed attributes that transform checkouts (`ident`, a smudge or LFS filter, `working-tree-encoding`):** the working tree differs from the raw objects, so `open` refuses with `spec_revision_uncommitted`.
+- **Crafted symlinks at the commit:** chained links resolve; nothing is written under a link or outside the temporary tree, a link resolving outside it is dropped, and a name that is both a link and a directory refuses the record (`spec_revision_unverified`).
 - **Uncommitted reviewed sources at open:** refused with `spec_revision_uncommitted`; commit them first.
 
 ## Quality Engineering

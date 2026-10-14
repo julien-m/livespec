@@ -78,27 +78,85 @@ def _blobs(top: Path, commit: str, paths: list[str]) -> dict[str, tuple[str, byt
     if batch.returncode != 0:
         return None
     blobs: dict[str, tuple[str, bytes]] = {}
-    data = batch.stdout
+    data, start = batch.stdout, 0
     for name, mode, _ in entries:
-        header, _, data = data.partition(b"\n")
-        size = int(header.split()[2])
-        blobs[name], data = (mode, data[:size]), data[size + 1 :]
+        end = data.index(b"\n", start)
+        size = int(data[start:end].split()[2])
+        blobs[name], start = (mode, data[end + 1 : end + 1 + size]), end + 2 + size
     return blobs
 
 
-def _write(into: Path, blobs: dict[str, tuple[str, bytes]]) -> None:
-    """Write blobs under ``into``; a symlink is kept only when it stays inside ``into``."""
-    for name, (mode, content) in blobs.items():
-        if name.startswith("/") or ".." in name.split("/"):
+def _under_links(into: Path, name: str) -> bool:
+    """Whether a directory on the way to ``name`` under ``into`` is a symlink."""
+    current = into
+    for part in name.split("/")[:-1]:
+        current = current / part
+        if current.is_symlink():
+            return True
+    return False
+
+
+def _escaping(into: Path, links: list[Path]) -> list[Path]:
+    """The links that physically resolve outside ``into`` (a loop stays inside)."""
+    inside = into.resolve()
+    escaping = []
+    for link in links:
+        try:
+            if not link.resolve().is_relative_to(inside):
+                escaping.append(link)
+        except (OSError, RuntimeError):  # A loop: reading it fails later, inside.
             continue
+    return escaping
+
+
+def _write(into: Path, blobs: dict[str, tuple[str, bytes]]) -> None:
+    """Write blobs under ``into``; nothing is ever written or read outside it.
+
+    Regular blobs come first and nothing is written under a symlink, so no write
+    follows a link of the commit. A link that resolves outside ``into``, alone or
+    through another link, is removed; a name both a link and a directory fails.
+    """
+    links: list[Path] = []
+    for name, (mode, content) in sorted(blobs.items(), key=lambda item: item[1][0] == "120000"):
+        if name.startswith("/") or {"", ".", ".."} & set(name.split("/")):
+            continue
+        if _under_links(into, name):
+            raise ValueError(f"commit_path_under_symlink:{name}")
         path = into / name
         path.parent.mkdir(parents=True, exist_ok=True)
         if mode == "120000":
-            target = posixpath.normpath(posixpath.join(posixpath.dirname(name), content.decode()))
-            if not target.startswith("../") and target != ".." and not target.startswith("/"):
-                path.symlink_to(content.decode())
+            path.symlink_to(content.decode())
+            links.append(path)
         else:
             path.write_bytes(content)
+    while escaping := _escaping(into, links):
+        for link in escaping:
+            link.unlink()
+            links.remove(link)
+
+
+def _with_link_targets(
+    top: Path, commit: str, blobs: dict[str, tuple[str, bytes]]
+) -> dict[str, tuple[str, bytes]] | None:
+    """Add the in-repository targets of the commit's symlinks, chained links included."""
+    asked: set[str] = set()
+    for _ in range(40):  # Bounded like the kernel's own symlink chain limit.
+        targets = {
+            posixpath.normpath(posixpath.join(posixpath.dirname(n), c.decode()))
+            for n, (m, c) in blobs.items()
+            if m == "120000"
+        }
+        missing = sorted(
+            t for t in targets - asked - set(blobs) if t != "." and not t.startswith(("../", "/"))
+        )
+        if not missing:
+            return blobs
+        asked.update(missing)
+        extra = _blobs(top, commit, missing)
+        if extra is None:
+            return None
+        blobs = {**extra, **blobs}
+    return None
 
 
 def _checkout(root: Path, commit: str, paths: list[str], into: Path) -> Path | None:
@@ -114,14 +172,10 @@ def _checkout(root: Path, commit: str, paths: list[str], into: Path) -> Path | N
         blobs = _blobs(Path(top), commit, [prefix + p for p in paths])
         if blobs is None:
             return None
-        links = {
-            posixpath.normpath(posixpath.join(posixpath.dirname(n), c.decode()))
-            for n, (m, c) in blobs.items()
-            if m == "120000"
-        }
-        missing = sorted(t for t in links if t not in blobs and not t.startswith(("../", "/")))
-        extra = _blobs(Path(top), commit, missing) if missing else {}
-        _write(into, {**(extra or {}), **blobs})
+        blobs = _with_link_targets(Path(top), commit, blobs)
+        if blobs is None:
+            return None
+        _write(into, blobs)
     except (OSError, subprocess.SubprocessError, UnicodeError, ValueError, IndexError):
         return None
     return into / prefix

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Literal
 
@@ -107,6 +108,57 @@ def test_open_accepts_a_committed_symlinked_source(root: Path) -> None:
     review_both(root)
     commit_all(root, "symlink")
     assert _open()[0] == 0
+
+
+def test_open_accepts_a_committed_chain_of_symlinks(root: Path) -> None:
+    (root / "docs/real").mkdir(parents=True)
+    (root / ".specs/project.md").rename(root / "docs/real/project.md")
+    (root / "docs/project.md").symlink_to("real/project.md")
+    (root / ".specs/project.md").symlink_to("../docs/project.md")
+    review_both(root)
+    commit_all(root, "chain")
+    assert _open()[0] == 0
+
+
+def _object(root: Path, data: bytes, *kind: str) -> bytes:
+    args = ["git", "-C", str(root), "hash-object", "-w", "--stdin", *kind]
+    return subprocess.run(args, input=data, capture_output=True, check=True).stdout.strip()
+
+
+def _tree(root: Path, entries: list[tuple[bytes, bytes, bytes]]) -> bytes:
+    raw = b"".join(
+        mode + b" " + name + b"\0" + bytes.fromhex(sha.decode()) for mode, name, sha in entries
+    )
+    return _object(root, raw, "-t", "tree", "--literally")
+
+
+def _entries(root: Path, tree: str) -> list[tuple[bytes, bytes, bytes]]:
+    listing = subprocess.run(["git", "-C", str(root), "ls-tree", "-z", tree], capture_output=True)
+    records = [r.partition(b"\t") for r in listing.stdout.split(b"\0") if r]
+    return [(m.split()[0], name, m.split()[2]) for m, _, name in records]
+
+
+def test_crafted_symlink_chain_writes_nothing_outside_the_tree(
+    root: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    (tmp_path / "tmp").mkdir()
+    (tmp_path / "victim").mkdir()
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path / "tmp"))
+    inner = _tree(root, [(b"100644", b"PWNED.txt", _object(root, b"outside\n"))])
+    links = [(b"0", b".."), (b"a", b"0/.."), (b"b", b"a/../victim")]
+    evil = [(b"120000", name, _object(root, target)) for name, target in links]
+    specs = [*_entries(root, "HEAD:.specs"), *evil, (b"40000", b"b", inner)]
+    specs.sort(key=lambda e: e[1] + (b"/" if e[0] == b"40000" else b""))
+    top = [
+        (m, n, _tree(root, specs) if n == b".specs" else s) for m, n, s in _entries(root, "HEAD")
+    ]
+    args = ["commit-tree", _tree(root, top).decode(), "-p", "HEAD", "-m", "crafted"]
+    crafted = subprocess.run(["git", "-C", str(root), *args], capture_output=True, check=True)
+    _git(root, "update-ref", "HEAD", crafted.stdout.decode().strip())
+    _hand_written_record(root, crafted.stdout.decode().strip())
+    with pytest.raises(ProgressionBlocked, match="spec_revision_unverified"):
+        require_progression(root, FEATURE, "implement", model="reviewer/v1")
+    assert not list(tmp_path.rglob("PWNED.txt"))
 
 
 def test_project_in_a_repository_subdirectory_opens_and_verifies(
