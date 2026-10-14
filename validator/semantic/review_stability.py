@@ -166,45 +166,64 @@ def _empty_source_role(name: str, feature: str) -> str:
     return canonical.get(name, "reference")
 
 
-def _authentic(reviewed: PreparedReview, context_hash: str) -> bool:
-    """Whether the stored context is what its sources prepare to, under ``context_hash``.
-
-    The source texts are rebuilt from the stored sections, checked against the stored
-    source hashes and prepared again, so an edited section or hash is refused.
-    """
-    from validator.semantic import review_context as context
-
-    texts = dict.fromkeys(reviewed.source_hashes, "")
+# @spec FR-001: Stored source roles
+#   — .specs/features/094-verified-review-continuity/spec.md#fr-001
+def reviewed_roles(reviewed: PreparedReview) -> dict[str, str]:
+    """The stored source roles, else those of the sections (receipts before feature 094)."""
+    if reviewed.source_roles:
+        return dict(reviewed.source_roles)
     roles: dict[str, str] = {}
     for section in reviewed.sections:
-        if section.source not in texts:
-            return False
-        texts[section.source] += section.text
         roles.setdefault(section.source, section.role)
-    for name in texts:  # An empty source has no section to carry its role.
+    for name in reviewed.source_hashes:  # An empty source has no section to carry its role.
         roles.setdefault(name, _empty_source_role(name, reviewed.feature))
-    if any(
-        context.content_hash(texts[name]) != hashed
-        for name, hashed in reviewed.source_hashes.items()
-    ):
-        return False
+    return roles
+
+
+def prepare_like(
+    reviewed: PreparedReview, texts: dict[str, str], dependencies: dict[str, str]
+) -> PreparedReview:
+    """Prepare ``texts`` with the identity fields of the reviewed context."""
+    from validator.semantic import review_context as context
+
     owners = {
         name: parts[2] if parts[:2] == [".specs", "features"] else reviewed.feature
         for name in texts
         for parts in [name.split("/")]
     }
-    rebuilt = context.prepare_review_context(
+    return context.prepare_review_context(
         reviewed.feature,
         texts,
         kind=reviewed.kind,
         model=reviewed.reviewer_model,
-        source_roles=roles,
+        source_roles=reviewed_roles(reviewed),
         source_features=owners,
-        dependencies=reviewed.dependencies,
+        dependencies=dependencies,
         max_chars=reviewed.max_chars,
         requirement_scope=reviewed.requirement_scope,
     )
-    return rebuilt.context_hash == context_hash and reviewed_snapshot(rebuilt) == reviewed
+
+
+def _authentic(reviewed: PreparedReview, context_hash: str) -> bool:
+    """Whether the stored context is what its sources prepare to, under ``context_hash``.
+
+    The source texts are rebuilt from the stored sections, checked against the stored
+    source hashes and prepared again, so an edited section, hash or role is refused.
+    """
+    from validator.semantic.review_context import content_hash
+
+    texts = dict.fromkeys(reviewed.source_hashes, "")
+    for section in reviewed.sections:
+        if section.source not in texts:
+            return False
+        texts[section.source] += section.text
+    if any(content_hash(texts[name]) != hashed for name, hashed in reviewed.source_hashes.items()):
+        return False
+    rebuilt = prepare_like(reviewed, texts, reviewed.dependencies)
+    snapshot = reviewed_snapshot(rebuilt)
+    if not reviewed.source_roles:
+        snapshot = snapshot.model_copy(update={"source_roles": {}})
+    return rebuilt.context_hash == context_hash and snapshot == reviewed
 
 
 def reviewed_against(

@@ -131,6 +131,7 @@
 | 091 | One-Command Specify Close | Draft | 2026-10-13 | 2026-10-13 | [spec](features/091-specify-close/spec.md), [plan](features/091-specify-close/plan.md) |
 | 092 | Existing Repository Onboarding | Draft | 2026-10-13 | 2026-10-13 | [spec](features/092-init-onboarding/spec.md), [plan](features/092-init-onboarding/plan.md) |
 | 093 | Configured Review Identity | Draft | 2026-10-13 | 2026-10-13 | [spec](features/093-configured-review-identity/spec.md), [plan](features/093-configured-review-identity/plan.md) |
+| 094 | Verified Review Continuity | In Progress | 2026-10-14 | 2026-10-14 | [spec](features/094-verified-review-continuity/spec.md), [plan](features/094-verified-review-continuity/plan.md), [implementation](features/094-verified-review-continuity/implementation.md) |
 <!-- readme:features:end -->
 
 ---

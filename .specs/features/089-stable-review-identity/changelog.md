@@ -1,5 +1,7 @@
 # Changelog - 089-stable-review-identity
 
+> The carried warnings on the unauthenticated revision record and on empty linked documents are fixed by [094](../094-verified-review-continuity/changelog.md).
+
 ## 2026-10-13 — [Feature]: Reviews stay current until requirements change; one spec revision during implementation
 
 - **Type:** Feature

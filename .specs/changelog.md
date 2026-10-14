@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-13
+> Last updated: 2026-10-14
 
 ---
+
+## 2026-10-14 — Feature: Verified review continuity
+
+- [094](features/094-verified-review-continuity/changelog.md): the reviewed context stores every source role, and a spec revision record is verified against the commit it was opened at, so a hand-written record no longer lets stale reviews pass implementation.
 
 ## 2026-10-13 — Feature: Reviews that stay current and a contestable criticality
 

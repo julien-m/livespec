@@ -11,9 +11,13 @@ from __future__ import annotations
 import os
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from .review_models import SCHEMA_VERSION, feature_dir, read_json, write_json
+from .revision_commit import head_commit, is_ancestor, matches_commit
+
+if TYPE_CHECKING:
+    from ..semantic.review_contract import ReviewReceipt
 
 _KINDS: tuple[Literal["spec", "plan"], ...] = ("spec", "plan")
 
@@ -38,16 +42,46 @@ def read_revision(root: Path, feature: str) -> dict[str, Any] | None:
     return record
 
 
+class RevisionUnverified(ValueError):
+    """The open revision record does not match the commit it names (feature 094)."""
+
+
+# @spec FR-003: Verified acceptance of recorded receipts
+#   — .specs/features/094-verified-review-continuity/spec.md#fr-003
 def accepted_reviews(root: Path, feature: str) -> frozenset[str]:
-    """Context hashes an open revision accepts; empty when no revision is open."""
+    """Context hashes an open revision accepts; empty when no revision is open.
+
+    A recorded receipt still in place is accepted only when the record's commit is an
+    ancestor of HEAD and the receipt's reviewed sources at that commit have its stable
+    identity; a receipt replaced since opening follows the normal rules.
+    """
+    from ..semantic.review_files import review_receipt_path
+    from ..semantic.review_receipts import load_review_receipt
+
     record = read_revision(root, feature)
-    return frozenset(str(record[kind]) for kind in _KINDS) if record else frozenset()
+    if record is None:
+        return frozenset()
+    commit = record.get("commit")
+    if not isinstance(commit, str) or not is_ancestor(root, commit):
+        raise RevisionUnverified("spec_revision_unverified: no commit of HEAD's history")
+    accepted = []
+    for kind in _KINDS:
+        try:
+            receipt = load_review_receipt(review_receipt_path(root, feature, kind))
+        except (OSError, ValueError):
+            continue
+        if receipt.context_hash != record[kind]:
+            continue
+        if receipt.reviewed is None or not matches_commit(root, commit, receipt.reviewed):
+            raise RevisionUnverified(f"spec_revision_unverified: {kind} review at {commit}")
+        accepted.append(receipt.context_hash)
+    return frozenset(accepted)
 
 
 def _current(
     root: Path, feature: str, kind: Literal["spec", "plan"], model: str, max_chars: int | None
-) -> str | None:
-    """Context hash of a current and ready receipt of ``kind``, else None.
+) -> ReviewReceipt | None:
+    """A current and ready receipt of ``kind`` with a reviewed context, else None.
 
     A receipt without a stored reviewed context (written before 089) is refused: it
     could not stay current once the spec changes.
@@ -63,24 +97,24 @@ def _current(
     except (OSError, ValueError):
         return None
     if receipt.ready and receipt.reviewed and reviewed_against(receipt, prepared) is not None:
-        return receipt.context_hash
+        return receipt
     return None
 
 
 def _reviews(
     root: Path, feature: str, model: str, max_chars: int | None
-) -> tuple[dict[str, str], str]:
-    """Current context hashes of both reviews, or the code naming the first stale one."""
+) -> tuple[dict[str, ReviewReceipt], str]:
+    """Both current receipts, or the code naming the first stale one."""
     from ..semantic.review_files import current_review_model
 
     resolved = current_review_model(root, model)
-    hashes: dict[str, str] = {}
+    receipts: dict[str, ReviewReceipt] = {}
     for kind in _KINDS:
         current = _current(root, feature, kind, resolved, max_chars) if resolved else None
         if current is None:
-            return hashes, f"{kind}_review_not_current"
-        hashes[kind] = current
-    return hashes, ""
+            return receipts, f"{kind}_review_not_current"
+        receipts[kind] = current
+    return receipts, ""
 
 
 # @spec FR-004: Spec revision record
@@ -91,13 +125,20 @@ def open_revision(
     """Record the current reviews; the second value is an error code or ''."""
     if read_revision(root, feature) is not None:
         return {"feature": feature, "open": True}, "spec_revision_open"
-    hashes, error = _reviews(root, feature, model, max_chars)
+    receipts, error = _reviews(root, feature, model, max_chars)
+    closed = {"feature": feature, "open": False}
     if error:
-        return {"feature": feature, "open": False}, error
+        return closed, error
+    commit = head_commit(root)
+    if commit is None:
+        return closed, "spec_revision_unverified"
+    if not all(r.reviewed and matches_commit(root, commit, r.reviewed) for r in receipts.values()):
+        return closed, "spec_revision_uncommitted"
     record = {
         "schema_version": SCHEMA_VERSION,
         "feature": feature,
-        **hashes,
+        **{kind: receipt.context_hash for kind, receipt in receipts.items()},
+        "commit": commit,
         "opened_at": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     write_json(revision_path(root, feature), record)

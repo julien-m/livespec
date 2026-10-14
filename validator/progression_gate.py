@@ -5,13 +5,28 @@ from __future__ import annotations
 from pathlib import Path
 
 from .clarify_inventory import collect_clarification_inventory
-from .delivery.revision import accepted_reviews
+from .delivery.revision import RevisionUnverified, accepted_reviews, read_revision
 from .pre_impl_analysis import analyze_feature_artifacts, has_blocking_findings
 from .semantic.review_files import prepare_feature_review, review_receipt_path
 
 
 class ProgressionBlocked(ValueError):
     """Current source obligations do not permit the requested transition."""
+
+
+def _accepted(project_root: Path, feature: str, destination: str) -> frozenset[str]:
+    """Receipts an open spec revision lets ``implement`` and ``test`` accept (089, 094)."""
+    try:
+        record = read_revision(project_root, feature)
+        verify = record is not None and destination in ("implement", "test")
+        accepted = accepted_reviews(project_root, feature) if verify else frozenset()
+    except RevisionUnverified as exc:
+        raise ProgressionBlocked(str(exc)) from exc
+    except ValueError as exc:
+        raise ProgressionBlocked(f"spec_revision_malformed:{exc}") from exc
+    if record is not None and destination == "complete":
+        raise ProgressionBlocked("spec_revision_open")
+    return accepted
 
 
 def require_progression(
@@ -28,13 +43,7 @@ def require_progression(
     spec = project_root / ".specs/features" / feature / "spec.md"
     # @spec FR-005: Progressions during a spec revision
     #   — .specs/features/089-stable-review-identity/spec.md#fr-005
-    try:
-        revision = accepted_reviews(project_root, feature)
-    except ValueError as exc:
-        raise ProgressionBlocked(f"spec_revision_malformed:{exc}") from exc
-    if revision and destination == "complete":
-        raise ProgressionBlocked("spec_revision_open")
-    accepted = revision if destination in ("implement", "test") else frozenset()
+    accepted = _accepted(project_root, feature, destination)
     prepared = prepare_feature_review(project_root, feature, "spec", model, max_chars)
     inventory = collect_clarification_inventory(
         spec,

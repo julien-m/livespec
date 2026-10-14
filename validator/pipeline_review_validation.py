@@ -83,9 +83,9 @@ def _require_terminal_review_replay(root: Path, feature: str, review_result: Pat
 
 def _refuse_open_revision(project_root: Path, feature: str) -> None:
     """An open spec revision keeps the feature from completing (089 FR-005)."""
-    from validator.delivery.revision import accepted_reviews
+    from validator.delivery.revision import read_revision
 
-    if accepted_reviews(project_root, feature):
+    if read_revision(project_root, feature) is not None:
         raise ValueError("spec_revision_open")
 
 
