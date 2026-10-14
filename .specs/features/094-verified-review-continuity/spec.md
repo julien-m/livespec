@@ -102,7 +102,7 @@ Prepared reviews carry the role of every source, including sources without secti
 
 ### AC-003
 
-While a revision is open, the `implement` and `test` progressions accept a recorded receipt only when the recorded commit is an ancestor of HEAD and the reviewed sources at that commit have the stable identity of the receipt's reviewed context; otherwise, and for a record without a commit, they are refused with `spec_revision_unverified`.
+While a revision is open, the `implement` and `test` progressions accept a recorded receipt only when the recorded commit, a full object id, is an ancestor of HEAD and the feature review prepared from that commit's tree (source discovery and roles included, no error but the budget) has the receipt's source names, roles and stable identity; otherwise, and for a record without a commit, they are refused with `spec_revision_unverified`.
 
 ## Functional Requirements
 
@@ -121,6 +121,8 @@ While a revision is open, the `implement` and `test` progressions accept a recor
 
 - **Opened at a commit, then rebased:** the recorded commit is no longer an ancestor of HEAD; close the revision and open it again.
 - **Record written by hand with an older commit at which the reviews were current:** accepted, as if the revision had been opened then; completion still requires current reviews.
+- **Linked document added at the commit:** the review prepared at the commit has another source set, so the record is refused.
+- **CRLF checkout or symlinked source:** the commit's tree is extracted with checkout filters and symlinks, and line endings do not change the stable identity.
 - **Uncommitted reviewed sources at open:** refused with `spec_revision_uncommitted`; commit them first.
 
 ## Quality Engineering

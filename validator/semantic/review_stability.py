@@ -118,7 +118,9 @@ def stable_identity(prepared: PreparedReview) -> str:
             digest = hashlib.sha256(requirement_projection(text).encode()).hexdigest()
             sources[source] = "requirements:" + digest
         else:
-            sources[source] = normative_hash(text, lifecycle_document=lifecycle)
+            # Line endings are formatting: a CRLF checkout keeps the identity (094).
+            plain = text.replace("\r\n", "\n")
+            sources[source] = normative_hash(plain, lifecycle_document=lifecycle)
     identity = {
         "feature": prepared.feature,
         "kind": prepared.kind,
@@ -143,7 +145,7 @@ _BUDGET_ERRORS = frozenset(
 )
 
 
-def _comparable(prepared: PreparedReview) -> bool:
+def comparable(prepared: PreparedReview) -> bool:
     """Cacheable, or complete but for the budget: its sections do not depend on the budget."""
     if prepared.cacheable:
         return True
@@ -243,7 +245,7 @@ def reviewed_against(
     reviewed = receipt.reviewed
     if (
         reviewed is None
-        or not _comparable(prepared)
+        or not comparable(prepared)
         or reviewed.context_hash != receipt.context_hash
     ):
         return None

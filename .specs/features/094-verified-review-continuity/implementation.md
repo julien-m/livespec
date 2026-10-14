@@ -29,4 +29,4 @@ updated: 2026-10-14
 | File | Change |
 |---|---|
 | `validator/delivery/revision_commit.py` | HEAD, ancestry and reviewed sources at a commit. |
-| `tests/stable_review_support.py`, `tests/test_review_continuity.py` | Committed fixture and 10 tests. |
+| `tests/stable_review_support.py`, `tests/test_review_continuity.py` | Committed fixture and 15 tests. |

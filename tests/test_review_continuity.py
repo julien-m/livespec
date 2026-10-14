@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import Literal
 
@@ -24,6 +25,10 @@ def root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     root = make_root(tmp_path)
     monkeypatch.chdir(root)
     return root
+
+
+def _git(root: Path, *args: str) -> None:
+    subprocess.run(["git", "-C", str(root), *args], check=True)
 
 
 def _current(root: Path) -> tuple[bool, bool]:
@@ -82,7 +87,25 @@ def test_open_records_the_head_commit(root: Path) -> None:
 def test_open_refuses_reviews_of_uncommitted_requirements(root: Path) -> None:
     edit_spec(root, *AC_EDIT)
     review_both(root)
-    assert _open()[1]["error"] == "spec_revision_uncommitted"
+    code, payload = _open()
+    assert (code, payload["error"]) == (1, "spec_revision_uncommitted")
+
+
+def test_open_accepts_committed_crlf_configuration(root: Path) -> None:
+    subprocess.run(["git", "-C", str(root), "config", "core.autocrlf", "true"], check=True)
+    (root / ".specs/semantic/config.yaml").write_bytes(b"review_model: reviewer/v1\r\n")
+    review_both(root)
+    commit_all(root, "crlf")
+    assert _open()[0] == 0
+
+
+def test_open_accepts_a_committed_symlinked_source(root: Path) -> None:
+    (root / "docs").mkdir()
+    (root / ".specs/project.md").rename(root / "docs/project.md")
+    (root / ".specs/project.md").symlink_to("../docs/project.md")
+    review_both(root)
+    commit_all(root, "symlink")
+    assert _open()[0] == 0
 
 
 def test_open_outside_git_is_unverified(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -103,11 +126,30 @@ def test_opened_revision_still_accepts_its_reviews(root: Path) -> None:
     require_progression(root, FEATURE, "implement", model="reviewer/v1")
 
 
-@pytest.mark.parametrize("commit", ["latest", None, "0" * 40], ids=["no-match", "none", "unknown"])
+@pytest.mark.parametrize(
+    "commit",
+    ["latest", None, "0" * 40, "HEAD~1", "side"],
+    ids=["no-match", "none", "unknown", "symbolic", "not-ancestor"],
+)
 def test_hand_written_record_for_stale_reviews_is_refused(root: Path, commit: str | None) -> None:
+    side = ""
+    if commit == "side":
+        _git(root, "checkout", "-qb", "side")
+        side = commit_all(root, "side")
+        _git(root, "checkout", "-q", "-")
     edit_spec(root, *AC_EDIT)
     latest = commit_all(root, "revise")  # The reviews never matched this commit.
-    _hand_written_record(root, latest if commit == "latest" else commit)
+    _hand_written_record(root, {"latest": latest, "side": side}.get(str(commit), commit))
+    with pytest.raises(ProgressionBlocked, match="spec_revision_unverified"):
+        require_progression(root, FEATURE, "implement", model="reviewer/v1")
+
+
+def test_hand_written_record_misses_no_linked_document(root: Path) -> None:
+    feature = root / ".specs/features" / FEATURE
+    (feature / "extra.md").write_text("Exports must be encrypted at rest.\n")
+    edit_spec(root, "## Scope\n", "## Scope\n\nRead [extra](extra.md).\n")
+    linked = commit_all(root, "link")  # The reviews never saw extra.md.
+    _hand_written_record(root, linked)
     with pytest.raises(ProgressionBlocked, match="spec_revision_unverified"):
         require_progression(root, FEATURE, "implement", model="reviewer/v1")
 
