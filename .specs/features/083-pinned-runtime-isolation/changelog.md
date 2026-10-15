@@ -135,3 +135,16 @@
 - **Proof:** the regression test fails without the fix. A snapshot that holds only the shipped evidence reaches `Conventions verdict: PASS` on a TypeScript project where the installed `21-3c1e6a776500` snapshot is BLOCKED. A drift guard checks that every `tests/` path cited by the conventions catalogs and modules ships.
 - **AC impacted:** AC-001
 - **Author:** spec-fix (claude-code)
+
+## 2026-10-15 — [Spec Update]: User approvals recorded; spec and plan reviews refreshed at a 120000-character budget
+
+- **Type:** Spec Update (review refresh)
+- **Spec modified:** Yes (Clarifications only: two entries record the user's 2026-10-15 approvals of `runtime install --no-activate`, the `pin` warning on a non-ignored `.specs/.livespec-path`, and plan decisions D-01 to D-15; no FR/AC/SC identifier or requirement meaning changed)
+- **Plan modified:** Yes (D-11 recovery now uses LiveSpec's own venv, `cd <livespec repo> && uv sync && .venv/bin/python -m validator.cli runtime install`, as the docs have since 2026-10-12)
+- **Code modified:** None
+- **Cause:** the spec review was stale since c0381aa (FR-001/AC-001 changed on 2026-10-13 without a new review), which kept `--progression implement` at `BLOCKED: clarify_not_ready:stale_or_incomplete_spec_review`; the plan review was stale too. Independent reviewers then flagged plan and spec behaviors beyond the six decided items as unapproved business scope; the user approved them on 2026-10-15.
+- **Budget:** reviews use `--review-max-chars 120000` instead of the 60000 default. At 60000 the plan review needs four batches and its synthesis prompt is 67069 characters (34559 of fixed cost), so it cannot be ingested; feature 089 (budget recorded in the receipt) is not in the installed runtime, so the gate must be run with the same `--review-max-chars 120000`. Tool defect recorded in `.specs/tool-defects/2026-10-15-review-synthesis-fixed-cost-exceeds-the-default-budget.md`.
+- **Reviews:** one batch each, independent native claude-opus-5-5 reviewers. Spec: complete and ready, 34 covered and AC-016 ambiguous with a non-critical ambiguity (D-04 versus the single INFO for a dev lock). Plan: complete and ready, 35/35 covered. No blocking finding, no unapproved business scope. Receipts are disposable caches in the checkout that ran them (`.reviews/spec.json`, `.reviews/plan.json`, round 1).
+- **Gate:** `livespec validate .specs/features/083-pinned-runtime-isolation --progression implement --model claude-opus-5-5 --review-max-chars 120000` → `Progression: READY`.
+- **Carry over:** realign AC-016 and the Story 6 flow with D-04; D-11 adds `uv`, absent from the declared stack, and its message omits `--source`/`--ref <commit>` required by AC-005 (the shim's `CHECKOUT_INSTALL` still says `python3 -m validator.cli runtime install`); Step 2 does not restate the kept conventions test evidence; `cli.py`, `doctor/scanner.py` and `pipeline.py` stay over 300 lines; AC-016 versus AC-017 for an invalid lock in the LiveSpec repository.
+- **Author:** spec-refine + native review refresh (claude-opus-5-5)

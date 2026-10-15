@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-10-15 — [Feature 083] Spec refined: user approvals of `--no-activate`, the `.livespec-path` pin warning and plan decisions D-01 to D-15 recorded in Clarifications; plan D-11 uses LiveSpec's venv; spec and plan reviews refreshed at 120000 characters, implement progression READY
+
 ## 2026-10-15 — Bugfix: 090 carried review warnings closed
 
 - [090](features/090-minimal-plan-scope/changelog.md): a release proof must name a path, URL or numbered identifier and announce nothing; fence, `Evidence-class`, `<strong>` and no-break-space forms no longer hide or slip past a declaration; step numbers are bounded; `--progression ship` blocks with `release_evidence_unreadable` instead of a raw `PermissionError`.
