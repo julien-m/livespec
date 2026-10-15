@@ -42,3 +42,17 @@
 - **AC impacted:** AC-001
 - **Author:** claude-code
 - PR #43 review: `--flags '--review-max-chars -1'` (or a budget flag without value) left a bare `--review-max-chars` token after normalization, so goal render silently used the configured budget. A bare token now raises `review_max_chars_out_of_bounds`; `tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_budget_flag` covers `=²`, `-1` and no value.
+
+## 2026-10-15 — [Bugfix]: A goal --model flag without value (bare, -x, empty or blank) now raises review_model_required instead of binding the configured model
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_review_identity_config.py, validator/goal_review_identity.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_identity_flag[--model -x-review_model_required: --model has no value], tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_identity_flag[--model-review_model_required: --model has no value], tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_identity_flag[--model=  -review_model_required: --model has no value], tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_identity_flag[--model=-review_model_required: --model has no value]
+- **RED receipt:** `.specs/.execution/620df126a89d4fb28add636742a98e91/receipt.json`
+- **GREEN receipt:** `.specs/.execution/b98033e3c5154489abb558b23067f3fd/receipt.json`
+- Neighbor of the PR #43 review: `--flags '--model'`, `--model -x`, `--model=` or `--model=  ` left no model value after `normalize_goal_flags`, so goal render silently bound the configured model. `flag_model` in `validator/goal_review_identity.py` now raises `review_model_required` ("--model has no value"), like `flag_budget` for a bare `--review-max-chars`. This closes the "empty `--model=` flag behaves as before 093" carried warning; `test_goal_render_refuses_a_malformed_budget_flag` became `test_goal_render_refuses_a_malformed_identity_flag` with the four model cases.
+<!-- bugfix:b98033e3c5154489abb558b23067f3fd -->
