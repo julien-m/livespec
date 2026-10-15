@@ -310,7 +310,9 @@ After the agent completes implementation, validate test completeness:
 
 1. The spawned agent runs `/spec-test <feature> --auto` as part of `/spec-feature` Phase 3.5
 2. If the test report shows ❌ failures in AC coverage → `SHIP_RESULT: BLOCKED` with test failure details
-3. If all AC are covered (✅ or ⚠️ Partial) → proceed to Step 4
+3. <!-- @spec FR-002: spec-ship requires release evidence — .specs/features/090-minimal-plan-scope/spec.md#fr-002 -->
+   Release evidence (feature 090): run `livespec validate .specs/features/<slug> --progression ship --model <actual-model>` (add `--review-max-chars <budget>` when the child used one). On `release_evidence_pending:<steps>` or `release_evidence_invalid:<errors>` → feature `Blocked (release evidence pending)` in `ship.md`, no merge; produce each proof, record it in the feature `implementation.md` under `## Release Evidence` (`| <step number> | <step name> | <proof> |`), then `/spec-ship --resume`. **Read** [plan evidence classes](../../../system/testing/execution-rules.md#plan-evidence-classes).
+4. If all AC are covered (✅ or ⚠️ Partial) and the ship progression passes → proceed to Step 4
 
 This gate catches AC that have no test at all — `/spec-implement`'s Phase 6 only runs existing tests, while `/spec-test` generates missing ones and reveals implementation gaps.
 
@@ -363,7 +365,8 @@ When `--resume` is provided:
    - If branch is gone but ship.md says `In Progress` → feature was likely completed and merged externally; verify on target branch and mark `Done`
 4. If status is `Blocked`:
    - Check if the blocking issue is resolved (re-run `livespec delivery review verify --feature <slug>` on the feature branch)
-   - If resolved → continue from Step 4 (merge)
+   - Re-run the release evidence gate of Step 3.5 (`livespec validate .specs/features/<slug> --progression ship --model <actual-model>`) on the feature branch, whatever the recorded block reason
+   - If both pass → continue from Step 4 (merge)
    - If `Blocked (merge conflict)` → attempt merge again
    - If not resolved → report still blocked
 5. If status is `In Progress`:
@@ -470,6 +473,7 @@ When all features are shipped:
 - [always] Validate branch/slug consistency before any git operation <!-- evidence:documentary -->
 - [always] Cross-check SHIP_RESULT against the exact child run artifact via livespec verify-output spec-feature --run <run_artifact> --json (command + feature identity, then outcome) before any merge/delete; mark Blocked on non-success, foreign, or missing artifact <!-- evidence:documentary -->
 - [always] Check AC coverage from test report (Test Gate) <!-- evidence:documentary -->
+- [always] Require recorded release evidence with `livespec validate .specs/features/<slug> --progression ship` before any merge; mark Blocked on `release_evidence_pending` <!-- evidence:documentary -->
 - [always] Switch to target branch: `git checkout <target>` <!-- evidence:documentary -->
 - [always] Merge feature branch: `livespec git merge feature/NNN-name --no-ff` <!-- evidence:documentary -->
 - [always] Delete feature branch: `livespec git delete feature/NNN-name` <!-- evidence:documentary -->

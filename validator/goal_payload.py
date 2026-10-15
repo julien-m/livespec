@@ -9,6 +9,7 @@ from . import goal_contracts as _contracts
 from .delivery.goal import goal_delivery_lane
 from .goal_outcome import MAX_ATTEMPTS_PER_TASK, goal_requirement, stop_condition
 from .goal_tasks import finalize_required_tasks
+from .release_evidence import release_goal_context
 
 __all__ = [
     "_bind_task_review_identity",
@@ -165,6 +166,7 @@ def _goal_runtime(
             "has_penflow": has_penflow,
             "visual_feature_slugs": visual_feature_slugs,
             **({"delivery_lane": delivery_lane} if delivery_lane else {}),
+            **release_goal_context(command, project_root, feature),
         },
         execution_tasks,
         definition_of_done,

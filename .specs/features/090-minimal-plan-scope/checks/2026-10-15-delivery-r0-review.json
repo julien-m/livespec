@@ -1,0 +1,130 @@
+{
+  "schema_version": "1",
+  "reviewer": {"agent": "native-reviewer-090-review", "model": "claude-opus-5-5", "effort": "high"},
+  "verdict": "BLOCKED",
+  "reviewed_files": [
+    ".agent-sync/skills/spec-implement/SKILL.md",
+    ".agent-sync/skills/spec-implement/expectations.md",
+    ".agent-sync/skills/spec-plan/SKILL.md",
+    ".agent-sync/skills/spec-plan/expectations.md",
+    ".agent-sync/skills/spec-ship/SKILL.md",
+    ".agent-sync/skills/spec-ship/expectations.md",
+    ".specs/features/090-minimal-plan-scope/plan.md",
+    ".specs/features/090-minimal-plan-scope/spec.md",
+    ".specs/features/090-minimal-plan-scope/implementation.md",
+    ".specs/features/090-minimal-plan-scope/progress.md",
+    ".specs/spec-system.md",
+    "system/review-protocol.md",
+    "system/spec-system.md",
+    "system/templates/plan-template.md",
+    "system/testing/execution-rules.md",
+    "system/minimal-spec-scope.md",
+    "validator/cli_commands/operation_options.py",
+    "validator/goal_payload.py",
+    "validator/progression_gate.py",
+    "validator/rules/__init__.py",
+    "validator/semantic/review_batches.py",
+    "validator/plan_evidence.py",
+    "tests/test_plan_evidence_class.py"
+  ],
+  "checks": [
+    {"command": ".venv/bin/python -m pytest -q -p no:cacheprovider tests/test_plan_evidence_class.py", "exit_code": 0},
+    {"command": ".venv/bin/python -m pytest -q -p no:cacheprovider tests/test_plan_evidence_class.py tests/test_*progression*.py tests/test_stable_review*.py (41 passed)", "exit_code": 0},
+    {"command": ".venv/bin/python -I -c '<evidence_class_errors/plan_steps over all 93 .specs/features/*/plan.md>' (0 errors, 6 plans with no parsed step)", "exit_code": 0},
+    {"command": "(caller) .venv/bin/python -m pytest tests/ --ignore=tests/integration -n 8 (4126 passed, 24 skipped)", "exit_code": 0},
+    {"command": "(caller) .venv/bin/ruff check validator/", "exit_code": 0},
+    {"command": "(caller) .venv/bin/ruff format --check", "exit_code": 0},
+    {"command": "(caller) .venv/bin/pyright <touched files>", "exit_code": 0},
+    {"command": "(caller) livespec conventions verify --json --feature 090-minimal-plan-scope (PASS)", "exit_code": 0}
+  ],
+  "findings": [
+    {
+      "severity": "blocking",
+      "file": ".agent-sync/skills/spec-ship/SKILL.md",
+      "line": 366,
+      "rule": "AC-002 (/spec-ship requires release evidence)",
+      "evidence": "The new Test Gate text (line 314) marks a feature 'Blocked (release evidence pending)' and tells the operator to record the proof 'then /spec-ship --resume'. The Resume procedure, step 4, decides whether a Blocked feature is resolved only by re-running 'livespec delivery review verify' and then says 'If resolved -> continue from Step 4 (merge)'. Nothing on the resume path re-runs 'livespec validate <feature-dir> --progression ship', so a resumed feature can be merged while a release step still has no recorded proof. That contradicts the new [always] checklist item (line 475), and it bypasses the gate on the exact path the feature sends users to.",
+      "correction": "In Resume step 4 add: for 'Blocked (release evidence pending)', re-run 'livespec validate .specs/features/<slug> --progression ship --model <actual-model>' and continue to the merge only on exit 0; otherwise report still blocked. More generally, re-run the ship progression before any merge reached from resume."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 58,
+      "rule": "FR-002 robustness: step identity used by Release Evidence and the ship gate",
+      "evidence": "PlanStep.number is the ordinal of the parsed step (len(self.steps)+1), not the number in its title. Probes: '### Step 0 - Pre' + '### Step 1 - Signed (release)' gives (2, 'Step 1 - Signed'); a numbered intro list before the Step headings shifts it to 3; sub-steps such as 'Step 2.5' shift every later step. The docs ask for 'step number' in '| Step | Proof |', and recorded_release_proofs keys proofs by that integer. A proof written under the title number can therefore satisfy a different release step (for example 'Step 2.5' when the user meant 'Step 3'). The only safeguard is that the error message shows the ordinal.",
+      "correction": "Derive the step number from the 'Step N' heading or the 'N.' item when present (fall back to the ordinal only when absent), reject duplicate numbers among release steps, and key Release Evidence rows by that label. Add a test with Step 0 or a sub-step."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 22,
+      "rule": "AC-003 robustness: no silent loss of a declared class",
+      "evidence": "Some declarations are silently ignored, so the step stays 'local' and is never deferred or required at ship. Examples: an inline class on a numbered item ('1. Signed build **Evidence class:** release' becomes the title) and a blockquoted '> **Evidence class:** release'. Other plan shapes in use in this repo fail loudly instead, as orphans: numbered headings without the word Step ('### 1. Build'), bold paragraph steps ('**Step 1 - Build**', as in feature 030) and table plans ('| 1 | ... |', as in feature 035). A release step cannot be declared in those plans.",
+      "correction": "Flag any 'Evidence class' text that _CLASS_LINE did not consume (inline or quoted) as an error. Document the supported step shapes ('### Step N' headings or top-level numbered items under 'Implementation Plan') in execution-rules.md and the spec-plan skill, or also accept numbered headings and bold 'Step N' paragraphs."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/goal_payload.py",
+      "line": 182,
+      "rule": "Constitution Structure: max file length 300 lines",
+      "evidence": "goal_payload.py grows from 294 lines (HEAD) to 313 lines with _IMPLEMENTING_COMMANDS and _release_context, which crosses the constitution limit. The 090 plan's Constitution Check records no deviation.",
+      "correction": "Move _release_context (and the command set) into validator/plan_evidence.py as a public helper, for example release_goal_context(command, project_root, feature), and call it from _goal_runtime. Otherwise record the deviation in plan.md."
+    },
+    {
+      "severity": "warning",
+      "file": "tests/test_plan_evidence_class.py",
+      "line": 172,
+      "rule": "AC-002 / SC-001 test strength",
+      "evidence": "'assert not any(\"Signed build\" in json.dumps(task) for task in goal[\"tasks\"])' is vacuous: goal tasks come from the skill checklists and never contain plan step titles, with or without this feature. 'Never blocks finalize' is therefore true by construction and not actually exercised. Separately, an AC whose only proof is release-class is still subject to the unchanged execution or acceptance certification at finalize. Nothing documents that interaction.",
+      "correction": "Assert something the feature changes. For example, the goal task list and hash are byte-identical with and without the release step except for runtime_context, or a finalize/prove run with pending release evidence succeeds. Also state in execution-rules.md that release-class steps must not be the sole proof of an AC certified at finalize, or say how such an AC is certified."
+    },
+    {
+      "severity": "warning",
+      "file": ".specs/features/090-minimal-plan-scope/spec.md",
+      "line": 23,
+      "rule": "Spec consistency",
+      "evidence": "'Out of scope: changing what /spec-ship requires.' contradicts AC-002 ('/spec-ship requires it') and the in-scope 'ship progression ... that /spec-ship runs before merging'. That progression also adds the complete-readiness checks (current spec and plan reviews for the passed model) to /spec-ship.",
+      "correction": "Reword the out-of-scope line, for example 'changing /spec-ship beyond requiring recorded release evidence through the ship progression', through the spec revision protocol."
+    },
+    {
+      "severity": "info",
+      "file": ".agent-sync/skills/spec-ship/SKILL.md",
+      "line": 314,
+      "rule": "Doc consistency",
+      "evidence": "The new step uses '--model <resolved-model>', but spec-ship names the model '<actual-model>' (line 22) and never defines <resolved-model>. It also does not forward '--review-max-chars' when the child used a non-default review budget.",
+      "correction": "Use '--model <actual-model>' and forward '--review-max-chars <budget>' when one is in force."
+    },
+    {
+      "severity": "info",
+      "file": "validator/cli_commands/operation_options.py",
+      "line": 85,
+      "rule": "Single source of truth",
+      "evidence": "progression_gate.py introduces PROGRESSION_DESTINATIONS, but operation_options.py still hard-codes the same tuple, with 'ship' added by hand. The validate --progression help text in validator/cli.py:426 still says 'plan/implement progression'.",
+      "correction": "Import PROGRESSION_DESTINATIONS in operation_options.py and update the help text."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 140,
+      "rule": "Parser robustness",
+      "evidence": "recorded_release_proofs does not skip fenced code blocks, so a table inside a code fence under '## Release Evidence' counts as proof. Placeholder detection is a closed list: '❌', 'no', 'not yet' or 'blocked' count as a recorded proof.",
+      "correction": "Skip fences as plan_steps does, and consider requiring a non-placeholder proof that names a receipt or path."
+    },
+    {
+      "severity": "info",
+      "file": ".specs/features/090-minimal-plan-scope/plan.md",
+      "line": 12,
+      "rule": "Plan / implementation consistency",
+      "evidence": "The summary still names 'validator/goal_tasks.py' and 'a native rule in the conventions pack'. The implementation changed validator/goal_payload.py and added system/minimal-spec-scope.md (D-01 was updated, the summary was not).",
+      "correction": "Align the summary line with D-01 and the touched files."
+    },
+    {
+      "severity": "info",
+      "file": "validator/semantic/review_batches.py",
+      "line": 17,
+      "rule": "Review identity (089)",
+      "evidence": "Keeping PROMPT_VERSION at '2' is safe for staleness: context_identity and stable_identity hash the version, not the prompts, and reviewed_snapshot strips prompts. Two different plan prompt texts now share version 2, so a stored receipt does not tell which instruction set the reviewer saw. The ~430 extra characters can also change batch packing near the budget edge for new preparations.",
+      "correction": "None required. Optionally note the instruction change in the 089/090 changelog."
+    }
+  ]
+}

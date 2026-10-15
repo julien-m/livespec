@@ -282,6 +282,8 @@ Before proceeding to Step 1, verify:
 > **@spec anchors:** Every file implementing a FR/AC must include `// @spec FR-NNN: description — spec.md#fr-nnn` next to the implementing function. Place anchors as code is written, not retroactively.
 >
 > **FR sub-tasks:** Each FR mentioned in a step must have a sequential sub-task number and a short description (< 50 chars). Format: `FR-001.1: Brief task description`. The sub-task number increments per FR across the entire plan.
+>
+> **Minimal scope and evidence:** Add no mechanism that traces to no FR, AC or constitution rule (LiveSpec rule `system/minimal-spec-scope.md`). A step whose proof needs release signing, a device fleet or production adds `**Evidence class:** release`; every other step is `local` by default.
 
 ### Step 1 — Database Schema
 

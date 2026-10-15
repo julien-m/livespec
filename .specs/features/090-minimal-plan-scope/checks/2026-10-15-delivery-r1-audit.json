@@ -1,0 +1,178 @@
+{
+  "schema_version": "1",
+  "reviewer": {
+    "agent": "native-reviewer-090-audit-r2",
+    "model": "claude-opus-5-5",
+    "effort": "high"
+  },
+  "verdict": "BLOCKED",
+  "reviewed_files": [
+    ".agent-sync/skills/spec-implement/SKILL.md",
+    ".agent-sync/skills/spec-implement/expectations.md",
+    ".agent-sync/skills/spec-plan/SKILL.md",
+    ".agent-sync/skills/spec-plan/expectations.md",
+    ".agent-sync/skills/spec-ship/SKILL.md",
+    ".agent-sync/skills/spec-ship/expectations.md",
+    ".specs/features/090-minimal-plan-scope/plan.md",
+    ".specs/features/090-minimal-plan-scope/spec.md",
+    ".specs/spec-system.md",
+    "system/review-protocol.md",
+    "system/spec-system.md",
+    "system/templates/plan-template.md",
+    "system/testing/execution-rules.md",
+    "validator/cli_commands/operation_options.py",
+    "validator/goal_payload.py",
+    "validator/progression_gate.py",
+    "validator/rules/__init__.py",
+    "validator/semantic/review_batches.py",
+    ".specs/features/090-minimal-plan-scope/implementation.md",
+    ".specs/features/090-minimal-plan-scope/progress.md",
+    "system/minimal-spec-scope.md",
+    "tests/test_plan_evidence_class.py",
+    "validator/plan_evidence.py"
+  ],
+  "checks": [
+    {
+      "command": ".venv/bin/python -m pytest -q -p no:cacheprovider tests/test_plan_evidence_class.py (36 passed)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff check --no-cache <7 touched python files>",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff format --check --no-cache <7 touched python files>",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -I -c '<evidence_class_errors over 94 .specs/features/*/plan*.md + system/templates/plan-template.md>' (0 errors, 0.05 s)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -I -u scratchpad/audit090r2/probe_units.py (declaration variants, step shapes, proof cells, regex timings at 1000/2000/4000 chars)",
+      "exit_code": 0
+    },
+    {
+      "command": "timeout 300 .venv/bin/python -I scratchpad/audit090r2/probe_units.py with timings at 4000/16000/64000 chars (killed by timeout: _HEADING blow-up)",
+      "exit_code": 124
+    },
+    {
+      "command": ".venv/bin/python -I -u scratchpad/audit090r2/probe_ship.py (require_progression ship + goal render on temp projects)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] pytest -n 8 tests/ --ignore=tests/integration (4146 passed, 24 skipped, 1 failed: test_generation_trials.py::test_one_repair_is_distinct_from_first_attempt_success, untouched file, 16/16 in isolation)",
+      "exit_code": 1
+    },
+    {
+      "command": "[caller-reported] ruff check / ruff format --check",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] pyright (0 errors)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] livespec conventions verify --feature 090-minimal-plan-scope (PASS)",
+      "exit_code": 0
+    }
+  ],
+  "findings": [
+    {
+      "severity": "blocking",
+      "file": "validator/plan_evidence.py",
+      "line": 24,
+      "rule": "robustness against hostile input / performance (ReDoS); the previous audit's regex finding is not closed",
+      "evidence": "_HEADING = r'^(#{1,6})\\s+(.*?)\\s*#*\\s*$' backtracks cubically when a heading contains a whitespace run followed by any character other than '#'. The lazy group is retried at every position and '\\s*#*\\s*' re-splits the run each time. Measured with evidence_class_errors on '# a' + N spaces + 'x': N=1000 takes 0.92 s, N=2000 takes 7.3 s and N=4000 takes 49.7 s. recorded_release_proofs on implementation.md shows the same timings (0.95, 7.1, 45.8 s). The 4000/16000/64000 run was killed by a 300 s timeout. `livespec validate plan.md` with a 1500-space heading took 4.25 s. This regex runs on every unfenced line of plan.md in `livespec validate <plan.md>` (new rule applied to all plans), in every spec-implement/spec-feature goal render (release_goal_context -> plan_steps) and in the ship gate, and on implementation.md when a release step exists. A single crafted or garbled line of a few KB therefore hangs validate, goal render and /spec-ship for minutes. The same defect class was reported for _CLASS_LINE in round 1 and was fixed only there.",
+      "correction": "Use a linear pattern, e.g. _HEADING = re.compile(r'^(#{1,6})[ \\t]+(.*)$'), then strip the closing hashes in Python: title = re.sub(r'[ \\t]+#+[ \\t]*$', '', m.group(2)).strip(), or rstrip() then rstrip('#') then rstrip(). Add a regression test that bounds the time for a heading with about 20,000 inner spaces (for example under 0.5 s)."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 33,
+      "rule": "AC-003 / fail-safe: an unrecognised declaration must not silently make a release step local",
+      "evidence": "These forms are not parsed as a class and not reported by _UNBOUND_CLASS: '**Evidence class: release**' (bold around the whole declaration), '*Evidence class:* release', plain 'Evidence class: release', '**Evidence  class:** release' (double space) and '**Évidence class:** release'. For each, validate returns no error, the step stays local, and require_progression(..., 'ship') returns READY with no proof (probe_ship.py). The blockquote, table and '__' cases from round 1 are now closed.",
+      "correction": "Flag as unbound any unfenced, non-inline-code line where a case-insensitive r'evidence\\s+class\\s*:' occurs and _CLASS_LINE did not consume it, whatever its emphasis. Add the whole-bold and plain forms to test_invalid_evidence_classes_are_reported."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 37,
+      "rule": "robustness: a fictitious release proof satisfies /spec-ship (round-1 placeholder finding, partly closed)",
+      "evidence": "The prefix list now catches 'pending ...', 'not yet ...', 'TBD ...', 'waiting ...'. These still count as recorded proof and ship returns READY in probe_ship.py: '?', 'TBC', 'will be signed later', '_pending_' (underscore emphasis is kept by _title), '[ ]', 'no proof yet', '🚧', 'blocked', 'not done', 'x', 'false'. The proof cell remains free text: nothing ties it to an artifact.",
+      "correction": "Require the proof to name something checkable: a path that exists in the repo, a URL, or an identifier pattern (receipt, build number). Otherwise invert the check and accept only cells that do not start with a negative or uncertain token: also strip '_' emphasis before matching, and add '?', 'tbc', 'no', 'blocked', 'not', 'later', '[ ]'. Document the rule in execution-rules.md."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 203,
+      "rule": "robustness: non-rendered Markdown counts as proof (round-1 fence finding closed for fences only)",
+      "evidence": "Fenced blocks are skipped now, but rows inside an HTML comment ('<!--\\n## Release Evidence\\n| 1 | x |\\n-->') and indented code rows ('    | 2 | indented code |') are accepted. Any heading that merely starts with 'release evidence' opens the table, including '## Release Evidence (template)', '#### release evidence template' and '## Release evidence – NOT YET'. Probe: an HTML-commented example table and a '(template)' heading with '| 1 | <receipt path> |' each make ship READY.",
+      "correction": "Skip HTML comment blocks and 4-space indented lines in _unfenced, and accept only a heading whose plain text is exactly 'Release Evidence'. Placeholders in angle brackets ('<...>') should not count as proof."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 241,
+      "rule": "robustness: a proof is bound to a step number, not to the step (round-1 renumbering finding, partly closed)",
+      "evidence": "Labels now come from the step title, so inserting steps no longer shifts the proof to a different ordinal. A proof row still carries only the number. Probe: plan v1 'Step 2 — Notarize (release)' with proof '| 2 | notarized build 1.4 (notary.json) |'. Plan v2 makes 'Step 2 — Device fleet run' the release step and leaves 'Step 3 — Notarize' local. The old notarization proof satisfies the fleet step and ship returns READY. The plan re-review does not read implementation.md, so nothing catches the mismatch.",
+      "correction": "Store the step title (or a stable slug) in the Release Evidence row ('| Step | Title | Proof |') and require it to match the plan step title, or report a proof row whose title differs as release_evidence_invalid."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 248,
+      "rule": "error handling at boundaries (round-1 warning, decode part closed)",
+      "evidence": "errors='replace' closes the UnicodeDecodeError crash. An unreadable implementation.md (chmod 000) with a release step still raises an uncaught PermissionError from _read. `livespec goal render spec-implement` exits 1 with an exception instead of a domain message. The ship gate converts it to 'BLOCKED: [Errno 13] ...' and fails closed.",
+      "correction": "Catch OSError in release_evidence: list the items as pending with a 'proof unreadable' note in goal context, and raise ProgressionBlocked('release_evidence_unreadable:...') in the gate."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 266,
+      "rule": "conventions python.md: 'Any is forbidden unless explicitly justified with a comment'",
+      "evidence": "release_goal_context returns dict[str, Any] without a justifying comment. Release items are plain dict[str, str] instead of a TypedDict. Non-trivial regexes _HEADING, _STEP_HEADING, _NUMBERED_ITEM and _FENCE have no explanatory comment (general.md row 10).",
+      "correction": "Return dict[str, list[ReleaseItem]] with a ReleaseItem TypedDict (feature, step, evidence, status, proof NotRequired), and add one-line comments to the regexes."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 178,
+      "rule": "consistency of step identity",
+      "evidence": "'Step 01' and 'Step 02' are distinct labels from '1' and '2', so a plan with 'Step 2 (release)' and 'Step 02' raises no duplicate error. A proof '| 2 |' does not satisfy 'Step 02' (fail-closed). An unnumbered '### Step — B' takes an ordinal label that can collide with a written number; this is reported as a duplicate.",
+      "correction": "Normalise labels (strip leading zeros per component) in both plan_steps and recorded_release_proofs."
+    },
+    {
+      "severity": "info",
+      "file": "validator/goal_payload.py",
+      "line": 169,
+      "rule": "compatibility: goal hash depends on implementation.md (round-1 info, unchanged)",
+      "evidence": "runtime_context.pending_release_evidence is part of the hashed canonical goal. Recording a release proof during /spec-implement (as the skill instructs) changes goal_hash and triggers goal recompilation. Contracts without release steps keep their bytes.",
+      "correction": "Accept and document it in the 090 changelog, or keep satisfied items with their status so the hash changes only with the plan."
+    },
+    {
+      "severity": "info",
+      "file": "validator/cli_commands/operation_options.py",
+      "line": 85,
+      "rule": "single source of truth (round-1 info, mitigated)",
+      "evidence": "The destination tuple is still duplicated. test_cli_progression_choices_match_the_gate now pins it to PROGRESSION_DESTINATIONS. validator/cli.py:426 help still says 'Check direct plan/implement progression' (intentionally unchanged per the caller).",
+      "correction": "Optional: import PROGRESSION_DESTINATIONS lazily and mention 'ship' in the --progression help."
+    },
+    {
+      "severity": "info",
+      "file": "validator/semantic/review_batches.py",
+      "line": 17,
+      "rule": "review identity (089), intentional",
+      "evidence": "PROMPT_VERSION stays '2' by decision, as recorded in implementation.md. Receipts prepared before and after 090 share one version with different plan prompts. The roughly 430 extra characters may change batch packing near --review-max-chars.",
+      "correction": "None required; note it in the changelog."
+    },
+    {
+      "severity": "info",
+      "file": "validator/progression_gate.py",
+      "line": 84,
+      "rule": "closure of round-1 findings",
+      "evidence": "Closed since round 1 (verified by probe or reading): ship fails closed on unknown, duplicated and orphan classes (progression_gate.py:84; the 3 probes give release_evidence_invalid); 'pending notarization' / 'not yet produced' rejected; fenced example tables ignored; a later placeholder row withdraws a proof; implementation.md read only when a release step exists, with errors='replace'; blockquote declaration accepted; table-cell and __ declarations rejected; _CLASS_LINE uses '(.*)' (no backtracking, 0.0 s at 4000); _release_context moved (goal_payload.py now 296 lines); relative import; title keeps underscores; spec out-of-scope and plan summary aligned; spec-ship --resume re-runs the ship gate whatever the block reason; 94 repo plans + template validate with 0 errors.",
+      "correction": "None."
+    }
+  ]
+}

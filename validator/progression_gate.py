@@ -7,7 +7,11 @@ from pathlib import Path
 from .clarify_inventory import collect_clarification_inventory
 from .delivery.revision import RevisionUnverified, accepted_reviews, read_revision
 from .pre_impl_analysis import analyze_feature_artifacts, has_blocking_findings
+from .release_evidence import pending_release_evidence, release_evidence_errors
 from .semantic.review_files import prepare_feature_review, review_receipt_path
+
+# ``ship`` is ``complete`` plus the release evidence the plan deferred (090).
+PROGRESSION_DESTINATIONS = ("plan", "implement", "test", "complete", "ship", "clarify", "analyze")
 
 
 class ProgressionBlocked(ValueError):
@@ -24,7 +28,7 @@ def _accepted(project_root: Path, feature: str, destination: str) -> frozenset[s
         raise ProgressionBlocked(str(exc)) from exc
     except ValueError as exc:
         raise ProgressionBlocked(f"spec_revision_malformed:{exc}") from exc
-    if record is not None and destination == "complete":
+    if record is not None and destination in ("complete", "ship"):
         raise ProgressionBlocked("spec_revision_open")
     return accepted
 
@@ -38,7 +42,7 @@ def require_progression(
     max_chars: int | None = None,
 ) -> None:
     """Recheck actual source and receipts without invoking another model or creating state."""
-    if destination not in ("plan", "implement", "test", "complete", "clarify", "analyze"):
+    if destination not in PROGRESSION_DESTINATIONS:
         raise ProgressionBlocked(f"unknown_progression_destination:{destination}")
     spec = project_root / ".specs/features" / feature / "spec.md"
     # @spec FR-005: Progressions during a spec revision
@@ -56,7 +60,7 @@ def require_progression(
             item.question for item in inventory.inventory if item.critical and not item.resolution
         ]
         raise ProgressionBlocked("clarify_not_ready:" + ";".join([*inventory.errors, *unresolved]))
-    if destination in ("implement", "test", "complete", "analyze"):
+    if destination in ("implement", "test", "complete", "ship", "analyze"):
         prepared_plan = prepare_feature_review(project_root, feature, "plan", model, max_chars)
         report = analyze_feature_artifacts(
             spec.parent,
@@ -67,3 +71,22 @@ def require_progression(
         )
         if has_blocking_findings(report):
             raise ProgressionBlocked(f"analyze_not_ready:{report.semantic_status}")
+    if destination == "ship":
+        _require_release_evidence(project_root, feature)
+
+
+# @spec FR-002: spec-ship requires release evidence
+#   — .specs/features/090-minimal-plan-scope/spec.md#fr-002
+def _require_release_evidence(project_root: Path, feature: str) -> None:
+    """Shipping needs a valid plan and a recorded proof for every release-class plan step.
+
+    A plan whose evidence classes do not validate fails closed: an unreadable declaration
+    could hide a release step.
+    """
+    errors = release_evidence_errors(project_root, feature)
+    if errors:
+        raise ProgressionBlocked("release_evidence_invalid:" + ";".join(errors))
+    pending = pending_release_evidence(project_root, feature)
+    if pending:
+        steps = ";".join(f"step {item['step']}: {item['evidence']}" for item in pending)
+        raise ProgressionBlocked("release_evidence_pending:" + steps)

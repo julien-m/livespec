@@ -1,0 +1,98 @@
+{
+  "schema_version": "1",
+  "reviewer": {"agent": "native-reviewer-090-review-r2", "model": "claude-opus-5-5", "effort": "high"},
+  "verdict": "PASS",
+  "reviewed_files": [
+    ".agent-sync/skills/spec-implement/SKILL.md",
+    ".agent-sync/skills/spec-implement/expectations.md",
+    ".agent-sync/skills/spec-plan/SKILL.md",
+    ".agent-sync/skills/spec-plan/expectations.md",
+    ".agent-sync/skills/spec-ship/SKILL.md",
+    ".agent-sync/skills/spec-ship/expectations.md",
+    ".specs/features/090-minimal-plan-scope/plan.md",
+    ".specs/features/090-minimal-plan-scope/spec.md",
+    ".specs/features/090-minimal-plan-scope/implementation.md",
+    ".specs/features/090-minimal-plan-scope/progress.md",
+    ".specs/spec-system.md",
+    "system/review-protocol.md",
+    "system/spec-system.md",
+    "system/templates/plan-template.md",
+    "system/testing/execution-rules.md",
+    "system/minimal-spec-scope.md",
+    "validator/cli_commands/operation_options.py",
+    "validator/goal_payload.py",
+    "validator/progression_gate.py",
+    "validator/rules/__init__.py",
+    "validator/semantic/review_batches.py",
+    "validator/plan_evidence.py",
+    "tests/test_plan_evidence_class.py"
+  ],
+  "checks": [
+    {"command": ".venv/bin/python -m pytest -q -p no:cacheprovider tests/test_plan_evidence_class.py (36 passed)", "exit_code": 0},
+    {"command": ".venv/bin/python -m pytest -q -p no:cacheprovider -n 8 <goal_*, progression_*, review_batching, stable_review, rules, coherence_rules test files> (4239 passed, 58 skipped)", "exit_code": 0},
+    {"command": ".venv/bin/python -m pytest -q -p no:cacheprovider tests/test_generation_trials.py (16 passed in isolation; file untouched by the diff)", "exit_code": 0},
+    {"command": "(caller) .venv/bin/python -m pytest -q -p no:cacheprovider -n 8 tests/ --ignore=tests/integration (4146 passed, 24 skipped, 1 failed: test_generation_trials.py::test_one_repair_is_distinct_from_first_attempt_success, unrelated file, passes in isolation; judged load flake)", "exit_code": 0},
+    {"command": ".venv/bin/ruff check <touched python files> ; .venv/bin/ruff format --check validator/plan_evidence.py validator/progression_gate.py tests/test_plan_evidence_class.py", "exit_code": 0},
+    {"command": "(caller) ruff check . ; ruff format --check validator tests ; pyright <touched files> ; livespec conventions verify --json --feature 090-minimal-plan-scope (PASS)", "exit_code": 0},
+    {"command": ".venv/bin/python -I -c '<evidence_class_errors over 94 repo plan files>' (no error, no false positive)", "exit_code": 0},
+    {"command": ".venv/bin/python -I scratchpad/probe_r2.py ; scratchpad/probe_time.py ; scratchpad/probe_ship_r2/run.py (parser, regex timing and ship-gate probes, temp projects only)", "exit_code": 0}
+  ],
+  "findings": [
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 95,
+      "rule": "AC-002 robustness: no silent loss of a declared release class (round-1 warning only partly fixed)",
+      "evidence": "Three declaration shapes are still neither bound nor reported, so validate returns [] and require_progression(..., 'ship') returns READY with no proof (probed in temp projects): (1) a class inside a step heading, '### Step 1 — Sign **Evidence class:** release' (heading() never runs the _UNBOUND_CLASS check, the text just becomes part of the title); (2) a class written as a heading, '#### **Evidence class:** release' under a step; (3) '__Evidence class:__ release' on a numbered item in numbered-item mode (line 116: the item branch is taken, _INLINE_CLASS only knows '**', and the elif _UNBOUND_CLASS check is skipped). execution-rules.md:59 claims validate rejects '`__Evidence class:__`'.",
+      "correction": "Run the _UNBOUND_CLASS check on heading text (in heading(), on the title outside inline code) and on the numbered-item text when _INLINE_CLASS found nothing. Add these three shapes to test_invalid_evidence_classes_are_reported and to test_ship_fails_closed_on_an_invalid_plan."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 37,
+      "rule": "AC-002 robustness: an announced proof must not satisfy the ship gate",
+      "evidence": "Placeholder detection only rejects a bare emoji or a cell whose first word is pending/tbd/todo/not yet/missing/... . These cells count as proofs (recorded_release_proofs probe), and '⏳ Pending notarization' lets ship pass in a temp project: '⏳ Pending release', '❌ Not produced', '(pending)', 'none yet', 'blocked', '?', 'will be produced at release'. LiveSpec tables mark status with ✅/❌/⏳ (implementation.md uses '✅ Pass'), so an emoji-prefixed pending cell is a likely way to write it. execution-rules.md:62 says a cell that only announces a proof is not one.",
+      "correction": "Strip leading status emoji and punctuation ('⏳', '❌', '(', '[') before the _PROOF_PENDING match, add 'none', 'blocked' and '?' to it, and add these cells to test_announced_or_example_proof_keeps_release_pending. Alternatively, require the proof cell to name a path or receipt identifier."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 24,
+      "rule": "Robustness against hostile input (round-1 regex warning: _CLASS fixed, a new super-linear pattern remains)",
+      "evidence": "_HEADING = r'^(#{1,6})\\s+(.*?)\\s*#*\\s*$' backtracks cubically on a heading with a long run of spaces followed by a character. Measured: '### Step ' + N spaces + 'x' takes 0.10 s for N=500, 0.76 s for N=1000 and 5.9 s for N=2000; N=8000 did not finish in 20 s. The same holds for '# x' + spaces + '#'*N + 'y'. The pattern runs on every plan validate, every spec-implement or spec-feature goal render, every ship progression, and on implementation.md. Honest documents never contain this, but the fix summary says the regexes no longer backtrack quadratically.",
+      "correction": "Match '^(#{1,6})(?:\\s+(.*))?$' and strip the closing '#' sequence and whitespace in Python (rstrip, then rstrip('#'), then rstrip). Add a timing guard test with a 10k-space heading."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 114,
+      "rule": "Parser false positive (fail-closed)",
+      "evidence": "In numbered-item mode every top-level numbered item of the section opens a step. A numbered intro list before the 'Step' headings, or a second numbered list (risks, notes) inside the same section, restarts at 1. With a classified step this produces 'Step 1 appears 2 times' (probe: '1. prereq / 2. prereq2 / ### Step 1 — Sign + release'). It fails closed and the message is clear, but the plan is valid.",
+      "correction": "Optional: stop numbered-item steps at the first Step heading (drop the items read before it), or document that a plan with a release step must not hold another top-level numbered list in its Implementation Plan section."
+    },
+    {
+      "severity": "info",
+      "file": "system/minimal-spec-scope.md",
+      "line": 12,
+      "rule": "Doc consistency",
+      "evidence": "'Each step names the evidence it produces and its class' reads as a mandatory class line on every step, while spec-plan SKILL.md:313 says 'local (default, omit it)' and the parser defaults to local.",
+      "correction": "Say 'Each step names the evidence it produces; a step whose proof needs release signing, a device fleet or production adds **Evidence class:** release (local is the default and is omitted).'"
+    },
+    {
+      "severity": "info",
+      "file": "validator/goal_payload.py",
+      "line": 169,
+      "rule": "Compatibility (carried from round 1, accepted)",
+      "evidence": "runtime_context.pending_release_evidence is hashed into goal_hash. Writing a plan with a release step during /spec-feature, or recording a proof in implementation.md, recompiles the goal. goal_recompile carries forward still-valid evidence and only resets the outcome task. The same pattern already exists for delivery_lane. Not a blocker.",
+      "correction": "None required; optionally mention it in the changelog."
+    },
+    {
+      "severity": "info",
+      "file": "validator/semantic/review_batches.py",
+      "line": 13,
+      "rule": "Review identity (089), deliberate",
+      "evidence": "PROMPT_VERSION stays '2' by design (identity hashes exclude prompts), so current plan reviews stay valid. Side effect: a review prepared before 090 counts as current although its reviewer never saw the minimal-scope rule, and the longer plan prompt can change batch packing near --review-max-chars.",
+      "correction": "None required; already recorded in implementation.md Decisions."
+    }
+  ]
+}

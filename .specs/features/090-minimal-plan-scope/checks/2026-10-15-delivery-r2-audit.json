@@ -1,0 +1,167 @@
+{
+  "schema_version": "1",
+  "reviewer": {
+    "agent": "native-reviewer-090-audit-r3",
+    "model": "claude-opus-5-5",
+    "effort": "high"
+  },
+  "verdict": "PASS",
+  "reviewed_files": [
+    ".agent-sync/skills/spec-implement/SKILL.md",
+    ".agent-sync/skills/spec-implement/expectations.md",
+    ".agent-sync/skills/spec-plan/SKILL.md",
+    ".agent-sync/skills/spec-plan/expectations.md",
+    ".agent-sync/skills/spec-ship/SKILL.md",
+    ".agent-sync/skills/spec-ship/expectations.md",
+    ".specs/README.md",
+    ".specs/changelog.md",
+    ".specs/features/090-minimal-plan-scope/plan.md",
+    ".specs/features/090-minimal-plan-scope/spec.md",
+    ".specs/spec-system.md",
+    "system/review-protocol.md",
+    "system/spec-system.md",
+    "system/templates/plan-template.md",
+    "system/testing/execution-rules.md",
+    "validator/cli_commands/operation_options.py",
+    "validator/goal_payload.py",
+    "validator/progression_gate.py",
+    "validator/rules/__init__.py",
+    "validator/semantic/review_batches.py",
+    ".specs/features/090-minimal-plan-scope/implementation.md",
+    ".specs/features/090-minimal-plan-scope/progress.md",
+    "system/minimal-spec-scope.md",
+    "tests/plan_evidence_support.py",
+    "tests/test_plan_evidence_class.py",
+    "tests/test_release_evidence.py",
+    "validator/plan_evidence.py",
+    "validator/release_evidence.py"
+  ],
+  "checks": [
+    {
+      "command": ".venv/bin/python -m pytest -q -p no:cacheprovider tests/test_plan_evidence_class.py tests/test_release_evidence.py (64 passed)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff check --no-cache <10 touched python files>",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff format --check --no-cache <10 touched python files>",
+      "exit_code": 0
+    },
+    {
+      "command": "PYRIGHT_PYTHON_FORCE_VERSION=latest .venv/bin/pyright validator/plan_evidence.py validator/release_evidence.py validator/progression_gate.py validator/goal_payload.py (0 errors)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -I -c '<evidence_class_errors over 94 .specs/features/*/plan*.md + plan-template; recorded_release_rows over every implementation.md>' (0 errors, 0.06 s)",
+      "exit_code": 0
+    },
+    {
+      "command": "timeout 900 .venv/bin/python -I -u scratchpad/audit090r3/probe_time.py (26 plan shapes + 7 implementation shapes at 4k/16k/64k/256k chars, 20 s alarm per case)",
+      "exit_code": 0
+    },
+    {
+      "command": "timeout 600 .venv/bin/python -I -u scratchpad/audit090r3/probe_ship.py (require_progression ship, goal context, validate CLI on temp projects)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] pytest -n 8 tests/ --ignore=tests/integration (4175 passed, 24 skipped)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] ruff check / ruff format --check",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] pyright (0 errors)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] livespec conventions verify --feature 090-minimal-plan-scope (PASS)",
+      "exit_code": 0
+    }
+  ],
+  "findings": [
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 33,
+      "rule": "robustness against hostile input / performance: every regex of the module must be linear (module docstring lines 6-7)",
+      "evidence": "_COMMENT = r'<!--.*?-->' is applied with .sub() to every line in unfenced() (line 93), and unfenced() runs for plan.md (validate, goal render, ship) and implementation.md (goal render, ship). A line with many '<!--' and no '-->' is quadratic: each opening scans lazily to the end of the line. Measured with evidence_class_errors on '<!--' repeated: 16 KB 0.18 s, 32 KB 0.74 s, 64 KB 3.0 s, 128 KB 13.0 s, 256 KB over the 20 s alarm. recorded_release_rows gives the same timings for a proof row. Every other pattern is linear: 25 other plan shapes and 6 other implementation shapes stay under 0.2 s at 256 KB, including the r2 heading case. Not blocking: it needs a crafted line of more than about 100 KB, where the r2 defect hung on 4 KB.",
+      "correction": "Remove the regex and scan with str.find: loop on start = line.find('<!--', pos), end = line.find('-->', start + 4), drop the text between them, and if end is -1 keep line[:start] and set comment=True. Add '<!--' * 50_000 to the time-bounded test at tests/test_plan_evidence_class.py:74."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 87,
+      "rule": "AC-003 / fail-safe: the parser and the Markdown renderer must agree on what is hidden",
+      "evidence": "Three shapes hide a visible declaration from the parser, so the step stays local and require_progression(..., 'ship') returns READY with no proof (probe_ship.py). (1) Inline code '`<!--`' with no '-->' on the line opens a comment (line 94), and every later line is dropped until some '-->'. That includes later Step headings and declarations. CommonMark does not open a comment inside a code span, so this one can happen by accident in a plan about HTML anchors (no current repo plan has it). (2) Text after '-->' on the closing line of a multi-line comment is dropped (line 88): '<!-- note' then '--> **Evidence class:** release'. (3) A line '```a`' opens a fence for _FENCE, but CommonMark does not, because a backtick info string may not contain a backtick. A following '**Evidence class:** release' is rendered but skipped, and '```b`' closes the fence because _FENCE ignores trailing text. Shapes (2) and (3) are deliberate, visible tricks.",
+      "correction": "Drop code spans (_INLINE_CODE) before looking for '<!--'. On a closing line, keep the text after '-->' and process it. Treat a backtick fence whose info string contains a backtick as text, and accept a closing fence only when nothing but spaces follows it. Add a regression case for each shape to test_invalid_evidence_classes_are_reported."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/release_evidence.py",
+      "line": 55,
+      "rule": "robustness: a fictitious release proof satisfies /spec-ship (r1/r2 placeholder finding, further narrowed)",
+      "evidence": "Closed since r2: '?', 'TBC', 'will be signed later', '_pending_', '[ ]', 'no proof yet', 'blocked', 'x', 'false', '<receipt>' and the construction emoji are now refused. Because only the first mark or word is checked, these still count as proof and ship returns READY: 'Proof pending', 'Notary receipt pending', '**Status:** TBD', '&lt;pending&gt;', '...', '✅', '✓', 'ok', 'yes', 'done'. execution-rules.md says a proof cell must not just announce a proof, but these announce one or name nothing.",
+      "correction": "Require the proof cell to contain something checkable: a path or file name with an extension, a URL, or an identifier with a digit. Alternatively, also refuse a cell in which any word is one of the _NOT_A_PROOF_WORDS (not only the first word), and refuse cells with no letter or digit. Document the rule in execution-rules.md."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 31,
+      "rule": "AC-003 / unbound mentions",
+      "evidence": "_ANY_CLASS ('[eé]vidence[ \\t]+class[*_ \\t]*:') misses some rendered-equivalent forms. These are not flagged, the step stays local and ship returns READY: '<strong>Evidence class</strong>: release', '**Evidence class:** release' (no-break space), '**Evidence-class:** release' and 'Evidence class — release'. Closed since r2: whole-bold, plain, single-star, double-space and accented forms now give release_evidence_invalid.",
+      "correction": "Widen the separators to [\\s -]+ and allow '</?\\w+>' between 'class' and ':', or flag any unfenced line where 'evidence' and 'class' are adjacent words, whatever comes after them."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 63,
+      "rule": "error handling at boundaries (hostile input)",
+      "evidence": "normalize_label calls int() on each component. With Python 3.14's limit of 4300 digits for integer string conversion, a step number or proof label longer than 4300 digits raises ValueError. That ValueError escapes evidence_class_errors: `livespec validate plan.md` exits 1 with a traceback, release_goal_context crashes (it catches only OSError) and require_progression raises a bare ValueError. The ship gate still fails closed.",
+      "correction": "Normalise without int(): part.lstrip('0') or '0'."
+    },
+    {
+      "severity": "info",
+      "file": "validator/release_evidence.py",
+      "line": 71,
+      "rule": "documentation consistency",
+      "evidence": "The heading match is _key(title) == 'release evidence' at any depth and in any case, so '#### release evidence' opens the proof table. execution-rules.md and the module docstring say 'a heading exactly `## Release Evidence`'. Harmless, because the text must still be exactly Release Evidence. A 4-cell row ('| 1 | Sign | r.json | extra |') is accepted and the extra cell ignored.",
+      "correction": "Either check depth 2 or reword the docs to 'a heading whose text is Release Evidence'."
+    },
+    {
+      "severity": "info",
+      "file": "validator/progression_gate.py",
+      "line": 86,
+      "rule": "error handling at boundaries (r2 info, goal part closed)",
+      "evidence": "release_goal_context now returns {'release_evidence_unreadable': 'PermissionError: Permission denied'} with no path, and goal render exits 0. In the ship gate, an unreadable implementation.md still raises a raw PermissionError. The validate CLI turns it into 'BLOCKED: [Errno 13] Permission denied: <abs path>' and exits 1, so it fails closed, but without the release_evidence_unreadable code the docs use for the goal.",
+      "correction": "Optional: catch OSError in _require_release_evidence and raise ProgressionBlocked('release_evidence_unreadable:...')."
+    },
+    {
+      "severity": "info",
+      "file": "validator/goal_payload.py",
+      "line": 169,
+      "rule": "compatibility: goal hash depends on implementation.md (r1/r2 info, now documented)",
+      "evidence": "Recording a proof changes runtime_context and therefore goal_hash, which recompiles the goal. execution-rules.md now documents this. Contracts without release steps keep their bytes.",
+      "correction": "None required."
+    },
+    {
+      "severity": "info",
+      "file": "validator/semantic/review_batches.py",
+      "line": 17,
+      "rule": "review identity (089), intentional per caller",
+      "evidence": "PROMPT_VERSION stays '2', the cli.py --progression help does not mention 'ship', and the destination tuple in operation_options.py is duplicated but pinned to PROGRESSION_DESTINATIONS by a test. All three are unchanged by decision.",
+      "correction": "None required; keep it in the changelog."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 20,
+      "rule": "closure of r2 findings",
+      "evidence": "Closed (by probe or reading): [blocking] the _HEADING ReDoS. The pattern is now '^(#{1,6})[ \\t]+(.*)$' with closing hashes stripped in Python; '# a'+spaces+'x', ' #' runs, hash runs and tab runs stay under 0.01 s at 256 KB, and the test at tests/test_plan_evidence_class.py:74 bounds a 20,000-space heading. [warning] whole-bold, plain, single-star, double-space and accented declarations now give release_evidence_invalid. [warning] placeholder proofs are narrowed (see the proof finding). [warning] rows inside an HTML comment, under a '(template)' heading or indented by 4 spaces are ignored. [warning] renumbering: a row naming another step gives release_evidence_invalid, and the old 2-column format is refused as a mismatch. [info] goal context reports unreadable files. [info] ReleaseItem TypedDict with a Literal status, the return type no longer uses Any, and comments on the regexes. [info] labels normalised: Step 02 matches row 2, and Step 2 plus Step 02 is reported as a duplicate. No regression: 94 repo plans and the template validate with 0 errors.",
+      "correction": "None."
+    }
+  ]
+}

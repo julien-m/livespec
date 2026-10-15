@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-14
+> Last updated: 2026-10-15
 
 ---
+
+## 2026-10-15 — Feature: Minimal plan scope and release evidence
+
+- [090](features/090-minimal-plan-scope/changelog.md): the native rule `system/minimal-spec-scope.md` and the plan review prompt report every mechanism no FR, AC or constitution rule asks for (blocking unless a justified technical necessity); a plan step may declare `**Evidence class:** release`, listed as pending by the implement goal without blocking `finalize` and required by `/spec-ship` through `livespec validate <feature-dir> --progression ship`.
 
 ## 2026-10-14 — Feature: Verified review continuity
 
