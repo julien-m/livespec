@@ -178,3 +178,13 @@
 - **Remaining:** fresh spec review for 083 before the complete gate can pass.
 - **Author:** spec-fix (claude-opus-5-5)
 
+
+## 2026-10-15 — [Bugfix]: Declared evidence and lost install races checked for completeness
+
+- **Type:** Bug Fix (PR #45 review)
+- **Spec modified:** No
+- **Code modified:** `validator/runtime/evidence.py` (`missing_evidence` also requires every `SNAPSHOT_TEST_EVIDENCE` entry the tree declares: a directory for an entry ending in `/`, a file otherwise), `validator/runtime/snapshot.py` (a concurrent install that loses the rename checks the winner's completeness before reusing it)
+- **Cause:** completeness covered only AST catalog citations, so evidence declared only by the policy could be missing from a build or a reused snapshot; and the lost-race reuse path verified the digest but not completeness, so an older winner could be activated incomplete.
+- **Proof:** `test_install_refuses_a_commit_missing_evidence_its_policy_declares` and `test_lost_rename_race_refuses_an_incomplete_winner` fail on the previous code and pass after the fix; `pytest tests/test_runtime_*.py` 120 passed; ruff, mypy and pyright clean.
+- **Gaps closed:** FR-001, FR-003 (snapshot completeness)
+- **Author:** claude-code

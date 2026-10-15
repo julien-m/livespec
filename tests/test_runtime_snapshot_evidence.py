@@ -153,6 +153,36 @@ def test_reuse_refuses_a_snapshot_an_older_builder_left_incomplete(
     assert "rebuild" in message and str(incomplete) in message
 
 
+def test_install_refuses_a_commit_missing_evidence_its_policy_declares(
+    home: RuntimeHome, tmp_path: Path
+) -> None:
+    """A policy entry no catalog cites is still required, as a file or a directory."""
+    source = _target_source(tmp_path)
+    policy = 'SNAPSHOT_TEST_EVIDENCE = ("tests/fixtures/declared_only/", "tests/test_read.py")\n'
+    write(source / "validator/runtime/models.py", policy)
+    commit_all(source, "declare evidence no catalog cites")
+    with pytest.raises(RuntimeSourceError) as refused:
+        install(home, source)
+    assert "tests/fixtures/declared_only/" in str(refused.value)
+    assert "tests/test_read.py" in str(refused.value)
+
+
+def test_lost_rename_race_refuses_an_incomplete_winner(home: RuntimeHome, tmp_path: Path) -> None:
+    """An older installer that wins the rename leaves an incomplete snapshot: never reuse it."""
+    from validator.runtime import snapshot as snapshot_module
+    from validator.runtime.manifest import read_manifest
+
+    source = _target_source(tmp_path)
+    with pytest.MonkeyPatch.context() as older:
+        _simulate_older_builder(older, unchecked=True)
+        incomplete = install(home, source).snapshot
+    base = read_manifest(incomplete)
+    entries = snapshot_module.list_snapshot_entries(source.resolve(), base.commit)
+    blobs = snapshot_module.read_blobs(source.resolve(), [entry.oid for entry in entries])
+    with pytest.raises(RuntimeSnapshotError, match="incomplete"):
+        snapshot_module._build_snapshot(home, base, entries, blobs)  # pyright: ignore[reportPrivateUsage]
+
+
 def test_target_rules_read_this_repository_policy_and_catalogs() -> None:
     """A future installer reads this commit's rules exactly as this code declares them."""
     assert declared_policy((ROOT / POLICY_PATH).read_text(encoding="utf-8")) == (

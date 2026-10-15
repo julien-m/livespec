@@ -182,9 +182,11 @@ def _seal_and_publish(home: RuntimeHome, staging: Path, base: RuntimeManifest) -
     except OSError:
         if not home.snapshot(base.runtime_id).is_dir():
             raise
-        # A concurrent install won the rename; reuse its snapshot once verified.
+        # A concurrent install won the rename; reuse its snapshot once verified. The winner
+        # may be an older installer that dropped the evidence, so completeness is checked too.
         remove_tree(staging, home.versions)
         verify_snapshot(home, base.runtime_id, base.commit)
+        _require_complete(home.snapshot(base.runtime_id), base.commit)
         return "reused"
     return "created"
 

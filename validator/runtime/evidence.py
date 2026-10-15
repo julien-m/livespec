@@ -94,8 +94,19 @@ def target_evidence(policy_source: str | None, catalog_sources: Iterable[str]) -
 
 
 def missing_evidence(root: Path) -> list[str]:
-    """Return the paths cited by the AST catalogs under ``root`` that are not files there."""
+    """Return the evidence entries the tree under ``root`` declares or cites but lacks.
+
+    A ``SNAPSHOT_TEST_EVIDENCE`` entry ending in ``/`` must be a directory there; every
+    other declared entry and every path an AST catalog cites must be a file.
+    """
+    policy = root / POLICY_PATH
+    declared = declared_policy(policy.read_text("utf-8")) if policy.is_file() else ()
     catalog_dir = root / CATALOG_DIR
     catalogs = sorted(catalog_dir.glob("*.yaml")) if catalog_dir.is_dir() else []
     cited = {path for catalog in catalogs for path in cited_paths(catalog.read_text("utf-8"))}
-    return sorted(path for path in cited if not (root / path).is_file())
+    missing = {
+        entry
+        for entry in declared
+        if not ((root / entry).is_dir() if entry.endswith("/") else (root / entry).is_file())
+    }
+    return sorted(missing | {path for path in cited if not (root / path).is_file()})
