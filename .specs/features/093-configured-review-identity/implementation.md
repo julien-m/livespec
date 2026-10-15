@@ -35,3 +35,9 @@ updated: 2026-10-15
 - The implement goal's internal lane (`runtime_context.delivery_lane`, 086 FR-007) keeps the full lane with reason `review_model_required` instead of raising: `goal render` compiles once without a model, then binds the resolved model or refuses a review-bearing goal.
 - The goal does not bind the configured budget into its flags: feature 089 removed the budget from staleness, and an absent `--review-max-chars` already means the configured budget; resolution still refuses a configured budget out of bounds before the goal is saved.
 - Removing or editing `.specs/semantic/config.yaml` changes the `semantic_config` dependency of prepared reviews, so existing reviews become stale: unchanged behavior.
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-15 | implementation | `tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_identity_flag[--model -x-review_model_required: --model has no value]`, `tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_identity_flag[--model-review_model_required: --model has no value]`, `tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_identity_flag[--model=  -review_model_required: --model has no value]`, `tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_identity_flag[--model=-review_model_required: --model has no value]` | `.specs/.execution/620df126a89d4fb28add636742a98e91/receipt.json` | `.specs/.execution/b98033e3c5154489abb558b23067f3fd/receipt.json` |

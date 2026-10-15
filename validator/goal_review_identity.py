@@ -31,6 +31,24 @@ def flag_budget(flags: list[str] | tuple[str, ...] | str | None) -> int | None:
     return int(budget)
 
 
+def flag_model(flags: list[str]) -> str:
+    """Return the ``--model=`` goal flag, '' when absent.
+
+    Raises:
+        ReviewIdentityError: The flag has no value, so it never falls back to the
+            configured model (feature 093).
+    """
+    from .semantic.review_identity_config import ReviewIdentityError
+
+    prefix = "--model="
+    model = next((flag[len(prefix) :] for flag in flags if flag.startswith(prefix)), None)
+    # A value starting with "-" or none at all leaves the flag bare.
+    if "--model" in flags or (model is not None and not model.strip()):
+        detail = "--model has no value; pass --model=<model> or omit it to read review_model"
+        raise ReviewIdentityError("review_model_required", detail)
+    return model or ""
+
+
 def bind_review_model(
     goal: GoalContract, project_root: Path, livespec_root: Path, feature: str | None
 ) -> GoalContract:
@@ -50,7 +68,7 @@ def bind_review_model(
     from .semantic.review_identity_config import resolve_review_identity
 
     flags = list(goal.payload.get("normalized_flags") or [])
-    supplied = next((flag.split("=", 1)[1] for flag in flags if flag.startswith("--model=")), "")
+    supplied = flag_model(flags)
     # @spec FR-001: Goal render reads the configured identity
     #   — .specs/features/093-configured-review-identity/spec.md#fr-001
     model = resolve_review_identity(project_root, supplied, flag_budget(flags)).model
