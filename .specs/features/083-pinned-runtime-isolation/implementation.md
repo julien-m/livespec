@@ -3,7 +3,7 @@ created: 2026-10-11
 feature: 083-pinned-runtime-isolation
 title: 'Implementation Map: Pinned Runtime Isolation'
 type: implementation
-updated: 2026-10-12
+updated: 2026-10-15
 ---
 
 # Implementation — Pinned Runtime Isolation
@@ -14,9 +14,9 @@ updated: 2026-10-12
 
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
-| [FR-001: Committed snapshot install](spec.md#fr-001) | `validator/runtime/snapshot.py`, `validator/runtime/git_tree.py`, `validator/runtime/errors.py`, `validator/cli_commands/runtime_cmd.py` | `@spec FR-001: Committed snapshot build — .specs/features/083-pinned-runtime-isolation/spec.md#fr-001` | ✅ Implemented | 2026-10-11 |
+| [FR-001: Committed snapshot install](spec.md#fr-001) | `validator/runtime/snapshot.py`, `validator/runtime/git_tree.py`, `validator/runtime/evidence.py`, `validator/runtime/errors.py`, `validator/cli_commands/runtime_cmd.py` | `@spec FR-001: Committed snapshot build — .specs/features/083-pinned-runtime-isolation/spec.md#fr-001` | ✅ Implemented | 2026-10-15 |
 | [FR-002: Manifest and atomic read-only snapshot](spec.md#fr-002) | `validator/runtime/models.py`, `validator/runtime/manifest.py`, `validator/runtime/snapshot.py` | `@spec FR-002: Manifest model, Content digest — .specs/features/083-pinned-runtime-isolation/spec.md#fr-002` | ✅ Implemented | 2026-10-11 |
-| [FR-003: Reuse, shim and activation](spec.md#fr-003) | `validator/runtime/snapshot.py`, `validator/runtime/shim.py` | `@spec FR-003: Reuse and activation, Shim on install — .specs/features/083-pinned-runtime-isolation/spec.md#fr-003` | ✅ Implemented | 2026-10-11 |
+| [FR-003: Reuse, shim and activation](spec.md#fr-003) | `validator/runtime/snapshot.py`, `validator/runtime/shim.py` | `@spec FR-003: Reuse and activation, Shim on install — .specs/features/083-pinned-runtime-isolation/spec.md#fr-003` | ✅ Implemented | 2026-10-15 |
 | [FR-004: Shim resolution and exit 3](spec.md#fr-004) | `validator/runtime/shim_core.py`, `validator/runtime/home.py` | `@spec FR-004: Shim resolution and exit 3 — .specs/features/083-pinned-runtime-isolation/spec.md#fr-004` | ✅ Implemented | 2026-10-11 |
 | [FR-005: Pin](spec.md#fr-005) | `validator/runtime/project.py`, `validator/cli_commands/runtime_cmd.py` | `@spec FR-005: Pin writes — .specs/features/083-pinned-runtime-isolation/spec.md#fr-005` | ✅ Implemented | 2026-10-11 |
 | [FR-006: Link retargeting](spec.md#fr-006) | `validator/runtime/links.py` | `@spec FR-006: Link retargeting — .specs/features/083-pinned-runtime-isolation/spec.md#fr-006` | ✅ Implemented | 2026-10-11 |
@@ -150,3 +150,13 @@ The documented first install runs the checkout's own venv (`.venv/bin/python -m 
 ## 2026-10-13 — Conventions test evidence in snapshots (spec-fix)
 
 FR-001 / AC-001: `ships_in_snapshot` in `validator/runtime/models.py` keeps `.specs/` and `tests/` out of a snapshot, except `SNAPSHOT_TEST_EVIDENCE`. That set is the AST fixtures and the three deterministic test files the bundled catalogs cite, which `conventions verify` reads from the runtime root. `validator/runtime/git_tree.py` applies it. [test_runtime_snapshot_evidence.py](../../../tests/test_runtime_snapshot_evidence.py) installs a snapshot and checks that the evidence ships and that other `tests/` files do not. Its drift guard fails when a catalog cites a `tests/` path the policy does not ship.
+
+## 2026-10-15 — Evidence rules of the installed commit (spec-fix)
+
+FR-001 / FR-003: the code running `livespec runtime install` may predate the commit it installs. `21-71f1e0d1b3d3` was built by `21-3c1e6a776500`, whose policy dropped every `tests/` path, so it shipped without the fixtures its own catalogs cite and later installs reused it.
+
+- [evidence.py](../../../validator/runtime/evidence.py) reads the target rules without running target code: the `SNAPSHOT_TEST_EVIDENCE` literal of the commit's `validator/runtime/models.py` (parsed with `ast`) and the `fixtures`/`deterministic_test_evidence` paths of its bundled `rule_catalog/*.yaml`.
+- [git_tree.py](../../../validator/runtime/git_tree.py) `list_snapshot_entries` ships the running policy plus those target entries (`ships_in_snapshot(path, target_evidence)`).
+- [snapshot.py](../../../validator/runtime/snapshot.py) checks the staging tree before sealing (a cited file absent from the commit is refused with `RuntimeSourceError`) and checks a reused snapshot (`RuntimeSnapshotError` listing the missing paths, with the commands to delete and rebuild it).
+- [test_runtime_snapshot_evidence.py](../../../tests/test_runtime_snapshot_evidence.py) simulates an older builder (empty running policy, then no target reading and no check) and covers the three cases; a guard checks that this repository's own policy and catalogs parse back exactly. [runtime_support.py](../../../tests/runtime_support.py) now copies that evidence into the real-code source, which the new check otherwise refuses.
+

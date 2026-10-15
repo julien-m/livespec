@@ -164,3 +164,17 @@
 - **Author:** spec-fix (claude-opus-5-5)
 
 <!-- finalize:spec-fix:2026-10-15:5c6d3cbb -->
+
+## 2026-10-15 — [Bugfix]: Install applies the evidence rules of the installed commit
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `validator/runtime/evidence.py` (new), `validator/runtime/git_tree.py`, `validator/runtime/models.py`, `validator/runtime/snapshot.py`, `docs/cli-reference.md`, `tests/test_runtime_snapshot_evidence.py`, `tests/runtime_support.py`
+- **Cause:** inclusion rules came only from the running CLI. `21-71f1e0d1b3d3` was built by the older `21-3c1e6a776500` and has no `tests/`, so `livespec conventions verify` fails with `fixture missing: tests/fixtures/conventions_ast/ts/no_as_any/pass.ts`; later installs reused it (`reused`) without noticing.
+- **Fix:** the target commit's `SNAPSHOT_TEST_EVIDENCE` and its AST catalogs' cited fixtures and tests also ship; a build citing a missing file is refused before publication; a reused snapshot missing cited evidence is refused with the commands to rebuild it.
+- **Proof:** the three regression tests failed before the fix (RED receipt) and pass after it (GREEN receipt). On a copy of the real `21-71f1e0d1b3d3`, install exits 1 and lists the 15 missing paths; a fresh install of `71f1e0d` into a temporary home has none. Full suite: 4152 passed, 56 skipped; the only failure, a `ui-form` generation witness, changes on each run and passes alone.
+- **Gate:** bugfix gate FALLBACK (`tests/runtime_support.py` is an existing test support file); the complete gate is BLOCKED by `clarify_not_ready:stale_or_incomplete_spec_review`, stale since c0381aa changed FR-001 on 2026-10-13. Conventions PASS (repo and feature scope).
+- **Gaps closed:** FR-001, FR-003 (snapshot completeness)
+- **Remaining:** fresh spec review for 083 before the complete gate can pass.
+- **Author:** spec-fix (claude-opus-5-5)
+
