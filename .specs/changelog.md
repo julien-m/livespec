@@ -3,9 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-13
+> Last updated: 2026-10-15
 
 ---
+
+## 2026-10-15 — [Feature 083] Fix: install applies the installed commit's conventions evidence rules and refuses an incomplete snapshot (FR-001, FR-003)
 
 ## 2026-10-13 — 085 ai-ressources located through AIRESOURCES or the recorded project path, without hard-coded fallback
 <!-- finalize:spec-feature:2026-10-13:72cf8076 -->

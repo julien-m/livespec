@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .errors import RuntimeSourceError
+from .evidence import POLICY_PATH, is_catalog, target_evidence
 from .models import ships_in_snapshot
 
 # Generous bound for local, network-free git queries on a large checkout (plan: 60 s).
@@ -146,7 +147,9 @@ def dirty_paths(repo: Path) -> list[str]:
 def list_snapshot_entries(source: Path, commit: str) -> list[TreeEntry]:
     """List the commit tree minus top-level ``.specs/`` and ``tests/``.
 
-    The conventions test evidence under ``tests/`` still ships (``ships_in_snapshot``).
+    The conventions test evidence under ``tests/`` still ships: the running code's
+    ``SNAPSHOT_TEST_EVIDENCE`` plus what the commit itself declares or cites
+    (``evidence.target_evidence``), so an older installer applies the target's rules.
 
     Args:
         source: Git working tree.
@@ -159,18 +162,33 @@ def list_snapshot_entries(source: Path, commit: str) -> list[TreeEntry]:
         RuntimeSourceError: If the tree contains a gitlink (D-01).
     """
     raw = run_git(source, ["ls-tree", "-r", "-z", "--full-tree", commit])
-    entries: list[TreeEntry] = []
+    tree: list[TreeEntry] = []
     for record in raw.decode("utf-8", "surrogateescape").split("\0"):
         if not record:
             continue
         meta, path = record.split("\t", 1)
         mode, _kind, oid = meta.split(" ")
-        if not ships_in_snapshot(path):
+        tree.append(TreeEntry(path=path, mode=mode, oid=oid))
+    evidence = target_evidence(*_rule_sources(source, tree))
+    entries: list[TreeEntry] = []
+    for entry in tree:
+        if not ships_in_snapshot(entry.path, evidence):
             continue
-        if mode == GITLINK_MODE:
-            raise RuntimeSourceError(f"gitlink (submodule) refused in {commit}: {path}")
-        entries.append(TreeEntry(path=path, mode=mode, oid=oid))
+        if entry.mode == GITLINK_MODE:
+            raise RuntimeSourceError(f"gitlink (submodule) refused in {commit}: {entry.path}")
+        entries.append(entry)
     return sorted(entries, key=lambda entry: entry.path)
+
+
+def _rule_sources(source: Path, tree: list[TreeEntry]) -> tuple[str | None, list[str]]:
+    """Read the commit's evidence policy module and bundled AST catalogs (regular blobs)."""
+    blobs = [e for e in tree if e.mode != GITLINK_MODE and not e.is_symlink]
+    policy = next((e for e in blobs if e.path == POLICY_PATH), None)
+    catalogs = [e for e in blobs if is_catalog(e.path)]
+    wanted = [e.oid for e in (*catalogs, *([policy] if policy else []))]
+    contents = read_blobs(source, wanted) if wanted else {}
+    policy_text = contents[policy.oid].decode("utf-8", "replace") if policy else None
+    return policy_text, [contents[e.oid].decode("utf-8", "replace") for e in catalogs]
 
 
 def read_blobs(source: Path, oids: list[str]) -> dict[str, bytes]:

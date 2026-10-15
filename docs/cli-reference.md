@@ -565,8 +565,12 @@ livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature 
   `.specs/` and `tests/` except the conventions test evidence under `tests/` that
   `conventions verify` reads, read-only, `.livespec-runtime.json` manifest with a content digest),
   rewrites `<home>/bin/livespec` for the installing interpreter and points `<home>/current` at
-  the snapshot unless `--no-activate`. Re-installing reuses a verified snapshot; a corrupted
-  one is refused, never overwritten. Without a working `livespec` yet, run it through the
+  the snapshot unless `--no-activate`. The evidence kept is also what the installed commit
+  declares (its `SNAPSHOT_TEST_EVIDENCE`) and cites (fixtures and tests of its bundled AST
+  catalogs), so an older running CLI still ships it; a commit whose catalogs cite a missing
+  file is refused. Re-installing reuses a verified snapshot; a corrupted one, or one an older
+  runtime built without that evidence, is refused, never overwritten (the error gives the
+  commands to delete and rebuild it). Without a working `livespec` yet, run it through the
   checkout's own environment: `cd <livespec repo> && uv sync && .venv/bin/python -m
   validator.cli runtime install` (a bare `python3` lacks LiveSpec's dependencies).
 - **pin** writes the portable lock (`schema`, `mode`, `runtime_id`, `livespec_version`,
