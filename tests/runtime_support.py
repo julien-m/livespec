@@ -19,7 +19,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from validator.runtime.home import RuntimeHome
-from validator.runtime.models import InstallResult
+from validator.runtime.models import SNAPSHOT_TEST_EVIDENCE, InstallResult
 from validator.runtime.snapshot import InstallRequest, install_runtime
 
 WORKTREE = Path(__file__).resolve().parents[1]
@@ -109,6 +109,18 @@ def _populate_shape(root: Path, version: int) -> None:
     os.symlink("../VERSION", root / "docs/version-link")
 
 
+def _copy_real_code(root: Path) -> None:
+    ignore = shutil.ignore_patterns("__pycache__", "*.pyc")
+    for name in REAL_CODE_DIRECTORIES:
+        shutil.copytree(WORKTREE / name, root / name, ignore=ignore, symlinks=True)
+    # The bundled catalogs cite this evidence; install refuses a tree without it.
+    for entry in SNAPSHOT_TEST_EVIDENCE:
+        if entry.endswith("/"):
+            shutil.copytree(WORKTREE / entry, root / entry, ignore=ignore)
+        else:
+            shutil.copy2(WORKTREE / entry, root / entry)
+
+
 def make_source(root: Path, version: int = 21, real_code: bool = False) -> Path:
     """Create and commit a temporary LiveSpec git source.
 
@@ -124,9 +136,7 @@ def make_source(root: Path, version: int = 21, real_code: bool = False) -> Path:
     root.mkdir(parents=True)
     git(root, "init", "-q", "-b", "main")
     if real_code:
-        ignore = shutil.ignore_patterns("__pycache__", "*.pyc")
-        for name in REAL_CODE_DIRECTORIES:
-            shutil.copytree(WORKTREE / name, root / name, ignore=ignore, symlinks=True)
+        _copy_real_code(root)
         write(root / "VERSION", f"{version}\n")
         write(root / ".specs/README.md", "# excluded from snapshots\n")
         write(root / "tests/test_excluded.py", "# excluded from snapshots\n")

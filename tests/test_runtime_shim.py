@@ -210,14 +210,37 @@ def test_no_current_and_bad_dev_source_exit_3(installed: Installed, tmp_path: Pa
     outside.mkdir()
     env = _env(installed)
     result = run_shim(empty, outside, "runtime", "status", env=env)
-    assert result.returncode == 3 and "python3 -m validator.cli runtime install" in result.stderr
+    assert result.returncode == 3 and CHECKOUT_RECOVERY in result.stderr
     project = make_project(tmp_path / "project")
     _pin_lock(project, installed.home, installed.runtime_a)
     pinned = run_shim(empty, project, "status", env=env)
-    assert pinned.returncode == 3 and "python3 -m validator.cli runtime install" in pinned.stderr
+    assert pinned.returncode == 3 and CHECKOUT_RECOVERY in pinned.stderr
     write(project / ".specs/livespec.lock", '{"mode": "dev", "schema": 1, "source": "missing"}')
     dev = run_shim(installed.home, project, "status", env=env)
     assert dev.returncode == 3 and "not a LiveSpec root" in dev.stderr
+
+
+# D-11: without a working `livespec`, recovery runs through the checkout's own venv.
+CHECKOUT_RECOVERY = (
+    "cd <livespec repo> && uv sync && .venv/bin/python -m validator.cli runtime install"
+    " --source <livespec repo>"
+)
+
+
+def test_exit_3_recovery_uses_the_checkout_venv(installed: Installed, tmp_path: Path) -> None:
+    """AC-005 (D-11): without current, exit 3 names the venv command with --source and --ref."""
+    empty = RuntimeHome((tmp_path / "empty-home").resolve())
+    write_shim(empty, PYTHON)
+    project = make_project(tmp_path / "project")
+    _pin_lock(project, installed.home, installed.runtime_a)
+    commit = read_manifest(installed.home.snapshot(installed.runtime_a)).commit
+    refused = run_shim(empty, project, "status", env=_env(installed))
+    assert refused.returncode == 3 and refused.stderr.startswith("livespec-shim:")
+    assert f"`{CHECKOUT_RECOVERY} --ref {commit}`" in refused.stderr
+    outside = tmp_path / "no-project"
+    outside.mkdir()
+    unlocked = run_shim(empty, outside, "status", env=_env(installed))
+    assert unlocked.returncode == 3 and f"`{CHECKOUT_RECOVERY}`" in unlocked.stderr
 
 
 def test_generated_home_reaches_executed_runtime(installed: Installed, tmp_path: Path) -> None:

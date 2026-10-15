@@ -565,8 +565,12 @@ livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature 
   `.specs/` and `tests/` except the conventions test evidence under `tests/` that
   `conventions verify` reads, read-only, `.livespec-runtime.json` manifest with a content digest),
   rewrites `<home>/bin/livespec` for the installing interpreter and points `<home>/current` at
-  the snapshot unless `--no-activate`. Re-installing reuses a verified snapshot; a corrupted
-  one is refused, never overwritten. Without a working `livespec` yet, run it through the
+  the snapshot unless `--no-activate`. The evidence kept is also what the installed commit
+  declares (its `SNAPSHOT_TEST_EVIDENCE`) and cites (fixtures and tests of its bundled AST
+  catalogs), so an older running CLI still ships it; a commit whose catalogs cite a missing
+  file is refused. Re-installing reuses a verified snapshot; a corrupted one, or one an older
+  runtime built without that evidence, is refused, never overwritten (the error gives the
+  commands to delete and rebuild it). Without a working `livespec` yet, run it through the
   checkout's own environment: `cd <livespec repo> && uv sync && .venv/bin/python -m
   validator.cli runtime install` (a bare `python3` lacks LiveSpec's dependencies).
 - **pin** writes the portable lock (`schema`, `mode`, `runtime_id`, `livespec_version`,
@@ -584,7 +588,8 @@ livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature 
 - **status** / `livespec doctor` report: checkout references (WARNING clean, ERROR dirty),
   snapshot links without lock (WARNING), missing/corrupted pinned snapshot (ERROR), executing
   runtime other than the pinned snapshot (ERROR), mismatched references (WARNING), invalid
-  lock (ERROR), dev mode (one INFO). The LiveSpec repository itself reports nothing.
+  lock (ERROR), dev mode (one INFO, or one ERROR `runtime_dev_source_invalid` when the
+  source is not a LiveSpec root). The LiveSpec repository itself reports nothing.
 - **defect** writes `.specs/tool-defects/<YYYY-MM-DD>-<slug>.md` (never overwritten: `-2`,
   `-3`, ...) with the command, verbatim error, frozen runtime identity and resume commands,
   then applies `livespec pipeline update --feature <slug> --phase <phase> --status blocked`.

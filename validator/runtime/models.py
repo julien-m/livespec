@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import StrEnum
@@ -33,13 +34,18 @@ SNAPSHOT_TEST_EVIDENCE = (
 )
 
 
-def ships_in_snapshot(path: str) -> bool:
-    """Return whether a committed tree path belongs to a runtime snapshot (FR-001)."""
+def ships_in_snapshot(path: str, target_evidence: Iterable[str] = ()) -> bool:
+    """Return whether a committed tree path belongs to a runtime snapshot (FR-001).
+
+    Args:
+        path: Tree path relative to the commit root.
+        target_evidence: Extra evidence entries declared or cited by the installed commit.
+    """
     if path.split("/", 1)[0] not in EXCLUDED_TOP_LEVEL:
         return True
     return any(
         path.startswith(entry) if entry.endswith("/") else path == entry
-        for entry in SNAPSHOT_TEST_EVIDENCE
+        for entry in (*SNAPSHOT_TEST_EVIDENCE, *target_evidence)
     )
 
 

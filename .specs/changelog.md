@@ -9,10 +9,17 @@
 
 ## 2026-10-15 — Bugfix: [093](features/093-configured-review-identity/changelog.md): a goal `--model` flag without value raises `review_model_required` instead of binding the configured model.
 
+## 2026-10-15 — [Feature 083] Fix: install applies the installed commit's conventions evidence rules and refuses an incomplete snapshot (FR-001, FR-003)
+
 ## 2026-10-15 — [093](features/093-configured-review-identity/changelog.md): spec and plan reviews complete and ready (native, `claude-opus-5-5`); delivery lane now light.
 
 ## 2026-10-15 — [093](features/093-configured-review-identity/changelog.md): goal render, progressions and the delivery lane take the reviewer model and budget from `.specs/semantic/config.yaml` when no option names them, and stop with `review_model_required` otherwise; out-of-bounds budgets are refused, never clamped.
 <!-- finalize:spec-implement:2026-10-15:8c213f7b -->
+
+## 2026-10-15 — [Feature 083] Fix: 2/2 review gaps closed (shim exit-3 recovery uses LiveSpec's venv with --source/--ref; AC-016 dev-lock wording aligned with D-04); spec and plan reviews refreshed at 120000 characters, implement progression READY
+<!-- finalize:spec-fix:2026-10-15:5c6d3cbb -->
+
+## 2026-10-15 — [Feature 083] Spec refined: user approvals of `--no-activate`, the `.livespec-path` pin warning and plan decisions D-01 to D-15 recorded in Clarifications; plan D-11 uses LiveSpec's venv; spec and plan reviews refreshed at 120000 characters, implement progression READY
 
 ## 2026-10-15 — Bugfix: 090 carried review warnings closed
 

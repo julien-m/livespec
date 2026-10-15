@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import posixpath
 import re
+import shlex
 import shutil
 import stat
 import tempfile
@@ -13,7 +14,8 @@ from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .errors import LiveSpecRuntimeError, RuntimeSourceError
+from .errors import LiveSpecRuntimeError, RuntimeSnapshotError, RuntimeSourceError
+from .evidence import missing_evidence
 from .git_tree import (
     TreeEntry,
     dirty_paths,
@@ -180,9 +182,11 @@ def _seal_and_publish(home: RuntimeHome, staging: Path, base: RuntimeManifest) -
     except OSError:
         if not home.snapshot(base.runtime_id).is_dir():
             raise
-        # A concurrent install won the rename; reuse its snapshot once verified.
+        # A concurrent install won the rename; reuse its snapshot once verified. The winner
+        # may be an older installer that dropped the evidence, so completeness is checked too.
         remove_tree(staging, home.versions)
         verify_snapshot(home, base.runtime_id, base.commit)
+        _require_complete(home.snapshot(base.runtime_id), base.commit)
         return "reused"
     return "created"
 
@@ -196,12 +200,36 @@ def _build_snapshot(
     staging = Path(tempfile.mkdtemp(prefix=prefix, dir=home.versions))
     try:
         _write_entries(staging, entries, blobs)
+        missing = missing_evidence(staging)
+        if missing:
+            raise RuntimeSourceError(
+                f"{base.commit} cites conventions evidence absent from its tree: {_shown(missing)}"
+            )
         return _seal_and_publish(home, staging, base)
     except BaseException:
         # Interrupted or failed install: never leave a partial tree behind, then re-raise.
         if staging.exists():
             remove_tree(staging, home.versions)
         raise
+
+
+def _shown(paths: list[str]) -> str:
+    extra = len(paths) - _MAX_REPORTED_DIRTY
+    return ", ".join(paths[:_MAX_REPORTED_DIRTY]) + (f" (+{extra} more)" if extra > 0 else "")
+
+
+def _require_complete(snapshot: Path, commit: str) -> None:
+    """Refuse to reuse a snapshot an older installer built without the cited evidence."""
+    missing = missing_evidence(snapshot)
+    if missing:
+        path = shlex.quote(str(snapshot))
+        raise RuntimeSnapshotError(
+            f"snapshot {snapshot} is incomplete (missing conventions evidence: {_shown(missing)}); "
+            "an older LiveSpec runtime built it. To rebuild it, delete it with "
+            f"`chmod -R u+w {path} && rm -rf {path}`, then run "
+            f"`livespec runtime install --ref {commit}` from another runtime or the source "
+            "checkout when it is `current` or the running CLI."
+        )
 
 
 def activate(home: RuntimeHome, runtime_id: str) -> None:
@@ -269,6 +297,7 @@ def install_runtime(request: InstallRequest) -> InstallResult:
     snapshot = home.snapshot(runtime_id)
     if snapshot.exists() or snapshot.is_symlink():
         verify_snapshot(home, runtime_id, commit)
+        _require_complete(snapshot, commit)
         status = "reused"
     else:
         created_at = request.clock().astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")

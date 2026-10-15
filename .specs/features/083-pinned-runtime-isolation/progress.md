@@ -37,3 +37,13 @@ Implementation corrections (both audit passes) are done; execution re-certified 
 |---|---|---|---|---|---|
 | Readiness gate | Done | `.reviews/{spec,plan}.json` (current caches) | `livespec validate --progression implement --model claude-opus-5-5` | READY | 2026-10-12 08:30 |
 | Fix | Done | `README.md`, `docs/cli-reference.md`, `tests/test_runtime_docs.py` | runtime docs tests in both environments + negative wording check | Pass | 2026-10-12 08:30 |
+
+## 2026-10-15 — spec-fix: D-11 exit-3 recovery and AC-016 dev-lock wording
+
+| Step | Status | Files | Verification | Result | Date |
+|---|---|---|---|---|---|
+| Regression test (RED) | Done | `tests/test_runtime_shim.py` (`test_exit_3_recovery_uses_the_checkout_venv`) | test against the previous `shim_core.py` | Fail (expected) | 2026-10-15 14:05 |
+| Fix | Done | `validator/runtime/shim_core.py` (`CHECKOUT_INSTALL`) | `pytest tests/test_runtime_*.py` | Pass (114) | 2026-10-15 14:06 |
+| Spec and plan realignment | Done | `spec.md` (AC-016, Story 6 Gherkin and flowchart), `plan.md` (D-11, Steps 2 and 3), `docs/cli-reference.md` | spec and plan reviews at `--review-max-chars 120000` | complete and ready | 2026-10-15 |
+| Readiness gate | Done | `.reviews/{spec,plan}.json` (disposable caches) | `livespec validate --progression implement --model claude-opus-5-5 --review-max-chars 120000` | READY | 2026-10-15 |
+| Full suite and conventions | Done | — | `pytest tests/ --ignore=tests/integration` (4218 passed); `livespec conventions verify --feature 083-pinned-runtime-isolation` | Pass / PASS | 2026-10-15 |

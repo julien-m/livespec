@@ -3,7 +3,7 @@ title: Pinned Runtime Isolation
 priority: P1
 feature: 083-pinned-runtime-isolation
 created: 2026-10-11
-updated: 2026-10-11
+updated: 2026-10-15
 status: Implemented
 ---
 
@@ -426,9 +426,12 @@ Feature: Runtime drift detection
     Given a project whose lock is not valid JSON
     When the developer runs "livespec runtime status --project <p> --json"
     Then an ERROR finding names the lock path
-    Given a consumer project whose lock declares dev mode
+    Given a consumer project whose lock declares dev mode with a LiveSpec root as source
     When the developer runs "livespec runtime status --project <p> --json"
     Then exactly one INFO runtime finding is reported and no checkout finding
+    Given a consumer project whose dev lock source is not a LiveSpec root
+    When the developer runs "livespec runtime status --project <p> --json"
+    Then exactly one ERROR finding "runtime_dev_source_invalid" names the source, no checkout finding is reported and the command exits 1
     Given the LiveSpec repository itself, with or without a dev lock, or a project with no runtime references and no lock
     When the developer runs "livespec runtime status" and "livespec doctor"
     Then no runtime finding is reported
@@ -451,7 +454,9 @@ flowchart TD
     E -- Snapshot --> W2[WARNING snapshot links without lock]
     C -- Yes --> F{Lock valid and mode}
     F -- Invalid --> E2[ERROR]
-    F -- dev --> I1[INFO only]
+    F -- dev --> S{Source is a LiveSpec root?}
+    S -- Yes --> I1[INFO only]
+    S -- No --> E5[ERROR runtime_dev_source_invalid only]
     F -- pinned --> G{Snapshot present and verified?}
     G -- No --> E3[ERROR]
     G -- Yes --> X{Executing runtime is the pinned snapshot?}
@@ -562,7 +567,7 @@ For a project without a lock, runtime references into a clean LiveSpec checkout 
 
 ### AC-016
 
-For a pinned project, a missing snapshot directory or a manifest or content digest mismatch produces an ERROR; an executing CLI whose runtime root is not the pinned snapshot (for example the editable development install) produces an ERROR naming the executing root and the PATH recovery; runtime references not matching the pinned snapshot produce a WARNING. For any project, an invalid lock produces an ERROR. For a consumer project with a dev lock, exactly one INFO finding and no checkout finding is produced.
+For a pinned project, a missing snapshot directory or a manifest or content digest mismatch produces an ERROR; an executing CLI whose runtime root is not the pinned snapshot (for example the editable development install) produces an ERROR naming the executing root and the PATH recovery; runtime references not matching the pinned snapshot produce a WARNING. For any project, an invalid lock produces an ERROR. For a consumer project with a dev lock, exactly one INFO finding and no checkout finding is produced when the source is a LiveSpec root; otherwise exactly one ERROR finding `runtime_dev_source_invalid` naming the source and no checkout finding is produced.
 
 ### AC-017
 
@@ -638,6 +643,8 @@ The README Installation section and `docs/cli-reference.md` document install, pi
 - Q: What does "no write" mean for tests? -> A: Tests run with temporary `HOME` and `LIVESPEC_HOME`. The canonical protected set compared before and after (test caches excluded; an absent location must stay absent) is: the development checkout's tracked files and `git status --porcelain` output, the real `~/.livespec` listing, the editable `livespec` entry point bytes (macOS `/opt/homebrew/bin/livespec`), the Handy project listing, and the bytes of every snapshot not created by the test itself.
 - Q: How are links created on a fresh machine? -> A: By the locked snapshot's existing `scripts/link-local.sh` (unchanged behavior), followed by `livespec runtime pin`; pin never creates links.
 - Q: What does `pin` do on a project that already has a lock? -> A: It replaces the lock (pinned or dev) and reports the previous one; `upgrade` is the migration-aware path that requires an existing pinned lock.
+- Q: Are behaviors beyond the six decided items approved business scope? -> A: Yes, these five, approved by the user on 2026-10-15: `runtime install --no-activate`, which leaves `<home>/current` unchanged; the `pin` warning when `.specs/.livespec-path` is not git-ignored, with no ignore file edited; the shim's `livespec-shim-notice:` stderr line when a dev source is not the project root (plan decision D-02); the ERROR finding `runtime_dev_source_invalid` reported by `runtime status` (exit 1) and doctor for a dev lock whose source is not a LiveSpec root (plan decision D-04); and install refusing a runtime home or interpreter path that contains whitespace when it generates the shim (plan decision D-06). D-06 is a provisional guard while the shim does not quote paths.
+- Q: Are the plan's implementation decisions approved? -> A: Yes. On 2026-10-15 the user approved every decision D-01 to D-15 listed in the plan, as written there: refusing absolute or escaping symlinks and gitlinks (D-01), the per-mode resume steps (D-03), pin never creating links (D-05), the docs bootstrap `bash <home>/versions/<id>/scripts/install.sh` (D-07), `upgrade --to current` and `--project` as the nearest `.specs/` (D-08), an unverified upgrade target exiting 1 with no write (D-10), recovery without snapshot or `current` through LiveSpec's own venv, `cd <livespec repo> && uv sync && .venv/bin/python -m validator.cli runtime install` (D-11), UTC report dates, slugs of at most 60 `[a-z0-9-]` characters and the `invalid-lock` identity (D-12), validating before any write then writing lock, path and links (D-14), and making a snapshot read-only before its same-parent rename (D-15), together with D-02, D-04 and D-06 above.
 
 ## Success Criteria
 
