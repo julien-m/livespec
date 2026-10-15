@@ -32,3 +32,13 @@
 - **Author:** claude-code
 - Native independent reviews (`claude-opus-5-5`), ingested with `livespec validate --ingest-review`; raw bundles in [checks/](checks/). Spec: complete and ready (AC-001, FR-001 covered; SC-001 ambiguous, non-critical: does "no review command" go beyond goal render, progressions and delivery?); the non-normative edits above keep it current. Plan, first review: complete and ready with warnings, then revised; second review of the revised plan: complete and ready. `--progression plan|implement|complete` READY; `livespec delivery lane` now LIGHT.
 - Carried warnings (plan review 2): the constitution check marks principle 4 although `review_config_invalid` keeps each command's exit code instead of 3 (spec-approved, to record as an exception or an ADR); `ReviewIdentityError` lives in `validator/semantic/review_identity_config.py`, not `validator/exceptions.py`; no test asserts the error message text; `review prepare` and `revision close` have no test without a model; the CLI cases sit in `tests/test_review_identity_config.py`, not `tests/integration/`.
+
+## 2026-10-15 — [Bugfix]: Bare budget goal flag refused
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Plan modified:** No
+- **Code modified:** Yes (`validator/goal_review_identity.py::flag_budget`)
+- **AC impacted:** AC-001
+- **Author:** claude-code
+- PR #43 review: `--flags '--review-max-chars -1'` (or a budget flag without value) left a bare `--review-max-chars` token after normalization, so goal render silently used the configured budget. A bare token now raises `review_max_chars_out_of_bounds`; `tests/test_review_identity_config.py::test_goal_render_refuses_a_malformed_budget_flag` covers `=²`, `-1` and no value.

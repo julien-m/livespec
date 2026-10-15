@@ -17,6 +17,10 @@ def flag_budget(flags: list[str] | tuple[str, ...] | str | None) -> int | None:
     from .semantic.review_identity_config import ReviewIdentityError
 
     items = normalize_goal_flags(flags)
+    if "--review-max-chars" in items:
+        # A value starting with "-" (such as -1) or none at all leaves the flag bare.
+        detail = "--review-max-chars has no decimal integer value"
+        raise ReviewIdentityError("review_max_chars_out_of_bounds", detail)
     prefix = "--review-max-chars="
     budget = next((flag[len(prefix) :] for flag in items if flag.startswith(prefix)), None)
     if budget is None:

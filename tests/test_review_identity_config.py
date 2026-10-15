@@ -241,12 +241,15 @@ def test_commands_refuse_an_unreadable_configuration_with_model(
     assert (code, "review_config_invalid" in output) == (1, True), output
 
 
+@pytest.mark.parametrize(
+    "flags", ["--review-max-chars=²", "--review-max-chars -1", "--review-max-chars"]
+)
 def test_goal_render_refuses_a_malformed_budget_flag(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, flags: str
 ) -> None:
     root = make_root(tmp_path)
     goal = ("goal", "render", "spec-plan", "--feature", FEATURE, "--flags")
-    code, output = _invoke(root, monkeypatch, *goal, "--review-max-chars=²")
+    code, output = _invoke(root, monkeypatch, *goal, flags)
     assert (code, "review_max_chars_out_of_bounds" in output) == (2, True), output
 
 
