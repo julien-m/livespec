@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-10-15 — Bugfix: [093](features/093-configured-review-identity/changelog.md): a goal `--model` flag without value raises `review_model_required` instead of binding the configured model.
+
 ## 2026-10-15 — [Feature 083] Fix: install applies the installed commit's conventions evidence rules and refuses an incomplete snapshot (FR-001, FR-003)
 
 ## 2026-10-15 — [093](features/093-configured-review-identity/changelog.md): spec and plan reviews complete and ready (native, `claude-opus-5-5`); delivery lane now light.
