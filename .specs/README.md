@@ -123,6 +123,7 @@
 | 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-12 | [spec](features/083-pinned-runtime-isolation/spec.md) |
 | 084 | Bugfix Lane | Implemented | 2026-10-12 | 2026-10-12 | [spec](features/084-bugfix-lane/spec.md) |
 | 085 | Cargo Execution Runner | Implemented | 2026-10-13 | 2026-10-13 | [spec](features/085-cargo-execution-runner/spec.md), [plan](features/085-cargo-execution-runner/plan.md), [implementation](features/085-cargo-execution-runner/implementation.md) |
+| 085 | Locate ai-ressources Without Hard-Coded Paths | Implemented | 2026-10-13 | 2026-10-13 | [spec](features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md) |
 | 086 | Risk-Proportional Delivery | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/086-risk-proportional-delivery/spec.md), [plan](features/086-risk-proportional-delivery/plan.md), [implementation](features/086-risk-proportional-delivery/implementation.md) |
 | 087 | Anchor-Derived Acceptance Mapping | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/087-anchor-derived-acceptance/spec.md), [plan](features/087-anchor-derived-acceptance/plan.md), [implementation](features/087-anchor-derived-acceptance/implementation.md) |
 | 088 | Capped Reviews | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/088-capped-reviews/spec.md), [plan](features/088-capped-reviews/plan.md), [implementation](features/088-capped-reviews/implementation.md) |
@@ -156,6 +157,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-13 | Feature | 085 ai-ressources located through AIRESOURCES or the recorded project path, without hard-coded fallback |
+| 2026-10-13 | Feature | [Feature 085] Test: 100% AC covered (11/11), 0 tests generated |
+| 2026-10-13 | Feature | [Feature 085] Implemented in code: shared ai-ressources resolution (AIRESOURCES, then recorded path, else explicit error) routed through 7 consumers; certification pending |
+| 2026-10-13 | Plan | [Feature 085] Plan created: Locate ai-ressources Without Hard-Coded Paths — 6 implementation steps, 1 diagram |
+| 2026-10-13 | Spec | [Feature 085] Spec created: Locate ai-ressources Without Hard-Coded Paths — 4 stories, 11 AC, 7 FR |
+| 2026-10-13 | Bugfix | [Feature 050] Bugfix: native quality review |
+| 2026-10-13 | Bugfix | [Feature 079] Fix: 1/1 gaps closed (FR-002) — CI installs public Penflow pinned at dd356b9 without credential |
+| 2026-10-13 | Check | [Feature 079] Check: 55% verified (3/5 FR, 3/6 AC) — FR-002 public Penflow pin missing in CI, AC-006 corpus drift, AC-005 pending |
+| 2026-10-13 | Feature | [Feature 079] Spec refined: Penflow is a public dependency pinned to verified commit dd356b9 without credential — FR-002/AC-002 reworded, IDs preserved |
+| 2026-10-12 | Bugfix | Bugfix: Stop conditions keep the caller runtime |
 | 2026-10-13 | Feature | [Feature 085] Cargo execution runner: trusted cargo test certification with per-test coverage assertion trace |
 | 2026-10-13 | Bugfix | [Feature 079] Fix: 1/1 gaps closed (FR-002) — CI installs public Penflow pinned at dd356b9 without credential |
 | 2026-10-13 | Check | [Feature 079] Check: 55% verified (3/5 FR, 3/6 AC) — FR-002 public Penflow pin missing in CI, AC-006 corpus drift, AC-005 pending |
@@ -325,3 +336,13 @@
 <!-- finalize:spec-check:2026-10-13:4cb75000 -->
 
 <!-- finalize:spec-fix:2026-10-13:5a48c61f -->
+
+<!-- finalize:spec-specify:2026-10-13:e8bcdd29 -->
+
+<!-- finalize:spec-plan:2026-10-13:5f189e4f -->
+
+<!-- finalize:spec-implement:2026-10-13:cedd6521 -->
+
+<!-- finalize:spec-test:2026-10-13:477becbc -->
+
+<!-- finalize:spec-feature:2026-10-13:72cf8076 -->

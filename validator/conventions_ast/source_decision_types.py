@@ -65,6 +65,8 @@ class ExcludedDecision(TypedDict):
     rule_decision: RuleDecision
 
 
+# @spec FR-005: Decision manifest carries resolution_error
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-005
 class RuleDecisionManifest(TypedDict):
     rule_level_project_inventory_enabled: bool
     rule_level_inventory_total_count: int
@@ -91,3 +93,4 @@ class RuleDecisionManifest(TypedDict):
     decisions: list[SourceDecision]
     undecided_sources: list[str]
     excluded_sources: list[ExcludedDecision]
+    resolution_error: NotRequired[str]

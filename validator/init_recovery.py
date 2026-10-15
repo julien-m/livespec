@@ -11,6 +11,8 @@ import uuid
 from datetime import UTC, date, datetime
 from pathlib import Path
 
+from .ai_resources import resolve_ai_resources_root
+from .exceptions import AiResourcesResolutionError
 from .init_profile import InitError, ObservedProfile
 
 BACKUP_ITEMS = (
@@ -123,25 +125,36 @@ Use `$spec-init` (Codex) or `/spec-init` (Claude) for initialization.
     return previous + ("\n" if previous else "") + section + "\n"
 
 
+# @spec FR-004: Validity uses the shared root, FR-005: Unresolved root is invalid
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-004
 def conventions_are_valid(root: Path) -> bool:
-    """Check routing sources exist before choosing to preserve existing conventions."""
+    """Check routing sources exist before choosing to preserve existing conventions.
+
+    Args:
+        root: Project whose ``.conventions/`` files are checked.
+
+    Returns:
+        True when both files exist, the ai-ressources root resolves and every
+        routed source exists under it; committed declarations may name another
+        machine's path when ``AIRESOURCES`` points to a complete local clone.
+    """
     index = root / ".conventions/index.md"
     manifest = root / ".conventions/manifest.yaml"
     if not index.is_file() or not manifest.is_file():
         return False
-    text = index.read_text(encoding="utf-8")
-    base = re.search(r"(?:\$AIRESOURCES|ai_resources_path)\s*[`]*\s*=\s*[`]*([^`\n]+)", text)
-    manifest_base = re.search(
-        r"^ai_resources_path:\s*(.+)$", manifest.read_text(encoding="utf-8"), flags=re.MULTILINE
-    )
-    if not base or not manifest_base:
+    try:
+        resources = resolve_ai_resources_root(root).path
+    except AiResourcesResolutionError:
+        # Invalid conventions are re-rendered; rendering then surfaces the explicit message.
         return False
-    resources = Path(base.group(1).strip())
-    if resources != Path(manifest_base.group(1).strip()):
-        return False
+    sources = _routed_sources(index.read_text(encoding="utf-8"), resources)
+    return bool(sources) and all(path.is_file() for path in sources)
+
+
+def _routed_sources(index_text: str, resources: Path) -> list[Path]:
     sources: list[Path] = []
     # A route's directory prefix applies to subsequent comma-separated filenames.
-    for line in text.splitlines():
+    for line in index_text.splitlines():
         if line.startswith("→ $AIRESOURCES/"):
             entries = line.removeprefix("→ $AIRESOURCES/").split(",")
             first = Path(entries[0].strip())
@@ -151,7 +164,7 @@ def conventions_are_valid(root: Path) -> bool:
                     *(resources / first.parent / entry.strip() for entry in entries[1:]),
                 ]
             )
-    return bool(sources) and all(path.is_file() for path in sources)
+    return sources
 
 
 def render_conventions(resources: Path, name: str) -> dict[str, str]:

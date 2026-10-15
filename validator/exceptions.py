@@ -10,6 +10,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from pathlib import Path
+
 
 class SpecsRootNotFoundError(Exception):
     """Raised when the .specs/ directory cannot be found.
@@ -83,7 +86,8 @@ class ContradictionComparisonError(Exception):
         self.reason = reason
 
 
-# @spec FR-002: SDK dependency check error + install hint — .specs/features/002-layer-3-cli-surface/spec.md#fr-002  # noqa: E501
+# @spec FR-002: SDK dependency check error + install hint
+#   — .specs/features/002-layer-3-cli-surface/spec.md#fr-002
 class SdkDependencyError(Exception):
     """Raised when claude-agent-sdk is not importable.
 
@@ -266,3 +270,48 @@ class XcuitestTargetUnresolvedError(Exception):
         )
         self.surface = surface
         self.candidates = candidates
+
+
+AIRESOURCES_FIX_SENTENCE = (
+    "Run ./setup.sh from your ai-ressources clone, "
+    "or export AIRESOURCES=<absolute path of the clone>."
+)
+"""Actionable fix appended to every ai-ressources resolution error message."""
+
+
+# @spec FR-002: Dedicated error and message
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-002
+class AiResourcesResolutionError(ValueError):
+    """Raised when no ai-ressources root resolves for a project.
+
+    It subclasses ``ValueError`` so existing ``ValueError`` boundaries (for
+    example ``livespec conventions compile``) surface it unchanged.
+
+    Args:
+        project_root: Absolute project root that was consulted, or ``None``
+            when only the environment could be read.
+        rejected: Recorded paths found but rejected, as ``(absolute path,
+            source file)`` pairs in resolution order.
+    """
+
+    def __init__(self, project_root: Path | None, rejected: Sequence[tuple[Path, str]]) -> None:
+        super().__init__(_resolution_message(project_root, rejected))
+        self.project_root = project_root
+        self.rejected: tuple[tuple[Path, str], ...] = tuple(rejected)
+
+
+def _resolution_message(project_root: Path | None, rejected: Sequence[tuple[Path, str]]) -> str:
+    # One line, so the message fits a JSON field, a violation and an `ERROR:` line.
+    if project_root is None:
+        return (
+            f"ai-ressources root not resolved: AIRESOURCES is not set. {AIRESOURCES_FIX_SENTENCE}"
+        )
+    if rejected:
+        listed = "; ".join(f"{path} (from {source})" for path, source in rejected)
+        detail = f"rejected recorded paths: {listed}"
+    else:
+        detail = "no path recorded in .conventions/manifest.yaml or .conventions/index.md"
+    return (
+        f"ai-ressources root not resolved for project {project_root}: "
+        f"AIRESOURCES is not set; {detail}. {AIRESOURCES_FIX_SENTENCE}"
+    )

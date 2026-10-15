@@ -428,7 +428,7 @@ A confined bug in an implemented feature can skip whole-feature readiness when `
 4. When a feature modifies existing screens, save the versioned PNG in `screens/<NNN-feature-name>/` and update the latest copy at `screens/<name>.png`
 5. The `## Screens` section in `spec.md` links features to their visual references
 6. <!-- @spec FR-005: Document design direction carry — .specs/features/075-design-direction-carry/spec.md#fr-005 -->
-   The optional `**Design direction:**` line above the Screens table carries the one-line creative direction from brainstorm/Penflow. **Read** [`design-read-protocol.md`](/Users/julienm/projects/ai-ressources/design/references/design-read-protocol.md) for the source format. It is informative context for implementation — never an input to fidelity checks, visual validation, or any gate.
+   The optional `**Design direction:**` line above the Screens table carries the one-line creative direction from brainstorm/Penflow. **Read** `$AIRESOURCES/design/references/design-read-protocol.md` for the source format. It is informative context for implementation — never an input to fidelity checks, visual validation, or any gate.
 7. Design fidelity threshold is 5% (more permissive than visual regression at `maxDiffPixels: 0`)
 
 #### Multi-Surface Configuration

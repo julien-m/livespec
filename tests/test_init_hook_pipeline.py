@@ -23,6 +23,7 @@ def test_backend_official_hook_then_after_init_skip_then_verify(
     tmp_path: Path,
     has_hook: bool,
     has_ignore: bool,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     project = tmp_path / "git project"
     project.mkdir()
@@ -67,6 +68,8 @@ def test_backend_official_hook_then_after_init_skip_then_verify(
     assert "already installed" in official.stdout
     assert tree(project) == before
     # Apply the after-init valid-conventions branch: existing routing is retained unchanged.
+    # The in-process check resolves the same fixture corpus as the backend, not the caller's.
+    monkeypatch.setenv("AIRESOURCES", env["AIRESOURCES"])
     assert conventions_are_valid(project)
     assert tree(project / ".conventions") == convention_bytes
     verified = execute(project, env, "--verify-only")

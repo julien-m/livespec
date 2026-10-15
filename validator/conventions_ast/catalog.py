@@ -5,12 +5,12 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any, Literal, cast
 
 import yaml
 
+from validator.ai_resources import resolve_ai_resources_root
 from validator.conventions_ast.models import (
     AstCatalog,
     AstDeterministicTestEvidence,
@@ -19,6 +19,7 @@ from validator.conventions_ast.models import (
     AstPattern,
     AstRule,
 )
+from validator.exceptions import AiResourcesResolutionError
 from validator.visual_evidence import sha256_file
 
 
@@ -217,29 +218,21 @@ def _validate_traceability(
         raise AstCatalogError("source_hash mismatch")
 
 
+# @spec FR-004: Route catalog through shared resolution, FR-005: Catalog error
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-004
 def _resolve_source_path(source_path: str, project_root: Path) -> Path:
     path = Path(source_path)
     if path.is_absolute():
         return path
     parts = path.parts
     if parts and parts[0] == "ai-ressources":
-        ai_resources = _ai_resources_root(project_root)
+        try:
+            ai_resources = resolve_ai_resources_root(project_root).path
+        except AiResourcesResolutionError as exc:
+            # Catalog boundary: loaders already report AstCatalogError as a catalog load error.
+            raise AstCatalogError(str(exc)) from exc
         return ai_resources.joinpath(*parts[1:])
     return project_root / path
-
-
-def _ai_resources_root(project_root: Path) -> Path:
-    configured = os.environ.get("AIRESOURCES")
-    if configured:
-        return Path(configured)
-    manifest = project_root / ".conventions" / "manifest.yaml"
-    try:
-        raw = yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}
-    except (OSError, yaml.YAMLError):
-        return Path.home() / "projects" / "ai-ressources"
-    if isinstance(raw, dict) and isinstance(raw.get("ai_resources_path"), str):
-        return Path(raw["ai_resources_path"])
-    return Path.home() / "projects" / "ai-ressources"
 
 
 def _patterns(data: dict[str, Any]) -> list[AstPattern]:

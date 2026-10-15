@@ -14,13 +14,14 @@ from validator.conventions_ast.source_decisions import (
 )
 
 
+@pytest.mark.usefixtures("without_airesources")
 def test_generated_executable_sources_are_explicitly_counted(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Count the complete synthetic fixture, independently of any private corpus.
 
-    HOME is empty and the default catalogs are bound to the fixture bytes, so neither
-    AIRESOURCES nor ~/projects/ai-ressources can decide the counts or load errors.
+    HOME is empty, AIRESOURCES is removed and the default catalogs are bound to the
+    fixture bytes, so no caller corpus can decide the counts or load errors.
     """
     monkeypatch.setenv("HOME", str(tmp_path / "empty-home"))
     project = convention_corpus_project(tmp_path)

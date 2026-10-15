@@ -288,7 +288,7 @@ Initialize LiveSpec through an interactive brainstorm or an observed from-code p
 
 Key flags: `--auto`, `--stack [preset]`, `--from-code`, `--deep`, `--force`, `--dir [path]`, `--dry-run`
 
-Explicit autonomous force recovery backs up prior specs, conventions and integration documents before overwriting owned bootstrap files, preserving custom history and source bytes. Mutable agents use local copies. `--dry-run` previews without project writes; the backend's `--verify-only` rechecks current profile/content identity without mutation. Autonomous `--deep` and conflicting presets fail before writes. Installer, sync, probes and hook subprocesses share one finite budget; backend exit zero still requires integration proof, after-init hooks, current verification and the authentic goal archive. Tooling READY does not certify application runtime. Set `AIRESOURCES` to the real conventions checkout when it is outside the default sibling `ai-ressources` directory.
+Explicit autonomous force recovery backs up prior specs, conventions and integration documents before overwriting owned bootstrap files, preserving custom history and source bytes. Mutable agents use local copies. `--dry-run` previews without project writes; the backend's `--verify-only` rechecks current profile/content identity without mutation. Autonomous `--deep` and conflicting presets fail before writes. Installer, sync, probes and hook subprocesses share one finite budget; backend exit zero still requires integration proof, after-init hooks, current verification and the authentic goal archive. Tooling READY does not certify application runtime. Conventions are rendered from the ai-ressources clone located as described in [ai-ressources location (`AIRESOURCES`)](#ai-ressources-location-airesources).
 
 ### `/spec-propose`
 
@@ -628,6 +628,26 @@ For existing projects initialized before v16, run `/spec-migrate` to migrate to
 the `.agent-sync` sync flow.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
+
+### ai-ressources location (`AIRESOURCES`)
+
+<!-- @spec FR-007: README documents AIRESOURCES — .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-007 -->
+
+[ai-ressources](https://github.com/julien-m/ai-ressources) is the conventions corpus read by `/spec-init`, the validator, the AST catalog and the conventions gate. Clone it anywhere and run its [`setup.sh`](https://github.com/julien-m/ai-ressources/blob/main/setup.sh): it exports `AIRESOURCES=<absolute path of the clone>` in your shell profile. `AIRESOURCES` is the only location variable.
+
+Every LiveSpec consumer resolves the ai-ressources root of a project with one rule, in this order:
+
+1. the `AIRESOURCES` environment variable, when it is non-empty (an empty or blank value counts as unset; the value is used as is);
+2. otherwise the `ai_resources_path` key of the project's `.conventions/manifest.yaml`;
+3. otherwise the `` `$AIRESOURCES` = `<path>` `` declaration of the project's `.conventions/index.md`.
+
+A recorded path (steps 2 and 3) is used only when it designates an existing directory: `.conventions/` files are committed and may name another machine's clone, which is why the environment variable wins. There is no other default location. When nothing resolves, LiveSpec reports an explicit error naming the project and every rejected recorded path, ending with:
+
+```text
+Run ./setup.sh from your ai-ressources clone, or export AIRESOURCES=<absolute path of the clone>.
+```
+
+`livespec conventions compile` then exits 2 with `rulebook_error`, `/spec-init --from-code` stops with exit 2 before writing anything, `livespec conventions verify` reports the error as a `catalog_load_error` blocker, the corpus and rule decision manifests carry a `resolution_error` field, and coherence rule R7.3 reports one ERROR.
 
 ---
 

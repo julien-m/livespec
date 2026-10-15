@@ -14,7 +14,7 @@ from validator.conventions_gates import DEFAULT_AST_CATALOGS
 from . import source_decision_builders as _builders
 from .ars_rules import EXPECTED_ARS_RULE_COUNT, load_ars_executable_rules, project_has_ars_inventory
 from .catalog import load_ast_catalogs
-from .corpus import SourceClassification, ai_resources_root, build_corpus_manifest
+from .corpus import CorpusManifest, SourceClassification, build_corpus_manifest
 from .source_decision_builders import (
     NOTION_DEFERRED_TASK_ID,
     build_excluded_decision,
@@ -29,23 +29,48 @@ from .source_decision_types import (
 from .source_decision_validation import validate_rule_decision_manifest as _validate_manifest
 
 
+# @spec FR-004: Decisions reuse the corpus root, FR-005: Zero decisions with error
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-004
 def build_rule_decision_manifest(project_root: Path) -> RuleDecisionManifest:
-    """Return one explicit decision per classified AI-res/ARS source."""
+    """Return one explicit decision per classified AI-res/ARS source.
+
+    Args:
+        project_root: Project whose corpus manifest and AST catalogs are decided.
+
+    Returns:
+        The rule decision manifest; when the AI-resources root does not resolve it
+        has zero decisions and copies the corpus ``resolution_error``.
+    """
     corpus = build_corpus_manifest(project_root)
-    root = ai_resources_root(project_root)
     _builders.DEFAULT_AST_CATALOGS = DEFAULT_AST_CATALOGS
     _builders.load_ast_catalogs = load_ast_catalogs
     executable_rules, catalog_errors = executable_rules_by_source(project_root)
+    decisions, excluded = _corpus_decisions(corpus, executable_rules, project_root)
+    undecided = _undecided_sources(decisions)
+    counts: Counter[str] = Counter(decision["rule_decision"]["kind"] for decision in decisions)
+    manifest = _manifest_payload(
+        project_root, corpus, decisions, excluded, undecided, counts, catalog_errors
+    )
+    if "resolution_error" in corpus:
+        manifest["resolution_error"] = corpus["resolution_error"]
+    return manifest
+
+
+def _corpus_decisions(
+    corpus: CorpusManifest,
+    executable_rules: dict[str, list[dict[str, object]]],
+    project_root: Path,
+) -> tuple[list[SourceDecision], list[ExcludedDecision]]:
+    # An unresolved root has no corpus; never turn its empty root text into Path(".").
+    if "resolution_error" in corpus:
+        return [], []
+    root = Path(corpus["ai_resources_root"])
     decisions = [
         build_source_decision(root, source, executable_rules, project_root=project_root)
         for source in cast(list[SourceClassification], corpus["sources"])
     ]
     excluded = [build_excluded_decision(root, item) for item in corpus["excluded_sources"]]
-    undecided = _undecided_sources(decisions)
-    counts: Counter[str] = Counter(decision["rule_decision"]["kind"] for decision in decisions)
-    return _manifest_payload(
-        project_root, corpus, decisions, excluded, undecided, counts, catalog_errors
-    )
+    return decisions, excluded
 
 
 def _undecided_sources(decisions: list[SourceDecision]) -> list[str]:
