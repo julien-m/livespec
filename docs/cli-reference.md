@@ -584,7 +584,8 @@ livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature 
 - **status** / `livespec doctor` report: checkout references (WARNING clean, ERROR dirty),
   snapshot links without lock (WARNING), missing/corrupted pinned snapshot (ERROR), executing
   runtime other than the pinned snapshot (ERROR), mismatched references (WARNING), invalid
-  lock (ERROR), dev mode (one INFO). The LiveSpec repository itself reports nothing.
+  lock (ERROR), dev mode (one INFO, or one ERROR `runtime_dev_source_invalid` when the
+  source is not a LiveSpec root). The LiveSpec repository itself reports nothing.
 - **defect** writes `.specs/tool-defects/<YYYY-MM-DD>-<slug>.md` (never overwritten: `-2`,
   `-3`, ...) with the command, verbatim error, frozen runtime identity and resume commands,
   then applies `livespec pipeline update --feature <slug> --phase <phase> --status blocked`.

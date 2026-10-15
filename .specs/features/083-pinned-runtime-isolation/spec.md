@@ -3,7 +3,7 @@ title: Pinned Runtime Isolation
 priority: P1
 feature: 083-pinned-runtime-isolation
 created: 2026-10-11
-updated: 2026-10-11
+updated: 2026-10-15
 status: Implemented
 ---
 
@@ -426,9 +426,12 @@ Feature: Runtime drift detection
     Given a project whose lock is not valid JSON
     When the developer runs "livespec runtime status --project <p> --json"
     Then an ERROR finding names the lock path
-    Given a consumer project whose lock declares dev mode
+    Given a consumer project whose lock declares dev mode with a LiveSpec root as source
     When the developer runs "livespec runtime status --project <p> --json"
     Then exactly one INFO runtime finding is reported and no checkout finding
+    Given a consumer project whose dev lock source is not a LiveSpec root
+    When the developer runs "livespec runtime status --project <p> --json"
+    Then exactly one ERROR finding "runtime_dev_source_invalid" names the source, no checkout finding is reported and the command exits 1
     Given the LiveSpec repository itself, with or without a dev lock, or a project with no runtime references and no lock
     When the developer runs "livespec runtime status" and "livespec doctor"
     Then no runtime finding is reported
@@ -451,7 +454,9 @@ flowchart TD
     E -- Snapshot --> W2[WARNING snapshot links without lock]
     C -- Yes --> F{Lock valid and mode}
     F -- Invalid --> E2[ERROR]
-    F -- dev --> I1[INFO only]
+    F -- dev --> S{Source is a LiveSpec root?}
+    S -- Yes --> I1[INFO only]
+    S -- No --> E5[ERROR runtime_dev_source_invalid only]
     F -- pinned --> G{Snapshot present and verified?}
     G -- No --> E3[ERROR]
     G -- Yes --> X{Executing runtime is the pinned snapshot?}
@@ -562,7 +567,7 @@ For a project without a lock, runtime references into a clean LiveSpec checkout 
 
 ### AC-016
 
-For a pinned project, a missing snapshot directory or a manifest or content digest mismatch produces an ERROR; an executing CLI whose runtime root is not the pinned snapshot (for example the editable development install) produces an ERROR naming the executing root and the PATH recovery; runtime references not matching the pinned snapshot produce a WARNING. For any project, an invalid lock produces an ERROR. For a consumer project with a dev lock, exactly one INFO finding and no checkout finding is produced.
+For a pinned project, a missing snapshot directory or a manifest or content digest mismatch produces an ERROR; an executing CLI whose runtime root is not the pinned snapshot (for example the editable development install) produces an ERROR naming the executing root and the PATH recovery; runtime references not matching the pinned snapshot produce a WARNING. For any project, an invalid lock produces an ERROR. For a consumer project with a dev lock, exactly one INFO finding and no checkout finding is produced when the source is a LiveSpec root; otherwise exactly one ERROR finding `runtime_dev_source_invalid` naming the source and no checkout finding is produced.
 
 ### AC-017
 

@@ -36,7 +36,7 @@ updated: 2026-10-12
 | AC-002 | `tests/test_runtime_snapshot.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
 | AC-003 | `tests/test_runtime_snapshot.py` (incl. `test_staging_named_symlink_is_unlinked_without_following`) | ✅ Pass 2026-10-12 (spec-test re-certification) |
 | AC-004 | `tests/test_runtime_shim.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
-| AC-005 | `tests/test_runtime_shim.py` (incl. `test_current_must_be_a_verified_snapshot`, `test_looping_current_symlink_exits_3_without_traceback`) | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-005 | `tests/test_runtime_shim.py` (incl. `test_current_must_be_a_verified_snapshot`, `test_looping_current_symlink_exits_3_without_traceback`, `test_exit_3_recovery_uses_the_checkout_venv`) | ✅ Pass 2026-10-12 (spec-test re-certification); D-11 recovery regression added 2026-10-15 (spec-fix) |
 | AC-006 | `tests/test_runtime_project.py` (incl. `test_pin_replaces_lock_pinned_to_another_runtime`) | ✅ Pass 2026-10-12 (spec-test re-certification) |
 | AC-007 | `tests/test_runtime_project.py` (incl. `test_broken_links_need_trusted_provenance`), `tests/test_runtime_cli.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
 | AC-008 | `tests/test_runtime_project.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |

@@ -120,7 +120,7 @@
 | 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-12 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
 | 081 | Lightweight Outcome-Based Goals | Implemented | 2026-10-10 | 2026-10-10 | Read [spec](features/081-lightweight-outcome-goals/spec.md) |
 | 082 | Conventions Gate Signal | Implemented | 2026-10-10 | 2026-10-11 | [spec](features/082-conventions-gate-signal/spec.md) |
-| 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-12 | [spec](features/083-pinned-runtime-isolation/spec.md) |
+| 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-15 | [spec](features/083-pinned-runtime-isolation/spec.md) |
 | 084 | Bugfix Lane | Implemented | 2026-10-12 | 2026-10-12 | [spec](features/084-bugfix-lane/spec.md) |
 | 085 | Cargo Execution Runner | Implemented | 2026-10-13 | 2026-10-13 | [spec](features/085-cargo-execution-runner/spec.md), [plan](features/085-cargo-execution-runner/plan.md), [implementation](features/085-cargo-execution-runner/implementation.md) |
 | 085 | Locate ai-ressources Without Hard-Coded Paths | Implemented | 2026-10-13 | 2026-10-13 | [spec](features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md) |
@@ -157,16 +157,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-10-15 | Feature | 090 Minimal plan scope and release evidence |
-| 2026-10-14 | Feature | 094 Verified review continuity |
-| 2026-10-13 | Feature | 089 Reviews that stay current and a contestable criticality |
+| 2026-10-15 | Bugfix | [Feature 083] Fix: 2/2 review gaps closed (shim exit-3 recovery uses LiveSpec's venv with --source/--ref; AC-016 dev-lock wording aligned with D-04); spec and plan reviews refreshed at 120000 characters, implement progression READY |
+| 2026-10-15 | Feature | [Feature 083] Spec refined: user approvals of `--no-activate`, the `.livespec-path` pin warning and plan decisions D-01 to D-15 recorded in Clarifications; plan D-11 uses LiveSpec's venv; spec and plan reviews refreshed at 120000 characters, implement progression READY |
+| 2026-10-15 | Bugfix | Bugfix: 090 carried review warnings closed |
+| 2026-10-15 | Feature | Feature: Minimal plan scope and release evidence |
+| 2026-10-14 | Feature | Feature: Verified review continuity |
+| 2026-10-13 | Feature | Feature: Reviews that stay current and a contestable criticality |
 | 2026-10-13 | Feature | 085 ai-ressources located through AIRESOURCES or the recorded project path, without hard-coded fallback |
 | 2026-10-13 | Feature | [Feature 085] Test: 100% AC covered (11/11), 0 tests generated |
 | 2026-10-13 | Feature | [Feature 085] Implemented in code: shared ai-ressources resolution (AIRESOURCES, then recorded path, else explicit error) routed through 7 consumers; certification pending |
 | 2026-10-13 | Plan | [Feature 085] Plan created: Locate ai-ressources Without Hard-Coded Paths — 6 implementation steps, 1 diagram |
-| 2026-10-13 | Spec | [Feature 085] Spec created: Locate ai-ressources Without Hard-Coded Paths — 4 stories, 11 AC, 7 FR |
-| 2026-10-13 | Bugfix | [Feature 050] Bugfix: native quality review |
-| 2026-10-13 | Bugfix | [Feature 079] Fix: 1/1 gaps closed (FR-002) — CI installs public Penflow pinned at dd356b9 without credential |
 <!-- readme:activity:end -->
 
 ---
@@ -336,3 +336,5 @@
 <!-- finalize:spec-test:2026-10-13:477becbc -->
 
 <!-- finalize:spec-feature:2026-10-13:72cf8076 -->
+
+<!-- finalize:spec-fix:2026-10-15:5c6d3cbb -->

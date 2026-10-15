@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-10-15 — [Feature 083] Fix: 2/2 review gaps closed (shim exit-3 recovery uses LiveSpec's venv with --source/--ref; AC-016 dev-lock wording aligned with D-04); spec and plan reviews refreshed at 120000 characters, implement progression READY
+<!-- finalize:spec-fix:2026-10-15:5c6d3cbb -->
+
 ## 2026-10-15 — [Feature 083] Spec refined: user approvals of `--no-activate`, the `.livespec-path` pin warning and plan decisions D-01 to D-15 recorded in Clarifications; plan D-11 uses LiveSpec's venv; spec and plan reviews refreshed at 120000 characters, implement progression READY
 
 ## 2026-10-15 — Bugfix: 090 carried review warnings closed

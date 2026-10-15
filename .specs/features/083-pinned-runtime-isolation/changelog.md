@@ -148,3 +148,19 @@
 - **Gate:** `livespec validate .specs/features/083-pinned-runtime-isolation --progression implement --model claude-opus-5-5 --review-max-chars 120000` → `Progression: READY`.
 - **Carry over:** realign AC-016 and the Story 6 flow with D-04; D-11 adds `uv`, absent from the declared stack, and its message omits `--source`/`--ref <commit>` required by AC-005 (the shim's `CHECKOUT_INSTALL` still says `python3 -m validator.cli runtime install`); Step 2 does not restate the kept conventions test evidence; `cli.py`, `doctor/scanner.py` and `pipeline.py` stay over 300 lines; AC-016 versus AC-017 for an invalid lock in the LiveSpec repository.
 - **Author:** spec-refine + native review refresh (claude-opus-5-5)
+
+## 2026-10-15 — [Bugfix]: 2 gaps closed from the 2026-10-15 review (1 functional, 1 spec wording)
+
+- **Type:** Bug Fix (review carry-over of the 2026-10-15 spec refresh)
+- **Spec modified:** Yes (AC-016 text, the Story 6 Gherkin "Invalid lock and quiet cases" and flowchart: a dev lock whose source is not a LiveSpec root yields exactly one ERROR `runtime_dev_source_invalid` and no checkout finding, per approved D-04; no identifier changed; frontmatter `updated`)
+- **Plan modified:** Yes (D-11 names `--source <livespec repo>` and `--ref <commit>` for a pinned lock, per AC-005; Step 2 states the kept conventions test evidence; Step 3 states the exit-3 recovery texts)
+- **Code modified:** `validator/runtime/shim_core.py` (`CHECKOUT_INSTALL` is now `cd <livespec repo> && uv sync && .venv/bin/python -m validator.cli runtime install --source <livespec repo>`, plus `--ref <commit>` for a pinned lock without `current`), `tests/test_runtime_shim.py`, `docs/cli-reference.md` (dev-mode finding)
+- **Cause:** the exit-3 message still printed `python3 -m validator.cli runtime install`, which lacks LiveSpec's dependencies and omitted `--source`; AC-016 promised one INFO for every dev lock although D-04 reports an ERROR for a non-root source.
+- **Proof:** `test_exit_3_recovery_uses_the_checkout_venv` fails on the previous `shim_core.py` and passes after the fix; `pytest tests/test_runtime_*.py` 114 passed; `pytest tests/ --ignore=tests/integration` 4218 passed; `livespec conventions verify --feature 083-pinned-runtime-isolation` PASS.
+- **Reviews:** spec and plan reviewed again at `--review-max-chars 120000` by independent native claude-opus-5-5 reviewers, one batch each, prepared by the installed runtime `21-71f1e0d1b3d3` (35/35 covered each, complete and ready, no blocker). The checkout code (feature 089 and 090 prompts) also reviewed both, ready, after one plan correction round (Steps 2 and 3); its receipts are not readable by the installed runtime (`reviewed` and `qe_assessment` fields), so the committed state keeps the installed-runtime receipts, which both runtimes accept.
+- **Gate:** `livespec validate .specs/features/083-pinned-runtime-isolation --progression implement --model claude-opus-5-5 --review-max-chars 120000` → `Progression: READY`, with the installed `livespec` and with this checkout's CLI.
+- **Gaps closed:** AC-005 recovery text (D-11), AC-016 dev-lock wording (D-04)
+- **Remaining (non-blocking carry-over):** plan digest wording "sorted records" reads as kind-first order while the Definitions require path order (code sorts by path); the documented 300-line deviation of `cli.py`, `doctor/scanner.py` and `pipeline.py` has no explicit approval; D-02 and D-06 have no AC; the stack still lists pip + venv while D-11 uses `uv`; AC-016 "for any project" versus the LiveSpec-root precedence of AC-017.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-15:5c6d3cbb -->
