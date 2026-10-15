@@ -61,7 +61,7 @@ def test_resolved_model_roundtrips_through_native_goal_render(review_goal_files)
         app, ["goal", "render", "spec-demo", "--feature", "001-test", "--save"]
     )
     assert unresolved.exit_code == 2
-    assert "reviewer_model_unresolved" in unresolved.output
+    assert "review_model_required" in unresolved.output
     assert "contract-file:" not in unresolved.output
     rendered = runner.invoke(
         app,

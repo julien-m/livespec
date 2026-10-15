@@ -3,8 +3,8 @@ title: Configured Review Identity
 priority: P2
 feature: 093-configured-review-identity
 created: 2026-10-13
-updated: 2026-10-13
-status: Draft
+updated: 2026-10-15
+status: In Progress
 ---
 
 # Feature Spec: Configured Review Identity
@@ -13,7 +13,7 @@ status: Draft
 - **Feature Number:** 093
 - **Branch:** `feat/lighten-delivery-gates`
 - **Date:** 2026-10-13
-- **Status:** Draft
+- **Status:** In Progress
 - **Input:** Moved from feature 089 when the maintainer narrowed 089 to review staleness (13 October 2026). On the Handy program the reviewer model was passed by hand to every command, and a missing `--model` made goal renders fail or select another identity.
 
 ## Scope and Source Evidence
@@ -70,6 +70,10 @@ flowchart TD
 ## Edge Cases
 
 - **Budget out of bounds in the configuration:** refused as invalid, never clamped.
+- **Budget bounds:** an integer from 1000 to 200000 characters (the execution-mapping review bounds); a boolean, float or string is refused too, explicit or configured.
+- **No `review_model`:** the first `review_reviewers` entry is the configured model (the existing fallback); `default`, `unknown` and blank values name no model.
+- **Unreadable configuration:** invalid YAML, non-UTF-8 bytes or an unreadable path stop with `review_config_invalid`, even with `--model`.
+- **Other delivery commands:** `livespec delivery review prepare|verify` evaluate the lane and exit 2 with `review_model_required` like `livespec delivery lane`; `livespec delivery revision open|close` report it as their error code (exit 1). The implement goal's internal lane keeps the full lane until goal render binds the model.
 
 ## Quality Engineering
 

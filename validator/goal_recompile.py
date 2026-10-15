@@ -26,7 +26,7 @@ from .goal_contracts import (
 from .goal_json import JsonObject
 from .goal_outcome import OUTCOME_TASK_ID
 from .goal_proof import _refresh_state_status, _validate_task_proof
-from .goal_review_identity import bind_review_model
+from .goal_review_identity import bind_review_model, flag_budget
 
 __all__ = [
     "GoalRecompileError",
@@ -60,7 +60,12 @@ def compile_goal(
     feature: str | None,
     flags: list[str] | tuple[str, ...] | str | None,
 ) -> GoalContract:
-    """Compile a goal and bind the review identity exactly like ``goal render``."""
+    """Compile a goal and bind the review identity exactly like ``goal render``.
+
+    Raises:
+        ReviewIdentityError: Malformed budget flag or unresolved identity (feature 093).
+    """
+    flag_budget(flags)  # refuse a malformed budget before the payload parses it
     goal = compile_command_goal(
         command,
         project_root=project_root,
@@ -110,8 +115,6 @@ def refresh_goal(
         return RefreshedGoal(contract, state, None)  # command removed: nothing to recompile
     except (ExpectationsInvalid, OverrideMalformed, ValueError, OSError) as exc:
         raise GoalRecompileError(f"recompile failed: {exc}") from exc
-    except typer.Exit as exc:
-        raise GoalRecompileError("recompile failed: reviewer_model_unresolved") from exc
     if goal.goal_hash == contract.get("goal_hash"):
         return RefreshedGoal(contract, state, None)
     new_contract = cast(JsonObject, json.loads(render_goal_contract_file(goal)))

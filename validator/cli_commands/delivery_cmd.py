@@ -24,6 +24,7 @@ from validator.delivery.review import (
 )
 from validator.delivery.revision import close_revision, open_revision, read_revision
 from validator.identity import SLUG_REGEX
+from validator.semantic.review_identity_config import ReviewIdentityError
 
 from ._common import require_specs_root
 
@@ -56,6 +57,10 @@ def _lane(root: Path, feature: str, model: str, max_chars: int | None) -> LaneDe
     try:
         return evaluate_lane(root, feature, model, max_chars)
     except DeliveryInputError as exc:
+        _usage(str(exc))
+    # @spec FR-001: An unresolved model stops the lane instead of the full lane
+    #   — .specs/features/093-configured-review-identity/spec.md#fr-001
+    except ReviewIdentityError as exc:
         _usage(str(exc))
 
 

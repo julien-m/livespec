@@ -104,13 +104,16 @@ def _current(
 def _reviews(
     root: Path, feature: str, model: str, max_chars: int | None
 ) -> tuple[dict[str, ReviewReceipt], str]:
-    """Both current receipts, or the code naming the first stale one."""
-    from ..semantic.review_files import current_review_model
+    """Both current receipts, or the code naming the first stale one or the identity error."""
+    from ..semantic.review_identity_config import ReviewIdentityError, resolve_review_identity
 
-    resolved = current_review_model(root, model)
     receipts: dict[str, ReviewReceipt] = {}
+    try:
+        identity = resolve_review_identity(root, model, max_chars)
+    except ReviewIdentityError as exc:
+        return receipts, exc.code
     for kind in _KINDS:
-        current = _current(root, feature, kind, resolved, max_chars) if resolved else None
+        current = _current(root, feature, kind, identity.model, identity.max_chars)
         if current is None:
             return receipts, f"{kind}_review_not_current"
         receipts[kind] = current

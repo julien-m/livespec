@@ -42,6 +42,7 @@ from .goal_json import JsonObject
 from .goal_pairing import GoalPairError
 from .goal_recompile import compile_goal, refresh_for_cli, reusable_state
 from .run_artifacts import archive_goal_run
+from .semantic.review_identity_config import ReviewIdentityError
 
 
 def render_goal_command(
@@ -84,6 +85,10 @@ def render_goal_command(
             flags=context.normalized_flags,
         )
     except (ExpectationsInvalid, ExpectationsMissing, OverrideMalformed) as exc:
+        typer.echo(f"goal render blocked: {exc}", err=True)
+        raise typer.Exit(2) from exc
+    except ReviewIdentityError as exc:
+        # A review-bearing goal is never saved without a reviewer identity (feature 093).
         typer.echo(f"goal render blocked: {exc}", err=True)
         raise typer.Exit(2) from exc
     _emit_rendered_goal(goal, json_out=json_out, save=save)

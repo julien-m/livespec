@@ -89,7 +89,9 @@ def test_goal_accepts_only_a_current_passing_receipt(project: DeliveryProject) -
         )
 
     assert missing() == ["delivery_review_receipt_valid:no_receipt"]
-    project.run("delivery", "review", "prepare", "--feature", FEATURE, "--base", "HEAD~1")
+    project.run(
+        "delivery", "review", "prepare", "--feature", FEATURE, "--base", "HEAD~1", "--model", MODEL
+    )
     report_path = project.root.parent / "report.json"
     report_path.write_text(json.dumps(report(["calc.py"])), encoding="utf-8")
     args = ["--feature", FEATURE, "--kind", "combined", "--report", str(report_path)]
