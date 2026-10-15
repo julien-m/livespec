@@ -30,7 +30,6 @@ _INLINE_CLASS = re.compile(_CLASS, re.IGNORECASE)
 # Any other "Evidence class:" mention is a declaration the parser cannot bind to a step.
 _ANY_CLASS = re.compile(r"[eé]vidence[ \t]+class[*_ \t]*:", re.IGNORECASE)
 _INLINE_CODE = re.compile(r"`[^`]*`")  # Quoted syntax in prose is not a declaration.
-_COMMENT = re.compile(r"<!--.*?-->")
 
 
 @dataclass(frozen=True)
@@ -75,6 +74,35 @@ def heading(line: str) -> tuple[int, str] | None:
     return len(match.group(1)), title
 
 
+def _strip_comments(line: str, comment: bool) -> tuple[str, bool]:
+    """Remove HTML comments from one line; ``comment`` is True inside a multi-line comment.
+
+    Linear ``str.find`` scan (no regex). An unclosed ``<!--`` opens a multi-line comment
+    only at the start of a line, as in rendered Markdown; elsewhere (inline code) it stays text.
+    """
+    kept: list[str] = []
+    position = 0
+    if comment:
+        end = line.find("-->")
+        if end < 0:
+            return "", True
+        position = end + 3
+    while True:
+        start = line.find("<!--", position)
+        if start < 0:
+            kept.append(line[position:])
+            return "".join(kept), False
+        end = line.find("-->", start + 4)
+        if end >= 0:
+            kept.append(line[position:start])
+            position = end + 3
+        elif not "".join(kept).strip() and not line[position:start].strip():
+            return "".join(kept), True
+        else:
+            kept.append(line[position:])
+            return "".join(kept), False
+
+
 def unfenced(text: str) -> Iterator[str]:
     """Rendered lines of a Markdown document: no code fence or HTML comment content."""
     fence, comment = "", False
@@ -84,16 +112,11 @@ def unfenced(text: str) -> Iterator[str]:
             if opening and opening.group(1)[0] == fence[0] and len(opening.group(1)) >= len(fence):
                 fence = ""
             continue
-        if comment:
-            comment = "-->" not in line
-            continue
-        if opening:
+        if opening and not comment:
             fence = opening.group(1)
             continue
-        line = _COMMENT.sub("", line)
-        if "<!--" in line:
-            line, comment = line.split("<!--", 1)[0], True
-        yield line
+        visible, comment = _strip_comments(line, comment)
+        yield visible
 
 
 def _step_name(title: str) -> str:

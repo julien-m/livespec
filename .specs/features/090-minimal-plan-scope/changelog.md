@@ -1,5 +1,14 @@
 # Changelog - 090-minimal-plan-scope
 
+## 2026-10-15 — [Bugfix]: Linear HTML comment filtering (CodeQL)
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/plan_evidence.py, tests/test_plan_evidence_class.py
+- **AC impacted:** AC-002, AC-003
+- **Author:** claude-code
+- CodeQL (PR #42, "Bad HTML filtering regexp") flagged `<!--.*?-->`. Comments are now removed by a linear `str.find` scan that spans lines; an unclosed `<!--` opens a multi-line comment only at the start of a line (an inline-code `<!--` no longer hides the rest of a plan) and text after `-->` is kept. Closes the first carried warning of the 090 delivery review.
+
 ## 2026-10-15 — [Feature]: Minimal plan scope and release evidence
 
 - **Type:** Feature
