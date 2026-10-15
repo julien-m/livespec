@@ -1,5 +1,14 @@
 # Changelog - 090-minimal-plan-scope
 
+## 2026-10-15 — [Bugfix]: Release Evidence section only at level 2; foreign tests removed
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/release_evidence.py, tests/test_release_evidence.py, tests/test_plan_evidence_class.py
+- **AC impacted:** AC-002
+- **Author:** claude-code
+- PR #42 review (Codex, P2): a `### Release Evidence` or `# Release Evidence` lookalike no longer opens the proof table; only the documented `## Release Evidence` does. Commit 1feed8e had also picked up in-progress failing tests of the follow-up hardening session (same worktree); they are removed here and come back with that fix.
+
 ## 2026-10-15 — [Bugfix]: Linear HTML comment filtering (CodeQL)
 
 - **Type:** Bugfix

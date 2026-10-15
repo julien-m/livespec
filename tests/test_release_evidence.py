@@ -86,6 +86,8 @@ def test_announced_proof_keeps_release_pending(tmp_path: Path, proof: str) -> No
         (f"<!--\n{PROOF}\n-->", "## Release Evidence"),
         ("    " + PROOF, "## Release Evidence"),
         (PROOF, "## Release Evidence (template)"),
+        (PROOF, "### Release Evidence"),
+        (PROOF, "# Release Evidence"),
     ],
 )
 def test_example_or_withdrawn_proof_keeps_release_pending(

@@ -1,5 +1,14 @@
 # Changelog - 089-stable-review-identity
 
+## 2026-10-15 — [Bugfix]: Underscore-emphasized requirement definitions stay in the projection
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/semantic/review_stability.py, tests/test_stable_review.py
+- **AC impacted:** AC-002
+- **Author:** claude-code
+- PR #42 review (Codex, P1): a definition outside the requirement sections written with underscore emphasis (`- _FR-001:_ ...`) was left out of the requirement projection, so editing it kept the reviews current. `_DEFINITION` now accepts `*` and `_` before the id, and FR/AC ids are delimited by non-alphanumeric characters instead of `\b` (an underscore is a word character). A spec using that form gets a new stable identity once, which makes its reviews stale (fail safe).
+
 > The carried warnings on the unauthenticated revision record and on empty linked documents are fixed by [094](../094-verified-review-continuity/changelog.md).
 
 ## 2026-10-13 — [Feature]: Reviews stay current until requirements change; one spec revision during implementation

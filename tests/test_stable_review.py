@@ -141,6 +141,16 @@ def test_projection_reads_decorated_requirement_headings(heading: str) -> None:
     assert "AC-003: Kept anywhere." in requirement_projection("## Notes\nAC-003: Kept anywhere.\n")
 
 
+@pytest.mark.parametrize(
+    "definition",
+    ["- _FR-001:_ Delete after 24 hours.", "__AC-002__: Listed.", "| _FR-003_ | Kept. |"],
+)
+def test_projection_keeps_underscore_emphasized_definitions(definition: str) -> None:
+    assert definition in requirement_projection(f"## Notes\n\n{definition}\n")
+    assert requirement_projection("### _FR-004_\nKeep it.\n## Notes\nFree.\n").endswith("Keep it.")
+    assert requirement_projection("## Notes\nSee XFR-001: not a definition.\n") == ""
+
+
 def test_empty_source_keeps_the_stable_path(root: Path) -> None:
     (root / ".specs/project.md").write_text("")
     review_both(root)

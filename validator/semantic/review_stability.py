@@ -28,10 +28,13 @@ _REQUIREMENT_SECTIONS = (
 )
 # Numbering before a title ("4.", "4)", "A.") and closing marks after it.
 _TITLE_NUMBER = re.compile(r"^(?:[0-9A-Za-z]{1,3}[.)]\s+)")
-_REQUIREMENT_ID = re.compile(r"\b(?:FR|AC)-\d+\b")
-# A requirement defined outside its section: "- **FR-001:** ...", "AC-002: ..." or a table
-# row whose first cell is an FR or AC id.
-_DEFINITION = re.compile(r"^\s*(?:[-*]\s+|\|\s*)?\**(?:FR|AC)-\d+\b")
+# An FR or AC id; "_" counts as emphasis around it, not as part of a word ("_FR-001:_").
+_REQUIREMENT_ID = re.compile(r"(?<![0-9A-Za-z])(?:FR|AC)-\d+(?![0-9A-Za-z])")
+# A requirement defined outside its section: "- **FR-001:** ...", "- _FR-001:_ ...",
+# "AC-002: ..." or a table row whose first cell is an FR or AC id.
+# @spec FR-002: Requirement projection and stable identity
+#   — .specs/features/089-stable-review-identity/spec.md#fr-002
+_DEFINITION = re.compile(r"^\s*(?:[-*]\s+|\|\s*)?[*_]*(?:FR|AC)-\d+(?![0-9A-Za-z])")
 
 
 def reviewed_snapshot(prepared: PreparedReview) -> PreparedReview:

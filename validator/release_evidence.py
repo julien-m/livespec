@@ -68,7 +68,8 @@ def recorded_release_rows(implementation: str) -> dict[str, tuple[str, str]]:
     for line in unfenced(implementation):
         parsed = heading(line)
         if parsed:
-            inside = _key(parsed[1]) == "release evidence"
+            # Only the canonical level-2 section: a nested or top-level lookalike is no proof.
+            inside = parsed[0] == 2 and _key(parsed[1]) == "release evidence"
             continue
         if not inside or not _ROW.match(line):
             continue
