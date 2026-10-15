@@ -9,6 +9,7 @@ from .delivery.revision import RevisionUnverified, accepted_reviews, read_revisi
 from .pre_impl_analysis import analyze_feature_artifacts, has_blocking_findings
 from .release_evidence import pending_release_evidence, release_evidence_errors
 from .semantic.review_files import prepare_feature_review, review_receipt_path
+from .semantic.review_identity_config import ReviewIdentityError, resolve_review_identity
 
 # ``ship`` is ``complete`` plus the release evidence the plan deferred (090).
 PROGRESSION_DESTINATIONS = ("plan", "implement", "test", "complete", "ship", "clarify", "analyze")
@@ -54,6 +55,13 @@ def require_progression(
             raise ProgressionBlocked("release_evidence_unreadable:" + reason) from exc
         return
     spec = project_root / ".specs/features" / feature / "spec.md"
+    # @spec FR-001: Progressions read the configured identity
+    #   — .specs/features/093-configured-review-identity/spec.md#fr-001
+    try:
+        identity = resolve_review_identity(project_root, model, max_chars)
+    except ReviewIdentityError as exc:
+        raise ProgressionBlocked(str(exc)) from exc
+    model, max_chars = identity.model, identity.max_chars
     # @spec FR-005: Progressions during a spec revision
     #   — .specs/features/089-stable-review-identity/spec.md#fr-005
     accepted = _accepted(project_root, feature, destination)

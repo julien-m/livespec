@@ -12,6 +12,7 @@ import mistune
 from .config import load_semantic_config
 from .review_context import PreparedReview, content_hash, prepare_review_context
 from .review_feature_scope import resolve_existing_feature
+from .review_identity_config import configured_model, review_budget
 
 # @spec FR-002: Sources — .specs/features/078-requirement-evidence-integrity/spec.md#fr-002
 # @spec AC-002: Context — .specs/features/078-requirement-evidence-integrity/spec.md#ac-002
@@ -81,8 +82,7 @@ def current_review_model(project_root: Path, model: str = "") -> str:
     """
     if model:
         return model
-    config = load_semantic_config(project_root / ".specs")
-    return config.review_model or next(iter(config.review_reviewers), "")
+    return configured_model(load_semantic_config(project_root / ".specs"))
 
 
 def review_receipt_path(project_root: Path, feature: str, kind: str) -> Path:
@@ -176,11 +176,7 @@ def prepare_feature_review(
         paths[feature_dir / "plan.md"] = "plan"
     sources, roles, owners, errors = _load_sources(root, paths, feature)
     settings = load_semantic_config(root / ".specs")
-    if (
-        not isinstance(cast(object, settings.review_max_chars), int)
-        or settings.review_max_chars < 1000
-    ):
-        raise ValueError("review_max_chars_must_be_integer_at_least_1000")
+    budget = review_budget(max_chars, settings)
     config = root / ".specs/semantic/config.yaml"
     dependencies = {
         "semantic_config": content_hash(
@@ -195,7 +191,7 @@ def prepare_feature_review(
         source_roles=roles,
         source_features=owners,
         dependencies=dependencies,
-        max_chars=max_chars if max_chars is not None else settings.review_max_chars,
+        max_chars=budget,
         unresolved_references=tuple(sorted(set(errors))),
     )
 

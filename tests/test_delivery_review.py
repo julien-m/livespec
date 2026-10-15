@@ -71,15 +71,12 @@ def test_prepare_hashes_every_counted_path(project: DeliveryProject) -> None:
 def test_prepare_reports_empty_scope_and_unknown_base(
     project: DeliveryProject, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    code, scope = project.json(
-        "delivery", "review", "prepare", "--feature", FEATURE, "--base", "no-such-rev"
-    )
+    prepare = ("delivery", "review", "prepare", "--feature", FEATURE, "--model", MODEL)
+    code, scope = project.json(*prepare, "--base", "no-such-rev")
     assert (code, scope["error"]) == (1, "diff_unavailable")
     clean = make_project(tmp_path / "clean")
     monkeypatch.chdir(clean.root)
-    code, scope = clean.json(
-        "delivery", "review", "prepare", "--feature", FEATURE, "--base", "HEAD"
-    )
+    code, scope = clean.json(*prepare, "--base", "HEAD")
     assert (code, scope["error"]) == (1, "empty_scope")
 
 

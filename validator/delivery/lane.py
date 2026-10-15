@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 from ..identity import SLUG_REGEX
+from ..semantic.review_identity_config import ReviewIdentityError
 
 if TYPE_CHECKING:
     from ..semantic.review_context import PreparedReview
@@ -146,18 +147,20 @@ def spec_review_state(
     """Return '' with the receipt and the context it reviewed when current and ready.
 
     Otherwise return the reason and no receipt. Reads sources and the receipt only.
+
+    Raises:
+        ReviewIdentityError: No option or configuration names a model, or the budget is
+            out of bounds (feature 093).
     """
-    from ..semantic.review_files import (
-        current_review_model,
-        prepare_feature_review,
-        review_receipt_path,
-    )
+    from ..semantic.review_files import prepare_feature_review, review_receipt_path
+    from ..semantic.review_identity_config import resolve_review_identity
     from ..semantic.review_receipts import load_review_receipt
     from ..semantic.review_stability import reviewed_against
 
-    resolved = current_review_model(project_root, model)
-    if not resolved:
-        return "reviewer model unresolved (pass --model or configure review_model)", None, None
+    # @spec FR-001: The lane reads the configured identity
+    #   — .specs/features/093-configured-review-identity/spec.md#fr-001
+    identity = resolve_review_identity(project_root, model, max_chars)
+    resolved, max_chars = identity.model, identity.max_chars
     receipt_path = review_receipt_path(project_root, feature, "spec")
     if not receipt_path.is_file():
         return f"no spec review receipt at {receipt_path.relative_to(project_root)}", None, None
@@ -175,12 +178,21 @@ def spec_review_state(
 
 
 def evaluate_lane(
-    project_root: Path, feature: str, model: str = "", max_chars: int | None = None
+    project_root: Path,
+    feature: str,
+    model: str = "",
+    max_chars: int | None = None,
+    *,
+    identity_required: bool = True,
 ) -> LaneDecision:
     """Evaluate the lane of an existing feature.
 
+    ``identity_required=False`` keeps the full lane, with the identity error as its
+    reason, instead of raising: a goal compiled before its model is bound (086 FR-007).
+
     Raises:
         DeliveryInputError: Unknown feature or unreadable spec.
+        ReviewIdentityError: The reviewer model is unresolved or the budget out of bounds.
     """
     spec = project_root / ".specs" / "features" / feature / "spec.md"
     if not SLUG_REGEX.fullmatch(feature) or not spec.is_file():
@@ -190,7 +202,13 @@ def evaluate_lane(
     except (OSError, UnicodeDecodeError) as exc:
         raise DeliveryInputError(f"unreadable spec {spec}: {exc}") from exc
     decision = classify(feature, text)
-    problem, receipt, reviewed = spec_review_state(project_root, feature, model, max_chars)
+    try:
+        problem, receipt, reviewed = spec_review_state(project_root, feature, model, max_chars)
+    except ReviewIdentityError as exc:
+        if identity_required:
+            raise
+        decision.reasons.append(LaneReason(exc.code, str(exc)))
+        return decision
     if receipt is None or reviewed is None:
         decision.reasons.append(LaneReason("spec_review_not_current", problem))
         return decision

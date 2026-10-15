@@ -804,11 +804,15 @@ See [docs/cli-reference.md](docs/cli-reference.md#livespec-finalize) for the ful
 Plan review configuration (`.specs/semantic/config.yaml`):
 
 ```yaml
+review_model: openai/gpt-5.4      # reviewer of goals, progressions and delivery lanes
+review_max_chars: 60000           # 1000 to 200000; out of bounds is refused
 review_reviewers:
   - google/gemini-3.1-pro
   - openai/gpt-5.4
 review_confidence_threshold: 3.0
 ```
+
+`livespec goal render`, `livespec validate --progression` and `livespec delivery` take the reviewer model and budget from `--model`/`--review-max-chars`, else from this file (`review_model`, else the first `review_reviewers` entry), and stop with `review_model_required` when neither names a model.
 
 When a single reviewer returns a suspiciously empty review on a complex plan, the validator automatically cascades to the next configured reviewer. If both agree there are no issues, the plan is validated with high confidence.
 

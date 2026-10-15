@@ -17,10 +17,14 @@ def goal_delivery_lane(
 
     model = _flag_value(normalized_flags, "--model") or ""
     budget = _flag_value(normalized_flags, "--review-max-chars")
+    # A malformed explicit budget becomes 0, which resolution refuses as out of bounds.
+    explicit = None
+    if budget is not None:
+        explicit = int(budget) if budget.isascii() and budget.isdigit() else 0
     try:
-        decision = evaluate_lane(
-            project_root, feature, model, int(budget) if budget and budget.isdigit() else None
-        )
+        # Goal render binds the model or refuses a review-bearing goal (093); until
+        # then an unresolved identity keeps the full lane.
+        decision = evaluate_lane(project_root, feature, model, explicit, identity_required=False)
     except DeliveryInputError:
         return None
     return decision.to_json()
