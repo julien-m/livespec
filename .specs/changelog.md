@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-10-15 — [093](features/093-configured-review-identity/changelog.md): spec and plan reviews complete and ready (native, `claude-opus-5-5`); delivery lane now light.
+
 ## 2026-10-15 — [093](features/093-configured-review-identity/changelog.md): goal render, progressions and the delivery lane take the reviewer model and budget from `.specs/semantic/config.yaml` when no option names them, and stop with `review_model_required` otherwise; out-of-bounds budgets are refused, never clamped.
 <!-- finalize:spec-implement:2026-10-15:8c213f7b -->
 

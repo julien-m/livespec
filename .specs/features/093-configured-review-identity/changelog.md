@@ -21,3 +21,14 @@
 - Carried warnings (follow-up): skills and `system/anti-drift-block.md` still say to always forward `--model`; `validator/goal_review_identity.py` imports `goal_compile` at module level (import-order dependency); a `--review-max-chars=` flag over 4300 digits and an empty `--model=` flag behave as before 093 (traceback, blank reviewer bound); the 1000–200000 bounds duplicate `validator/execution_mapping.py`; a non-mapping configuration still reads as defaults; the `--review-max-chars` typer options declare no maximum.
 
 <!-- finalize:spec-implement:2026-10-15:8c213f7b -->
+
+## 2026-10-15 — [Spec Update]: Spec and plan reviews ready
+
+- **Type:** Spec Update
+- **Spec modified:** Yes (non-normative: User Flow shows the configuration, budget and placeholder checks; Key Entities lists the `source` values; Edge Cases add the default budget, exit codes and messages; QE P0 evidence adds delivery lane fixtures. FR, AC, SC and Gherkin unchanged)
+- **Plan modified:** Yes (D-01 to D-03 match the implementation: module, resolution rules, exception, callers, exit codes; step 2 lists the test cases)
+- **Code modified:** No
+- **AC impacted:** AC-001
+- **Author:** claude-code
+- Native independent reviews (`claude-opus-5-5`), ingested with `livespec validate --ingest-review`; raw bundles in [checks/](checks/). Spec: complete and ready (AC-001, FR-001 covered; SC-001 ambiguous, non-critical: does "no review command" go beyond goal render, progressions and delivery?); the non-normative edits above keep it current. Plan, first review: complete and ready with warnings, then revised; second review of the revised plan: complete and ready. `--progression plan|implement|complete` READY; `livespec delivery lane` now LIGHT.
+- Carried warnings (plan review 2): the constitution check marks principle 4 although `review_config_invalid` keeps each command's exit code instead of 3 (spec-approved, to record as an exception or an ADR); `ReviewIdentityError` lives in `validator/semantic/review_identity_config.py`, not `validator/exceptions.py`; no test asserts the error message text; `review prepare` and `revision close` have no test without a model; the CLI cases sit in `tests/test_review_identity_config.py`, not `tests/integration/`.

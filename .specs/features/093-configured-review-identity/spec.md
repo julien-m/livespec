@@ -44,11 +44,17 @@ Feature: Configured identity
 
 ```mermaid
 flowchart TD
-    A[Command needs a reviewer identity] --> B{--model given?}
-    B -- Yes --> C[Use it]
-    B -- No --> D{review_model configured?}
+    A[Command needs a reviewer identity] --> R{Configuration readable?}
+    R -- No --> X[Exit with review_config_invalid]
+    R -- Yes --> G{Budget from --review-max-chars, else review_max_chars, within 1000-200000?}
+    G -- No --> Y[Exit with review_max_chars_out_of_bounds]
+    G -- Yes --> B{--model given?}
+    B -- Yes --> N{Names a model?}
+    N -- Yes --> C[Use it]
+    N -- No --> F[Exit with review_model_required]
+    B -- No --> D{review_model, else first review_reviewers entry, names a model?}
     D -- Yes --> E[Use configuration]
-    D -- No --> F[Exit with review_model_required]
+    D -- No --> F
 ```
 
 ## Acceptance Criteria
@@ -65,20 +71,22 @@ flowchart TD
 
 | Entity | Description | Key Fields |
 |---|---|---|
-| Review identity | Resolved model and budget | model, max_chars, source |
+| Review identity | Resolved model and budget | model, max_chars, source (`option` when `--model` names the model, `configuration` otherwise) |
 
 ## Edge Cases
 
 - **Budget out of bounds in the configuration:** refused as invalid, never clamped.
+- **No budget named:** `review_max_chars` defaults to 60000, the existing semantic configuration default.
 - **Budget bounds:** an integer from 1000 to 200000 characters (the execution-mapping review bounds); a boolean, float or string is refused too, explicit or configured.
 - **No `review_model`:** the first `review_reviewers` entry is the configured model (the existing fallback); `default`, `unknown` and blank values name no model.
 - **Unreadable configuration:** invalid YAML, non-UTF-8 bytes or an unreadable path stop with `review_config_invalid`, even with `--model`.
 - **Other delivery commands:** `livespec delivery review prepare|verify` evaluate the lane and exit 2 with `review_model_required` like `livespec delivery lane`; `livespec delivery revision open|close` report it as their error code (exit 1). The implement goal's internal lane keeps the full lane until goal render binds the model.
+- **Exit codes and messages:** `livespec goal render` exits 2 (the code it already used for an unresolved model) and a progression exits 1 (`BLOCKED:`), for every identity error. `review_config_invalid` keeps each command's existing code for a blocked input rather than the constitution's configuration-error code 3, so that callers which already branch on these codes are unaffected. Each message names the code and the fix: pass `--model` or set `review_model` in `.specs/semantic/config.yaml`, or the offending budget and its bounds.
 
 ## Quality Engineering
 
 - **Risk:** Medium criticality; Shared blast radius; primary risk Contract.
-- **P0 gates/evidence:** goal render and progression fixtures with and without the configuration.
+- **P0 gates/evidence:** goal render, progression and delivery lane fixtures with and without the configuration.
 
 ## Success Criteria
 
