@@ -64,6 +64,30 @@ def test_quoted_or_hidden_evidence_lines_are_ignored() -> None:
     assert evidence_class_errors(text) == []
 
 
+@pytest.mark.parametrize(
+    "steps",
+    [
+        "Keep the `<!--` marker style.\n\n### Step 1 — A\n\n### Step 2 — Sign\n",
+        "Use <!-- markers in prose.\n\n### Step 1 — A\n\n### Step 2 — Sign\n",
+        "### Step 1 — A\n\n<!-- note\n-->\n### Step 2 — Sign\n",
+        "### Step 1 — A\n\n### Step 2 — Sign\n\n```a`\n",
+        "### Step 1 — A\n\n```\n**Evidence class:** bogus\n``` x\n```\n\n### Step 2 — Sign\n",
+    ],
+)
+def test_rendered_declarations_are_not_hidden(steps: str) -> None:
+    text = plan_text(steps + "\n**Evidence class:** release\n")
+    assert [(s.label, s.evidence_class) for s in plan_steps(text)[0]] == [
+        ("1", "local"),
+        ("2", "release"),
+    ]
+    assert evidence_class_errors(text) == []
+
+
+def test_text_after_a_closing_comment_is_read() -> None:
+    text = plan_text("### Step 1 — Sign\n\n<!-- note\n--> **Evidence class:** release\n")
+    assert [s.evidence_class for s in plan_steps(text)[0]] == ["release"]
+
+
 def test_step_labels_drop_leading_zeros() -> None:
     text = plan_text("### Step 02 — A\n\n**Evidence class:** release\n\n### Step 2 — B\n")
     assert [s.label for s in plan_steps(text)[0]] == ["2", "2"]
@@ -73,6 +97,10 @@ def test_step_labels_drop_leading_zeros() -> None:
 def test_long_whitespace_runs_stay_linear() -> None:
     lines = ["# a" + " " * 20000 + "x", "### Step 1" + " " * 20000 + "x"]
     lines.append("Evidence class" + " " * 20000 + "x")
+    lines.append("**Evidence" + "\u00a0" * 20000 + "x")
+    lines.append("Evidence class" + "<b>" * 20000 + "x")
+    lines.append("x " + "<!--" * 20000)
+    lines.append("<!--" * 20000)  # Last: it opens a comment that hides the rest.
     started = time.perf_counter()
     evidence_class_errors(plan_text("\n".join(lines)))
     assert time.perf_counter() - started < 1.0
@@ -98,6 +126,9 @@ def test_long_whitespace_runs_stay_linear() -> None:
         ("### Step 1 — Sign **Evidence class:** release\n", "not recognised"),
         ("### Step 1 — Build\n\n#### **Evidence class:** release\n", "not recognised"),
         ("1. Sign __Evidence class:__ release\n", "not recognised"),
+        ("### Step 1 — Build\n\n**Evidence-class:** release\n", "not recognised"),
+        ("### Step 1 — Build\n\n<strong>Evidence class</strong>: release\n", "not recognised"),
+        ("### Step 1 — Build\n\n**Evidence\u00a0class:** release\n", "not recognised"),
         (
             "### Step 1 — A\n\n**Evidence class:** release\n\n### Step 1 — B\n",
             "Step 1 appears 2 times",
@@ -107,6 +138,13 @@ def test_long_whitespace_runs_stay_linear() -> None:
 def test_invalid_evidence_classes_are_reported(steps: str, message: str) -> None:
     errors = evidence_class_errors(plan_text(steps))
     assert any(message in error for error in errors), errors
+
+
+def test_overlong_step_numbers_do_not_raise() -> None:
+    text = plan_text("### Step " + "1" * 5000 + " — Sign\n\n**Evidence class:** release\n")
+    [step] = plan_steps(text)[0]
+    assert step.evidence_class == "release"
+    assert evidence_class_errors(text) == []
 
 
 def test_validate_plan_rejects_unknown_class(tmp_path: Path) -> None:

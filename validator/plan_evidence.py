@@ -14,21 +14,23 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 
 EVIDENCE_CLASSES = ("local", "release")
-# Opening or closing code fence of up to three spaces of indentation.
-_FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+# Code fence of up to three spaces of indentation and its info string (checked in Python).
+_FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 # ATX heading marker; the closing hashes are removed in Python (no regex backtracking).
 _HEADING = re.compile(r"^(#{1,6})[ \t]+(.*)$")
 _PLAN_SECTION = re.compile(r"implementation (plan|steps)", re.IGNORECASE)
-# "Step 2 — Title", "3. Step 2.5: Title" or "Step — Title" (numbered by position).
-_STEP_HEADING = re.compile(r"^(?:\d+[.)] +)?step\b *(\d+(?:\.\d+)*)?", re.IGNORECASE)
+# "Step 2 — Title", "3. Step 2.5: Title" or "Step — Title" (numbered by position). A number
+# part has at most nine digits, like a Markdown list marker; a longer one is not a label.
+_STEP_HEADING = re.compile(r"^(?:\d+[.)] +)?step\b *(\d{1,9}(?:\.\d{1,9})*(?!\d))?", re.IGNORECASE)
 # Top-level numbered item "1. Title" or "1) Title".
-_NUMBERED_ITEM = re.compile(r"^(\d+)[.)] +(\S.*)$")
+_NUMBERED_ITEM = re.compile(r"^(\d{1,9})[.)] +(\S.*)$")
 # The one declaration syntax; the value runs to the end of the line and is stripped after.
 _CLASS = r"\*\*Evidence class:?\*\*:?(.*)"
 _CLASS_LINE = re.compile(r"^ *(?:> *)*(?:[-*] +)?" + _CLASS, re.IGNORECASE)
 _INLINE_CLASS = re.compile(_CLASS, re.IGNORECASE)
-# Any other "Evidence class:" mention is a declaration the parser cannot bind to a step.
-_ANY_CLASS = re.compile(r"[eé]vidence[ \t]+class[*_ \t]*:", re.IGNORECASE)
+# Any other "Evidence class:" mention (hyphen, no-break space, HTML tags before the colon) is
+# a declaration the parser cannot bind to a step.
+_ANY_CLASS = re.compile(r"[eé]vidence[\s_-]*class(?:[*_\s]|</?\w+>)*:", re.IGNORECASE)
 _INLINE_CODE = re.compile(r"`[^`]*`")  # Quoted syntax in prose is not a declaration.
 
 
@@ -59,7 +61,7 @@ def title_text(text: str) -> str:
 
 def normalize_label(label: str) -> str:
     """``02.50`` and ``2.50`` are the same step label (leading zeros dropped)."""
-    return ".".join(str(int(part)) for part in label.split(".")) if label else label
+    return ".".join(part.lstrip("0") or "0" for part in label.split(".")) if label else label
 
 
 def heading(line: str) -> tuple[int, str] | None:
@@ -108,12 +110,15 @@ def unfenced(text: str) -> Iterator[str]:
     fence, comment = "", False
     for line in text.splitlines():
         opening = _FENCE.match(line)
+        marker, info = opening.groups() if opening else ("", "")
         if fence:
-            if opening and opening.group(1)[0] == fence[0] and len(opening.group(1)) >= len(fence):
+            # A closing fence repeats the opening character and has nothing after it.
+            if marker[:1] == fence[0] and len(marker) >= len(fence) and not info.strip():
                 fence = ""
             continue
-        if opening and not comment:
-            fence = opening.group(1)
+        # A backtick info string cannot hold a backtick: such a line is text, not a fence.
+        if marker and not comment and not (marker[0] == "`" and "`" in info):
+            fence = marker
             continue
         visible, comment = _strip_comments(line, comment)
         yield visible

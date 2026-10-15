@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-15 — Bugfix: 090 carried review warnings closed
+
+- [090](features/090-minimal-plan-scope/changelog.md): a release proof must name a path, URL or numbered identifier and announce nothing; fence, `Evidence-class`, `<strong>` and no-break-space forms no longer hide or slip past a declaration; step numbers are bounded; `--progression ship` blocks with `release_evidence_unreadable` instead of a raw `PermissionError`.
+
 ## 2026-10-15 — Feature: Minimal plan scope and release evidence
 
 - [090](features/090-minimal-plan-scope/changelog.md): the native rule `system/minimal-spec-scope.md` and the plan review prompt report every mechanism no FR, AC or constitution rule asks for (blocking unless a justified technical necessity); a plan step may declare `**Evidence class:** release`, listed as pending by the implement goal without blocking `finalize` and required by `/spec-ship` through `livespec validate <feature-dir> --progression ship`.

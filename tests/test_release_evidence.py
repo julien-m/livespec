@@ -70,12 +70,44 @@ def test_release_evidence_is_pending_until_recorded(tmp_path: Path) -> None:
         "\u274c Not produced",
         "(pending)",
         "<receipt path>",
+        "Proof pending",
+        "Notary receipt pending",
+        "Deferred to release",
+        "To be signed at release",
+        "In progress",
+        "Release build 1.4 (pending)",
+        "Signed build: pending",
+        "**Status:** TBD",
+        "&lt;pending&gt;",
+        "\u231b Pending",
+        "...",
+        "\u2026",
+        "\u2705",
+        "done",
+        "ok",
+        "n/a",
     ],
 )
 def test_announced_proof_keeps_release_pending(tmp_path: Path, proof: str) -> None:
     root = _feature(tmp_path)
     _implementation(root, f"| 2 | Signed build | {proof} |")
     assert release_evidence(root, FEATURE)[0]["status"] == "pending"
+
+
+@pytest.mark.parametrize(
+    "proof",
+    [
+        "notarized build 1.4",
+        "receipt.json",
+        "checks/notary-receipt.json",
+        "https://ci.example.com/runs/latest",
+        "TestFlight build #2031",
+    ],
+)
+def test_checkable_proof_satisfies_release(tmp_path: Path, proof: str) -> None:
+    root = _feature(tmp_path)
+    _implementation(root, f"| 2 | Signed build | {proof} |")
+    assert release_evidence(root, FEATURE)[0]["status"] == "satisfied"
 
 
 @pytest.mark.parametrize(
@@ -88,6 +120,7 @@ def test_announced_proof_keeps_release_pending(tmp_path: Path, proof: str) -> No
         (PROOF, "## Release Evidence (template)"),
         (PROOF, "### Release Evidence"),
         (PROOF, "# Release Evidence"),
+        ("| " + "2" * 5000 + " | Signed build | receipt.json |", "## Release Evidence"),
     ],
 )
 def test_example_or_withdrawn_proof_keeps_release_pending(
@@ -98,7 +131,9 @@ def test_example_or_withdrawn_proof_keeps_release_pending(
     assert release_evidence(root, FEATURE)[0]["status"] == "pending"
 
 
-@pytest.mark.parametrize("row", ["| 2 | Device fleet run | notarized |", "| 2 | notarized |"])
+@pytest.mark.parametrize(
+    "row", ["| 2 | Device fleet run | notarized build 1.4 |", "| 2 | notarized build 1.4 |"]
+)
 def test_proof_naming_another_step_is_a_mismatch(tmp_path: Path, row: str) -> None:
     root = _feature(tmp_path)
     _implementation(root, row)
@@ -206,3 +241,18 @@ def test_unreadable_map_is_reported_not_raised(tmp_path: Path) -> None:
     finally:
         implementation.chmod(0o644)
     assert "PermissionError" in str(context["release_evidence_unreadable"])
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root reads unreadable files")
+def test_unreadable_map_blocks_ship_with_a_code(tmp_path: Path) -> None:
+    root = make_root(tmp_path)
+    write_plan(root, RELEASE_PLAN)
+    review_both(root)
+    _implementation(root, PROOF)
+    implementation = root / ".specs/features" / FEATURE / "implementation.md"
+    implementation.chmod(0)
+    try:
+        with pytest.raises(ProgressionBlocked, match="release_evidence_unreadable:PermissionError"):
+            _ship(root)
+    finally:
+        implementation.chmod(0o644)

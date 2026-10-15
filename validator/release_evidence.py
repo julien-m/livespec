@@ -3,7 +3,8 @@
 A release proof is a row of the ``## Release Evidence`` table of ``implementation.md``:
 ``| Step | Evidence | Proof |``. The row must give the step number and the step's own name,
 so a proof never moves to another step when the plan is renumbered or rewritten, and its
-proof cell must name something rather than announce it (``pending``, ``TBC``, ``❌``).
+proof cell must name something checkable (a path, a URL or an identifier with a digit) and
+announce nothing (``pending``, ``deferred``, ``in progress``, ``❌``).
 """
 
 from __future__ import annotations
@@ -25,14 +26,25 @@ from .plan_evidence import (
 
 # A table row: up to three spaces of indentation, then a pipe (four spaces is code).
 _ROW = re.compile(r"^ {0,3}\|")
-_LABEL = re.compile(r"(?:step *)?(\d+(?:\.\d+)*)", re.IGNORECASE)
+_LABEL = re.compile(r"(?:step *)?(\d{1,9}(?:\.\d{1,9})*)", re.IGNORECASE)
 # A proof cell opening with one of these marks or words announces a proof instead of naming one.
-_NOT_A_PROOF_MARKS = ("❌", "⏳", "\U0001f6a7", "?", "☐", "[ ]", "<", "✗")
+_NOT_A_PROOF_MARKS = ("❌", "⏳", "⌛", "\U0001f6a7", "?", "☐", "[ ]", "<", "✗")
 _NOT_A_PROOF_WORDS = re.compile(
     r"^(pending|tbd|tbc|todo|to do|not|no|none|missing|awaiting|waiting|will|later|blocked"
     r"|unknown|n/?a|wip|soon|x|false|planned|expected|placeholder)\b",
     re.IGNORECASE,
 )
+# Announcement words anywhere in the prose of the cell (paths and URLs are not prose).
+_ANNOUNCEMENT = re.compile(
+    r"\b(pending|tbd|tbc|tba|todo|to do|to be|yet|deferred|in progress|awaiting|waiting|later"
+    r"|soon|coming|planned|placeholder|wip|missing|blocked)\b",
+    re.IGNORECASE,
+)
+# Checkable tokens: a URL, a path (a separator and a 2+ character part, so not ``n/a``), a
+# file name with an extension, or an identifier with a digit (build or receipt number).
+_URL = re.compile(r"[a-z][a-z0-9+.-]*://\S+", re.IGNORECASE)
+_PATH = re.compile(r"[/\\]\w{2}|\w{2}[/\\]|\w\.[a-z0-9]{1,8}$", re.IGNORECASE)
+_TOKEN_EDGES = "()[]{}<>,;:'\"`*_"
 _LEADING_PUNCTUATION = "-" + chr(0x2014) + chr(0x2013) + " ([{'\""
 # Commands whose goal implements a feature; spec-ship requires the release evidence instead.
 _IMPLEMENTING_COMMANDS = frozenset({"spec-implement", "spec-feature"})
@@ -52,13 +64,21 @@ def _key(text: str) -> str:
     return plain(text).lower().rstrip(" .:;")
 
 
+def _checkable(token: str) -> bool:
+    return bool(_URL.match(token) or _PATH.search(token) or any(c.isdigit() for c in token))
+
+
 def is_proof(cell: str) -> bool:
-    """Whether a proof cell names a proof: no announcement, mark or placeholder."""
+    """Whether a proof cell names something checkable and announces nothing."""
     text = cell.strip()
     if not text or text.startswith(_NOT_A_PROOF_MARKS):
         return False
     words = plain(text).lstrip(_LEADING_PUNCTUATION)
-    return bool(words) and not _NOT_A_PROOF_WORDS.match(words)
+    if not words or _NOT_A_PROOF_WORDS.match(words):
+        return False
+    tokens = [token.strip(_TOKEN_EDGES) for token in words.split()]
+    prose = " ".join(t for t in tokens if not (_URL.match(t) or _PATH.search(t)))
+    return any(_checkable(t) for t in tokens) and not _ANNOUNCEMENT.search(prose)
 
 
 def recorded_release_rows(implementation: str) -> dict[str, tuple[str, str]]:

@@ -28,7 +28,7 @@ def _accepted(project_root: Path, feature: str, destination: str) -> frozenset[s
         raise ProgressionBlocked(str(exc)) from exc
     except ValueError as exc:
         raise ProgressionBlocked(f"spec_revision_malformed:{exc}") from exc
-    if record is not None and destination in ("complete", "ship"):
+    if record is not None and destination == "complete":
         raise ProgressionBlocked("spec_revision_open")
     return accepted
 
@@ -44,6 +44,15 @@ def require_progression(
     """Recheck actual source and receipts without invoking another model or creating state."""
     if destination not in PROGRESSION_DESTINATIONS:
         raise ProgressionBlocked(f"unknown_progression_destination:{destination}")
+    if destination == "ship":
+        # An unreadable plan or implementation map blocks shipping with a code, not a raw error.
+        try:
+            require_progression(project_root, feature, "complete", model=model, max_chars=max_chars)
+            _require_release_evidence(project_root, feature)
+        except OSError as exc:
+            reason = f"{type(exc).__name__}: {exc.strerror or exc}"
+            raise ProgressionBlocked("release_evidence_unreadable:" + reason) from exc
+        return
     spec = project_root / ".specs/features" / feature / "spec.md"
     # @spec FR-005: Progressions during a spec revision
     #   — .specs/features/089-stable-review-identity/spec.md#fr-005
@@ -60,7 +69,7 @@ def require_progression(
             item.question for item in inventory.inventory if item.critical and not item.resolution
         ]
         raise ProgressionBlocked("clarify_not_ready:" + ";".join([*inventory.errors, *unresolved]))
-    if destination in ("implement", "test", "complete", "ship", "analyze"):
+    if destination in ("implement", "test", "complete", "analyze"):
         prepared_plan = prepare_feature_review(project_root, feature, "plan", model, max_chars)
         report = analyze_feature_artifacts(
             spec.parent,
@@ -71,8 +80,6 @@ def require_progression(
         )
         if has_blocking_findings(report):
             raise ProgressionBlocked(f"analyze_not_ready:{report.semantic_status}")
-    if destination == "ship":
-        _require_release_evidence(project_root, feature)
 
 
 # @spec FR-002: spec-ship requires release evidence
