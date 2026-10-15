@@ -45,7 +45,12 @@ MANIFEST_SHAPE_KEYS = frozenset(
 )
 # Content digest format "sha256:<64 hex>"; the shim never recomputes it (FR-004).
 DIGEST_RE = re.compile(r"\Asha256:[0-9a-f]{64}\Z")
-CHECKOUT_INSTALL = "python3 -m validator.cli runtime install"
+# Recovery without a working `livespec` (D-11): the checkout's own venv holds LiveSpec's
+# dependencies, a bare `python3` does not.
+CHECKOUT_INSTALL = (
+    "cd <livespec repo> && uv sync && .venv/bin/python -m validator.cli runtime install"
+    " --source <livespec repo>"
+)
 
 LockData = dict[str, str | int]
 
@@ -150,9 +155,7 @@ def _pinned_root(home: Path, lock: LockData) -> Path:
     snapshot = home / "versions" / runtime_id
     recovery = f"livespec runtime install --source <livespec repo> --ref {commit}"
     if not (home / "current").is_dir():
-        recovery += (
-            f" (no current runtime: run `{CHECKOUT_INSTALL} --ref {commit}` in the checkout)"
-        )
+        recovery += f" (no current runtime: run `{CHECKOUT_INSTALL} --ref {commit}`)"
     try:
         manifest: object = json.loads((snapshot / MANIFEST_FILE).read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
@@ -226,7 +229,7 @@ def _current_snapshot(home: Path) -> Path:
     current = home / "current"
     missing = ShimResolutionError(
         f"no runtime installed under {home}; install one from the LiveSpec checkout with "
-        f"its own CLI: `cd <livespec repo> && {CHECKOUT_INSTALL}`"
+        f"its own CLI: `{CHECKOUT_INSTALL}`"
     )
     try:
         target = current.resolve(strict=True)
@@ -245,7 +248,7 @@ def _current_snapshot(home: Path) -> Path:
     if not (installed and _manifest_identity_ok(identity, target)):
         raise ShimResolutionError(
             f"{current} does not point to an installed runtime snapshot ({target}); "
-            f"reinstall from the LiveSpec checkout: `cd <livespec repo> && {CHECKOUT_INSTALL}`"
+            f"reinstall from the LiveSpec checkout: `{CHECKOUT_INSTALL}`"
         )
     return target
 
