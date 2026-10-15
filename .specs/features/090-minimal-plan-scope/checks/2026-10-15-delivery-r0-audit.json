@@ -1,0 +1,194 @@
+{
+  "schema_version": "1",
+  "reviewer": {
+    "agent": "native-reviewer-090-audit",
+    "model": "claude-opus-5-5",
+    "effort": "high"
+  },
+  "verdict": "BLOCKED",
+  "reviewed_files": [
+    ".agent-sync/skills/spec-implement/SKILL.md",
+    ".agent-sync/skills/spec-implement/expectations.md",
+    ".agent-sync/skills/spec-plan/SKILL.md",
+    ".agent-sync/skills/spec-plan/expectations.md",
+    ".agent-sync/skills/spec-ship/SKILL.md",
+    ".agent-sync/skills/spec-ship/expectations.md",
+    ".specs/features/090-minimal-plan-scope/plan.md",
+    ".specs/features/090-minimal-plan-scope/spec.md",
+    ".specs/spec-system.md",
+    "system/review-protocol.md",
+    "system/spec-system.md",
+    "system/templates/plan-template.md",
+    "system/testing/execution-rules.md",
+    "validator/cli_commands/operation_options.py",
+    "validator/goal_payload.py",
+    "validator/progression_gate.py",
+    "validator/rules/__init__.py",
+    "validator/semantic/review_batches.py",
+    ".specs/features/090-minimal-plan-scope/implementation.md",
+    ".specs/features/090-minimal-plan-scope/progress.md",
+    "system/minimal-spec-scope.md",
+    "tests/test_plan_evidence_class.py",
+    "validator/plan_evidence.py"
+  ],
+  "checks": [
+    {
+      "command": ".venv/bin/python -m pytest -q -p no:cacheprovider tests/test_plan_evidence_class.py (15 passed)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff check --no-cache <touched python files>",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -I scratchpad/audit090/probe_ship.py (ship progression bypass probes, temp projects only)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -I scratchpad/audit090/probe_goal.py (goal render encoding probes, temp projects only)",
+      "exit_code": 0
+    },
+    {
+      "command": "evidence_class_errors over all 94 plan*.md files of the repo (no false positive)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] pytest tests/ --ignore=tests/integration -n 8 (4126 passed, 24 skipped)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] ruff check validator/ ; ruff format --check",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] pyright on touched files",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] livespec conventions verify --json --feature 090-minimal-plan-scope",
+      "exit_code": 0
+    }
+  ],
+  "findings": [
+    {
+      "severity": "blocking",
+      "file": "validator/progression_gate.py",
+      "line": 80,
+      "rule": "fail-safe: a malformed plan must not let ship pass (FR-002 / AC-002 '/spec-ship requires it')",
+      "evidence": "_require_release_evidence only calls pending_release_evidence, which keeps steps whose classes == ('release',) and ignores orphans. Probe (temp project, spec+plan reviewed): '**Evidence class:** release (signing)', a step with the release line twice, or the release line under '## Steps' (not matched by _PLAN_SECTION) all give `livespec validate plan.md` errors but `require_progression(..., 'ship')` returns READY (release_evidence() == []). /spec-ship only runs `--progression ship`, so an invalid or unparsable release declaration silently ships without its proof.",
+      "correction": "In _require_release_evidence (or release_evidence), read plan.md and raise ProgressionBlocked('release_evidence_invalid:' + ';'.join(evidence_class_errors(text))) when evidence_class_errors is non-empty, before computing pending items; add a ship test for an unknown class, a duplicated class and an orphan release line."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 23,
+      "rule": "robustness: placeholder detection of release proofs",
+      "evidence": "A proof cell is accepted unless it equals exactly one of '', '-', '—', 'pending', 'tbd', 'todo', 'n/a'. Probe: '| 2 | pending notarization |' and '| 2 | not yet produced |' mark the step satisfied and ship returns READY.",
+      "correction": "Reject cells whose first word is a placeholder (pending, tbd, todo, n/a, none, not, waiting, '?', en dash) or require the proof to name a receipt path/identifier; add tests."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 144,
+      "rule": "robustness: fenced code is not skipped in implementation.md",
+      "evidence": "recorded_release_proofs scans every line, unlike plan_steps which skips fences. Probe: an example block ```markdown\\n## Release Evidence\\n| 2 | example |\\n``` inside implementation.md satisfies step 2 and ship returns READY.",
+      "correction": "Reuse the _FENCE tracking of plan_steps in recorded_release_proofs so fenced examples (and the rows they contain) are ignored."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 170,
+      "rule": "compatibility / error handling at boundaries",
+      "evidence": "release_evidence reads implementation.md whenever plan.md exists, even when no step is release-class, and lets UnicodeDecodeError/OSError escape. Probe: a single invalid UTF-8 byte in implementation.md makes `livespec goal render spec-implement --feature <f>` exit 1 with an uncaught UnicodeDecodeError traceback from plan_evidence.py, for features that declare no release step (new failure surface for every implement goal).",
+      "correction": "Return early when no step is release-class before reading implementation.md, and convert decode/OS errors into a domain error (ProgressionBlocked in the gate; an explicit pending_release_evidence error or controlled CLI message in goal render)."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 76,
+      "rule": "robustness: silent fail-open on unrecognised declarations",
+      "evidence": "_CLASS_LINE only matches lines starting with optional spaces/bullet then '**Evidence class:**'. A declaration in a blockquote ('> **Evidence class:** release'), in a table cell, with '__Evidence class:__', or after text on the same line is neither a class nor an orphan: validate reports nothing and the step is local (probe: blockquote -> validate [] and ship READY).",
+      "correction": "Detect any line containing 'Evidence class' (case-insensitive, outside fences) that the strict pattern does not parse and report it as a malformed declaration in evidence_class_errors."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 58,
+      "rule": "robustness: step identity is the ordinal, not the declared step number or title",
+      "evidence": "PlanStep.number = len(steps)+1 and proofs are keyed only by that integer. A plan whose heading says 'Step 5' but is the 2nd step is reported as 'step 2: Step 5 — ...' and a proof row '| 5 | ... |' is ignored (probe). After a plan edit renumbers steps (and a re-review), an older proof row keyed by number can satisfy a different release step; the proof is never bound to the step title.",
+      "correction": "Use the number written in a 'Step N' heading when present, and bind the proof row to the step (e.g. require the title or a stable step id in the row, or store the plan step title next to the proof and compare)."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 22,
+      "rule": "robustness against hostile input (quadratic regex)",
+      "evidence": "_CLASS_LINE ends with lazy '(.*?)\\s*$': a class line followed by many spaces is O(n^2). Measured: 16,000 trailing spaces then a character -> 0.9 s for one line (4x input ~ 16x time), so a crafted plan line can stall validate and goal render.",
+      "correction": "Capture '(.*)' and strip in Python, or use '(\\S(?:.*\\S)?)?\\s*$'."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 153,
+      "rule": "robustness: a later placeholder row does not revoke an earlier proof",
+      "evidence": "Rows '| 2 | signed |' then '| 2 | pending |' keep step 2 satisfied (placeholders are skipped, last non-placeholder wins).",
+      "correction": "Let the last row for a step win, including placeholders, or report duplicate step rows."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 40,
+      "rule": "readability of reported titles",
+      "evidence": "_plain strips '_' so 'tests/test_plan_evidence_class.py' becomes 'tests/testplanevidenceclass.py' in step titles exposed in pending_release_evidence and release_evidence_pending messages (observed on the 090 plan).",
+      "correction": "Strip only emphasis markers that wrap words, or keep the raw title for display."
+    },
+    {
+      "severity": "info",
+      "file": "validator/semantic/review_batches.py",
+      "line": 35,
+      "rule": "compatibility: unchanged PROMPT_VERSION (089 identity)",
+      "evidence": "Prompts are excluded from the stable identity (review_stability.reviewed_snapshot), so keeping PROMPT_VERSION='2' keeps current plan reviews valid, as decided. Side effects: reviews prepared before 090 count as current although the reviewer never received the minimal-scope rule; and the plan prompt is ~430 chars longer, which feeds the 'fits' budget check, so a plan near --review-max-chars can now split into a different batch partition (identity change) or an indivisible section can become over budget.",
+      "correction": "Document both effects in the changelog/decision; optionally exclude the constant rule text from the budget computation or reserve it in the budget."
+    },
+    {
+      "severity": "info",
+      "file": "validator/goal_payload.py",
+      "line": 182,
+      "rule": "compatibility: goal hash now depends on implementation.md",
+      "evidence": "runtime_context is part of the hashed canonical payload; recording a release proof in implementation.md during /spec-implement (as the skill instructs) removes the pending item, changes goal_hash and triggers goal recompilation, which resets the outcome task and re-validates carried evidence. Contracts without release steps keep their bytes (key omitted), as intended.",
+      "correction": "Accept and document, or keep satisfied items in the list with their status so the hash changes only when the plan changes."
+    },
+    {
+      "severity": "info",
+      "file": "validator/goal_payload.py",
+      "line": 182,
+      "rule": "conventions: file size and typing",
+      "evidence": "goal_payload.py grows from 294 to 313 lines (above the 300-line target given for this review; the project gate target is 400/limit 500, so the conventions gate passes). _release_context returns dict[str, Any] and release_evidence returns list[dict[str, object]] without a TypedDict, while python.md asks for justified Any and explicit domain types.",
+      "correction": "Move _release_context next to goal_delivery_lane (validator/delivery/goal.py) or into plan_evidence, and type the pending item as a TypedDict (feature, step, evidence, status, proof)."
+    },
+    {
+      "severity": "info",
+      "file": "validator/rules/__init__.py",
+      "line": 7,
+      "rule": "conventions: import style",
+      "evidence": "The rules package uses relative imports; the new import is absolute ('from validator.plan_evidence import ...').",
+      "correction": "Use 'from ..plan_evidence import evidence_class_errors'."
+    },
+    {
+      "severity": "info",
+      "file": ".specs/features/090-minimal-plan-scope/spec.md",
+      "line": 23,
+      "rule": "spec consistency",
+      "evidence": "'Out of scope: changing what /spec-ship requires' contradicts AC-002 ('/spec-ship requires it') and the in-scope ship progression added to spec-ship. The plan summary still names validator/goal_tasks.py and 'the conventions pack' while the code changes goal_payload.py and system/minimal-spec-scope.md.",
+      "correction": "Reword the out-of-scope line (e.g. 'other /spec-ship requirements') and align the plan summary with D-01/D-03."
+    },
+    {
+      "severity": "info",
+      "file": "validator/cli_commands/operation_options.py",
+      "line": 85,
+      "rule": "duplication",
+      "evidence": "The progression destination list is duplicated here instead of reusing progression_gate.PROGRESSION_DESTINATIONS added by this diff.",
+      "correction": "Import PROGRESSION_DESTINATIONS (lazily if import cost matters) and check membership against it."
+    }
+  ]
+}

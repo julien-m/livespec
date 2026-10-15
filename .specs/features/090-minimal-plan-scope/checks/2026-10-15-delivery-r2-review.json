@@ -1,0 +1,155 @@
+{
+  "schema_version": "1",
+  "reviewer": {
+    "agent": "native-reviewer-090-review-r3",
+    "model": "claude-opus-5-5",
+    "effort": "high"
+  },
+  "verdict": "PASS",
+  "reviewed_files": [
+    ".agent-sync/skills/spec-implement/SKILL.md",
+    ".agent-sync/skills/spec-implement/expectations.md",
+    ".agent-sync/skills/spec-plan/SKILL.md",
+    ".agent-sync/skills/spec-plan/expectations.md",
+    ".agent-sync/skills/spec-ship/SKILL.md",
+    ".agent-sync/skills/spec-ship/expectations.md",
+    ".specs/README.md",
+    ".specs/changelog.md",
+    ".specs/features/090-minimal-plan-scope/plan.md",
+    ".specs/features/090-minimal-plan-scope/spec.md",
+    ".specs/spec-system.md",
+    "system/review-protocol.md",
+    "system/spec-system.md",
+    "system/templates/plan-template.md",
+    "system/testing/execution-rules.md",
+    "validator/cli_commands/operation_options.py",
+    "validator/goal_payload.py",
+    "validator/progression_gate.py",
+    "validator/rules/__init__.py",
+    "validator/semantic/review_batches.py",
+    ".specs/features/090-minimal-plan-scope/implementation.md",
+    ".specs/features/090-minimal-plan-scope/progress.md",
+    "system/minimal-spec-scope.md",
+    "tests/plan_evidence_support.py",
+    "tests/test_plan_evidence_class.py",
+    "tests/test_release_evidence.py",
+    "validator/plan_evidence.py",
+    "validator/release_evidence.py"
+  ],
+  "checks": [
+    {
+      "command": ".venv/bin/python -m pytest -q -p no:cacheprovider tests/test_plan_evidence_class.py tests/test_release_evidence.py (64 passed)",
+      "exit_code": 0
+    },
+    {
+      "command": "AIRESOURCES=/Users/julienm/projects/ai-ressources .venv/bin/python -m pytest -q -p no:cacheprovider -n 8 <tests/test_*{goal,progress,review,plan,validat,ship,cli}*.py> (989 passed; without AIRESOURCES 1 env-only failure in test_status_play_conventions_cli.py, unrelated, passes once set)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] .venv/bin/python -m pytest -q -p no:cacheprovider -n 8 tests/ --ignore=tests/integration (4175 passed, 24 skipped)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff check --no-cache <10 touched python files>",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/ruff format --check --no-cache <6 new/changed python files>",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/pyright validator/plan_evidence.py validator/release_evidence.py validator/progression_gate.py validator/goal_payload.py (0 errors)",
+      "exit_code": 0
+    },
+    {
+      "command": "[caller-reported] ruff check . ; ruff format --check validator tests ; livespec conventions verify --json --feature 090-minimal-plan-scope (PASS)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -I scratchpad/r3/probe_units.py (evidence_class_errors on 94 .specs plan*.md + plan-template: 0 errors; timings; proof cells; declaration shapes)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python scratchpad/r3/probe_ship.py (require_progression ship, goal context and CLI on temp projects)",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/bin/python -c '<release_goal_context(spec-implement) for the 97 repo features>' (no feature gets a new runtime_context key: existing goals keep their bytes)",
+      "exit_code": 0
+    }
+  ],
+  "findings": [
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 93,
+      "rule": "AC-002 fail-safe: a declared release step must not disappear silently (HTML comment handling diverges from rendering)",
+      "evidence": "unfenced() treats any '<!--' left on a line after removing same-line '<!--...-->' pairs as the start of a multi-line comment, wherever it sits, even inside inline code. CommonMark only opens an HTML comment block when the line starts with '<!--'; an unclosed '<!--' in the middle of a line, or inside a code span, renders as text. Probe: '## Implementation Plan / Keep the `<!--` marker style of the skills. / ### Step 1 — A / ### Step 2 — Sign / **Evidence class:** release' gives plan_steps() == [] and evidence_class_errors() == []. A temp project with that plan has no pending release item, and the ship progression passes without proof. No repo plan has such a line today (grep: 0), so this is rare. It is the same class of silent loss that rounds 0 and 1 rated as warnings.",
+      "correction": "Open a multi-line comment only when the line, after up to 3 spaces, starts with '<!--'. Remove same-line comments after inline code spans are stripped, or leave them. Alternatively fail closed: when a comment or fence is still open at the end of the document, evidence_class_errors reports it. Add the inline-code case to test_quoted_or_hidden_evidence_lines_are_ignored or to a fail-closed test."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/plan_evidence.py",
+      "line": 33,
+      "rule": "Robustness against hostile input; the module docstring (line 6) claims every pattern is linear",
+      "evidence": "_COMMENT = r'<!--.*?-->' backtracks quadratically on a line with many unclosed '<!--': the lazy group scans to the end of the line from every opener. Measured with unfenced('<!--'*n): 0.28 s at n=5000 (20 KB line), 4.6 s at n=20000 (80 KB), 76.5 s at n=80000 (320 KB). unfenced runs on every plan validate, every spec-implement or spec-feature goal render, and every ship gate, and on implementation.md when a release step exists. This is far less severe than the round-1 _HEADING blow-up (49.7 s at 4 KB): it needs a crafted single line of 100 KB or more. The round-1 regex fix is closed: '# a'+20000 spaces+'x' and the other patterns stay at 0.0 s up to 80000 characters.",
+      "correction": "Remove same-line comments with a str.find loop: find '<!--', then find '-->' from that point, slice, and repeat. Or use a single pass that stops at the first unclosed opener. Extend test_long_whitespace_runs_stay_linear with a line of 20000 '<!--'."
+    },
+    {
+      "severity": "warning",
+      "file": "validator/release_evidence.py",
+      "line": 55,
+      "rule": "AC-002 robustness: an announced proof must not satisfy /spec-ship (round-0/1 placeholder warning, partly closed again)",
+      "evidence": "The listed tokens are now rejected (17 parametrized cells, including '⏳ Pending notarization', '(pending)', '<receipt path>', '_pending_', 'x', '?'). The check is still a denylist of first words and marks. These cells are accepted as proof, and require_progression(..., 'ship') returns READY in a temp project: 'To be signed at release', 'Deferred to release', 'Still pending', '⌛ Pending' (U+231B, not U+23F3), 'Yet to be produced', 'In progress', '...'. 'Release build (pending)', 'Signed build: pending', 'Coming at release', '✅ pending' and '…' also pass is_proof(). Several of these are natural ways to write a deferred proof. execution-rules.md says a cell that only announces a proof is not one.",
+      "correction": "Invert the check and accept only a cell that names something checkable: a repo path or file name with an extension, a URL, or an identifier with a digit (build or receipt number). Otherwise reject any cell that contains a pending, deferred, 'to be', 'yet', 'in progress' or 'later' token anywhere, not only as the first word, and strip any leading emoji before matching. Add the cells above to test_announced_proof_keeps_release_pending."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 31,
+      "rule": "AC-003 fail-safe: unbound declaration variants",
+      "evidence": "Every shape named in rounds 0 and 1 is now rejected and tested: whole bold, *...*, plain, double space, in a heading, #### heading, __...__ on a numbered item, table cell. These forms still neither bind nor report, so the step stays local: '**Evidence-class:** release', '**EvidenceClass:** release', '**Evidence:** release'. A line that closes a multi-line comment ('-->**Evidence class:** release') is dropped whole. '**Evidence class** release' (no colon) binds correctly.",
+      "correction": "Optional: let _ANY_CLASS accept '[ \\t_-]*' between the two words, and keep the text after '-->' on a comment-closing line."
+    },
+    {
+      "severity": "info",
+      "file": "validator/plan_evidence.py",
+      "line": 128,
+      "rule": "Parser binding (fail-closed direction)",
+      "evidence": "In heading mode a step runs until the next Step heading or the end of the section. A sibling non-step heading does not close it. Probe: '### Step 1 — A / ### Rollout / **Evidence class:** release / ### Step 2 — B' makes Step 1 the release step. A heading such as '### Step-by-step notes' opens an unnumbered step with an ordinal label, and that label can collide ('Step 2 appears 2 times'). Both fail toward more proof or a clear error, never toward less proof. The numbered intro list collision from round 1 (info) is unchanged.",
+      "correction": "Optional: close the current step on a heading at the same or a shallower depth than the step heading. Require a digit or a separator after 'Step' for an unnumbered step heading."
+    },
+    {
+      "severity": "info",
+      "file": "validator/progression_gate.py",
+      "line": 80,
+      "rule": "Error handling at boundaries (round-1 info, closed for the goal only)",
+      "evidence": "release_goal_context now reports 'release_evidence_unreadable' (tested). In the ship gate, a chmod 000 implementation.md still raises a raw PermissionError from require_progression instead of ProgressionBlocked. `livespec validate <feature> --progression ship` converts it to 'BLOCKED: [Errno 13] ...' with exit 1, so the gate fails closed. Other callers of require_progression would need to catch OSError themselves.",
+      "correction": "Optional: catch OSError in _require_release_evidence and raise ProgressionBlocked('release_evidence_unreadable:...'), matching the goal key."
+    },
+    {
+      "severity": "info",
+      "file": ".specs/features/090-minimal-plan-scope/plan.md",
+      "line": 64,
+      "rule": "Plan / implementation consistency, traceability",
+      "evidence": "Plan step 3 still lists only tests/test_plan_evidence_class.py. The tests are now split into tests/test_plan_evidence_class.py, tests/test_release_evidence.py and tests/plan_evidence_support.py, which implementation.md lists correctly. The global changelog links features/090-minimal-plan-scope/changelog.md for the implementation entry. That feature changelog still holds only the 2026-10-13 'Specified' entry, and the diff does not touch it.",
+      "correction": "Name the three test files in plan step 3 (a lifecycle edit outside FR/AC). Add the implementation entry to the feature changelog at commit time."
+    },
+    {
+      "severity": "info",
+      "file": "validator/goal_payload.py",
+      "line": 169,
+      "rule": "Compatibility (carried, accepted)",
+      "evidence": "runtime_context.pending_release_evidence and release_evidence_unreadable are part of the hashed goal, so recording a proof recompiles the goal. execution-rules.md now documents this. None of the 97 repo features gets the key, so existing goals keep their bytes. PROMPT_VERSION '2', the --progression help text in validator/cli.py and the destination tuple in operation_options.py are unchanged by decision. The tuple is pinned to PROGRESSION_DESTINATIONS by test_cli_progression_choices_match_the_gate.",
+      "correction": "None required."
+    },
+    {
+      "severity": "info",
+      "file": "validator/release_evidence.py",
+      "line": 102,
+      "rule": "Closure of round-0 and round-1 blocking findings and warnings, AC coverage",
+      "evidence": "Closed (verified by reading, tests and probes). R0 blocking (spec-ship does not require release evidence): spec-ship SKILL Step 3.5 and --resume run --progression ship. R0 audit blocking (a malformed plan passes ship): release_evidence_invalid, tested by test_ship_fails_closed_on_an_invalid_plan and by the outside-section test. R1 audit blocking (_HEADING cubic): linear pattern plus Python stripping, 0.0 s at 80 KB, guarded by test_long_whitespace_runs_stay_linear. Warnings closed: step identity (title number, normalized labels, name match, mismatch -> release_evidence_invalid); fenced, HTML-comment, 4-space-indented and '(template)' rows ignored; heading must equal 'Release Evidence'; heading, '####' and '__' declarations rejected; goal_payload.py at 296 lines; ReleaseItem TypedDict; spec scope wording; finalize tasks identical with a release step. AC-001: test_plan_review_prompt_carries_minimal_scope_rule and test_untraced_cache_blocks_unless_justified_technical_necessity. AC-002: test_release_evidence_is_pending_until_recorded, test_implement_goal_lists_release_evidence_outside_required_tasks (required task ids unchanged), test_ship_progression_requires_recorded_release_evidence and test_ship_progression_cli. AC-003: test_validate_plan_rejects_unknown_class (CLI exit 1) and test_invalid_evidence_classes_are_reported. Regression: the 94 repo plan*.md files and the template give 0 evidence-class errors in 0.04 s.",
+      "correction": "None."
+    }
+  ]
+}

@@ -406,6 +406,12 @@ To prevent changelogs from growing unbounded:
 
 `livespec delivery lane --feature <slug>` decides the lane from the reviewed `## Quality Engineering` classification: **light** for Low/Medium criticality with Local/Shared blast radius and a current ready spec review, **full** otherwise (including a missing or conflicting classification). In both lanes an implementation step runs only targeted tests, lint, format and the conventions gate; no reviewer or audit runs per step. The complete feature diff is reviewed once at the end by independent native agents with effort `high` (light: one `combined` report; full: a `review` and an `audit` report), recorded with `livespec delivery review prepare|record|verify` and capped at two correction rounds. **Read** [the delivery review protocol](delivery-review.md) for the procedure. The retired `audit` skill and Codex are never used.
 
+### Minimal plan scope and evidence classes
+
+<!-- @spec FR-001: Native minimal-spec-scope rule, FR-002: Evidence classes — .specs/features/090-minimal-plan-scope/spec.md#fr-001 -->
+
+A plan adds no mechanism that traces to no FR, AC or constitution rule; the plan review reports each one in `extra_scope` and it blocks unless it is a justified technical necessity. **Read** [minimal spec scope](minimal-spec-scope.md). A plan step may declare `**Evidence class:** release` (default `local`) when its proof needs signing, a device fleet or production: the implement goal lists it as pending without blocking, and `/spec-ship` requires it through `livespec validate <feature-dir> --progression ship`.
+
 ### Bugfix lane (`/spec-fix <feature> --bugfix`)
 
 <!-- @spec FR-012: Bugfix lane in the universal rules — .specs/features/084-bugfix-lane/spec.md#fr-012 -->

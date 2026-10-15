@@ -137,6 +137,10 @@ def test_file_review_preserves_crlf_hashes_citations_and_freshness(tmp_path):
     assert verify_feature_review(tmp_path, "001-test", receipt)
     spec.write_bytes(raw.replace(b"\r\n", b"\n"))
     assert not prepared_sources_current(prepared, feature, tmp_path / ".specs/constitution.md")
+    # Feature 089: line endings are formatting, so the review stays current; a
+    # requirement change makes it stale.
+    assert verify_feature_review(tmp_path, "001-test", receipt)
+    spec.write_bytes(raw.replace(b"\r\n", b"\n").replace(b"FR-001", b"FR-001 changed", 1))
     assert not verify_feature_review(tmp_path, "001-test", receipt)
 
 

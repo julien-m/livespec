@@ -12,14 +12,14 @@ updated: 2026-10-13
 
 ## Requirement Mapping
 
-| Requirement | File(s) | Status | Last Verified |
-|---|---|---|---|
-| [FR-001: anchor scan and binding](spec.md#fr-001) | `validator/acceptance_anchors.py` | ✅ Implemented | 2026-10-13 |
-| [FR-002: derivation field](spec.md#fr-002) | `validator/execution_mapping.py` (`AcceptanceMapping.derivation`, `derived_mapping`) | ✅ Implemented | 2026-10-13 |
-| [FR-003: Rust functions](spec.md#fr-003) | `validator/execution_rust_source.py::rust_functions` | ✅ Implemented | 2026-10-13 |
-| [FR-004: --derive-mapping](spec.md#fr-004) | `validator/cli_commands/test_cmd.py`, `execution_io.py`, `operation_options.py` | ✅ Implemented | 2026-10-13 |
-| [FR-005: anchored certification](spec.md#fr-005) | `validator/execution_mapping.py::_certify_anchored`, `validator/execution_evidence.py::_acceptance_input_gaps` | ✅ Implemented | 2026-10-13 |
-| [FR-006: documentation](spec.md#fr-006) | `system/testing/execution-rules.md`, `.agent-sync/skills/spec-implement/SKILL.md` | ✅ Implemented | 2026-10-13 |
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| [FR-001: anchor scan and binding](spec.md#fr-001) | `validator/acceptance_anchors.py` | `@spec FR-001: Anchor-derived acceptance mapping` | ✅ Implemented | 2026-10-13 |
+| [FR-002: derivation field](spec.md#fr-002) | `validator/execution_mapping.py` (`AcceptanceMapping.derivation`, `derived_mapping`) | `@spec FR-002: Anchor derivation needs no mapping review` | ✅ Implemented | 2026-10-13 |
+| [FR-003: Rust functions](spec.md#fr-003) | `validator/execution_rust_source.py::rust_functions` | `@spec FR-003: Rust anchor targets` | ✅ Implemented | 2026-10-13 |
+| [FR-004: --derive-mapping](spec.md#fr-004) | `validator/cli_commands/test_cmd.py`, `execution_io.py`, `operation_options.py` | — | ✅ Implemented | 2026-10-13 |
+| [FR-005: anchored certification](spec.md#fr-005) | `validator/execution_mapping.py::_certify_anchored`, `validator/execution_evidence.py::_acceptance_input_gaps` | `@spec FR-005: Certify anchored bindings without review grounding` | ✅ Implemented | 2026-10-13 |
+| [FR-006: documentation](spec.md#fr-006) | `system/testing/execution-rules.md`, `.agent-sync/skills/spec-implement/SKILL.md` | `@spec FR-006: Anchor-derived mapping` | ✅ Implemented | 2026-10-13 |
 
 ## Acceptance Criteria Mapping
 

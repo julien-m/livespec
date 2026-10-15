@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from pydantic import ValidationError
 
 from validator.pre_impl_analysis import AnalyzeFinding, AnalyzeSeverity, _finding_id
 from validator.review_source_identity import prepared_sources_current
 from validator.semantic.review_context import PreparedReview
+
+if TYPE_CHECKING:
+    from validator.semantic.review_contract import ReviewReceipt
 
 
 def _finding(category: str, summary: str, locations: tuple[str, ...] = ()) -> AnalyzeFinding:
@@ -26,15 +30,33 @@ def _finding(category: str, summary: str, locations: tuple[str, ...] = ()) -> An
 # — .specs/features/078-requirement-evidence-integrity/spec.md#fr-004
 
 
+def _receipt_current(
+    receipt: ReviewReceipt,
+    prepared: PreparedReview,
+    feature_dir: Path,
+    constitution_path: Path,
+    accepted: frozenset[str],
+) -> bool:
+    """Complete receipt, current sources and a reviewed context it is valid against (089)."""
+    from validator.semantic.review_stability import reviewed_against
+
+    return (
+        receipt.complete
+        and prepared_sources_current(prepared, feature_dir, constitution_path)
+        and reviewed_against(receipt, prepared, accepted) is not None
+    )
+
+
 def analyze_semantic_readiness(
     feature_dir: Path,
     constitution_path: Path,
     receipt_path: Path | None,
     prepared: PreparedReview | None,
+    accepted_reviews: frozenset[str] = frozenset(),
 ) -> tuple[str, list[AnalyzeFinding]]:
     """Reject absent, stale or incomplete receipts; never interpret prose heuristically."""
     from validator.semantic.review_contract import conclusion_blocks, scope_accepted
-    from validator.semantic.review_receipts import load_review_receipt, verify_review_receipt
+    from validator.semantic.review_receipts import load_review_receipt
 
     path = receipt_path or feature_dir / ".reviews" / "plan.json"
     if not path.is_file():
@@ -46,10 +68,8 @@ def analyze_semantic_readiness(
             project_root = constitution_path.parent.parent
             prepared = prepare_feature_review(project_root, feature_dir.name, "plan")
         receipt = load_review_receipt(path)
-        if (
-            not prepared_sources_current(prepared, feature_dir, constitution_path)
-            or not verify_review_receipt(receipt, prepared)
-            or not receipt.complete
+        if not _receipt_current(
+            receipt, prepared, feature_dir, constitution_path, accepted_reviews
         ):
             return "incomplete", [
                 _finding("semantic", "Stale, invalid or incomplete semantic review")

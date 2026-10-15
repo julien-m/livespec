@@ -70,9 +70,11 @@ def test_review_identity_retains_every_non_lifecycle_byte(
     after = prepare_feature_review(tmp_path, "retention", "spec", "reviewer/actual")
     assert before.source_hashes != after.source_hashes
     assert (before.context_hash == after.context_hash) is (change == "lifecycle")
+    # Feature 089: only requirement sections make a spec review stale; the frontmatter
+    # creation date is outside them.
     assert verify_feature_review(
         tmp_path, "retention", path, model="reviewer/actual", expected_kind="spec"
-    ) is (change == "lifecycle")
+    ) is (change in ("lifecycle", "created"))
 
 
 @pytest.mark.parametrize(

@@ -58,6 +58,8 @@ class PreparedReview(BaseModel):
     reviewer_model: str
     context_hash: str
     source_hashes: dict[str, str]
+    # Roles as passed to preparation, for sources without sections too (094 FR-001).
+    source_roles: dict[str, str] = Field(default_factory=dict)
     dependencies: dict[str, str] = Field(default_factory=dict)
     sections: tuple[ReviewSection, ...]
     requirements: tuple[ReviewRequirement, ...]
@@ -264,6 +266,7 @@ def prepare_review_context(
         reviewer_model=model,
         context_hash=identity,
         source_hashes=hashes,
+        source_roles=dict(roles),
         dependencies=dependencies or {},
         sections=tuple(sections),
         requirements=requirements,

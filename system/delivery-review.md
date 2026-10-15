@@ -2,11 +2,11 @@
 
 # Delivery Review — once per feature, on the complete diff
 
-Implementation steps run only targeted tests, lint, format and the conventions gate. Spec compliance, code quality and audit are reviewed **once**, at the end of the feature, on the complete diff. The lane decides how many independent reviewers run; the CLI decides the lane (`livespec delivery lane --feature <slug> --model <m>`), never the agent.
+Implementation steps run only targeted tests, lint, format and the conventions gate. Spec compliance, code quality and audit are reviewed **once**, at the end of the feature, on the complete diff. The lane decides how many independent reviewers run; the CLI decides the lane (`livespec delivery lane --feature <slug> --model <m>`), never the agent. The lane reads the Quality Engineering section of the current spec and of the spec the review judged, and keeps every reason from both: editing the QE section after the review never lowers the lane. The reviewer's `qe_assessment` raises the criticality to High or contests an author High; it never contests the blast radius.
 
 | Lane | When (CLI-verified) | End-of-feature reviewers |
 |---|---|---|
-| light | Low or Medium criticality, Local or Shared blast radius, no `**Delivery lane:** full`, current ready spec review | one `combined` report: spec compliance, code quality and audit |
+| light | Low or Medium criticality (or an author High contested as Low or Medium by the current spec review, reported as `criticality_contested`), Local or Shared blast radius, no `**Delivery lane:** full`, current ready spec review | one `combined` report: spec compliance, code quality and audit |
 | full | every other case, including a missing or conflicting QE classification | one `review` report (spec compliance, code quality) and one `audit` report (security, robustness, conventions), from two independent agents |
 
 ## Procedure
@@ -30,7 +30,7 @@ Implementation steps run only targeted tests, lint, format and the conventions g
    PASS means zero blocking finding and every check exit 0; BLOCKED needs at least one blocking finding. Warnings and info findings never block; carry them into the changelog or a follow-up.
 5. **Record.** `livespec delivery review record --feature <slug> --kind combined|review|audit --report <report.json>`. The CLI stores the exact report text and its SHA-256; `verify` re-validates the stored report, so an edited receipt is refused. The CLI refuses a report whose scope changed since `prepare`, that does not list every scoped file, whose effort is not `high`, or whose verdict contradicts its findings.
 6. **Corrections.** On BLOCKED, the implementing agent fixes only the blocking findings, reruns the affected checks, prepares the scope again and dispatches a fresh independent review of the complete diff. At most two correction rounds follow the initial report: the CLI then refuses another report with `round_cap_reached`, and the run stops for the maintainer with the remaining findings.
-7. **Verify.** `livespec delivery review verify --feature <slug> --model <m>` exits 0 only when the latest round of every kind the lane requires passed and the diff is unchanged since; the light lane accepts the latest `combined` round or the latest `review` and `audit` rounds, and a `review` and an `audit` must come from different agents and reports (`reviewers_not_independent`). Submit `delivery_review_receipt_path` (`.specs/features/<slug>/.reviews/delivery.json`) to the goal task `delivery.review`. A later code change (for example during `/spec-test`) makes it stale: review again before the commit.
+7. **Verify.** While a spec revision is open (`livespec delivery revision open`, see the [review protocol](review-protocol.md)), verify is refused with `spec_revision_open`: close it first. `livespec delivery review verify --feature <slug> --model <m>` exits 0 only when the latest round of every kind the lane requires passed and the diff is unchanged since; the light lane accepts the latest `combined` round or the latest `review` and `audit` rounds, and a `review` and an `audit` must come from different agents and reports (`reviewers_not_independent`). Submit `delivery_review_receipt_path` (`.specs/features/<slug>/.reviews/delivery.json`) to the goal task `delivery.review`. A later code change (for example during `/spec-test`) makes it stale: review again before the commit.
 
 This review is independent evidence of quality. It does not replace the conventions gate, the execution certification of acceptance criteria or the visual gate.
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 
+from ..plan_evidence import evidence_class_errors
 from .changelog_entries import validate_changelog_entries
 from .roadmap_markers import validate_roadmap_markers
 from .sections import validate_sections
@@ -36,6 +37,9 @@ def validate_by_type(content: str, file_type: str, code_blocks: list[dict]) -> l
         has_mermaid = any(cb.get("lang") == "mermaid" for cb in code_blocks)
         if not has_mermaid:
             errors.append("Plan requires at least one mermaid code block")
+        # @spec FR-002: Reject unknown evidence classes
+        #   — .specs/features/090-minimal-plan-scope/spec.md#fr-002
+        errors.extend(evidence_class_errors(content))
 
     elif file_type == "implementation":
         if "@spec" not in content:

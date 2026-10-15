@@ -87,6 +87,7 @@ def _check_semantic_values(options: SemanticOptions) -> None:
         "implement",
         "test",
         "complete",
+        "ship",
         "clarify",
         "analyze",
     ):

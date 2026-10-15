@@ -63,7 +63,11 @@ Resolve the lane once with `livespec delivery lane --feature <slug> --model <act
 - **Every step, both lanes:** targeted tests, lint and format of the touched files, and the conventions gate. No Spec Reviewer, Code Quality Reviewer, native review or audit runs per step.
 - **End of the feature, light lane** (Low/Medium criticality, Local/Shared blast radius, current spec review): one independent native `combined` review of the complete diff and one certification.
 - **End of the feature, full lane** (every other case): two independent native agents, one `review` (spec compliance, quality) and one `audit` (security, robustness, conventions), on the complete diff, then one certification.
+- **Spec revision during implementation:** when a requirement must change, commit the reviewed spec and plan, run `livespec delivery revision open --feature <slug>` before editing, revise the spec and plan as often as needed (steps keep running), then review the revised spec and plan once and run `livespec delivery revision close --feature <slug>` before Phase 6.8. Edits outside the FR and AC sections and Gherkin need no revision: they do not make the reviews stale. **Read** [the review protocol](../../../system/review-protocol.md).
 - **Read** [the delivery review protocol](../../../system/delivery-review.md) for the end-of-feature review (Phase 6.8). The retired `audit` skill, Codex and any external launcher are never used.
+
+<!-- @spec FR-002: Release evidence never blocks implement — .specs/features/090-minimal-plan-scope/spec.md#fr-002 -->
+**Evidence classes (feature 090):** produce the evidence of every `local` plan step (the default) during implementation. A step declared `**Evidence class:** release` is listed under `runtime_context.pending_release_evidence` of the goal, outside the required tasks: never wait for it and never block `finalize` on it; `/spec-ship` requires it. Record a release proof produced early in `implementation.md` under `## Release Evidence` as `| <step number> | <step name> | <proof or receipt path> |`. **Read** [plan evidence classes](../../../system/testing/execution-rules.md#plan-evidence-classes).
 
 # Command: /spec-implement
 

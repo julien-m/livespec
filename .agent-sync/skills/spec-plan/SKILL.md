@@ -307,6 +307,11 @@ For each file:
 - List the functions/components to create
 - Reference which FR it satisfies
 
+<!-- @spec FR-001: Minimal spec scope, FR-002: Evidence class per step — .specs/features/090-minimal-plan-scope/spec.md#fr-001 -->
+**Minimal spec scope:** **Read** [minimal spec scope](../../../system/minimal-spec-scope.md) before writing steps. Plan only mechanisms that trace to an FR, an AC or a constitution rule; drop caches, retry layers, telemetry or abstractions nobody asked for, or keep one only as a justified technical necessity that names the requirement it serves.
+
+**Evidence class:** Each step may add one line `**Evidence class:** local` (default, omit it) or `**Evidence class:** release` when its proof needs release signing, a device fleet or production. Release evidence is pending during implementation and required by `/spec-ship`; split a step whose proof is partly local. `livespec validate <plan.md>` rejects an unknown class.
+
 ### Step 7.5 — Test Resolution
 
 Before generating the testing strategy, resolve the project's test infrastructure:
@@ -557,6 +562,7 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 - [always] Update .specs/README.md feature row Status to Planned <!-- evidence:documentary -->
 - [always] Add plan entry to feature changelog.md and global .specs/changelog.md <!-- evidence:documentary -->
 - [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation <!-- evidence:documentary -->
+- [always] Apply the minimal spec scope rule and declare `**Evidence class:** release` only on steps whose proof needs signing, a device fleet or production <!-- evidence:documentary -->
 - [always] Run LLM plan review unless --no-review; retry on blocking findings <!-- evidence:review review-kind:plan -->
 - [always] Run `livespec validate` structural validation; retry on failure <!-- evidence:documentary -->
 

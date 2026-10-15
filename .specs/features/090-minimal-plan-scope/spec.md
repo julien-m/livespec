@@ -3,7 +3,7 @@ title: Minimal Plan Scope
 priority: P2
 feature: 090-minimal-plan-scope
 created: 2026-10-13
-updated: 2026-10-13
+updated: 2026-10-15
 status: Draft
 ---
 
@@ -19,8 +19,8 @@ status: Draft
 ## Scope and Source Evidence
 
 - **Observed problem:** `system/` has no rule bounding plan scope; the plan review prompt asks for "extra business scope" only; plan steps have one evidence notion and the goal blocks on all of it.
-- **In scope:** a `.conventions` native rule `minimal-spec-scope`, the plan review guidance and the `extra_scope` kind of feature 088 applied to mechanisms, a `**Evidence class:**` line per plan step (`local` default, `release`), and the goal and delivery checks that defer `release` evidence to `/spec-ship`.
-- **Out of scope:** changing what `/spec-ship` requires.
+- **In scope:** a native LiveSpec rule `minimal-spec-scope` (`system/minimal-spec-scope.md`, shipped with LiveSpec like `system/tool-project-boundary.md`, because `.conventions/` only lists ai-ressources sources), the plan review guidance and the `extra_scope` kind of feature 088 applied to mechanisms, a `**Evidence class:**` line per plan step (`local` default, `release`), the goal context that defers `release` evidence, and the `ship` progression (`livespec validate <feature-dir> --progression ship`) that `/spec-ship` runs before merging.
+- **Out of scope:** any other `/spec-ship` requirement; certifying an acceptance criterion from release evidence (every AC stays provable locally).
 
 ## User Scenarios & Testing
 

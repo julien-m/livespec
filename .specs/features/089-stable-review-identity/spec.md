@@ -1,6 +1,6 @@
 ---
 title: Stable Review Identity
-priority: P2
+priority: P1
 feature: 089-stable-review-identity
 created: 2026-10-13
 updated: 2026-10-13
@@ -9,122 +9,179 @@ status: Draft
 
 # Feature Spec: Stable Review Identity
 
-- **Feature:** a review receipt records the budget it was prepared with, model and budget come from one project configuration, and only normative changes make a review stale
+- **Feature:** a spec or plan review stays current until the requirements it judged change: only the functional requirements, the acceptance criteria and the Gherkin scenarios of the feature spec make it stale, the review budget never does, and a spec revised during implementation is reviewed once, at the end
 - **Feature Number:** 089
 - **Branch:** `feat/lighten-delivery-gates`
 - **Date:** 2026-10-13
 - **Status:** Draft
-- **Input:** On the Handy program a spec review prepared with `--review-max-chars 120000` was later checked by a goal or progression without that option. The budget is part of the context hash (`validator/semantic/review_identity.py`), so the current review was reported stale and redone. The model was also passed by hand at each command. The maintainer decided: record `--review-max-chars` in the receipt; take model and budget from `.specs/semantic/config.yaml`; only normative changes may make a review stale.
+- **Input:** On the Handy program a spec review prepared with `--review-max-chars 120000` was later checked without that option and reported stale, because the budget is part of the context hash (`validator/semantic/review_identity.py`). An edit to an edge case, to the Quality Engineering section or to the formatting of the spec also made the spec and plan reviews stale, and a spec corrected during implementation blocked the next phase until both were reviewed again. The maintainer decided (13 October 2026): a review becomes stale only when the FR, the AC or the Gherkin change, never for edge cases, QE sections or formatting; the receipt is no longer bound to the review budget; a grouped spec revision is allowed during implementation, with a single new review at the end. The reviewer model and budget configuration first planned here moved to feature 093.
 
 ## Scope and Source Evidence
 
-- **Observed problem:** `ReviewReceipt` (`validator/semantic/review_contract.py`) has no budget field; `verify_feature_review`, `progression_gate.require_progression` and `delivery.lane.spec_review_current` prepare with the caller's budget or the configuration default; `SemanticConfig.review_model` and `review_max_chars` exist but goal rendering asks for `--model=` explicitly.
-- **In scope:** a `review_max_chars` receipt field excluded from the receipt comparison, verification with the recorded budget when the caller gives none, goal and progression resolution from `.specs/semantic/config.yaml`, a doctor check that reports a receipt whose identity differs from the configuration only by budget or model.
-- **Out of scope:** the prompt, the policy version and batching; review readiness (feature 088).
+- **Observed problem:** `context_identity` hashes every source byte outside lifecycle metadata and the budget; `verify_review_receipt` (`validator/semantic/review_receipts.py`) accepts a receipt only when that hash is equal and the raw results rebuild against the current sections, whose identifiers carry line numbers. Section edits that move lines therefore make every citation fail.
+- **In scope:** the reviewed context stored in the receipt, a stable identity of spec and plan reviews, verification against the reviewed context, the spec revision record and its command, the progression and delivery checks that read it, `system/review-protocol.md` and the spec-implement skill.
+- **Out of scope:** acceptance, mapping and delivery reviews, which stay strict; the review prompt and policy versions; reviewer model and budget resolution (feature 093).
+
+## Constitution Alignment
+
+- **No silent trust:** a stable receipt is still rebuilt from its raw reviewer output against the context it reviewed; only the comparison with the current sources changes.
+- **CLI surface:** one subgroup `livespec delivery revision` (`open`, `close`, `status`), JSON output, exit codes 0, 1 and 2.
+- **Compatibility:** a receipt written before this feature has no reviewed context and keeps the exact comparison.
+
+## Definitions
+
+- **Reviewed context:** the prepared review a receipt was validated against (sections, requirements, batches without their prompts, identity fields), stored in the receipt at ingestion.
+- **Requirement projection:** for the feature `spec.md`, the lines of the `Functional Requirements` and `Acceptance Criteria` sections (numbered or decorated titles and their French forms included), of every line or table row that starts with an FR or AC id, and of every `gherkin` fenced block, with Markdown emphasis, code marks and runs of whitespace removed; blank lines do not count.
+- **Stable identity:** feature, review kind, reviewer model, policy, schema and prompt versions, requirement scope, dependencies, the requirement ids under review (FR, AC and SC), and one hash per source: the requirement projection for the feature `spec.md`, the normative hash for every other source. It excludes the review budget.
+- **Spec revision:** a record `.specs/features/<feature>/.reviews/spec-revision.json` naming the context hashes of the spec and plan receipts that were current and ready when it was opened.
 
 ## User Scenarios & Testing
 
-### Story 1 — Verify with the recorded budget `P1`
+### Story 1 — Only requirement changes make a review stale `P1`
 
-**As a** maintainer, **I want** verification to reuse the budget recorded in the receipt, **so that** a review is never redone only because a later command omitted the option.
+**As a** maintainer, **I want** a review to stay current when an edge case, the QE section or the formatting of the spec changes, **so that** a review is redone only when the requirements it judged change.
 
-**Priority reason:** it removes the most frequent false staleness.
+**Priority reason:** these edits made both reviews stale on every Handy feature.
 
-**Independent test:** Ingest a review prepared with a non-default budget, then verify it without a budget.
+**Independent test:** Ingest spec and plan reviews, edit each kind of section, then verify both.
 
 ```gherkin
-Feature: Recorded budget
-  Scenario: Verification without a budget uses the recorded one
-    Given a ready spec review prepared with review_max_chars 120000
-    When "livespec validate <feature> --progression plan" runs without a budget
-    Then the review is current
+Feature: Stable review
+  Scenario: Edge case edited
+    Given current and ready spec and plan reviews
+    When an edge case of the spec is rewritten and moves the following lines
+    Then both reviews are still current
 
-  Scenario: A normative change still makes it stale
-    Given the same receipt
-    When an acceptance criterion changes
-    Then the review is stale
+  Scenario: Acceptance criterion edited
+    Given the same reviews
+    When the text of AC-001 changes
+    Then both reviews are stale
+
+  Scenario: Another budget
+    Given a spec review prepared with review_max_chars 120000
+    When it is verified with the default budget
+    Then it is current
 ```
 
 #### User Flow
 
 ```mermaid
 flowchart TD
-    A[Verify review] --> B{Caller budget given?}
-    B -- Yes --> C[Prepare with caller budget]
-    B -- No --> D{Receipt records a budget?}
-    D -- Yes --> E[Prepare with recorded budget]
-    D -- No --> F[Prepare with configuration budget]
-    C --> G[Compare context hash and rebuild]
-    E --> G
-    F --> G
+    A[Verify receipt] --> B{Context hash equal?}
+    B -- Yes --> C[Rebuild against current context]
+    B -- No --> D{Reviewed context stored and stable identity equal?}
+    D -- No --> X[Stale]
+    D -- Yes --> E[Rebuild against reviewed context]
+    C --> F{Rebuild equals receipt?}
+    E --> F
+    F -- Yes --> G[Current]
+    F -- No --> X
 ```
 
-### Story 2 — One configuration for model and budget `P2`
+### Story 2 — Revise the spec once during implementation `P1`
 
-**As an** agent, **I want** every review command and goal to read the reviewer model and budget from `.specs/semantic/config.yaml`, **so that** I never pass them by hand.
+**As an** implementing agent, **I want** to group spec corrections found during implementation and review them once at the end, **so that** implementation never stops for a review per correction.
 
-**Priority reason:** a missing `--model` made goal renders fail or select another identity.
+**Priority reason:** a corrected requirement blocked the next implementation phase until two reviews were redone.
 
-**Independent test:** Render a goal and run a progression with only the configuration set.
+**Independent test:** Open a revision, change an AC, pass the implement and test progressions, refuse completion, then close after one new review.
 
 ```gherkin
-Feature: Configured identity
-  Scenario: Goal render without --model
-    Given review_model "m1" in .specs/semantic/config.yaml
-    When "livespec goal render spec-plan --feature <feature>" runs without --model
-    Then the review task expects reviewer_model "m1"
+Feature: Spec revision
+  Scenario: Implementation continues during a revision
+    Given an open spec revision and an edited acceptance criterion
+    When "livespec validate <feature> --progression implement" runs
+    Then it is READY with the reviews recorded at opening
+
+  Scenario: Completion waits for the closing review
+    Given the same open revision
+    When the complete progression or the delivery review verification runs
+    Then it is refused with "spec_revision_open"
+
+  Scenario: Close after one review
+    Given current and ready spec and plan reviews of the revised spec
+    When the agent runs "livespec delivery revision close --feature <feature>"
+    Then the revision record is removed and the command exits 0
 ```
 
 #### User Flow
 
 ```mermaid
 flowchart TD
-    A[Command needs a reviewer identity] --> B{--model given?}
-    B -- Yes --> C[Use it]
-    B -- No --> D{review_model configured?}
-    D -- Yes --> E[Use configuration]
-    D -- No --> F[Exit with review_model_required]
+    A[revision open] --> B{Spec and plan reviews current and ready?}
+    B -- No --> X[Exit 1]
+    B -- Yes --> C[Record their context hashes]
+    C --> D[Edit spec during implementation]
+    D --> E[implement and test progressions accept the recorded reviews]
+    E --> F[Review spec, then plan, once]
+    F --> G{revision close: both current and ready?}
+    G -- No --> Y[Exit 1, record kept]
+    G -- Yes --> H[Remove record, exit 0]
 ```
 
 ## Acceptance Criteria
 
 ### AC-001
 
-Spec and plan ingestion record `review_max_chars` in the receipt; verification without an explicit budget prepares with the recorded budget, and the receipt comparison excludes this field so older receipts stay valid.
+Spec and plan review ingestion stores the reviewed context in the receipt; a spec or plan review whose context hash differs from the current one is current when its stored reviewed context has the same stable identity as the current preparation and its raw results rebuild exactly against that reviewed context; the review budget is not part of the stable identity, so a receipt prepared with another `--review-max-chars` stays current.
 
 ### AC-002
 
-A change to a normative section of a reviewed source makes the review stale; a change of lifecycle metadata, of the budget or of the configuration file alone does not.
+A change to the requirement projection of the feature `spec.md` (a functional requirement, an acceptance criterion or a Gherkin scenario) or to the normative content of any other reviewed source, including `plan.md`, makes the review stale; a change limited to other spec sections (edge cases, Quality Engineering, stories, scope), to Markdown emphasis or whitespace, or to lifecycle metadata does not.
 
 ### AC-003
 
-`livespec goal render`, progression checks and `livespec delivery lane` resolve the reviewer model and budget from `--model`/`--review-max-chars`, else `.specs/semantic/config.yaml`, and exit with `review_model_required` when neither names a model; for `livespec delivery lane` this replaces the 086 behavior (exit 0, lane full with `spec_review_not_current`) only for the unresolved-model case.
+Acceptance, mapping and delivery reviews, and receipts without a stored reviewed context, keep the exact context comparison; a receipt whose stored reviewed context does not prepare again, from its own section texts, to the receipt's context hash, or does not rebuild its own raw results, is stale.
+
+### AC-004
+
+`livespec delivery revision open --feature <feature> [--model <m>]` writes the spec revision record and exits 0 only when the spec and plan reviews are current and ready; otherwise it exits 1 with `spec_review_not_current` or `plan_review_not_current`. `status` prints the record or `{"open": false}`.
+
+### AC-005
+
+While a spec revision is open, the `implement` and `test` progressions accept a spec or plan receipt whose context hash is recorded in the revision and whose raw results rebuild against its reviewed context, even when the spec changed; the `complete` progression and `livespec delivery review verify` are refused with `spec_revision_open`.
+
+### AC-006
+
+`livespec delivery revision close --feature <feature> [--model <m>]` removes the record and exits 0 only when the spec and plan reviews are current and ready for the revised sources; otherwise it exits 1, names the stale review and keeps the record.
 
 ## Functional Requirements
 
-- **FR-001:** Receipt field and budget-aware verification. **Maps to:** AC-001, AC-002.
-- **FR-002:** One resolution function for model and budget used by goal, progression and delivery. **Maps to:** AC-003.
+- **FR-001:** Store the reviewed context in spec and plan receipts and exclude it from the receipt comparison. **Maps to:** AC-001, AC-003.
+- **FR-002:** Compute the requirement projection and the stable identity, and verify spec and plan receipts against their reviewed context when the stable identity is equal. **Maps to:** AC-001, AC-002, AC-003.
+- **FR-003:** Use stable verification in the spec review, Clarify, Analyze and delivery lane checks. **Maps to:** AC-001, AC-002.
+- **FR-004:** Add `livespec delivery revision open|close|status` and the revision record. **Maps to:** AC-004, AC-006.
+- **FR-005:** Accept the recorded receipts in the `implement` and `test` progressions and refuse `complete` and the delivery review verification while a revision is open. **Maps to:** AC-005.
+- **FR-006:** Document stable reviews and spec revisions in `system/review-protocol.md` and the spec-implement skill. **Maps to:** AC-002, AC-005.
 
 ## Key Entities
 
 | Entity | Description | Key Fields |
 |---|---|---|
-| Review receipt | Existing receipt | + review_max_chars |
-| Review identity | Resolved model and budget | model, max_chars, source |
+| Review receipt | Existing receipt | + reviewed (prepared context without prompts) |
+| Stable identity | Digest of what a review judged | kind, model, versions, scope, dependencies, per-source hashes |
+| Spec revision | Open revision record | feature, spec, plan (context hashes), opened_at |
 
 ## Edge Cases
 
-- **Receipt without a recorded budget:** the configuration budget applies, as today.
-- **Recorded budget out of bounds:** refused as invalid, never clamped.
+- **New Success Criteria id:** it adds a review obligation, so the review is stale.
+- **Requirement moved without change:** the projection keeps line order but not line numbers, so moving the Functional Requirements section is not a change; reordering acceptance criteria is.
+- **Lane classification after a QE edit:** a QE edit no longer makes the spec review stale, so the delivery lane reads the classification of the reviewed spec as well as the current one and keeps the stricter (feature 086).
+- **Review prepared with a larger budget:** the current preparation may not fit the default budget; its sections do not depend on the budget, so the stable comparison still applies.
+- **Receipt written before this feature:** it has no reviewed context; `revision open` refuses it with `spec_review_not_current`, so review again first.
+- **Malformed revision record:** progressions and `delivery review verify` are refused with `spec_revision_malformed`.
+- **Revision opened twice:** `open` refuses an existing record with `spec_revision_open`.
+- **Receipt replaced during a revision:** a receipt whose context hash is not in the record follows the normal rules.
 
 ## Quality Engineering
 
-- **Risk:** Medium criticality; Shared blast radius; primary risk Contract.
-- **P0 gates/evidence:** receipt fixtures with and without the field, progression and goal render tests.
+- **Risk:** Medium criticality (it widens what a current review accepts; every accepted receipt is still rebuilt from raw reviewer output); Shared blast radius (every feature review); primary risk Contract.
+- **Applicable dimensions:** fail-safe staleness, compatibility of existing receipts, tamper resistance of the stored context, progression gates. Accessibility not applicable.
+- **P0 gates/evidence:** pytest fixtures with real ingested receipts for each section kind, budget, tampered context, revision lifecycle and the existing review suites unchanged.
 
 ## Success Criteria
 
 | ID | Criterion | How to Measure |
 |---|---|---|
-| SC-001 | No review is redone when only the budget option differs | Fixture with a non-default budget |
-| SC-002 | No review command needs `--model` when the configuration names one | Goal render and progression fixtures |
+| SC-001 | An edge case, QE or formatting edit never requires a new spec or plan review | Stable review fixtures |
+| SC-002 | A spec revised during implementation needs one spec review and one plan review in total | Revision lifecycle fixture |

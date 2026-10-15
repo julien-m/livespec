@@ -100,6 +100,15 @@ def _ordered_unique(tokens: list[str]) -> list[str]:
     return ordered
 
 
+def _read_artifacts(feature_dir: Path) -> tuple[str, str, str, bool]:
+    """Spec, plan and implementation texts ('' when absent) and whether implementation exists."""
+    texts = []
+    for name in ("spec.md", "plan.md", "implementation.md"):
+        path = feature_dir / name
+        texts.append(path.read_text(encoding="utf-8") if path.is_file() else "")
+    return texts[0], texts[1], texts[2], (feature_dir / "implementation.md").is_file()
+
+
 # @spec(FR-002): read-only cross-artifact analysis, never writes a file (070-analyze-gate)
 def analyze_feature_artifacts(
     feature_dir: Path,
@@ -108,6 +117,7 @@ def analyze_feature_artifacts(
     review_receipt: Path | None = None,
     structural_only: bool = False,
     prepared_review: PreparedReview | None = None,
+    accepted_reviews: frozenset[str] = frozenset(),
 ) -> PreImplAnalysisReport:
     """Read structural coverage and semantic readiness without writing files.
 
@@ -117,22 +127,15 @@ def analyze_feature_artifacts(
         review_receipt: Plan receipt override; defaults to .reviews/plan.json.
         structural_only: Skip semantic checks; references cannot certify readiness.
         prepared_review: Prepared context to verify; otherwise prepare from disk.
+        accepted_reviews: Receipt context hashes accepted by an open spec revision (089).
     Returns:
         Separate reference coverage and semantic findings; invalid receipts are incomplete.
     Raises:
         OSError: An existing feature artifact cannot be read.
         UnicodeError: An existing feature artifact is not valid UTF-8.
     """
-    spec_path = feature_dir / "spec.md"
-    plan_path = feature_dir / "plan.md"
-    impl_path = feature_dir / "implementation.md"
-
-    spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
-    plan_text = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else ""
-    impl_present = impl_path.is_file()
-    impl_text = impl_path.read_text(encoding="utf-8") if impl_present else ""
-
-    findings = _missing_artifact_findings(spec_path, plan_path)
+    spec_text, plan_text, impl_text, impl_present = _read_artifacts(feature_dir)
+    findings = _missing_artifact_findings(feature_dir / "spec.md", feature_dir / "plan.md")
 
     semantic_status = "not_requested"
     if not structural_only:
@@ -143,6 +146,7 @@ def analyze_feature_artifacts(
             constitution_path,
             review_receipt,
             prepared_review,
+            accepted_reviews,
         )
         findings.extend(semantic_findings)
 

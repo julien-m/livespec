@@ -8,7 +8,8 @@ from typing import TYPE_CHECKING, Literal
 
 from .review_contract import ReviewReceipt, validate_review_result
 from .review_files import prepare_feature_review, review_receipt_path
-from .review_receipts import load_review_receipt, save_review_receipt, verify_review_receipt
+from .review_receipts import load_review_receipt, save_review_receipt
+from .review_stability import reviewed_against
 
 if TYPE_CHECKING:
     from validator.semantic.plan_review import PlanReviewResult
@@ -195,7 +196,9 @@ def verify_feature_review(
     )
     for kind in kinds:
         prepared = prepare_feature_review(project_root, feature, kind, model, max_chars)
-        if verify_review_receipt(receipt, prepared):
+        # @spec FR-003: Stable verification of spec and plan reviews
+        #   — .specs/features/089-stable-review-identity/spec.md#fr-003
+        if reviewed_against(receipt, prepared) is not None:
             return receipt.ready
     return False
 

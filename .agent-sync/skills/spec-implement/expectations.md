@@ -1,7 +1,7 @@
 ---
 command: spec-implement
 contract_version: "1.0"
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-15
 ---
 
 # Expectations — /spec-implement

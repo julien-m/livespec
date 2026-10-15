@@ -5,9 +5,28 @@ from __future__ import annotations
 import hashlib
 from typing import TYPE_CHECKING
 
+from pydantic import ValidationError
+
 if TYPE_CHECKING:
     from validator.semantic.review_context import PreparedReview
-    from validator.semantic.review_contract import ReviewResponse
+    from validator.semantic.review_contract import QeAssessment, ReviewResponse
+
+
+_CRITICALITY_RANK = {"Low": 0, "Medium": 1, "High": 2}
+
+
+# @spec FR-009: Reviewer QE assessment
+#   — .specs/features/086-risk-proportional-delivery/spec.md#fr-009
+def strictest_assessment(
+    final: ReviewResponse | None, responses: list[ReviewResponse]
+) -> QeAssessment | None:
+    """The highest QE criticality of the final response or any batch; the final wins ties.
+
+    A batch that assessed High is never lost because the synthesis left the field out.
+    """
+    candidates = [r.qe_assessment for r in [*([final] if final else []), *responses]]
+    present = [a for a in candidates if a is not None]
+    return max(present, key=lambda a: _CRITICALITY_RANK[a.criticality], default=None)
 
 
 def _key(kind: str, identity: str) -> str:
@@ -66,3 +85,25 @@ def validate_issue_ledger(
     for resolution in final.resolutions:
         errors.extend(_citation_errors(resolution.citations, prepared, allowed))
     return errors
+
+
+def validated_synthesis(
+    prepared: PreparedReview,
+    raws: list[str],
+    responses: list[ReviewResponse],
+    synthesis: str | None,
+) -> tuple[ReviewResponse | None, list[str]]:
+    """Native ingestion and provider execution enforce the same complete transport budget."""
+    from validator.semantic.review_contract import ReviewResponse, validate_response
+    from validator.semantic.review_synthesis_transport import synthesis_prompt
+
+    errors = []
+    if len(synthesis_prompt(prepared, raws)) > prepared.max_chars:
+        errors.append("synthesis_context_over_budget")
+    try:
+        final = ReviewResponse.model_validate_json(synthesis or "")
+    except ValidationError:
+        return None, [*errors, "missing_or_malformed_synthesis"]
+    errors.extend(validate_response(final, prepared))
+    errors.extend(validate_issue_ledger(responses, final, prepared))
+    return final, errors
