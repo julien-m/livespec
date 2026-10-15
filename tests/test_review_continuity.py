@@ -152,7 +152,9 @@ def test_crafted_symlink_chain_writes_nothing_outside_the_tree(
     top = [
         (m, n, _tree(root, specs) if n == b".specs" else s) for m, n, s in _entries(root, "HEAD")
     ]
-    args = ["commit-tree", _tree(root, top).decode(), "-p", "HEAD", "-m", "crafted"]
+    # commit-tree needs an identity: CI runners have no global git user.
+    identity = ["-c", "user.name=t", "-c", "user.email=t@example.invalid"]
+    args = [*identity, "commit-tree", _tree(root, top).decode(), "-p", "HEAD", "-m", "crafted"]
     crafted = subprocess.run(["git", "-C", str(root), *args], capture_output=True, check=True)
     _git(root, "update-ref", "HEAD", crafted.stdout.decode().strip())
     _hand_written_record(root, crafted.stdout.decode().strip())

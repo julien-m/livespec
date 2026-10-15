@@ -1,5 +1,13 @@
 # Changelog - 094-verified-review-continuity
 
+
+## 2026-10-15 — [Bugfix]: Test commit identity on CI
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_review_continuity.py
+- **Author:** claude-code
+- `test_crafted_symlink_chain_writes_nothing_outside_the_tree` ran `git commit-tree` without a user identity, which fails with exit 128 on CI runners that have no global git user (PR #42). It now passes the same test identity as the other commits.
 ## 2026-10-14 — [Feature]: Stored source roles and revision records verified at their commit
 
 - **Type:** Feature
