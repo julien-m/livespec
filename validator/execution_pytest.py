@@ -6,14 +6,18 @@ import ast
 import json
 import os
 import sys
-from collections.abc import Iterator
+from collections.abc import Generator
 from pathlib import Path
 from types import FrameType
-from typing import NamedTuple, Protocol
+from typing import TYPE_CHECKING, NamedTuple, Protocol
 
 from _pytest.assertion.rewrite import _call_assertion_pass
-from execution_test_budget import read_budget, resolve_test_budget, test_watchdog
 from pytest import Config, Item, Session, StashKey, hookimpl
+
+if TYPE_CHECKING:
+    from .execution_test_budget import read_budget, resolve_test_budget, test_watchdog
+else:
+    from execution_test_budget import read_budget, resolve_test_budget, test_watchdog
 
 
 class CaptureContext(NamedTuple):
@@ -174,7 +178,7 @@ def pytest_collection_modifyitems(items: list[Item]) -> None:
 
 
 @hookimpl(wrapper=True, tryfirst=True)
-def pytest_runtest_protocol(item: Item, nextitem: Item | None) -> Iterator[object]:
+def pytest_runtest_protocol(item: Item, nextitem: Item | None) -> Generator[None, object, object]:
     """The watchdog surrounds the complete pytest setup/call/teardown protocol."""
     del nextitem
     budget = item.stash.get(_TEST_BUDGET, None)

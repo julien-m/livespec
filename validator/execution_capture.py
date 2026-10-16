@@ -146,7 +146,8 @@ def _capture_execution(
     finished = time.time_ns()
     scope = current_deadline()
     if scope is not None and scope.timed_out:
-        raw_after, after = {}, {}
+        raw_after: dict[str, str] = {}
+        after: dict[str, str] = {}
         gaps.append("Post-execution source snapshot omitted after timeout")
     else:
         raw_after, after = _manifests(root, feature, gaps)

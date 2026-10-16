@@ -49,3 +49,12 @@
 - **AC impacted:** AC-001, AC-002; all five acceptance criteria recertified with 15 observed assertions.
 - **Validation:** Ruff/format, local Pyright, current conventions and refreshed independent delivery review PASS; newer CI Pyright rechecked after push.
 - **Author:** Codex
+
+## 2026-10-16 — Bugfix: Strict mypy runner annotations
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `validator/execution_capture.py`, `validator/execution_pytest.py`; explicit snapshot dictionaries, static-only helper import and wrapper generator typing, preserving runtime behavior.
+- **AC impacted:** AC-001 to AC-005 recertified with 15 passing assertions.
+- **Validation:** Locked CI dependencies: mypy passes 779 files, Pyright passes, Ruff/format pass, and 83 neighboring execution/CLI regressions pass. Current conventions and refreshed independent delivery review PASS.
+- **Author:** Codex
