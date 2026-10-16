@@ -10,6 +10,10 @@
 ## 2026-10-17 — [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture
 <!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
 
+## 2026-10-16 — [Feature 078] Bugfix: reserve the full Plan before packing review sources
+
+- Avoid unnecessary Cartesian review expansion and preserve exact historical receipt layouts. Read [the validation record](features/078-requirement-evidence-integrity/checks/2026-10-16-plan-packing.md).
+
 ## 2026-10-17 — 097: preserve exact Git index bytes while reviewing complete root bootstrap scope; current six-AC certification and independent full reviews pass.
 <!-- finalize:spec-implement:2026-10-17:1bab7ffb -->
 

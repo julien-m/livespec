@@ -269,3 +269,15 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/a5afa5c4870749d0bfcf0b35f80bc286/receipt.json`
 - **GREEN receipt:** `.specs/.execution/01917bd3a4b445ceac4993164733cdbe/receipt.json`
 <!-- bugfix:01917bd3a4b445ceac4993164733cdbe -->
+## 2026-10-16 — [Bugfix]: Reserve the complete Plan before packing review sources and retain exact historical layouts for existing receipts
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/fixtures/review-plan-packing-legacy.json, tests/test_review_plan_packing.py, validator/semantic/review_batches.py, validator/semantic/review_context.py, validator/semantic/review_stability.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_review_plan_packing.py::test_complete_plan_reservation_prevents_cartesian_review_explosion
+- **RED receipt:** `.specs/.execution/e2d13ae570de416fbc8c6ba40e8e685b/receipt.json`
+- **GREEN receipt:** `.specs/.execution/9f1fbbf9ed264615bf0efd56923a5aba/receipt.json`
+<!-- bugfix:9f1fbbf9ed264615bf0efd56923a5aba -->
