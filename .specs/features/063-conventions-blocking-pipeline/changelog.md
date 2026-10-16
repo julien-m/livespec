@@ -66,3 +66,16 @@ AC-006 is now proven by parsing each real `expectations.md` with `validator.expe
 - **Code modified:** `validator/run_receipts.py`, `validator/verify_output.py`, `validator/expectations.py`, `validator/goal_contracts.py`, `validator/coherence/rules/r7_conventions_gates.py`, `validator/conventions_diffguard.py`
 - **AC impacted:** AC-001 through AC-015
 - **Author:** Codex
+
+## 2026-10-16 — [Bugfix]: Resolve mapped CI configuration and documentation as feature scope while preserving source checks and scope boundaries
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** README.md, tests/test_conventions_noncode_scope.py, validator/conventions_feature_scope.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_conventions_noncode_scope.py::test_cli_verify_ci_only_scope_writes_receipt
+- **RED receipt:** `.specs/.execution/b45af31ce51b4f919e0752f5546119b6/receipt.json`
+- **GREEN receipt:** `.specs/.execution/1b3896287423475883ad899d443017eb/receipt.json`
+<!-- bugfix:1b3896287423475883ad899d443017eb -->

@@ -37,6 +37,10 @@ SOURCE_SUFFIXES = frozenset(
         ".zsh",
     }
 )
+# @spec FR-006: Resolve config/docs implementation maps
+#   .specs/features/063-conventions-blocking-pipeline/spec.md#fr-006
+# Scope ownership includes declarative artifacts; AST discovery still uses SOURCE_SUFFIXES.
+_SCOPE_SUFFIXES = SOURCE_SUFFIXES | {".json", ".md", ".toml", ".yaml", ".yml"}
 _MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\((?P<target>[^)]+)\)")
 _MARKDOWN_CODE_PATH_PATTERN = re.compile(r"`(?P<target>[^`]+)`")
 _DATE_PATTERN = re.compile(r"\b20\d{2}-\d{2}-\d{2}\b")
@@ -48,14 +52,14 @@ class FeatureScopeError(ValueError):
 
 @dataclass(frozen=True)
 class FeatureScope:
-    """Feature-owned source paths used by scoped conventions verification."""
+    """Feature-owned implementation paths used by scoped conventions verification."""
 
     feature_slug: str
     paths: frozenset[str]
 
 
 def resolve_feature_scope(project_root: Path, feature_slug: str) -> FeatureScope:
-    """Resolve current source/test files attributable to a LiveSpec feature."""
+    """Resolve current implementation files attributable to a LiveSpec feature."""
     feature_dir = project_root / ".specs" / "features" / feature_slug
     if not feature_dir.is_dir():
         raise FeatureScopeError(f"feature scope not found: .specs/features/{feature_slug}")
@@ -125,7 +129,8 @@ def _artifact_scope_paths(project_root: Path, artifact: Path, text: str) -> list
                 continue
             if (
                 candidate.is_file()
-                and candidate.suffix.lower() in SOURCE_SUFFIXES
+                and not rel.startswith(".specs/")
+                and candidate.suffix.lower() in _SCOPE_SUFFIXES
                 and rel not in seen
             ):
                 paths.append(rel)
@@ -158,7 +163,11 @@ def _dirty_feature_scope_paths(project_root: Path, feature_slug: str) -> list[st
     return [
         path
         for path in changed_paths
-        if Path(path).suffix.lower() in SOURCE_SUFFIXES and (project_root / path).is_file()
+        if not path.startswith(".specs/")
+        and Path(path).suffix.lower() in _SCOPE_SUFFIXES
+        and (project_root / path).is_file()
+        and (project_root / path).resolve().is_relative_to(project_root.resolve())
+        and not (project_root / path).resolve().is_relative_to(project_root.resolve() / ".specs")
     ]
 
 

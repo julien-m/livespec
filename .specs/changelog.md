@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-16 — [Feature 063] Bugfix: resolve mapped CI/configuration and documentation scopes
+
+- CI-only mappings now produce conventions receipts; source/AST support and declared-linter failures stay unchanged. Scope, mixed mappings, missing files and canonical path boundaries covered; independent native review PASS.
+
 ## 2026-10-16 — Bound test execution and require only necessary validation with declared long-running exceptions
 <!-- finalize:spec-feature:2026-10-16:d775ec24 -->
 

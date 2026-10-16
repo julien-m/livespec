@@ -10,3 +10,5 @@
 | Command docs tests | Done | Added failing tests in [`tests/test_conventions_pipeline_docs.py`](../../../tests/test_conventions_pipeline_docs.py) |
 | Implementation | Done | Targeted feature tests pass: 22 passed |
 | Full verification | Done | `pytest tests/ -x -q`: 2079 passed, 40 skipped; `ruff check .`; `ruff format --check .`; `pyright` |
+
+| CI-only scope bugfix | Done | Runner-owned RED/GREEN and bugfix ELIGIBLE; 21 scope checks passed; 58 adjacent receipt/baseline/supervisor/signal checks passed; Ruff, format and Pyright passed; independent native review PASS |
