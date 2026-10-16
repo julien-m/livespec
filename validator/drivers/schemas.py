@@ -152,6 +152,7 @@ class CapabilityResult(BaseModel):
     report_path: str | None = None
     execution_receipt_path: str | None = None
     certification_gaps: list[str] = Field(default_factory=list)
+    budget: dict[str, object] | None = None
     stdout: str = ""
     stderr: str = ""
 

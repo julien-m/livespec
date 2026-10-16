@@ -25,6 +25,7 @@ from typing import Any
 
 from validator.execution_cargo_command import CargoTestCommand, parse_cargo_test, runner_variable
 from validator.execution_cargo_toolchain import host_triple, runner_paths
+from validator.execution_test_budget import read_budget
 
 _LIB_KINDS = frozenset({"lib", "rlib", "dylib", "cdylib", "staticlib", "proc-macro"})
 _DOCTESTS = re.compile(r"^\s*Doc-tests\s", re.M)
@@ -40,6 +41,7 @@ class _Context:
     invocation: str
     root: Path
     feature: str
+    budget: dict[str, object] | None
 
     @classmethod
     def from_env(cls) -> _Context:
@@ -52,6 +54,7 @@ class _Context:
             os.environ["LIVESPEC_EXECUTION_NONCE"],
             Path(os.environ["LIVESPEC_EXECUTION_PROJECT"]),
             os.environ["LIVESPEC_EXECUTION_FEATURE"],
+            read_budget(),
         )
 
 
@@ -117,6 +120,7 @@ def _runner_environment(
         "profdata": options["--profdata"],
         "cov": options["--cov"],
         "binaries": binaries,
+        "budget": context.budget,
         "strip_env": sorted({"RUSTC_WORKSPACE_WRAPPER", *variables}),
     }
     path = work / "config.json"

@@ -19,6 +19,7 @@ import subprocess
 import sys
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import nullcontext
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -31,6 +32,7 @@ from validator.execution_cargo_coverage import (
     panic_locations,
 )
 from validator.execution_rust_source import RustAssertion
+from validator.execution_test_budget import resolve_test_budget, test_watchdog
 
 _STATUS = {"ok": "passed", "failed": "failed", "ignored": "skipped"}
 
@@ -54,6 +56,7 @@ class _Hook:
     index: SourceIndex
     selection: LibtestSelection
     env: dict[str, str]
+    budget: dict[str, object] | None = None
 
 
 def hook(args: list[str]) -> int:
@@ -79,6 +82,7 @@ def hook(args: list[str]) -> int:
         SourceIndex(Path(config["root"])),
         parse_libtest(libtest_args),
         env,
+        config.get("budget"),
     )
     return _run_binary(context, libtest_args)
 
@@ -133,6 +137,18 @@ def _list(context: _Hook, args: list[str]) -> list[str] | None:
 
 
 def _run_test(context: _Hook, number: int, name: str) -> _Test:
+    """Bound exact libtest startup, body and evidence cleanup together."""
+    category = "integration" if context.binary_id.split("/")[1:2] == ["test"] else "unit"
+    budget = (
+        resolve_test_budget(context.budget, f"{context.binary_id}::{name}", category)
+        if context.budget
+        else None
+    )
+    with test_watchdog(budget) if budget else nullcontext():
+        return _run_test_inner(context, number, name)
+
+
+def _run_test_inner(context: _Hook, number: int, name: str) -> _Test:
     stem = context.work / f"{hashlib.sha256(context.binary.encode()).hexdigest()[:12]}-{number}"
     log = stem.with_suffix(".log")
     profile = Path(f"{stem}-%p.profraw")

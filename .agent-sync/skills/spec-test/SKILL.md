@@ -40,6 +40,8 @@ argument-hint: "<feature-name>"
 
 > **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2), runtime goal contract for autonomous runs (§5).
 
+Read [necessary validation](../../../system/minimal-spec-scope.md#necessary-validation) and [validation budgets](../../../system/testing/execution-rules.md#validation-budgets) before planning, generating or executing tests. Add only distinct behavior/risk/regression proof; reuse adequate passing tests, avoid redundant matrices and stop after relevant checks pass. Preparation/generation/cleanup share the command budget; timeout means stop/diagnose, never identical relaunch or automatic limit inflation.
+
 ## STEP 0 — Goal (autonomous runs)
 
 A goal is required only with `--auto` (for example as a child of `/spec-feature --auto`); interactive runs skip this step. **Read** [runtime goal contract](../../../system/anti-drift-block.md#runtime-goal-contract) for the full protocol.
@@ -75,7 +77,7 @@ Si verdict `PASS`, soumettre `{"conventions_receipt_path":"<receipt_path>"}` au 
 
 # Command: /spec-test
 
-> Post-implementation test validation — audit AC coverage, generate missing tests from Gherkin, execute the full suite, capture visual baselines, and produce a test report.
+> Post-implementation test validation — audit AC coverage, generate missing tests from Gherkin, execute the necessary regression selection, capture visual baselines, and produce a test report.
 
 ## User Journeys v2
 
@@ -106,7 +108,7 @@ flowchart TD
     AO -->|"no"| NG{"--no-generate?"}
     NG -->|"yes"| EXECUTE
     NG -->|"no"| GENERATE["Phase 3 — Generate\nCreate missing tests\nfrom Gherkin scenarios"]
-    GENERATE --> EXECUTE["Phase 4 — Execute\nRun full test suite\n(unit + integration +\nE2E)"]
+    GENERATE --> EXECUTE["Phase 4 — Execute\nRun necessary regression selection\n(unit + integration +\nE2E)"]
     EXECUTE --> VIS{"UI feature\n+ missing\nbaselines?"}
     VIS -->|"yes"| VISUAL["Phase 4.5 — Visual\nCapture missing baselines\n+ design fidelity"]
     VIS -->|"no"| REPORT
@@ -138,7 +140,7 @@ flowchart TD
 | Command | Role | What it does with tests |
 |---|---|---|
 | `/spec-implement` | Creates code + tests during TDD | Runs EXISTING tests as validation gate. Does NOT audit coverage, does NOT generate missing tests |
-| `/spec-test` | Post-implementation test validation | AUDITS coverage against AC, GENERATES missing tests from Gherkin, EXECUTES full suite, REPORTS |
+| `/spec-test` | Post-implementation test validation | AUDITS coverage against AC, GENERATES missing tests from Gherkin, EXECUTES necessary regression selection, REPORTS |
 | `/spec-check` | Static alignment verification | Verifies @spec anchors, FR→code mapping, runs visual regression on existing baselines |
 
 `/spec-test` catches what `/spec-implement` misses: AC that have NO test at all, visual baselines that were skipped (`--no-visual`), and partial test coverage.
@@ -495,7 +497,7 @@ The `taxonomy_hash` is obtained via `git hash-object system/testing/ui-behaviora
 
 ## Phase 4 — Execute
 
-Run the full resolved test suite in order:
+Run the necessary resolved regression selection in order; a full suite requires a concrete changed-scope or unresolved-risk justification:
 
 1. **Type checker** (if resolved) — e.g., `npx tsc --noEmit`
 2. **Linter** (if resolved) — e.g., `npx eslint src/`
@@ -1402,7 +1404,7 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 - [ ] Coverage matrix produced for all AC <!-- evidence:documentary -->
 - [ ] [generate] Missing tests generated <!-- evidence:documentary -->
-- [ ] [test-suite] Full test suite executed <!-- evidence:execution -->
+- [ ] [test-suite] Necessary regression selection executed (full suite only when justified) <!-- evidence:execution -->
 - [ ] [visual] Visual baselines captured for missing screens (or `--no-visual` / non-UI feature) <!-- evidence:documentary -->
 - [ ] [visual] `baselines/baseline.manifest.yml` written after every baseline approval (or `--no-visual`) <!-- evidence:documentary -->
 - [ ] [test-report] Test report saved to `checks/YYYY-MM-DD-test.md` <!-- evidence:documentary -->

@@ -16,8 +16,11 @@ from ..drivers.patch_coverage import parse_lcov
 from ..drivers.runner import run_capability
 from ..drivers.schemas import CapabilityNotImplementedError, DriverManifest
 from ..exceptions import DriverTestSelectionError, FeatureResolutionError
+from ..journeys.paths import relative_to_project
+from ..journeys.runner import run_journeys
 from ..selector import SmartTestSelector
 from ._common import emit_summary
+from .journey_cmd import journey_category_counts
 
 
 def resolve_feature_or_exit(project_root: Path, value: str) -> str:
@@ -176,6 +179,9 @@ def run_mutation_step(project_root: Path, driver: DriverManifest, feature: str |
         typer.echo(mut.stdout)
     if mut.stderr:
         typer.echo(mut.stderr, err=True)
+    if mut.exit_code:
+        emit_summary("test", "FAIL", driver=driver.name, exit_code=mut.exit_code)
+        raise typer.Exit(EXIT_FAILURE)
 
 
 __all__ = [
@@ -185,3 +191,36 @@ __all__ = [
     "run_mutation_step",
     "selected_tests_or_exit",
 ]
+
+
+def run_driver_journeys(
+    project_root: Path, feature: str | None, driver_name: str
+) -> tuple[int, int]:
+    """Report and run selected journeys inside the driver's shared command envelope."""
+    executable_journeys, manual_journeys, disabled_journeys = journey_category_counts(
+        project_root,
+        feature,
+    )
+    # @spec FR-012: Separate journey reporting
+    # — .specs/features/056-executable-user-journeys/spec.md#fr-012
+    typer.echo("Direct tests: driver coverage capability")
+    typer.echo(f"Executable user journeys: {executable_journeys}")
+    typer.echo(f"Manual tests: {manual_journeys}")
+    typer.echo(f"Disabled journeys: {disabled_journeys}")
+    journey_run = run_journeys(project_root, feature=feature)
+    for issue in journey_run.issues:
+        typer.echo(
+            f"{issue.severity.value} {issue.code} "
+            f"{relative_to_project(project_root, issue.path)}: {issue.message}"
+        )
+    if journey_run.error_count:
+        emit_summary(
+            "test",
+            "FAIL",
+            driver=driver_name,
+            journeys=len(journey_run.executed),
+            journey_errors=journey_run.error_count,
+        )
+        raise typer.Exit(EXIT_FAILURE)
+
+    return executable_journeys, manual_journeys

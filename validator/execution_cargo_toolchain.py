@@ -27,6 +27,7 @@ RUNNER_FILES = (
     "execution_cargo_rustc.sh",
     "execution_cargo_toolchain.py",
     "execution_rust_source.py",
+    "execution_test_budget.py",
 )
 _TOOL_KEYS = ("cargo", "llvm_profdata", "llvm_cov")
 

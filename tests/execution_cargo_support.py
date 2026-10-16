@@ -179,7 +179,7 @@ def capture(root: Path, command: list[str], env: dict[str, str] | None = None) -
         feature=FEATURE,
         adapter="junit",
         env=env or cargo_env(root),
-        timeout=600,
+        timeout=30,
         acceptance_mapping=mapping,
     )
     return Path(result.receipt_path)

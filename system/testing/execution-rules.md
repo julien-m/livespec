@@ -12,7 +12,7 @@ Stack-agnostic rules — applies to all ecosystems:
 - **After each implementation step:** run tests targeting the layer just implemented
 - **Transverse checks:** lint + type checker on touched files after each step
 - **Before declaring a step Done:** the Step Gate in `implement.md` requires tests to pass
-- **Before declaring the feature complete:** full suite (unit + integration + E2E if applicable)
+- **Before declaring the feature complete:** the smallest relevant regression selection (unit/integration/E2E only where justified); reuse passing proof when inputs have not changed
 
 All commands come from the **Resolved Test Commands** table. Never hardcode commands.
 
@@ -77,7 +77,7 @@ Before declaring implementation complete, execute in order:
 
 1. Type checker (if applicable)
 2. Linter
-3. Full test suite (unit + integration)
+3. Necessary unit/integration regression selection; run the full suite only when changed scope or a concrete unresolved risk requires it
 4. E2E suite (if applicable)
 5. Visual tests (if applicable and tool available)
 
@@ -86,3 +86,24 @@ All commands come from `plan.md` **Resolved Test Commands**. No hardcoded comman
 ---
 
 *LiveSpec Test Protocol — Execution Rules v1.1*
+
+## Validation budgets
+
+<!-- @spec FR-001: Managed command bounds — .specs/features/095-test-time-budgets/spec.md#fr-001 -->
+<!-- @spec FR-006: Necessary validation — .specs/features/095-test-time-budgets/spec.md#fr-006 -->
+<!-- @spec FR-007: Stop and diagnose — .specs/features/095-test-time-budgets/spec.md#fr-007 -->
+- Apply [necessary validation](../minimal-spec-scope.md#necessary-validation): each added test proves a named behavior, changed branch, concrete risk or regression; reuse sufficient existing tests, avoid duplicate cases and unjustified exhaustive matrices, and stop when relevant checks pass. Broaden or repeat only for a new change, failure or concrete unresolved concern.
+- Ordinary individual limits: unit 2s, integration 10s, acceptance 30s (unclassified means unit). The whole command, including preparation, data generation and cleanup, shares 300s across capabilities. Pytest/Cargo managed instrumentation covers the full test lifecycle. Other managed commands report `command-only`; configure the framework's native per-test timeout or an explicitly bounded selection before execution. Direct shell, separate SDK/journey/device runners and remote jobs are not intercepted by these guards.
+- Resolve strict prior exceptions from `.specs/testing/test-budgets.yaml`: schema version 1, exact original command argv, optional exact collected test id, unique id, category, nonempty reason, command_seconds and test_seconds for a test exception. Every duration is positive, finite and at most 600s. A test above 300s needs a sufficient command-wide companion declaration. A command exception never enlarges unrelated tests. Existing timeout arguments can only tighten the effective maximum.
+- Canonical driver identity: `livespec test`, then present options in order `--feature <resolved-slug>`, `--mutation`, `--no-coverage`. Captures/capabilities use their exact pre-instrumentation argv. Invalid active policy refuses before spawn; nested work cannot extend the enclosing command cap.
+- On timeout, stop the owned execution, report command/test scope, limit, elapsed duration, granularity and diagnostics; exit 124 at execution boundaries cannot certify acceptance or assertion RED. Never reuse a stale report.
+- No identical automatic retry or timeout inflation. At most one retry requires a documented changed cause/new evidence and shares the initial attempt's cumulative 300s (or prior declared maximum ≤600s). Exhaustion remains unresolved. This retry policy governs agents; runner enforcement bounds each invocation without claiming persistent interception of arbitrary shell commands.
+- These changes reach a pinned consumer only after its explicit runtime update/migration; never rewrite a consumer project's pins or tests as part of a tooling change.
+
+Example of a prior command exception (individual tests keep ordinary limits):
+
+```yaml
+schema_version: 1
+exceptions:
+  - {id: capacity, command: [cargo, test, --test, scale], category: benchmark, reason: Required capacity measurement, command_seconds: 600}
+```

@@ -7,6 +7,19 @@
 
 ---
 
+## 2026-10-16 — Bound test execution and require only necessary validation with declared long-running exceptions
+<!-- finalize:spec-feature:2026-10-16:d775ec24 -->
+
+## 2026-10-16 — [Feature 095] Test: 100% AC covered (5/5), 0 tests generated
+
+- Inspect [the test report](features/095-test-time-budgets/run/2026-10-16-test.md): runner-owned certification PASS, 5 tests in 0.61s; independent delivery review pending.
+
+## 2026-10-16 — Plan created: Test Time Budgets — 3 implementation steps, 1 state diagram; necessary tests and bounded recovery
+<!-- finalize:spec-plan:2026-10-16:bb751413 -->
+
+## 2026-10-16 — [Feature 095] Spec created: Test Time Budgets — 3 stories, 5 AC, 7 FR
+<!-- finalize:spec-specify:2026-10-16:e7daafa0 -->
+
 ## 2026-10-15 — Bugfix: [093](features/093-configured-review-identity/changelog.md): a goal `--model` flag without value raises `review_model_required` instead of binding the configured model.
 
 ## 2026-10-15 — [Feature 083] Fix: install applies the installed commit's conventions evidence rules and refuses an incomplete snapshot (FR-001, FR-003)

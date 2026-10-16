@@ -1,0 +1,102 @@
+{
+  "schema_version": "1",
+  "reviewer": {
+    "agent": "/root/delivery_review",
+    "model": "gpt-6.1-sol",
+    "effort": "high"
+  },
+  "verdict": "BLOCKED",
+  "reviewed_files": [
+    ".agent-sync/skills/spec-feature/SKILL.md",
+    ".agent-sync/skills/spec-feature/expectations.md",
+    ".agent-sync/skills/spec-implement/SKILL.md",
+    ".agent-sync/skills/spec-implement/expectations.md",
+    ".agent-sync/skills/spec-plan/SKILL.md",
+    ".agent-sync/skills/spec-plan/expectations.md",
+    ".agent-sync/skills/spec-test/SKILL.md",
+    ".agent-sync/skills/spec-test/expectations.md",
+    ".specs/features/095-test-time-budgets/plan.md",
+    ".specs/features/095-test-time-budgets/spec.md",
+    ".specs/roadmap.md",
+    ".specs/spec-system.md",
+    "README.md",
+    "pyproject.toml",
+    "system/anti-drift-block.md",
+    "system/minimal-spec-scope.md",
+    "system/review-protocol.md",
+    "system/spec-system.md",
+    "system/testing/execution-rules.md",
+    "tests/execution_cargo_support.py",
+    "tests/test_execution_deadline.py",
+    "tests/test_execution_test_budgets.py",
+    "tests/test_test_budget_contracts.py",
+    "tests/test_test_budgets.py",
+    "validator/cli_commands/test_cmd.py",
+    "validator/cli_commands/test_selection.py",
+    "validator/drivers/runner.py",
+    "validator/drivers/schemas.py",
+    "validator/execution_capture.py",
+    "validator/execution_capture_storage.py",
+    "validator/execution_cargo_driver.py",
+    "validator/execution_cargo_hook.py",
+    "validator/execution_cargo_toolchain.py",
+    "validator/execution_deadline.py",
+    "validator/execution_pytest.py",
+    "validator/execution_runner.py",
+    "validator/execution_test_budget.py",
+    "validator/execution_timeout_capture.py",
+    "validator/test_budgets.py"
+  ],
+  "checks": [
+    {
+      "command": "pytest -q tests/test_drivers.py tests/test_execution_capture_policy.py --tb=short",
+      "exit_code": 0
+    },
+    {
+      "command": "pytest -q tests/test_test_budgets.py tests/test_execution_deadline.py tests/test_execution_test_budgets.py tests/test_test_budget_contracts.py tests/test_execution_cargo.py tests/test_cli_unified.py::test_test_subcommand_happy_path tests/test_cli_unified.py::test_mutation_unsupported_exits_3 --tb=short",
+      "exit_code": 1
+    },
+    {
+      "command": "pytest -q tests/test_execution_test_budgets.py::test_real_cargo_exact_test_timeout tests/test_execution_deadline.py --tb=short",
+      "exit_code": 0
+    },
+    {
+      "command": "ruff check <20 changed Python files listed in tool invocation>; ruff format --check <same 20 files>; pyright",
+      "exit_code": 0
+    },
+    {
+      "command": "livespec validate .specs/features/095-test-time-budgets --format compact",
+      "exit_code": 0
+    },
+    {
+      "command": "livespec conventions verify --repo . --feature 095-test-time-budgets --json",
+      "exit_code": 0
+    }
+  ],
+  "findings": [
+    {
+      "severity": "blocking",
+      "file": "validator/execution_deadline.py",
+      "line": 195,
+      "rule": "AC-001 / FR-001 / D-03 total lifecycle budget",
+      "evidence": "run_owned disarms ITIMER_REAL on timeout and returns into _capture_execution, which still calls _manifests and _finish_capture/_publish. A short real child sleeping 1s with timeout=0.15 plus an in-memory 0.4s delay in the second _manifests call returned exit124 after0.567s (budget.elapsed_seconds0.5655). The post-timeout finalization has no active watchdog. timeout_capture after a preparation alarm likewise executes after the one-shot alarm was consumed. Unsuccessful certification does not satisfy the promised finite total command bound.",
+      "correction": "Keep finalization inside an absolute bounded envelope after child termination; ensure both normal timeout finalization and preparation-timeout publication cannot perform unbounded manifests/storage work. Add only a targeted regression for this demonstrated path."
+    },
+    {
+      "severity": "blocking",
+      "file": "validator/execution_runner.py",
+      "line": 77,
+      "rule": "AC-002 / FR-002 honest unsupported granularity",
+      "evidence": "granularity is set to individual-and-command before _prepare_cargo succeeds. Both capture and prepare_uncaptured catch CargoRunnerUnavailable and execute raw Cargo, retaining that granularity. In-memory unavailable-toolchain reproduction returned argv [cargo,test] with scope.evidence.enforcement individual-and-command. Individual guards were not installed.",
+      "correction": "Set individual-and-command only after successful preparation, or explicitly restore command-only on fallback in both captured and uncaptured paths."
+    },
+    {
+      "severity": "blocking",
+      "file": "validator/cli_commands/test_cmd.py",
+      "line": 42,
+      "rule": "Required conventions receipt must be PASS",
+      "evidence": "The supplied receipt .specs/conventions/runs/20261016T032009Z/receipt.json has verdict FAIL, although blockers is empty. It contains error violations test_command115>60 and _run_driver_test65>60. /tmp/095-checks.json exit0/blockers=[] does not establish the required PASS gate.",
+      "correction": "Apply the minimal entry-point extraction already being prepared, obtain a feature-scope receipt with verdict PASS, refresh the prepared scope and review the changed files before approval."
+    }
+  ]
+}

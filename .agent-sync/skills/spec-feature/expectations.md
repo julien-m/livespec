@@ -1,7 +1,7 @@
 ---
 command: spec-feature
 contract_version: "1.0"
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-16
 ---
 
 <!-- @spec(FR-004) -->

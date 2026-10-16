@@ -4,7 +4,7 @@ priority: P1
 feature: 095-test-time-budgets
 created: 2026-10-16
 updated: 2026-10-16
-status: Planned
+status: Implemented
 ---
 
 # Feature Spec: Test Time Budgets
@@ -13,7 +13,7 @@ status: Planned
 - **Feature Number:** 095
 - **Branch:** `main`
 - **Date:** 2026-10-16
-- **Status:** Planned
+- **Status:** Implemented
 - **Input:** A HandoffBox validation plan promoted a large capacity case into a blocking matrix and retried it for hours. The maintainer requests short ordinary tests, declared exceptions for long tests, and protection against repeating this failure.
 
 ## Scope

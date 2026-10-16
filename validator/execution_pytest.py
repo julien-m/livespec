@@ -6,12 +6,14 @@ import ast
 import json
 import os
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 from types import FrameType
 from typing import NamedTuple, Protocol
 
 from _pytest.assertion.rewrite import _call_assertion_pass
-from pytest import Config, Session, StashKey
+from execution_test_budget import read_budget, resolve_test_budget, test_watchdog
+from pytest import Config, Item, Session, StashKey, hookimpl
 
 
 class CaptureContext(NamedTuple):
@@ -36,10 +38,13 @@ class TestItem(Protocol):
 _assertions: list[dict[str, str | int]] = []
 _ASSERTION_DISPATCH_CODE = _call_assertion_pass.__code__
 _CAPTURE_CONTEXT = StashKey[CaptureContext]()
+_BUDGET_POLICY = StashKey[dict[str, object] | None]()
+_TEST_BUDGET = StashKey[dict[str, object]]()
 
 
 def pytest_configure(config: Config) -> None:
     """Resolve runner-owned identity once at session setup, never during test callbacks."""
+    config.stash[_BUDGET_POLICY] = read_budget()
     config.stash[_CAPTURE_CONTEXT] = CaptureContext(
         root=Path(os.environ["LIVESPEC_EXECUTION_PROJECT"]),
         trace=Path(os.environ["LIVESPEC_ASSERTION_TRACE"]),
@@ -149,3 +154,31 @@ def pytest_sessionfinish(session: Session) -> None:
         json.dump(payload, stream)
         stream.flush()
         os.fsync(stream.fileno())
+
+
+def pytest_collection_modifyitems(items: list[Item]) -> None:
+    """Freeze category and exact identity before setup or runtime marker mutation."""
+    for item in items:
+        policy = item.config.stash[_BUDGET_POLICY]
+        if policy is None:
+            continue
+        markers = {
+            name for name in ("unit", "integration", "acceptance") if item.get_closest_marker(name)
+        }
+        if len(markers) > 1:
+            raise ValueError(f"Conflicting test categories for {item.nodeid}")
+        category = next(
+            iter(markers), "integration" if "tests/integration/" in str(item.path) else "unit"
+        )
+        item.stash[_TEST_BUDGET] = resolve_test_budget(policy, item.nodeid, category)
+
+
+@hookimpl(wrapper=True, tryfirst=True)
+def pytest_runtest_protocol(item: Item, nextitem: Item | None) -> Iterator[object]:
+    """The watchdog surrounds the complete pytest setup/call/teardown protocol."""
+    del nextitem
+    budget = item.stash.get(_TEST_BUDGET, None)
+    if budget is None:
+        return (yield)
+    with test_watchdog(budget):
+        return (yield)

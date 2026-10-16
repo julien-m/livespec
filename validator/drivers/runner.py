@@ -12,11 +12,11 @@ from __future__ import annotations
 
 import os
 import shlex
-import subprocess
 from collections.abc import Sequence
 from pathlib import Path
 
 from ..exceptions import DriverTestSelectionError
+from ..execution_deadline import BudgetExpired, command_scope, run_owned
 from .placeholders import resolve_argv_placeholders
 from .preconditions import capability_skip_message
 from .schemas import (
@@ -54,34 +54,44 @@ def run_capability(
     feature: str | None = None,
     test_paths: Sequence[str] | None = None,
 ) -> CapabilityResult:
-    """Execute a capability, retaining gaps when its result cannot certify acceptance.
+    """Run a capability within one bounded preparation/execution lifecycle.
 
-    Args:
-        driver: Driver manifest that owns the capability.
-        capability: Capability name from ``CAPABILITY_NAMES``.
-        project_root: Command working directory; defaults to the current directory.
-        env: Overrides merged onto ``os.environ``; capture owns evidence variables.
-        timeout: Subprocess limit in seconds; captured timeouts return exit 124.
-        feature: Feature bound to receipt capture when a report adapter is declared.
-        test_paths: Selected test files appended to the argv; requires the capability
-            to declare ``test_selection: append`` (feature 035 AC-002).
-
-    Returns:
-        Process output, exit code and certification gaps; missing commands return 127.
-        Captured runs include a receipt path; uncaptured runs cannot certify acceptance.
-
-    Raises:
-        ValueError: Invalid capability, command quoting, runner or capture publication.
-        CapabilityNotImplementedError: The driver does not define the capability.
-        DriverTestSelectionError: ``test_paths`` given to a capability without
-            ``test_selection: append``.
-        FileNotFoundError: A script reference or capture root does not exist.
-        OSError: Process launch or capture storage fails outside handled missing commands.
-        subprocess.TimeoutExpired: An uncaptured command exceeds its timeout.
-
-    Side effects:
-        Runs the command; captured runs persist immutable evidence under .specs/.execution.
+    Report adapter and feature enable captured execution; otherwise results remain
+    uncertified. Existing timeout arguments may only tighten the declared budget.
+    Test selection requires the capability's explicit append support.
     """
+    cwd = project_root or Path.cwd()
+    cap = driver.get_capability(capability)
+    identity = (
+        _capability_argv(driver, capability, cap, cwd)
+        if cap is not None
+        else ["livespec", "capability", capability]
+    )
+    if test_paths is not None and cap is not None:
+        identity = _append_test_paths(driver, capability, cap, identity, test_paths)
+    with command_scope(cwd, identity, timeout):
+        return _run_capability(
+            driver,
+            capability,
+            project_root=project_root,
+            env=env,
+            timeout=timeout,
+            feature=feature,
+            test_paths=test_paths,
+        )
+
+
+def _run_capability(
+    driver: DriverManifest,
+    capability: str,
+    *,
+    project_root: Path | None,
+    env: dict[str, str] | None,
+    timeout: float | None,
+    feature: str | None,
+    test_paths: Sequence[str] | None,
+) -> CapabilityResult:
+    """Resolve one capability within the already active preparation envelope."""
     if capability not in CAPABILITY_NAMES:
         raise ValueError(f"Unknown capability: {capability!r}")
 
@@ -98,9 +108,24 @@ def run_capability(
     argv = _capability_argv(driver, capability, cap, cwd)
     if test_paths is not None:
         argv = _append_test_paths(driver, capability, cap, argv, test_paths)
-    if cap.report_adapter is not None and feature is not None:
-        return _run_captured(cap, capability, argv, cwd, proc_env, timeout, feature)
-    return _run_uncertified(cap, capability, argv, cwd, proc_env, timeout)
+    with command_scope(cwd, argv, timeout) as scope:
+        try:
+            if cap.report_adapter is not None and feature is not None:
+                result = _run_captured(cap, capability, argv, cwd, proc_env, timeout, feature)
+            else:
+                result = _run_uncertified(cap, capability, argv, cwd, proc_env, timeout)
+        except BudgetExpired:
+            scope.timed_out = True
+            result = CapabilityResult(
+                capability_name=capability,
+                exit_code=124,
+                stderr="TIMEOUT during capability preparation",
+            )
+        result.budget = result.budget or scope.evidence()
+        if scope.timed_out:
+            result.exit_code = 124
+            result.certification_gaps.append("Execution timed out; cannot certify acceptance")
+        return result
 
 
 def _skipped_result(capability: str, cap: DriverCapability, skip: str) -> CapabilityResult:
@@ -190,6 +215,7 @@ def _run_captured(
         stderr=captured.stderr,
         report_path=cap.report_path,
         execution_receipt_path=captured.receipt_path,
+        budget=captured.budget,
         certification_gaps=verified.gaps,
     )
 
@@ -203,29 +229,19 @@ def _run_uncertified(
     timeout: float | None,
 ) -> CapabilityResult:
     """Keep legacy subprocess results and coverage-artifact failure semantics."""
-    try:
-        completed = subprocess.run(
-            argv,
-            cwd=str(cwd),
-            env=proc_env,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            check=False,
-        )
-    except FileNotFoundError:
-        return CapabilityResult(
-            capability_name=capability,
-            exit_code=127,
-            stdout="",
-            stderr=f"command not found: {argv[0]}",
-            report_path=cap.report_path,
-        )
+    del timeout
+    from tempfile import TemporaryDirectory
+
+    from ..execution_runner import prepare_uncaptured
+
+    with TemporaryDirectory(prefix="livespec-test-") as directory:
+        argv, proc_env = prepare_uncaptured(argv, cwd, proc_env, Path(directory))
+        code, stdout, stderr = run_owned(argv, cwd, proc_env)
     result = CapabilityResult(
         capability_name=capability,
-        exit_code=completed.returncode,
-        stdout=completed.stdout,
-        stderr=completed.stderr,
+        exit_code=code,
+        stdout=stdout,
+        stderr=stderr,
         report_path=cap.report_path,
     )
     if capability == "coverage" and cap.report_path:
@@ -251,26 +267,19 @@ def run_all_capabilities(
     timeout: float | None = None,
     feature: str | None = None,
 ) -> dict[str, CapabilityResult | None]:
-    """Run declared capabilities sequentially and skip undeclared slots.
+    """Run declared capabilities sequentially within one shared command budget."""
+    with command_scope(project_root or Path.cwd(), ["livespec", "capabilities"], timeout):
+        return _run_all(driver, project_root, env, timeout, feature)
 
-    Args:
-        driver: Driver manifest whose capabilities are exercised.
-        project_root: Command working directory; defaults to the current directory.
-        env: Environment overrides forwarded to each capability.
-        timeout: Per-command subprocess limit in seconds.
-        feature: Feature forwarded to adapter-backed receipt capture for each capability.
 
-    Returns:
-        Capability results with receipts and certification gaps, or None if undeclared.
-
-    Raises:
-        ValueError: A command, runner or capture publication is invalid.
-        OSError: A script/root is missing, launch fails or capture storage fails.
-        subprocess.TimeoutExpired: An uncaptured command exceeds its timeout.
-
-    Side effects:
-        Runs each command and persists adapter-backed execution evidence, as run_capability.
-    """
+def _run_all(
+    driver: DriverManifest,
+    project_root: Path | None,
+    env: dict[str, str] | None,
+    timeout: float | None,
+    feature: str | None,
+) -> dict[str, CapabilityResult | None]:
+    """All capabilities consume one shared invocation deadline."""
     out: dict[str, CapabilityResult | None] = {}
     for cap in CAPABILITY_NAMES:
         try:
