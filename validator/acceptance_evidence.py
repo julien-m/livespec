@@ -61,7 +61,7 @@ def verify_acceptance_evidence(
     runtime_ids = tuple(
         item.requirement_id for item in inventory if item.evidence_kind == "execution"
     )
-    missing: list[str] = []
+    missing = []
     # An all-review inventory has no runtime assertion scope; mixed inventories still do.
     if runtime_ids:
         if receipt is None:
