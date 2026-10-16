@@ -77,6 +77,7 @@ def test_green_capture_is_the_only_bugfix_execution_proof(monkeypatch: pytest.Mo
     assert [t.get("evidence_expected_outcome") for t in execution] == ["passed"]
 
 
+@pytest.mark.integration
 def test_outcome_passed_accepts_current_green_only(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -1,6 +1,6 @@
 # Implementation — Node Vitest Execution Observations
 
-Local implementation is present. Fresh final consumer observations pass. Full acceptance certification, independent delivery review and finalization remain pending. Inspect the [progress checkpoint](progress.md) and [approved plan](plan.md) before resuming.
+Local implementation is present. Fresh final consumer observations pass. Canonical mapping and independent complete-diff review are current and pass. Fresh acceptance execution certification and finalization remain pending; status is explicitly INCOMPLETE/DRAFT. Inspect the [progress checkpoint](progress.md) and [approved plan](plan.md) before resuming.
 
 ## Requirement Mapping
 
@@ -45,3 +45,7 @@ Inspect the real Python assertions; parameterized cases retain exact IDs and req
 - Original consumer inputs/pins and lifecycle remain untouched. Observations certify zero ACs. This is cooperative local provenance, not a same-user JavaScript sandbox.
 
 - Inspect [installed wheel assets and module identity](.reviews/implementation-evidence/wheel-installation.json), [real installed adapter execution](.reviews/implementation-evidence/installed-wheel-adapter.json) and [source CLI witness](.reviews/implementation-evidence/generic-source-cli.json). Whole-wheel CLI import remains a pre-existing missing driver-template packaging limitation; no installed CLI success is claimed.
+
+## Incomplete checkpoint after canonical identity correction
+
+Inspect [the identity/assertion/citation diagnostic](.reviews/implementation-evidence/canonical-junit-diagnostic.json):128/128 observed, passing and grounded against an existing genuine87-case run. The mapping now uses the existing canonical JUnit identity API and has current native raw review/synthesis. This diagnostic does not certify execution: governed mapping/review bytes changed after that run, so its receipt remains stale and certified ACs are empty. A future fresh capture requires an explicitly authorized envelope. No successful goal/archive, finalization or delivery is claimed.

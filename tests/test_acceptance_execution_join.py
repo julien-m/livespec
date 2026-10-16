@@ -99,6 +99,7 @@ def _archive(project, contract, state, monkeypatch):
     )
 
 
+@pytest.mark.acceptance
 def test_real_execution_and_documentary_review_jointly_prove_archive_and_verify(
     project, monkeypatch
 ):
@@ -113,6 +114,7 @@ def test_real_execution_and_documentary_review_jointly_prove_archive_and_verify(
     assert verified.exit_code == 0, verified.output
 
 
+@pytest.mark.acceptance
 @pytest.mark.parametrize("change", ["missing", "forged", "stale"])
 def test_real_runtime_cannot_replace_missing_forged_or_stale_documentary_review(project, change):
     contract, state, evidence = _joined_goal(project)
@@ -128,6 +130,7 @@ def test_real_runtime_cannot_replace_missing_forged_or_stale_documentary_review(
     assert result["state"]["tasks"][task["id"]]["status"] == "pending"
 
 
+@pytest.mark.acceptance
 def test_archive_and_terminal_read_recheck_documentary_review_after_real_execution(
     project, monkeypatch
 ):
@@ -202,6 +205,7 @@ def _legacy_goal(project):
     return contract, state, {"execution_receipt_path": str(run(project))}
 
 
+@pytest.mark.acceptance
 def test_unchanged_policy1_real_capture_archives_and_rechecks_without_current_exemption(
     project, monkeypatch
 ):

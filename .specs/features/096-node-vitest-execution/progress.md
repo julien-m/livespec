@@ -8,7 +8,7 @@ Read the [approved plan](plan.md) for step contracts.
 | 2 | Done | Genuine transport/provenance and installed-wheel adapter API pass; whole-wheel CLI has unrelated pre-existing template packaging limitation. |
 | 3 | Done | CLI and purpose separation pass; current generic task016 accepted from a real Node observation; historical goal bytes unchanged. |
 | 4 | Done | Fresh 46/55 observations valid; anchored two-run Python verification passes with all original consumer inputs unchanged. |
-| 5 | In Progress | All static checks and current conventions PASS; independent full review/manual mapping review pending, then typed capture/finalization/archive. |
+| 5 | In Progress | Official ignored-input capture fix integrated; mapping remains strictly current. Fresh complete-diff review and one new bounded87-ID acceptance capture precede finalization/archive. |
 
 Resume at Step 5 final validation. No native goal created (parent instruction); CLI goal rendered. No consumer lifecycle changes.
 
@@ -28,3 +28,35 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Installed whole-wheel CLI import failed on a pre-existing unbundled driver template; retained as nonqualifying evidence, without broadening this feature.
 - Round 1 independent review and audit blocked on missing evidence. Twelve provenance cases and two preparation/runtime cancellation cases now pass; the task016/archive guard conjunction is being corrected to use the canonical task rather than an exploratory fixture. Mapping and round 2 review remain pending.
 - Remaining: ingest mapping/full review, execute the exact mapped existing Python selection, prove final AC scope, machine finalize, archive and verify output.
+
+## Resumed after the delivered capture fix
+
+- Official baseline fix PR50 (`fe972a39`) was cleanly integrated at `e2ebf782`; no096 implementation or test assertion changed. Parent verified nine green CI checks and preserved114 historical artifacts.
+- New goal: `f9cbd9c9824d3d01e5cda97c1afc71bc1fb57b35e79d8629bb14c1c9695819d6`, active flags `--auto --economy --resume --model=gpt-6.1-sol`. Old goal pairs and nonqualifying captures remain immutable.
+- Inspect [strict current mapping verification](.reviews/implementation-evidence/resume-mapping-current.json):128bindings,87IDs, current receipt and native raw synthesis remain valid; no semantic re-review is required.
+- Inspect [fresh conventions](.reviews/implementation-evidence/resume-conventions.json). Complete-diff review is refreshed for the official capture change.
+- One new exact87-ID campaign is authorized, capped300s including preparation; per-test limits remain2/10/30s. Any capture failure stops for diagnosis, without identical retry. No final certification or successful archive is claimed yet.
+
+## Complete selected-category correction
+
+- The new official capture stopped at96.3268735s: `test_outcome_passed_accepts_current_green_only` launched two real runners but was unclassified unit2s; observed2.010254s. Inspect [the preserved failure](.reviews/implementation-evidence/resume-acceptance-capture.json). No report or AC certification is claimed.
+- Parent authorized one grouped correction after auditing every selected ID. Inspect [all87 categories and exact edits](.reviews/implementation-evidence/resume-category-audit.json): seven decorators on selected functions only, unchanged assertions and caps; final10unit/67integration/10acceptance.
+- Inspect [targeted static results](.reviews/implementation-evidence/resume-category-static-checks.json) and [conventions PASS](.reviews/implementation-evidence/resume-category-conventions.json). Full current source review and native manual mapping review are refreshed for42 files.
+- The mapping retains all128 bindings and exact87 IDs; thirteen spans/hashes shifted only with decorators. Inspect [the frozen collected selection](.reviews/implementation-evidence/resume-category-selection.json). No test trial consumed the remaining budget.
+- After actual native review/synthesis, the sole changed-cause retry is capped200s:96.3268735+200=296.3268735s within the initial300s campaign. Any new failure stops without another correction or retry.
+
+## Explicitly incomplete checkpoint: canonical JUnit mapping
+
+- The sole changed-cause retry genuinely passed87 tests in140.84s, runner exit0; managed budget elapsed144.5536366s. Inspect [immutable result and recovered metadata](.reviews/implementation-evidence/resume-category-capture.json), receipt `bb77dc9596354d47bf8c63637510028b`. Governed mapping/review identities are correctly bound before/after.
+- Strict certification still returned0AC: our manually authored mapping used pytest collection IDs instead of canonical JUnit IDs. All128 assertions were actually observed and independently grounded; the report identity comparison failed. The metadata wrapper's separate serialization error was recovered from published artifacts without rerunning tests.
+- Parent authorized correcting mapping data only via existing `junit_test_id`, preserving all128 bindings,87 raw execution IDs, assertions, coverage, hashes and spans. Inspect [identity-only audit](.reviews/implementation-evidence/canonical-junit-identity-audit.json). It is not execution certification.
+- Exact pre-correction mapping and review bytes were preserved externally as `/private/tmp/livespec-096-resume-20261016/before-junit-mapping.json` and `before-junit-review.json`. No old receipt or budget was modified.
+- Canonical mapping and current native reviews are being prepared for an explicitly incomplete checkpoint/DRAFT. No new capture is authorized; existing captured evidence legitimately becomes stale when governed mapping bytes change.
+- Step5 remains In Progress. No finalize, Implemented status, successful goal/archive, commit, push or Test phase is performed by this implementer.
+
+## Final owner handoff: INCOMPLETE / DRAFT
+
+- Canonical JUnit mapping is now independently reviewed and officially ingested: complete/ready true, errors empty; context `0e3e555cc836148783f0ad2f35f45c26d865f0006c2f5fe80186b6ef62e410fb`,128 bindings and87 unchanged raw execution IDs.
+- Inspect [the final diagnostic](.reviews/implementation-evidence/canonical-junit-diagnostic.json):128 observed,128 passing and128 grounded against the immutable87-case report and364 real assertion callbacks. This is diagnostic only, not execution certification or receipt revalidation. The old capture remains stale for two changed governed inputs; certified ACs remain empty.
+- Current complete-diff review and audit PASS for the frozen42-file scope. The dedicated CI job already runs all five observer modules under300s, binds Node22/local Vitest2.1.9 and rejects any skipped test; consumer receipts remain outside that CI selection.
+- No additional capture is authorized. Parent owns the checkpoint commit and explicitly incomplete DRAFT. Step5 and goal `f9cbd9c9` remain active/In Progress; no finalize, Implemented promotion, successful archive or Test phase occurred.
