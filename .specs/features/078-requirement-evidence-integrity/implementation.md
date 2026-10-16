@@ -11,6 +11,7 @@ Read the [contract](spec.md), [approved plan](plan.md), [progress](progress.md) 
 
 | Requirement | Acceptance scope | Implementation | Regression coverage |
 |---|---|---|---|
+| FR-009, FR-016 | AC-007, AC-015 | Verified 2026-10-16: read [typed policy](../../../validator/evidence_policy.py) and [acceptance conjunction](../../../validator/acceptance_evidence.py). | Read [documentary-only boundary tests](../../../tests/test_documentary_only_acceptance.py). |
 | FR-001 | AC-001, AC-002 | Read [qualified inventory](../../../validator/semantic/review_context.py). | Read [context tests](../../../tests/test_review_context.py). |
 | FR-002 | AC-002 | Read [complete batches](../../../validator/semantic/review_batches.py), [synthesis](../../../validator/semantic/review_synthesis.py) and [lossless synthesis transport](../../../validator/semantic/review_synthesis_transport.py). | Read [paired-plan/blocker tests](../../../tests/test_review_batching.py) and [transport/budget tests](../../../tests/test_review_synthesis_transport.py). |
 | FR-003 | AC-003 | Read [grounded validation](../../../validator/semantic/review_contract.py) and [semantic Analyze](../../../validator/semantic_analysis.py). | Read [semantic gate tests](../../../tests/test_gate_review_evidence.py). |
