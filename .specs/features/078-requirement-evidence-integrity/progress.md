@@ -67,3 +67,7 @@ Capture22c6c801 certifies AC007/AC015 with zero gaps and 3875 passing tests. The
 - Runner-owned RED/GREEN for frozen and reviewed-spec final goals; bugfix ELIGIBLE (5/8 files, 178/300 lines).
 - Targeted regression selection: 55 passed; additional archive transition cases: 2 passed. Independent high review PASS with 49 tests rerun; Ruff, format and Pyright PASS.
 - Acceptance review provenance and all mixed/execution, fix-selection and RED/GREEN observation guards remain in force.
+
+## 2026-10-16 — Governed cache capture bugfix
+
+RED a5afa5c4 and GREEN 01917bd3 prove real mapped assertions in Git-ignored caches and reject later mapping/review tampering. Closing bugfix gate ELIGIBLE; 29 adjacent tests pass. Existing feature acceptance/status remains unchanged.

@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
 
 from tests.execution_evidence_support import AC, FEATURE, run
 from tests.execution_evidence_support import project as project
+from validator.execution_capture import ExecutionCapture
 from validator.execution_evidence import verify_execution_receipt
 from validator.execution_mapping import ingest_mapping_review, prepare_mapping_review
+from validator.execution_scope import digest
 
 
 def test_acceptance_mapping_budget_is_explicit_bounded_and_fingerprint_bound(project: Path) -> None:
@@ -32,7 +35,11 @@ def test_acceptance_mapping_budget_is_explicit_bounded_and_fingerprint_bound(pro
         prepare_mapping_review(project, FEATURE, path)
 
 
-def _capture_cached_mapping(project: Path) -> tuple[Path, Path, Path]:
+def _capture_cached_mapping(project: Path, *, ignored: bool = False) -> tuple[Path, Path, Path]:
+    if ignored:
+        # A real repository reproduces the normal generated-review ignore rule.
+        subprocess.run(["git", "init", "-q", str(project)], check=True, timeout=10)
+        (project / ".gitignore").write_text(".specs/features/*/.reviews/\n")
     cache = project / ".specs/features" / FEATURE / ".reviews"
     cache.mkdir()
     mapping_path = cache / "acceptance-mapping.json"
@@ -48,14 +55,24 @@ def _capture_cached_mapping(project: Path) -> tuple[Path, Path, Path]:
     (project / "acceptance-review.json").unlink()
     path = run(project, mapping=mapping_path.relative_to(project).as_posix())
     assert verify_execution_receipt(path, project, FEATURE).valid
+    capture = ExecutionCapture.model_validate_json((path.parent / "capture.json").read_bytes())
+    for governed in (mapping_path, review_path):
+        relative = governed.relative_to(project).as_posix()
+        assert (
+            capture.raw_before[relative]
+            == capture.raw_after[relative]
+            == digest(governed.read_bytes())
+        )
     return path, mapping_path, review_path
 
 
+@pytest.mark.integration
+@pytest.mark.parametrize("ignored", [False, True])
 @pytest.mark.parametrize("changed", ["mapping", "review"])
 def test_governed_mapping_and_raw_review_cannot_change_inside_generated_cache(
-    project: Path, changed: str
+    project: Path, changed: str, ignored: bool
 ) -> None:
-    path, mapping_path, review_path = _capture_cached_mapping(project)
+    path, mapping_path, review_path = _capture_cached_mapping(project, ignored=ignored)
     # Even a semantically identical JSON rewrite changes governed raw evidence.
     target = mapping_path if changed == "mapping" else review_path
     target.write_text(target.read_text() + "\n")
