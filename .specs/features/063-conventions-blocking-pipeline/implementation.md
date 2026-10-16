@@ -3,7 +3,7 @@ title: Conventions Blocking Pipeline Implementation
 feature: 063-conventions-blocking-pipeline
 status: Implemented
 created: 2026-06-13
-updated: 2026-06-25
+updated: 2026-10-16
 ---
 
 # Implementation — Conventions Blocking Pipeline
@@ -18,7 +18,7 @@ updated: 2026-06-25
 | FR-004 | [`validator/verify_output.py`](../../../validator/verify_output.py), [`validator/expectations.py`](../../../validator/expectations.py) | receipt_verdict parser/evaluator | Implemented | 2026-06-13 |
 | FR-005 | [`validator/verify_output.py`](../../../validator/verify_output.py) | gates-absent skip branch | Implemented | 2026-06-13 |
 | FR-006 | [`validator/goal_contracts.py`](../../../validator/goal_contracts.py) | scoped task-level conventions_receipt_path proof | Implemented | 2026-06-29 |
-| FR-006 | [`validator/cli_commands/conventions_cmd.py`](../../../validator/cli_commands/conventions_cmd.py), [`validator/conventions_gate.py`](../../../validator/conventions_gate.py), [`validator/conventions_feature_scope.py`](../../../validator/conventions_feature_scope.py), [`validator/conventions_gate_types.py`](../../../validator/conventions_gate_types.py), [`tests/test_conventions_verify_scope.py`](../../../tests/test_conventions_verify_scope.py) | conventions receipt CLI and scoped verification | Implemented | 2026-06-25 |
+| FR-006 | [`validator/cli_commands/conventions_cmd.py`](../../../validator/cli_commands/conventions_cmd.py), [`validator/conventions_gate.py`](../../../validator/conventions_gate.py), [`validator/conventions_feature_scope.py`](../../../validator/conventions_feature_scope.py), [`validator/conventions_gate_types.py`](../../../validator/conventions_gate_types.py), [`tests/test_conventions_verify_scope.py`](../../../tests/test_conventions_verify_scope.py), [`tests/test_conventions_noncode_scope.py`](../../../tests/test_conventions_noncode_scope.py) | conventions receipt CLI and scoped verification | Implemented | 2026-10-16 |
 | FR-007 | [`.agent-sync/skills/spec-implement/SKILL.md`](../../../.agent-sync/skills/spec-implement/SKILL.md), [`.agent-sync/skills/spec-test/SKILL.md`](../../../.agent-sync/skills/spec-test/SKILL.md), [`.agent-sync/skills/spec-fix/SKILL.md`](../../../.agent-sync/skills/spec-fix/SKILL.md), [`.agent-sync/skills/spec-*/expectations.md`](../../../.agent-sync/skills/spec-implement/expectations.md), [`tests/test_conventions_pipeline_docs.py`](../../../tests/test_conventions_pipeline_docs.py) | command docs contract | Implemented | 2026-06-25 |
 | FR-008 | [`.agent-sync/agents/livespec-verifier/prompt.md`](../../../.agent-sync/agents/livespec-verifier/prompt.md), [`.agent-sync/agents/livespec-supervisor/prompt.md`](../../../.agent-sync/agents/livespec-supervisor/prompt.md) | prompt hard gate text | Implemented | 2026-06-13 |
 | FR-009 | [`validator/coherence/rules/r7_conventions_gates.py`](../../../validator/coherence/rules/r7_conventions_gates.py), [`validator/coherence/rules/__init__.py`](../../../validator/coherence/rules/__init__.py) | R7 registration | Implemented | 2026-06-13 |
@@ -65,3 +65,9 @@ updated: 2026-06-25
 - Ruff: `ruff check .` passed.
 - Format: `ruff format --check .` passed.
 - Pyright: `0 errors, 0 warnings, 0 informations`.
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-16 | implementation | `tests/test_conventions_noncode_scope.py::test_cli_verify_ci_only_scope_writes_receipt` | `.specs/.execution/b45af31ce51b4f919e0752f5546119b6/receipt.json` | `.specs/.execution/1b3896287423475883ad899d443017eb/receipt.json` |

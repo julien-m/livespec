@@ -101,6 +101,8 @@ livespec conventions verify --report
 livespec conventions supervisor-gate --base-ref <ref> --head-ref <ref>
 ```
 
+Feature-scoped verification resolves mapped source, configuration (`.yaml`, `.yml`, `.json`, `.toml`) and Markdown files from `implementation.md`. CI-only features therefore receive the same conventions receipt; declared linters still enforce their diagnostics, while source AST checks keep their supported language set. Internal `.specs/` artifacts and paths outside the project cannot establish implementation scope.
+
 `livespec conventions verify --json` also emits `source_manifest`, an
 AI-res/ARS corpus inventory with source counts, explicit exclusions, and a
 language/domain matrix.
