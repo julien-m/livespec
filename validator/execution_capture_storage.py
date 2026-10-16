@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import fcntl
 import os
+import time
 import uuid
 from contextlib import suppress
 from pathlib import Path
+
+from .execution_deadline import BudgetExpired, current_deadline, disarm_deadline_alarm
 
 __all__ = ["_open_storage", "_run_directory", "_write_new", "acquire_capture_lock"]
 
@@ -57,11 +60,25 @@ def _run_directory(root: Path) -> tuple[Path, tuple[int, int]]:
 
 
 def acquire_capture_lock(specs_fd: int) -> int:
-    """Publication never waits indefinitely behind another writer after a timeout."""
+    """Serialize publishers within the command deadline (one second without a scope)."""
+    scope = current_deadline()
+    deadline = scope.end if scope else time.monotonic() + 1.0
     descriptor = os.dup(specs_fd)
     try:
-        fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        while True:
+            try:
+                fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                return descriptor
+            except BlockingIOError:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    if scope:
+                        scope.timed_out = True
+                        disarm_deadline_alarm()
+                    raise BudgetExpired(
+                        "command budget exhausted waiting for capture publication"
+                    ) from None
+                time.sleep(min(0.01, remaining))
     except BaseException:
         os.close(descriptor)
         raise
-    return descriptor

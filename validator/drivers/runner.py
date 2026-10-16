@@ -194,7 +194,7 @@ def _run_captured(
 ) -> CapabilityResult:
     """Use runner-owned execution evidence for supported feature-scoped reports."""
     from validator.execution_capture import capture_execution
-    from validator.execution_evidence import verify_execution_receipt
+    from validator.execution_evidence import EvidenceVerification, verify_execution_receipt
 
     assert cap.report_adapter is not None
     captured = capture_execution(
@@ -207,10 +207,16 @@ def _run_captured(
         acceptance_mapping=cap.acceptance_mapping,
         required_report_path=cap.report_path if capability == "coverage" else None,
     )
-    verified = verify_execution_receipt(Path(captured.receipt_path), cwd, feature)
+    verified = (
+        verify_execution_receipt(Path(captured.receipt_path), cwd, feature)
+        if captured.receipt_path
+        else EvidenceVerification(
+            valid=False, certified_acs=[], gaps=captured.gaps or ["No fresh execution receipt"]
+        )
+    )
     return CapabilityResult(
         capability_name=capability,
-        exit_code=captured.exit_code,
+        exit_code=captured.exit_code if captured.receipt_path else captured.exit_code or 1,
         stdout=captured.stdout,
         stderr=captured.stderr,
         report_path=cap.report_path,

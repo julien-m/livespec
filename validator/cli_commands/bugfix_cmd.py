@@ -71,9 +71,12 @@ def capture_command(
         adapter="junit",
         env=dict(os.environ),
     )
-    _, gaps = observe(root, feature, Path(result.receipt_path), expect)
+    if result.receipt_path:
+        _, gaps = observe(root, feature, Path(result.receipt_path), expect)
+    else:
+        gaps = result.gaps or ["No fresh execution receipt"]
     _emit_capture(result.receipt_path, expect, result.exit_code, gaps, as_json)
-    raise typer.Exit(0 if not gaps else 1)
+    raise typer.Exit(124 if result.exit_code == 124 else 0 if not gaps else 1)
 
 
 def _emit_capture(

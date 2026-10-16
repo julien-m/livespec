@@ -21,6 +21,7 @@ from .execution_deadline import (
     arm_finalization,
     command_scope,
     current_deadline,
+    disarm_deadline_alarm,
     run_owned,
 )
 from .execution_runner import CargoRunnerUnavailable, prepare_runner
@@ -104,6 +105,7 @@ def capture_execution(
                 arm_finalization(scope)
                 return timeout_capture(argv, project_root, feature, adapter, scope.evidence())
             except BudgetExpired:
+                disarm_deadline_alarm()
                 return CaptureResult(
                     exit_code=124,
                     stdout="",
@@ -239,9 +241,9 @@ def _manifests(root: Path, feature: str, gaps: list[str]) -> tuple[dict[str, str
 
 def _publish(directory: Path, capture: ExecutionCapture, stdout: str, stderr: str) -> None:
     specs_fd, storage_fd = _open_storage(Path(capture.project_root))
-    lock = acquire_capture_lock(specs_fd)
-    directory_fd = -1
+    lock = directory_fd = -1
     try:
+        lock = acquire_capture_lock(specs_fd)
         directory_fd = os.open(
             capture.invocation, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=storage_fd
         )
@@ -281,7 +283,8 @@ def _publish(directory: Path, capture: ExecutionCapture, stdout: str, stderr: st
     finally:
         if directory_fd >= 0:
             os.close(directory_fd)
-        release_archive_lock(lock)
+        if lock >= 0:
+            release_archive_lock(lock)
         os.close(storage_fd)
         os.close(specs_fd)
 

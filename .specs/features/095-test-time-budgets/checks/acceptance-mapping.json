@@ -12,7 +12,7 @@
       "assertion_path": "tests/test_execution_deadline.py",
       "start_line": 26,
       "end_line": 26,
-      "source_sha256": "8cacce35a4297b7f7b6bf26c365e93b7a4e7783fcc54704b8ca7df7e1b4a8342",
+      "source_sha256": "6a0ae9b00d5624a8f298d63dfe4e5d1a3e1bc0844588d5a4015c93e2ae464e8b",
       "justification": "Derived from the @spec anchor at tests/test_execution_deadline.py:16"
     },
     {
@@ -20,10 +20,10 @@
       "test_id": "tests.test_execution_test_budgets::test_frozen_category_defaults_and_exact_exception",
       "expected": "AC-002: Frozen category limits",
       "assertion_path": "tests/test_execution_test_budgets.py",
-      "start_line": 69,
-      "end_line": 72,
-      "source_sha256": "6c7f8feb78057948de78849fcdaf157d79a01d706446351318c3365cf3eb4dc6",
-      "justification": "Derived from the @spec anchor at tests/test_execution_test_budgets.py:67"
+      "start_line": 80,
+      "end_line": 83,
+      "source_sha256": "b01376eac0f1dc1529551c5e00dfc3713d0cf540255d693743ab300b5ad021c4",
+      "justification": "Derived from the @spec anchor at tests/test_execution_test_budgets.py:78"
     },
     {
       "requirement_id": "095-test-time-budgets:AC-003",
@@ -32,7 +32,7 @@
       "assertion_path": "tests/test_execution_deadline.py",
       "start_line": 46,
       "end_line": 46,
-      "source_sha256": "8cacce35a4297b7f7b6bf26c365e93b7a4e7783fcc54704b8ca7df7e1b4a8342",
+      "source_sha256": "6a0ae9b00d5624a8f298d63dfe4e5d1a3e1bc0844588d5a4015c93e2ae464e8b",
       "justification": "Derived from the @spec anchor at tests/test_execution_deadline.py:44"
     },
     {

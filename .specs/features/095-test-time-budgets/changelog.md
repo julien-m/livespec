@@ -68,3 +68,13 @@
 - **AC impacted:** AC-001 to AC-005 recertified with 15 passing assertions.
 - **Validation:** 51 affected tests pass in 0.81s; locked mypy, Pyright and Ruff/format pass. Inspect [the current report](.reviews/test-report.md) for the five acceptance tests and current receipt. Conventions PASS; current independent review is refreshed before commit.
 - **Author:** Codex
+
+
+## 2026-10-16 — Bugfix: Address publication and timeout review findings
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** Publication waits within the managed deadline and closes owned descriptors on expiry; three capture consumers handle absent receipts as non-certifying failures; nested evidence distinguishes the effective remaining budget from the declared maximum.
+- **AC impacted:** AC-001, AC-003 and AC-004.
+- **Validation:** Three necessary regressions pass in 0.69s and seven affected neighbors pass in 5.94s. Locked Ruff/format/mypy/Pyright and conventions pass; current acceptance and independent delivery review are refreshed before commit.
+- **Author:** Codex

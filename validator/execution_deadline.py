@@ -41,9 +41,14 @@ class ExecutionDeadline:
         return min(own_end, self.outer_end) if self.outer_end is not None else own_end
 
     @property
+    def effective_seconds(self) -> float:
+        """Budget available at entry, distinct from the policy maximum used by tests."""
+        return max(0.0, self.end - self.started)
+
+    @property
     def reserve(self) -> float:
         """Reserve at most 200ms inside the envelope for termination escalation."""
-        return min(0.2, self.seconds / 10)
+        return min(0.2, self.effective_seconds / 10)
 
     def remaining(self) -> float:
         """Remaining work allowance, excluding the cleanup reserve."""
@@ -54,7 +59,8 @@ class ExecutionDeadline:
         exception = self.policy.matching(self.argv)
         return {
             "scope": self.argv,
-            "command_seconds": self.seconds,
+            "command_seconds": self.effective_seconds,
+            "declared_command_seconds": self.seconds,
             "individual_seconds": self.policy.frozen(self.argv, self.seconds)["defaults"],
             "test_exceptions": self.policy.frozen(self.argv, self.seconds)["exceptions"],
             "elapsed_seconds": time.monotonic() - self.started,
@@ -78,7 +84,7 @@ def _expired(_signum: int, _frame: object) -> None:
     if scope:
         scope.timed_out = True
     detail = (
-        f"scope={scope.argv!r} limit={scope.seconds}s "
+        f"scope={scope.argv!r} limit={scope.effective_seconds}s "
         f"elapsed={time.monotonic() - scope.started:.3f}s enforcement={scope.granularity}"
         if scope
         else "no active scope"
@@ -96,7 +102,9 @@ def command_scope(
     maximum = policy.command_limit(argv, timeout)
     if parent:
         maximum = min(maximum, parent.seconds)
-    scope = ExecutionDeadline(policy, argv, maximum, outer_end=parent.end if parent else None)
+    scope = ExecutionDeadline(
+        policy, argv, maximum, started=time.monotonic(), outer_end=parent.end if parent else None
+    )
     if threading.current_thread() is not threading.main_thread() or not hasattr(
         signal, "setitimer"
     ):
@@ -157,6 +165,17 @@ def arm_finalization(scope: ExecutionDeadline) -> None:
     if remaining <= 0:
         raise BudgetExpired("command budget exhausted before evidence publication")
     signal.setitimer(signal.ITIMER_REAL, remaining)
+
+
+def disarm_deadline_alarm() -> None:
+    """Drain an owned pending alarm before returning an already-expired outcome."""
+    masked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
+    try:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        if signal.SIGALRM in signal.sigpending():
+            signal.sigwait({signal.SIGALRM})
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, masked)
 
 
 def _signal_group(pid: int, signum: int) -> str:

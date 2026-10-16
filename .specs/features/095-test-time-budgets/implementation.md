@@ -10,7 +10,7 @@ Local implementation and targeted checks are recorded below. All implementation 
 | [FR-002](spec.md#fr-002) | [execution_test_budget.py](../../../validator/execution_test_budget.py), [execution_pytest.py](../../../validator/execution_pytest.py), [execution_cargo_hook.py](../../../validator/execution_cargo_hook.py) | `@spec FR-002` | Implemented; pytest and Cargo timeout proof pass | 2026-10-16 |
 | [FR-003](spec.md#fr-003) | [execution_deadline.py](../../../validator/execution_deadline.py), [execution_capture_storage.py](../../../validator/execution_capture_storage.py) | `@spec FR-003` | Implemented; bounded TERM/KILL and pipe proof pass | 2026-10-16 |
 | [FR-004](spec.md#fr-004) | [test_budgets.py](../../../validator/test_budgets.py) | `@spec FR-004` | Implemented; strict policy proof passes | 2026-10-16 |
-| [FR-005](spec.md#fr-005) | [execution_capture.py](../../../validator/execution_capture.py), [execution_timeout_capture.py](../../../validator/execution_timeout_capture.py) | `@spec FR-005` | Implemented; normal receipts and timeout refusal verified | 2026-10-16 |
+| [FR-005](spec.md#fr-005) | [execution_capture.py](../../../validator/execution_capture.py), [execution_timeout_capture.py](../../../validator/execution_timeout_capture.py), [execution_io.py](../../../validator/cli_commands/execution_io.py), [bugfix_cmd.py](../../../validator/cli_commands/bugfix_cmd.py) | `@spec FR-005` | Implemented; normal receipts and timeout refusal verified | 2026-10-16 |
 | [FR-006](spec.md#fr-006) | [minimal-spec-scope.md](../../../system/minimal-spec-scope.md), [review-protocol.md](../../../system/review-protocol.md), [execution-rules.md](../../../system/testing/execution-rules.md) | `@spec FR-006` | Implemented; contract PASS; delivery review recorded PASS | 2026-10-16 |
 | [FR-007](spec.md#fr-007) | [anti-drift-block.md](../../../system/anti-drift-block.md), [execution-rules.md](../../../system/testing/execution-rules.md) | `@spec FR-007` | Implemented; contract PASS; delivery review recorded PASS | 2026-10-16 |
 
@@ -38,18 +38,20 @@ Local implementation and targeted checks are recorded below. All implementation 
 - Initial driver/capture regression: 57 PASS in 7.45s.
 - Consolidated policy/deadline/instrumentation/contracts/Cargo/CLI selection: 31 PASS with one cleanup EPERM failure in 13.49s; after handling this observed kernel error as an explicit cleanup diagnostic, affected Cargo/deadline checks: 4 PASS in 2.11s. No assertion or timeout was weakened.
 - Final changed-scope Ruff/format and full configured Pyright pass with 0 errors. Atomic SIGALRM restoration was checked after its final source change; final acceptance capture is current.
-- Doctor: 0 errors, 23 pre-existing warnings. Inspect [the current conventions receipt](../../conventions/runs/20261016T040255Z/receipt.json): PASS, no errors or blockers.
+- Doctor: 0 errors, 23 pre-existing warnings. Inspect [the current conventions receipt](../../conventions/runs/20261016T042049Z/receipt.json): PASS, no errors or blockers.
 - A kernel denial while terminating an owned group remains a visible cleanup gap and an unsuccessful timeout. Detached/remote jobs and direct shell/SDK/device surfaces are outside executable interception; unsupported individual hooks report command-only enforcement.
 - Independent delivery review is recorded and verified PASS; deterministic feature finalization is verified PASS. Git records repository delivery.
 
 ## Current acceptance execution
 
-- Inspect [the test report](.reviews/test-report.md) and [the derived mapping](checks/acceptance-mapping.json): 5/5 AC certified, 5 tests PASS in 0.63s, 0 tests generated.
-- Inspect [the current execution receipt](../../.execution/0ad600da923c456cab784772c8240fa8/receipt.json): valid=true, all five AC, gaps=[].
-- Inspect [the current conventions receipt](../../conventions/runs/20261016T040255Z/receipt.json): PASS, no errors or blockers. Delivery review and feature finalization are recorded and verified PASS.
+- Inspect [the test report](.reviews/test-report.md) and [the derived mapping](checks/acceptance-mapping.json): 5/5 AC certified, 5 tests PASS in 1.10s, 0 tests generated.
+- Inspect [the current execution receipt](../../.execution/db152036d7224a8c86a9e6cb0bade955/receipt.json): valid=true, all five AC, gaps=[].
+- Inspect [the current conventions receipt](../../conventions/runs/20261016T042049Z/receipt.json): PASS, no errors or blockers. Delivery review and feature finalization are recorded and verified PASS.
 
 - Latest acceptance recapture follows annotation-only compatibility correction for CI Pyright 1.1.411 (`Iterator` to `Generator` on two context managers); behavior unchanged. Inspect [the current report](.reviews/test-report.md): all five AC certified with current source bytes.
 
 - Current acceptance recapture follows the final strict-mypy typing-only correction, using the stable global CLI/pytest interpreter. Inspect [the current report](.reviews/test-report.md): five AC certified, gaps=[]. The supervisor reports locked CI-toolchain mypy PASS (779 files), Pyright 1.1.411 PASS (0 errors), Ruff/format PASS and 83 neighboring runner/CLI/evidence regressions PASS in 24.43s; no broad suite was repeated by this phase.
 
 - Current acceptance capture was refreshed once after the four legacy-test compatibility changes entered the source manifest; no production behavior changed. Inspect [the current report](.reviews/test-report.md): valid=true, five AC, 15 assertions, gaps=[]. Existing legacy selection was reported by the supervisor as 51 PASS in 0.81s; this phase ran no other suite.
+
+- Current capture follows the three production-review corrections and the supervisor-refreshed five-binding acceptance mapping: valid=true, 5/5 AC, 15 assertions, gaps=[]. Inspect [the current report](.reviews/test-report.md). The intervening mapping-staleness attempt remains unsuccessful historical evidence; no assertion or requirement was weakened.

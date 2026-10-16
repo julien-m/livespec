@@ -70,3 +70,38 @@ def test_normal_result_retains_stdout_and_status(tmp_path: Path) -> None:
         result = run_owned(argv, tmp_path, dict(os.environ))
     assert result == (0, "normal\n", "")
     assert scope.evidence()["timed_out"] is False
+
+
+def test_nested_evidence_reports_remaining_without_invalidating_declared_tests(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Prior work shrinks effective time, while a valid test declaration keeps its maximum."""
+    from validator import execution_deadline
+    from validator.execution_test_budget import resolve_test_budget
+    from validator.test_budgets import BudgetException, BudgetPolicy
+
+    clock = [1000.0]
+    policy = BudgetPolicy(
+        exceptions=(
+            BudgetException(
+                id="capacity",
+                command=("coverage",),
+                test="slow",
+                category="benchmark",
+                reason="Required capacity proof",
+                command_seconds=300.0,
+                test_seconds=250.0,
+            ),
+        )
+    )
+    monkeypatch.setattr(execution_deadline, "load_budget_policy", lambda _root: policy)
+    monkeypatch.setattr(execution_deadline.time, "monotonic", lambda: clock[0])
+    with command_scope(tmp_path, ["validation"]) as parent:
+        clock[0] += 100
+        with command_scope(tmp_path, ["coverage"]) as nested:
+            assert nested.end == parent.end
+            assert nested.evidence()["command_seconds"] == 200
+            assert nested.evidence()["declared_command_seconds"] == 300
+            assert nested.reserve == min(0.2, nested.effective_seconds / 10)
+            frozen = nested.policy.frozen(nested.argv, nested.seconds)
+            assert resolve_test_budget(frozen, "slow", "unit")["test_seconds"] == 250
