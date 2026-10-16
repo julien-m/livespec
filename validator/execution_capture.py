@@ -24,8 +24,15 @@ from .execution_deadline import (
     disarm_deadline_alarm,
     run_owned,
 )
+from .execution_mapping import AcceptanceMapping
 from .execution_runner import CargoRunnerUnavailable, prepare_runner
-from .execution_scope import EXECUTION_SCOPE_POLICY, digest, read_from_directory, source_manifest
+from .execution_scope import (
+    EXECUTION_SCOPE_POLICY,
+    digest,
+    read_from_directory,
+    read_regular,
+    source_manifest,
+)
 from .goal_archive_file import release_archive_lock
 
 
@@ -140,7 +147,7 @@ def _capture_execution(
         gaps.append(f"Unsupported runner: {exc}")
     if not provenance and not gaps:
         gaps.append("Unsupported runner: structured reports alone cannot certify execution")
-    raw_before, before = _manifests(root, feature, gaps)
+    raw_before, before = _manifests(root, feature, gaps, acceptance_mapping)
     started = time.time_ns()
     code, stdout, stderr = _invoke(
         argv, root, directory, feature, env, timeout, required_report_path, gaps
@@ -152,7 +159,7 @@ def _capture_execution(
         after: dict[str, str] = {}
         gaps.append("Post-execution source snapshot omitted after timeout")
     else:
-        raw_after, after = _manifests(root, feature, gaps)
+        raw_after, after = _manifests(root, feature, gaps, acceptance_mapping)
     capture = ExecutionCapture(
         acceptance_evidence_policy="2",
         invocation=directory.name,
@@ -229,14 +236,33 @@ def _invoke(
     return code, stdout, stderr
 
 
-def _manifests(root: Path, feature: str, gaps: list[str]) -> tuple[dict[str, str], dict[str, str]]:
+def _manifests(
+    root: Path, feature: str, gaps: list[str], acceptance_mapping: str | None = None
+) -> tuple[dict[str, str], dict[str, str]]:
     try:
-        return source_manifest(root), source_manifest(root, feature)
+        raw = source_manifest(root)
+        if acceptance_mapping:
+            raw.update(_acceptance_inputs(root, acceptance_mapping))
+        return raw, source_manifest(root, feature)
     except (OSError, ValueError) as exc:
         # Unsupported scope does not prevent the user's command from running;
         # the explicit gap prevents this capture from certifying it.
         gaps.append(f"Execution input scope unavailable: {exc}")
         return {}, {}
+
+
+# @spec FR-010: Bind governed runner inputs
+#   — .specs/features/078-requirement-evidence-integrity/spec.md#fr-010
+def _acceptance_inputs(root: Path, relative: str) -> dict[str, str]:
+    """Bind governed raw bytes even when Git excludes their generated cache."""
+    path = root / relative
+    raw = read_regular(path, root)
+    mapping = AcceptanceMapping.model_validate_json(raw)
+    inputs = {path.relative_to(root).as_posix(): digest(raw)}
+    if mapping.derivation == "review":
+        review = root / mapping.review_receipt_path
+        inputs[review.relative_to(root).as_posix()] = digest(read_regular(review, root))
+    return inputs
 
 
 def _publish(directory: Path, capture: ExecutionCapture, stdout: str, stderr: str) -> None:

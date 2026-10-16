@@ -256,3 +256,16 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/56e45aefdf574871927347a14ea70e0f/receipt.json`
 - **GREEN receipt:** `.specs/.execution/9ad8beec4d00468dbdc5b60e866bfb82/receipt.json`
 <!-- bugfix:9ad8beec4d00468dbdc5b60e866bfb82 -->
+
+## 2026-10-16 — [Bugfix]: Bind ignored acceptance mapping and raw review inputs in execution captures
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .specs/livespec.lock, tests/test_execution_mapping.py, validator/execution_capture.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_mapping.py::test_governed_mapping_and_raw_review_cannot_change_inside_generated_cache[mapping-True], tests/test_execution_mapping.py::test_governed_mapping_and_raw_review_cannot_change_inside_generated_cache[review-True]
+- **RED receipt:** `.specs/.execution/a5afa5c4870749d0bfcf0b35f80bc286/receipt.json`
+- **GREEN receipt:** `.specs/.execution/01917bd3a4b445ceac4993164733cdbe/receipt.json`
+<!-- bugfix:01917bd3a4b445ceac4993164733cdbe -->
