@@ -58,3 +58,13 @@
 - **AC impacted:** AC-001 to AC-005 recertified with 15 passing assertions.
 - **Validation:** Locked CI dependencies: mypy passes 779 files, Pyright passes, Ruff/format pass, and 83 neighboring execution/CLI regressions pass. Current conventions and refreshed independent delivery review PASS.
 - **Author:** Codex
+
+
+## 2026-10-16 — Bugfix: Preserve existing tests across runner and validation changes
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** Four existing test modules now mock the owned runner boundary and identify execution obligations by their semantic fields; exact arguments, evidence requirements and inactive modes remain asserted. No new cases or production changes.
+- **AC impacted:** AC-001 to AC-005 recertified with 15 passing assertions.
+- **Validation:** 51 affected tests pass in 0.81s; locked mypy, Pyright and Ruff/format pass. Inspect [the current report](.reviews/test-report.md) for the five acceptance tests and current receipt. Conventions PASS; current independent review is refreshed before commit.
+- **Author:** Codex

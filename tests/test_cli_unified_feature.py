@@ -74,10 +74,7 @@ class TestRunCapabilitySelection:
         )
 
     def test_append_adds_paths_after_command(self, tmp_path: Path) -> None:
-        with patch("validator.drivers.runner.subprocess.run") as run_mock:
-            run_mock.return_value.returncode = 0
-            run_mock.return_value.stdout = ""
-            run_mock.return_value.stderr = ""
+        with patch("validator.drivers.runner.run_owned", return_value=(0, "", "")) as run_mock:
             run_capability(
                 self._driver("append"),
                 "coverage",

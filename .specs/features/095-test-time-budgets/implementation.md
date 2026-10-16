@@ -38,16 +38,18 @@ Local implementation and targeted checks are recorded below. All implementation 
 - Initial driver/capture regression: 57 PASS in 7.45s.
 - Consolidated policy/deadline/instrumentation/contracts/Cargo/CLI selection: 31 PASS with one cleanup EPERM failure in 13.49s; after handling this observed kernel error as an explicit cleanup diagnostic, affected Cargo/deadline checks: 4 PASS in 2.11s. No assertion or timeout was weakened.
 - Final changed-scope Ruff/format and full configured Pyright pass with 0 errors. Atomic SIGALRM restoration was checked after its final source change; final acceptance capture is current.
-- Doctor: 0 errors, 23 pre-existing warnings. Inspect [the current conventions receipt](../../conventions/runs/20261016T034413Z/receipt.json): PASS, no errors or blockers.
+- Doctor: 0 errors, 23 pre-existing warnings. Inspect [the current conventions receipt](../../conventions/runs/20261016T040255Z/receipt.json): PASS, no errors or blockers.
 - A kernel denial while terminating an owned group remains a visible cleanup gap and an unsuccessful timeout. Detached/remote jobs and direct shell/SDK/device surfaces are outside executable interception; unsupported individual hooks report command-only enforcement.
 - Independent delivery review is recorded and verified PASS; deterministic feature finalization is verified PASS. Git records repository delivery.
 
 ## Current acceptance execution
 
-- Inspect [the test report](.reviews/test-report.md) and [the derived mapping](checks/acceptance-mapping.json): 5/5 AC certified, 5 tests PASS in 0.62s, 0 tests generated.
-- Inspect [the current execution receipt](../../.execution/fdc7d6d3a51f4c78bd231f7d416ff79e/receipt.json): valid=true, all five AC, gaps=[].
-- Inspect [the current conventions receipt](../../conventions/runs/20261016T034413Z/receipt.json): PASS, no errors or blockers. Delivery review and feature finalization are recorded and verified PASS.
+- Inspect [the test report](.reviews/test-report.md) and [the derived mapping](checks/acceptance-mapping.json): 5/5 AC certified, 5 tests PASS in 0.63s, 0 tests generated.
+- Inspect [the current execution receipt](../../.execution/0ad600da923c456cab784772c8240fa8/receipt.json): valid=true, all five AC, gaps=[].
+- Inspect [the current conventions receipt](../../conventions/runs/20261016T040255Z/receipt.json): PASS, no errors or blockers. Delivery review and feature finalization are recorded and verified PASS.
 
 - Latest acceptance recapture follows annotation-only compatibility correction for CI Pyright 1.1.411 (`Iterator` to `Generator` on two context managers); behavior unchanged. Inspect [the current report](.reviews/test-report.md): all five AC certified with current source bytes.
 
 - Current acceptance recapture follows the final strict-mypy typing-only correction, using the stable global CLI/pytest interpreter. Inspect [the current report](.reviews/test-report.md): five AC certified, gaps=[]. The supervisor reports locked CI-toolchain mypy PASS (779 files), Pyright 1.1.411 PASS (0 errors), Ruff/format PASS and 83 neighboring runner/CLI/evidence regressions PASS in 24.43s; no broad suite was repeated by this phase.
+
+- Current acceptance capture was refreshed once after the four legacy-test compatibility changes entered the source manifest; no production behavior changed. Inspect [the current report](.reviews/test-report.md): valid=true, five AC, 15 assertions, gaps=[]. Existing legacy selection was reported by the supervisor as 51 PASS in 0.81s; this phase ran no other suite.

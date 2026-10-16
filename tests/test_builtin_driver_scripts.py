@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 from pathlib import Path
 
 import pytest
@@ -18,15 +17,13 @@ def test_builtin_script_capability_runs_shipped_script_in_any_project(
     driver = next(m for m in DriverRegistry(tmp_path).discover() if m.name == "go")
     launched: list[list[str]] = []
 
-    def fake_run(argv: list[str], **_: object) -> object:
+    def fake_run(argv: list[str], _root: Path, _env: dict[str, str]) -> tuple[int, str, str]:
         launched.append(argv)
-        raise FileNotFoundError(argv[0])  # stop before executing the real gate
+        return 127, "", "not executed: inspect the owned-process boundary"
 
-    monkeypatch.setattr("validator.drivers.runner.subprocess.run", fake_run)
+    monkeypatch.setattr("validator.drivers.runner.run_owned", fake_run)
 
-    # Either the launcher (fixed) or the script lookup (bug) raises; the launch list decides.
-    with contextlib.suppress(FileNotFoundError):
-        run_capability(driver, "coverage", project_root=tmp_path)
+    run_capability(driver, "coverage", project_root=tmp_path)
 
     assert driver.source_path is not None
     shipped = driver.source_path.parent / "scripts" / "go-coverage-gate.sh"

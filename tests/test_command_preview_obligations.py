@@ -86,7 +86,11 @@ def test_test_report_generation_and_full_suite_follow_the_effective_mode(
     tasks = contract["tasks"]
     descriptions = contract["checklist"]
     assert bool([text for text in descriptions if text.startswith(REPORT_WRITES)]) is persists
-    full = [task for task in tasks if task["description"].startswith("Full test suite executed")]
+    full = [
+        task
+        for task in tasks
+        if task.get("category") == "definition_of_done" and task.get("evidence_kind") == "execution"
+    ]
     assert bool(full) is executes
     assert (
         bool([text for text in descriptions if text.startswith("Missing tests generated")])
@@ -119,7 +123,11 @@ def test_full_suite_cli_proof_rejects_prose_and_keeps_the_task_pending(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     goal = _goal(tmp_path, "spec-test", "", False)
-    task = next(t for t in goal.payload["tasks"] if t["description"] == "Full test suite executed")
+    task = next(
+        t
+        for t in goal.payload["tasks"]
+        if t.get("category") == "definition_of_done" and t.get("evidence_kind") == "execution"
+    )
     contract = tmp_path / "contract.json"
     state = tmp_path / "state.json"
     contract.write_text(render_goal_contract_file(goal))
