@@ -13,7 +13,11 @@ def test_visual_prerequisite_distinguishes_failed_suite_from_unrequested_suite(
     tmp_path: Path, flags: str, suite_active: bool
 ) -> None:
     tasks = checklist_tasks(_goal(tmp_path, "spec-test", flags, True).payload)
-    suite = [task for task in tasks if task["description"] == "Full test suite executed"]
+    suite = [
+        task
+        for task in tasks
+        if task.get("category") == "definition_of_done" and task.get("evidence_kind") == "execution"
+    ]
     assert bool(suite) is suite_active
     if suite:
         assert suite[0]["required_evidence"] == ["execution_receipt_path"]
@@ -51,4 +55,7 @@ def test_inactive_visual_modes_have_no_capture_prerequisite_or_visual_receipt_ta
     assert not any("Skip phase 4.5" in task["description"] for task in tasks)
     assert not any("visual-gate validate" in task["description"] for task in tasks)
     assert not any("After runtime capture and approval" in task["description"] for task in tasks)
-    assert not any(task["description"] == "Full test suite executed" for task in tasks)
+    assert not any(
+        task.get("category") == "definition_of_done" and task.get("evidence_kind") == "execution"
+        for task in tasks
+    )

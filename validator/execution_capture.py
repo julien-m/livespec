@@ -4,18 +4,29 @@ from __future__ import annotations
 
 import json
 import os
-import subprocess
 import time
-import uuid
-from contextlib import suppress
 from pathlib import Path
 from typing import cast
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .execution_capture_storage import (
+    _open_storage,
+    _run_directory,
+    _write_new,
+    acquire_capture_lock,
+)
+from .execution_deadline import (
+    BudgetExpired,
+    arm_finalization,
+    command_scope,
+    current_deadline,
+    disarm_deadline_alarm,
+    run_owned,
+)
 from .execution_runner import CargoRunnerUnavailable, prepare_runner
 from .execution_scope import EXECUTION_SCOPE_POLICY, digest, read_from_directory, source_manifest
-from .goal_archive_file import acquire_archive_lock, release_archive_lock
+from .goal_archive_file import release_archive_lock
 
 
 class ExecutionCapture(BaseModel):
@@ -45,6 +56,9 @@ class ExecutionCapture(BaseModel):
     stdout_sha256: str
     stderr_sha256: str
     acceptance_mapping: str | None = None
+    # @spec FR-005: Effective limits and timeout provenance
+    # — .specs/features/095-test-time-budgets/spec.md#fr-005
+    budget: dict[str, object] | None = None
     gaps: list[str] = Field(default_factory=list)
 
 
@@ -55,52 +69,8 @@ class CaptureResult(BaseModel):
     stdout: str
     stderr: str
     receipt_path: str
+    budget: dict[str, object] | None = None
     gaps: list[str]
-
-
-def _write_new(directory_fd: int, name: str, data: bytes) -> None:
-    descriptor = os.open(
-        name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=directory_fd
-    )
-    with os.fdopen(descriptor, "wb") as stream:
-        stream.write(data)
-        stream.flush()
-        os.fsync(stream.fileno())
-        os.fchmod(stream.fileno(), 0o400)
-
-
-def _open_storage(root: Path) -> tuple[int, int]:
-    root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-    specs_fd = -1
-    try:
-        # Existing directories must still pass the descriptor no-follow checks.
-        with suppress(FileExistsError):
-            os.mkdir(".specs", mode=0o700, dir_fd=root_fd)
-        specs_fd = os.open(".specs", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=root_fd)
-        with suppress(FileExistsError):
-            os.mkdir(".execution", mode=0o700, dir_fd=specs_fd)
-        storage_fd = os.open(
-            ".execution", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=specs_fd
-        )
-        return specs_fd, storage_fd
-    except BaseException:
-        if specs_fd >= 0:
-            os.close(specs_fd)
-        raise
-    finally:
-        os.close(root_fd)
-
-
-def _run_directory(root: Path) -> tuple[Path, tuple[int, int]]:
-    specs_fd, storage_fd = _open_storage(root)
-    try:
-        nonce = uuid.uuid4().hex
-        os.mkdir(nonce, mode=0o700, dir_fd=storage_fd)
-        created = os.stat(nonce, dir_fd=storage_fd, follow_symlinks=False)
-        return root / ".specs/.execution" / nonce, (created.st_dev, created.st_ino)
-    finally:
-        os.close(storage_fd)
-        os.close(specs_fd)
 
 
 def capture_execution(
@@ -114,7 +84,51 @@ def capture_execution(
     acceptance_mapping: str | None = None,
     required_report_path: str | None = None,
 ) -> CaptureResult:
+    """Include runner preparation and evidence capture in the managed deadline."""
+    from .execution_timeout_capture import timeout_capture
+
+    with command_scope(project_root, argv, timeout) as scope:
+        try:
+            return _capture_execution(
+                argv,
+                project_root=project_root,
+                feature=feature,
+                adapter=adapter,
+                env=env,
+                timeout=timeout,
+                acceptance_mapping=acceptance_mapping,
+                required_report_path=required_report_path,
+            )
+        except BudgetExpired as exc:
+            scope.timed_out = True
+            try:
+                arm_finalization(scope)
+                return timeout_capture(argv, project_root, feature, adapter, scope.evidence())
+            except BudgetExpired:
+                disarm_deadline_alarm()
+                return CaptureResult(
+                    exit_code=124,
+                    stdout="",
+                    stderr=f"TIMEOUT: {exc}; no fresh receipt finalized within command budget",
+                    receipt_path="",
+                    budget=scope.evidence(),
+                    gaps=["Command budget exhausted; no fresh execution receipt"],
+                )
+
+
+def _capture_execution(
+    argv: list[str],
+    *,
+    project_root: Path,
+    feature: str,
+    adapter: str,
+    env: dict[str, str],
+    timeout: float | None = None,
+    acceptance_mapping: str | None = None,
+    required_report_path: str | None = None,
+) -> CaptureResult:
     """Execute once with fresh report env; retain honest gaps on insufficient proof."""
+    env = dict(env)
     root = project_root.resolve(strict=True)
     directory, directory_identity = _run_directory(root)
     report = directory / "runner-report"
@@ -132,7 +146,13 @@ def capture_execution(
         argv, root, directory, feature, env, timeout, required_report_path, gaps
     )
     finished = time.time_ns()
-    raw_after, after = _manifests(root, feature, gaps)
+    scope = current_deadline()
+    if scope is not None and scope.timed_out:
+        raw_after: dict[str, str] = {}
+        after: dict[str, str] = {}
+        gaps.append("Post-execution source snapshot omitted after timeout")
+    else:
+        raw_after, after = _manifests(root, feature, gaps)
     capture = ExecutionCapture(
         acceptance_evidence_policy="2",
         invocation=directory.name,
@@ -162,6 +182,11 @@ def _finish_capture(
     directory: Path, capture: ExecutionCapture, stdout: str, stderr: str
 ) -> CaptureResult:
     """Publish captured facts and return the same process outcome to the driver."""
+    scope = current_deadline()
+    if scope is not None:
+        capture.budget = scope.evidence()
+        if scope.timed_out or capture.exit_code == 124:
+            capture.gaps.append("Execution timed out; cannot certify acceptance")
     if capture.before != capture.after:
         capture.gaps.append("Execution inputs changed during invocation")
     _publish(directory, capture, stdout, stderr)
@@ -170,6 +195,7 @@ def _finish_capture(
         stdout=stdout,
         stderr=stderr,
         receipt_path=str(directory / "receipt.json"),
+        budget=capture.budget,
         gaps=capture.gaps,
     )
 
@@ -194,21 +220,8 @@ def _invoke(
         "LIVESPEC_EXECUTION_PROJECT": str(root),
         "LIVESPEC_EXECUTION_FEATURE": feature,
     }
-    try:
-        completed = subprocess.run(
-            argv,
-            cwd=root,
-            env=proc_env,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            check=False,
-        )
-        code, stdout, stderr = completed.returncode, completed.stdout, completed.stderr
-    except FileNotFoundError:
-        code, stdout, stderr = 127, "", f"command not found: {argv[0]}"
-    except subprocess.TimeoutExpired as exc:
-        code, stdout, stderr = 124, _text(exc.stdout), _text(exc.stderr) + "\nExecution timed out"
+    del timeout
+    code, stdout, stderr = run_owned(argv, root, proc_env)
     if required_report_path and not (root / required_report_path).is_file():
         code = code or 1
         stderr += f"\nMissing coverage report at {root / required_report_path}"
@@ -226,15 +239,11 @@ def _manifests(root: Path, feature: str, gaps: list[str]) -> tuple[dict[str, str
         return {}, {}
 
 
-def _text(value: bytes | str | None) -> str:
-    return value.decode(errors="replace") if isinstance(value, bytes) else value or ""
-
-
 def _publish(directory: Path, capture: ExecutionCapture, stdout: str, stderr: str) -> None:
     specs_fd, storage_fd = _open_storage(Path(capture.project_root))
-    lock = acquire_archive_lock(specs_fd)
-    directory_fd = -1
+    lock = directory_fd = -1
     try:
+        lock = acquire_capture_lock(specs_fd)
         directory_fd = os.open(
             capture.invocation, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=storage_fd
         )
@@ -274,7 +283,8 @@ def _publish(directory: Path, capture: ExecutionCapture, stdout: str, stderr: st
     finally:
         if directory_fd >= 0:
             os.close(directory_fd)
-        release_archive_lock(lock)
+        if lock >= 0:
+            release_archive_lock(lock)
         os.close(storage_fd)
         os.close(specs_fd)
 

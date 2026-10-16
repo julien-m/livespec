@@ -3,84 +3,9 @@
 # @spec(FR-024)
 # @spec(FR-026)
 
-"""``livespec test`` — run tests via the active driver."""
+"""``livespec test`` — run tests via the active driver.
 
-# @spec FR-001: test subcommand — .specs/features/035-unified-cli-surface/spec.md#fr-001
-# @spec AC-001: zero-arg run — .specs/features/035-unified-cli-surface/spec.md#ac-001
-# @spec AC-003: --mutation flag — .specs/features/035-unified-cli-surface/spec.md#ac-003
-# @spec FR-024, FR-026: compiled-only journey gate in livespec test
-# — .specs/features/057-cross-feature-user-journeys-v2/spec.md#fr-024
-
-from __future__ import annotations
-
-from pathlib import Path
-from typing import Annotated
-
-import typer
-
-from ..cli_exit_codes import EXIT_FAILURE, EXIT_OK
-from ..cli_resolvers import read_threshold_from_conventions
-from ..journeys.paths import relative_to_project
-from ..journeys.runner import run_journeys
-from ._common import (
-    emit_summary,
-    help_epilog,
-    require_specs_root,
-    resolve_primary_driver,
-    run_with_debug,
-)
-from .journey_cmd import journey_category_counts
-from .test_selection import (
-    resolve_feature_or_exit,
-    run_coverage_step,
-    run_mutation_step,
-    selected_tests_or_exit,
-)
-
-
-def test_command(
-    feature: str | None = typer.Option(
-        None,
-        "--feature",
-        help=(
-            "Run only the tests mapped to one feature: its number (035) or full "
-            "directory name (035-unified-cli-surface)."
-        ),
-    ),
-    mutation: bool = typer.Option(
-        False,
-        "--mutation",
-        help="Also invoke the driver's mutation capability after coverage.",
-    ),
-    no_coverage: bool = typer.Option(
-        False,
-        "--no-coverage",
-        help="Skip the coverage capability (only useful with --mutation).",
-    ),
-    execution_command: str | None = typer.Option(
-        None, "--execution-command", help="Capture a resolved test command"
-    ),
-    acceptance_mapping: Annotated[
-        Path | None,
-        typer.Option("--acceptance-mapping", help="Generated reviewed acceptance mapping"),
-    ] = None,
-    prepare_mapping_review: bool = typer.Option(
-        False, "--prepare-mapping-review", help="Prepare existing independent test review input"
-    ),
-    derive_mapping: bool = typer.Option(
-        False,
-        "--derive-mapping",
-        help="Write the mapping derived from @spec AC-xxx test anchors (needs no review)",
-    ),
-    ingest_mapping_review: Annotated[
-        Path | None, typer.Option("--ingest-mapping-review", help="Actual raw test reviewer bundle")
-    ] = None,
-    report_adapter: str = typer.Option(
-        "junit", "--report-adapter", help="Structured execution result adapter"
-    ),
-    debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
-) -> None:
-    """Run driver tests or prepare, ingest and certify mapped execution evidence.
+Run driver tests or prepare, ingest and certify mapped execution evidence.
 
     Args:
         feature: Informational driver scope; required feature slug for execution/review modes.
@@ -114,7 +39,109 @@ def test_command(
         Driver: python · Tests: pytest --cov=. --cov-report=lcov:lcov.info
         Coverage: 87.3% (threshold 70.0%) · OK
         LIVESPEC test · OK · driver=python · coverage=87.3 · threshold=70.0
-    """
+
+"""
+
+# @spec FR-001: test subcommand — .specs/features/035-unified-cli-surface/spec.md#fr-001
+# @spec AC-001: zero-arg run — .specs/features/035-unified-cli-surface/spec.md#ac-001
+# @spec AC-003: --mutation flag — .specs/features/035-unified-cli-surface/spec.md#ac-003
+# @spec FR-024, FR-026: compiled-only journey gate in livespec test
+# — .specs/features/057-cross-feature-user-journeys-v2/spec.md#fr-024
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Annotated
+
+import typer
+
+from ..cli_exit_codes import EXIT_FAILURE, EXIT_OK
+from ..cli_resolvers import read_threshold_from_conventions
+from ..execution_deadline import BudgetExpired, command_scope
+from ._common import (
+    emit_summary,
+    help_epilog,
+    require_specs_root,
+    resolve_primary_driver,
+    run_with_debug,
+)
+from .test_selection import (
+    resolve_feature_or_exit,
+    run_coverage_step,
+    run_driver_journeys,
+    run_mutation_step,
+    selected_tests_or_exit,
+)
+
+_FEATURE_HELP = (
+    "Run only the tests mapped to one feature: its number (035) or full "
+    "directory name (035-unified-cli-surface)."
+)
+
+
+def test_command(
+    feature: str | None = typer.Option(None, "--feature", help=_FEATURE_HELP),
+    mutation: bool = typer.Option(
+        False,
+        "--mutation",
+        help="Also invoke the driver's mutation capability after coverage.",
+    ),
+    no_coverage: bool = typer.Option(
+        False,
+        "--no-coverage",
+        help="Skip the coverage capability (only useful with --mutation).",
+    ),
+    execution_command: str | None = typer.Option(
+        None, "--execution-command", help="Capture a resolved test command"
+    ),
+    acceptance_mapping: Annotated[
+        Path | None,
+        typer.Option("--acceptance-mapping", help="Generated reviewed acceptance mapping"),
+    ] = None,
+    prepare_mapping_review: bool = typer.Option(
+        False, "--prepare-mapping-review", help="Prepare existing independent test review input"
+    ),
+    derive_mapping: bool = typer.Option(
+        False,
+        "--derive-mapping",
+        help="Write the mapping derived from @spec AC-xxx test anchors (needs no review)",
+    ),
+    ingest_mapping_review: Annotated[
+        Path | None, typer.Option("--ingest-mapping-review", help="Actual raw test reviewer bundle")
+    ] = None,
+    report_adapter: str = typer.Option(
+        "junit", "--report-adapter", help="Structured execution result adapter"
+    ),
+    debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
+) -> None:
+    """Run bounded driver tests or prepare, ingest and certify mapped evidence."""
+    _dispatch_test(
+        feature,
+        mutation,
+        no_coverage,
+        execution_command,
+        acceptance_mapping,
+        prepare_mapping_review,
+        derive_mapping,
+        ingest_mapping_review,
+        report_adapter,
+        debug,
+    )
+
+
+def _dispatch_test(
+    feature: str | None,
+    mutation: bool,
+    no_coverage: bool,
+    execution_command: str | None,
+    acceptance_mapping: Path | None,
+    prepare_mapping_review: bool,
+    derive_mapping: bool,
+    ingest_mapping_review: Path | None,
+    report_adapter: str,
+    debug: bool,
+) -> None:
+    """Validate mode exclusivity and dispatch to native capture or bounded driver execution."""
     from .operation_options import check_execution_options
 
     try:
@@ -172,6 +199,26 @@ def _run_test(
 ) -> None:
     """Execute the ``test`` subcommand body (driver mode)."""
     project_root = require_specs_root()
+    argv = ["livespec", "test"]
+    if feature:
+        feature = resolve_feature_or_exit(project_root, feature)
+        argv += ["--feature", feature]
+    if mutation:
+        argv.append("--mutation")
+    if no_coverage:
+        argv.append("--no-coverage")
+    try:
+        with command_scope(project_root, argv):
+            _run_driver_test(project_root, feature, mutation, no_coverage)
+    except BudgetExpired as exc:
+        typer.echo(f"TIMEOUT: {exc}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from exc
+
+
+def _run_driver_test(
+    project_root: Path, feature: str | None, mutation: bool, no_coverage: bool
+) -> None:
+    """Selection, journeys, coverage and mutation share the enclosing deadline."""
     driver = resolve_primary_driver(project_root)
 
     typer.echo(f"Driver: {driver.name}")
@@ -186,31 +233,7 @@ def _run_test(
             test_paths = selected_tests_or_exit(project_root, feature)
             typer.echo(f"Selected tests: {len(test_paths)} file(s)")
 
-    executable_journeys, manual_journeys, disabled_journeys = journey_category_counts(
-        project_root,
-        feature,
-    )
-    # @spec FR-012: Separate journey reporting
-    # — .specs/features/056-executable-user-journeys/spec.md#fr-012
-    typer.echo("Direct tests: driver coverage capability")
-    typer.echo(f"Executable user journeys: {executable_journeys}")
-    typer.echo(f"Manual tests: {manual_journeys}")
-    typer.echo(f"Disabled journeys: {disabled_journeys}")
-    journey_run = run_journeys(project_root, feature=feature)
-    for issue in journey_run.issues:
-        typer.echo(
-            f"{issue.severity.value} {issue.code} "
-            f"{relative_to_project(project_root, issue.path)}: {issue.message}"
-        )
-    if journey_run.error_count:
-        emit_summary(
-            "test",
-            "FAIL",
-            driver=driver.name,
-            journeys=len(journey_run.executed),
-            journey_errors=journey_run.error_count,
-        )
-        raise typer.Exit(EXIT_FAILURE)
+    executable_journeys, manual_journeys = run_driver_journeys(project_root, feature, driver.name)
 
     threshold_pct = read_threshold_from_conventions(project_root)
     coverage_pct = (

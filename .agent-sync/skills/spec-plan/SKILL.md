@@ -16,6 +16,8 @@ argument-hint: "<feature-name>"
 
 > **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2), runtime goal contract for autonomous runs (§5).
 
+Read [necessary validation](../../../system/minimal-spec-scope.md#necessary-validation) and [validation budgets](../../../system/testing/execution-rules.md#validation-budgets) before planning, generating or executing tests. Add only distinct behavior/risk/regression proof; reuse adequate passing tests, avoid redundant matrices and stop after relevant checks pass. Preparation/generation/cleanup share the command budget; timeout means stop/diagnose, never identical relaunch or automatic limit inflation.
+
 ## STEP 0 — Goal (autonomous runs)
 
 A goal is required only with `--auto` (for example as a child of `/spec-feature --auto`); interactive runs skip this step. **Read** [runtime goal contract](../../../system/anti-drift-block.md#runtime-goal-contract) for the full protocol.
@@ -331,7 +333,7 @@ Before generating the testing strategy, resolve the project's test infrastructur
 | Visual tests | `[resolved]` | `[resolved]` | Verified / Not available |
 | Type check | `[resolved]` | `[resolved]` | Verified / N/A |
 | Lint | `[resolved]` | `[resolved]` | Verified / Not verified |
-| Full suite | `[resolved]` | `[resolved]` | Verified / Not verified |
+| Full suite (only if concrete risk justifies it) | `[resolved]` | `[resolved]` | Verified / Not verified |
 
 5. If a tool is missing → mark `[TOOL NEEDED: install command]` in the plan
 

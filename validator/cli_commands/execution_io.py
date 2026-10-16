@@ -11,7 +11,7 @@ from pathlib import Path
 import typer
 
 from validator.execution_capture import capture_execution
-from validator.execution_evidence import verify_execution_receipt
+from validator.execution_evidence import EvidenceVerification, verify_execution_receipt
 from validator.execution_mapping import (
     AcceptanceMapping,
     ingest_mapping_review,
@@ -118,6 +118,12 @@ def _capture(
         env=dict(os.environ),
         acceptance_mapping=mapping_path.relative_to(root).as_posix(),
     )
-    result = verify_execution_receipt(Path(capture.receipt_path), root, feature)
+    result = (
+        verify_execution_receipt(Path(capture.receipt_path), root, feature)
+        if capture.receipt_path
+        else EvidenceVerification(
+            valid=False, certified_acs=[], gaps=capture.gaps or ["No fresh execution receipt"]
+        )
+    )
     typer.echo(json.dumps({"execution_receipt_path": capture.receipt_path, **result.model_dump()}))
-    raise typer.Exit(0 if result.valid else 1)
+    raise typer.Exit(0 if result.valid else capture.exit_code or 1)

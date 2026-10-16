@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
 import shutil
 import sys
@@ -11,6 +12,7 @@ from pathlib import Path
 
 from .execution_cargo_command import is_cargo, parse_cargo_test
 from .execution_cargo_toolchain import CargoRunnerUnavailable, cargo_provenance, runner_paths
+from .execution_deadline import current_deadline
 from .execution_scope import digest
 
 __all__ = ["CargoRunnerUnavailable", "prepare_runner", "runner_provenance"]
@@ -49,6 +51,7 @@ def runner_provenance() -> dict[str, str]:
         "pytest_sha256": digest(pytest_file.read_bytes()),
         "plugin_path": str(plugin),
         "plugin_sha256": digest(plugin.read_bytes()),
+        "budget_helper_sha256": digest(plugin.with_name("execution_test_budget.py").read_bytes()),
     }
 
 
@@ -66,12 +69,20 @@ def prepare_runner(
         ValueError: The command uses an option the trusted runner owns.
         CargoRunnerUnavailable: `cargo test` cannot be traced here (missing tools).
     """
+    scope = current_deadline()
+    if scope is not None and env is not None:
+        env["LIVESPEC_TEST_BUDGET"] = json.dumps(scope.policy.frozen(scope.argv, scope.seconds))
     if is_cargo(argv):
-        return _prepare_cargo(argv, adapter, root or Path.cwd(), dict(env or os.environ))
+        prepared = _prepare_cargo(argv, adapter, root or Path.cwd(), dict(env or os.environ))
+        if scope is not None:
+            scope.granularity = "individual-and-command"
+        return prepared
     args = _pytest_args(argv)
     if args is None or adapter not in {"junit", "pytest-json"}:
         return argv, {}
     provenance = runner_provenance()
+    if scope is not None:
+        scope.granularity = "individual-and-command"
     options = ("--junitxml", "--junit-xml", "--json-report-file")
     if any(arg.startswith(options) for arg in args):
         raise ValueError("Runner owns test report location; remove the fixed report option")
@@ -88,6 +99,7 @@ def prepare_runner(
         "import pytest; "
         "spec = importlib.util.spec_from_file_location('livespec_execution_trace', "
         f"{provenance['plugin_path']!r}); "
+        f"sys.path.insert(0, {str(Path(__file__).parent)!r}); "
         "plugin = importlib.util.module_from_spec(spec); spec.loader.exec_module(plugin); "
         "raise SystemExit(pytest.main(sys.argv[1:], plugins=[plugin]))"
     )
@@ -131,3 +143,29 @@ def _prepare_cargo(
         "--",
         *argv,
     ], provenance
+
+
+def prepare_uncaptured(
+    argv: list[str], root: Path, env: dict[str, str], directory: Path
+) -> tuple[list[str], dict[str, str]]:
+    """Apply managed pytest/Cargo individual guards even without evidence adapters."""
+    from .execution_cargo_toolchain import CargoRunnerUnavailable
+
+    scope = current_deadline()
+    env = dict(env)
+    if scope:
+        env["LIVESPEC_TEST_BUDGET"] = json.dumps(scope.policy.frozen(scope.argv, scope.seconds))
+    if _pytest_args(argv) is not None or is_cargo(argv):
+        env.update(
+            LIVESPEC_EXECUTION_PROJECT=str(root),
+            LIVESPEC_ASSERTION_TRACE=str(directory / "assertions"),
+            LIVESPEC_EXECUTION_NONCE=directory.name,
+            LIVESPEC_EXECUTION_FEATURE="",
+            LIVESPEC_EXECUTION_REPORT=str(directory / "report"),
+        )
+        try:
+            wrapped, _ = prepare_runner(argv, "junit", directory / "report", root=root, env=env)
+            return wrapped, env
+        except CargoRunnerUnavailable:
+            pass  # Command cap remains enforced; evidence reports command-only.
+    return argv, env

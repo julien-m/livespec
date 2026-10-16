@@ -31,7 +31,7 @@ updated: 2026-09-08
 | FR-008 | Feature-owned test modules and [progress.md](progress.md) | test collection | 185 feature tests and 179 goal/run/version regressions |
 | FR-009 | [goal_bootstrap.py](../../../validator/goal_bootstrap.py), anchored goal_contracts.py serialization façade | `@spec FR-003`, `@spec FR-009` | `test_explicit_target_controls_root_and_conventions` |
 | FR-010 | [goal_pairing.py](../../../validator/goal_pairing.py), anchored goal_contracts.py proof façade, [goal_run_builder.py](../../../validator/goal_run_builder.py), [run_artifacts.py](../../../validator/run_artifacts.py) | `@spec FR-010` | proof transition and archive outcome tests |
-| FR-011 | [goal_evidence_paths.py](../../../validator/goal_evidence_paths.py), [goal_archive_paths.py](../../../validator/goal_archive_paths.py) | `@spec FR-011` | evidence escape and `.runs` symlink matrices |
+| FR-011 | [goal_evidence_paths.py](../../../validator/goal_evidence_paths.py), [goal_archive_paths.py](../../../validator/goal_archive_paths.py) | `@spec FR-011` | [test_goal_bootstrap_archive.py](../../../tests/test_goal_bootstrap_archive.py): evidence escape and run-directory symlink matrices |
 | FR-012 | [goal_cli_inputs.py](../../../validator/goal_cli_inputs.py), [goal_pairing.py](../../../validator/goal_pairing.py) | `@spec FR-012` | omitted/empty/malformed/mismatched pair tests |
 
 ## Acceptance Criteria Mapping
@@ -45,7 +45,7 @@ updated: 2026-09-08
 | AC-005 | [`tests/test_goal_bootstrap_prove.py`](../../../tests/test_goal_bootstrap_prove.py): eight transitions, external evidence, and real-path confinement | Covered — PASS |
 | AC-006 | [`tests/test_goal_bootstrap_archive.py`](../../../tests/test_goal_bootstrap_archive.py), [`tests/test_goal_bootstrap_archive_races.py`](../../../tests/test_goal_bootstrap_archive_races.py), and [`tests/test_goal_bootstrap_archive_publication.py`](../../../tests/test_goal_bootstrap_archive_publication.py): contained archive, descriptor lifetime, symlink/target identity, cooperative-writer ownership checks, exclusive publication, cleanup, residue, and outcome identity | Covered — PASS |
 | AC-007 | [`tests/test_goal_bootstrap_archive.py`](../../../tests/test_goal_bootstrap_archive.py), [`tests/test_goal_bootstrap_non_init.py`](../../../tests/test_goal_bootstrap_non_init.py): missing `.specs` and strict non-init operations | Covered — PASS |
-| AC-008 | Seven bootstrap test modules, including [`test_goal_bootstrap_archive_races.py`](../../../tests/test_goal_bootstrap_archive_races.py) and [`test_goal_bootstrap_archive_publication.py`](../../../tests/test_goal_bootstrap_archive_publication.py), plus the existing goal-contract, archive-CLI, run-artifact, and version-guard regressions recorded in the Test report | Covered — PASS |
+| AC-008 | Seven bootstrap test modules, including [`tests/test_goal_bootstrap_archive_races.py`](../../../tests/test_goal_bootstrap_archive_races.py) and [`tests/test_goal_bootstrap_archive_publication.py`](../../../tests/test_goal_bootstrap_archive_publication.py), plus the existing goal-contract, archive-CLI, run-artifact, and version-guard regressions recorded in the Test report | Covered — PASS |
 | AC-009 | Prove/archive/non-init modules: external control files allowed while project evidence and run destinations remain confined | Covered — PASS |
 | AC-010 | [`tests/test_goal_bootstrap_pairing.py`](../../../tests/test_goal_bootstrap_pairing.py): explicit pair failures and legacy/mixed claims | Covered — PASS |
 

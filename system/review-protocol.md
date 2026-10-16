@@ -82,3 +82,8 @@ livespec validate .specs/features/NNN-feature-name --progression implement --mod
 - AC declarations default to execution; `**Evidence:** review` requires explicit `**Review inputs:**` links. Unknown/conflicting types block.
 - Within the existing review work, prepare with `livespec validate <feature-dir> --prepare-review acceptance --model <actual-model>` and ingest actual raw output with `--ingest-review <bundle.json> --review-kind acceptance` and the same model/budget. Attach `acceptance_review_receipt_path` alongside the runtime receipt for final acceptance. No documentary AC enters runtime `certified_acs`.
 - Policy2 proof, terminal acceptance archive and archive read enforce the same conjunction using the immutable contract. Preparation retains its individual scope; policy1 and historical contracts retain their versioned interpretation.
+
+## Validation scope in review
+
+<!-- @spec FR-006: Review proportionality — .specs/features/095-test-time-budgets/spec.md#fr-006 -->
+Apply [necessary validation](minimal-spec-scope.md#necessary-validation) when reviewing plans and tests. Judge the distinct behavior/risk each test proves, reuse existing sufficient proof, and require a real scale requirement before making a capacity counterexample blocking. Do not request duplicate cases, exhaustive matrices or repeat passing suites without a concrete unresolved concern. Check minimum volume, configurations and lifecycle budgets for expensive proof.

@@ -347,3 +347,8 @@ executing — NOT the outer pipeline name. Implementation contract:
 
 See [`integrations.md`](integrations.md) for the full Level 0 semantics
 and [`hooks.md`](hooks.md) for the Level 1/2/3 algorithm.
+
+## Validation timeout recovery
+
+<!-- @spec FR-007: Bounded evidence-first retry — .specs/features/095-test-time-budgets/spec.md#fr-007 -->
+For test/validation scopes, this rule takes precedence over generic retry counts: stop on timeout, retain diagnostics and report scope, effective limit, elapsed duration and enforcement granularity. Never relaunch an identical attempt or increase a timeout merely because it failed. At most one retry requires a documented changed cause or new evidence; initial attempt and retry share 300 seconds, or a prior explicitly declared command maximum up to 600 seconds. Exhaustion leaves validation unresolved and forbids a success claim. Read [validation budgets](testing/execution-rules.md#validation-budgets); this agent policy does not persistently intercept unrelated shell invocations.

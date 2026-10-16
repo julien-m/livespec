@@ -24,6 +24,8 @@ argument-hint: "<feature-name>"
 
 > **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2), runtime goal contract for autonomous runs (§5).
 
+Read [necessary validation](../../../system/minimal-spec-scope.md#necessary-validation) and [validation budgets](../../../system/testing/execution-rules.md#validation-budgets) before planning, generating or executing tests. Add only distinct behavior/risk/regression proof; reuse adequate passing tests, avoid redundant matrices and stop after relevant checks pass. Preparation/generation/cleanup share the command budget; timeout means stop/diagnose, never identical relaunch or automatic limit inflation.
+
 ## STEP 0 — Goal (autonomous runs)
 
 A goal is required unless `--step` or `--dry-run` is active. **Read** [runtime goal contract](../../../system/anti-drift-block.md#runtime-goal-contract) for the full protocol.
@@ -107,7 +109,7 @@ flowchart TD
     P2_LOOP --> P5{"UI\nfeature?"}
     P5 -->|"yes"| VIS["Phase 5\nVisual baselines\n(Playwright)"]
     P5 -->|"no"| P6
-    VIS --> P6["Phase 6\nFull test suite"]
+    VIS --> P6["Phase 6\nNecessary regression selection"]
     P6 --> P65{"Phase 6.5\nMandatory\nVisual Gate"}
     P65 -->|"PASS / not UI"| P7["Phase 7\nUpdate\nimplementation.md"]
     P65 -->|"FAIL / BLOCKED"| BLOCKED
@@ -443,7 +445,7 @@ During TDD implementation (inside Phase 3 dispatch loop), when a visual step com
    Example: npx playwright test --update-snapshots tests/e2e/screens/
    ```
 2. **Baseline storage:** New screenshots automatically saved to `.specs/features/NNN-feature-name/baselines/`
-3. **Commit strategy:** Only commit baseline PNG files **if Phase 4 non-visual tests pass**. If Phase 4 fails or doesn't exist yet, keep baselines uncommitted until the full test suite passes.
+3. **Commit strategy:** Only commit baseline PNG files **if Phase 4 non-visual tests pass**. If Phase 4 fails or doesn't exist yet, keep baselines uncommitted until the necessary checks pass.
 4. **Reference:** Read [`visual-baselines.md`](../../system/testing/visual-baselines.md) for screenshot lifecycle rules and 3-image format (baseline, diff, previous).
 5. **If visual tooling is unavailable for a UI feature:** Visual tooling unavailable on a UI feature is BLOCKED; do not continue without blocking. Record the missing tool, recovery command, and resume point in `progress.md`; status remains `In Progress`.
 
@@ -451,7 +453,7 @@ During TDD implementation (inside Phase 3 dispatch loop), when a visual step com
 
 Before declaring implementation complete:
 
-**Step 1: Run full test suite** — Execute the final validation sequence from `system/testing/execution-rules.md`:
+**Step 1: Run the necessary regression selection** — Execute the final validation sequence from `system/testing/execution-rules.md`:
 - All commands come from `plan.md` **Resolved Test Commands** — no hardcoded commands
 - Order: Types → Linter → Unit → Integration → E2E → Visual (if applicable)
 - All checks must pass. Fix any issues found within iteration limits.
@@ -463,7 +465,7 @@ Before declaring implementation complete:
 **Step 3: Check Phase 4 gate** — If any test suite fails (unit, integration, E2E):
 - DO NOT commit baseline PNG files yet
 - Fix the failing tests first
-- Re-run Phase 6 validation
+- Re-run only the affected Phase 6 checks after a relevant change
 - Only commit baselines once Phase 4 fully passes
 
 > **Note:** Phase 6 runs EXISTING tests (created during Phase 3 TDD) as a validation gate. For post-implementation test coverage audit, generation of missing tests, design fidelity checks, and visual baseline review, use `/spec-test` after implementation is complete (see `/spec-feature` Phase 3.5).
@@ -641,7 +643,7 @@ Supervisor (Orchestrator/Translator — never codes, never tests)
 4. Supervisor receives results, updates `progress.md` via Documenter
 
 **Final phase:**
-1. Supervisor dispatches a Final Validation to Superpowers (full test suite regression check)
+1. Supervisor dispatches a Final Validation to Superpowers (necessary regression selection)
 2. Supervisor spawns Documenter to finalize `implementation.md`, changelogs, and README
 
 > **Note:** The `livespec-implementer` agent is only used for infrastructure provisioning (Phase 0). The `livespec-verifier` agent is only used for spec/plan review in `/spec-feature`. All feature code implementation, testing, and code review are handled by isolated implementation sub-agents. The `livespec-documenter` agent is retained for post-implementation traceability.
@@ -736,7 +738,7 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 ### Phase 6 — Validate
 
-- [always] Run full test suite: types → lint → unit → integration → E2E → visual <!-- evidence:execution ac-scope:feature -->
+- [always] Run necessary checks: types → lint → relevant unit/integration/E2E/visual selection <!-- evidence:execution ac-scope:feature -->
 - [visual] Confirm baseline PNG files have corresponding test references <!-- evidence:documentary -->
 - [visual] Hold baseline commits until non-visual tests pass <!-- evidence:execution -->
 

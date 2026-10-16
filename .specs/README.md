@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-10-15
+> Last updated: 2026-10-16
 
 
 ---
@@ -133,6 +133,7 @@
 | 092 | Existing Repository Onboarding | Draft | 2026-10-13 | 2026-10-13 | [spec](features/092-init-onboarding/spec.md), [plan](features/092-init-onboarding/plan.md) |
 | 093 | Configured Review Identity | In Progress | 2026-10-13 | 2026-10-15 | [spec](features/093-configured-review-identity/spec.md), [plan](features/093-configured-review-identity/plan.md), [implementation](features/093-configured-review-identity/implementation.md) |
 | 094 | Verified Review Continuity | In Progress | 2026-10-14 | 2026-10-14 | [spec](features/094-verified-review-continuity/spec.md), [plan](features/094-verified-review-continuity/plan.md), [implementation](features/094-verified-review-continuity/implementation.md) |
+| 095 | Test Time Budgets | Implemented | 2026-10-16 | 2026-10-16 | [spec](features/095-test-time-budgets/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -157,19 +158,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-16 | Feature | Bound test execution and require only necessary validation with declared long-running exceptions |
+| 2026-10-16 | Feature | [Feature 095] Test: 100% AC covered (5/5), 0 tests generated |
+| 2026-10-16 | Plan | Plan created: Test Time Budgets — 3 implementation steps, 1 state diagram; necessary tests and bounded recovery |
+| 2026-10-16 | Spec | [Feature 095] Spec created: Test Time Budgets — 3 stories, 5 AC, 7 FR |
+| 2026-10-15 | Bugfix | Bugfix: [093](features/093-configured-review-identity/changelog.md): a goal `--model` flag without value raises `review_model_required` instead of binding the configured model. |
+| 2026-10-15 | Bugfix | [Feature 083] Fix: install applies the installed commit's conventions evidence rules and refuses an incomplete snapshot (FR-001, FR-003) |
+| 2026-10-15 | Feature | [093](features/093-configured-review-identity/changelog.md): spec and plan reviews complete and ready (native, `claude-opus-5-5`); delivery lane now light. |
 | 2026-10-15 | Feature | [093](features/093-configured-review-identity/changelog.md): goal render, progressions and the delivery lane take the reviewer model and budget from `.specs/semantic/config.yaml` when no option names them, and stop with `review_model_required` otherwise; out-of-bounds budgets are refused, never clamped. |
 | 2026-10-15 | Bugfix | [Feature 083] Fix: 2/2 review gaps closed (shim exit-3 recovery uses LiveSpec's venv with --source/--ref; AC-016 dev-lock wording aligned with D-04); spec and plan reviews refreshed at 120000 characters, implement progression READY |
 | 2026-10-15 | Feature | [Feature 083] Spec refined: user approvals of `--no-activate`, the `.livespec-path` pin warning and plan decisions D-01 to D-15 recorded in Clarifications; plan D-11 uses LiveSpec's venv; spec and plan reviews refreshed at 120000 characters, implement progression READY |
-| 2026-10-15 | Bugfix | Bugfix: 090 carried review warnings closed |
-| 2026-10-15 | Feature | Feature: Minimal plan scope and release evidence |
-| 2026-10-14 | Feature | Feature: Verified review continuity |
-| 2026-10-13 | Feature | Feature: Reviews that stay current and a contestable criticality |
-| 2026-10-13 | Feature | 085 ai-ressources located through AIRESOURCES or the recorded project path, without hard-coded fallback |
-| 2026-10-13 | Feature | [Feature 085] Test: 100% AC covered (11/11), 0 tests generated |
-| 2026-10-13 | Feature | [Feature 085] Implemented in code: shared ai-ressources resolution (AIRESOURCES, then recorded path, else explicit error) routed through 7 consumers; certification pending |
-| 2026-10-13 | Plan | [Feature 085] Plan created: Locate ai-ressources Without Hard-Coded Paths — 6 implementation steps, 1 diagram |
-| 2026-10-13 | Spec | [Feature 085] Spec created: Locate ai-ressources Without Hard-Coded Paths — 4 stories, 11 AC, 7 FR |
-| 2026-10-13 | Feature | Feature: Lighter delivery gates (Handy findings) |
 <!-- readme:activity:end -->
 
 ---
@@ -342,3 +340,9 @@
 
 <!-- finalize:spec-implement:2026-10-15:8c213f7b -->
 <!-- finalize:spec-fix:2026-10-15:5c6d3cbb -->
+
+<!-- finalize:spec-specify:2026-10-16:e7daafa0 -->
+
+<!-- finalize:spec-plan:2026-10-16:bb751413 -->
+
+<!-- finalize:spec-feature:2026-10-16:d775ec24 -->

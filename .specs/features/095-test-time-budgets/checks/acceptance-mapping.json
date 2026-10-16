@@ -1,0 +1,60 @@
+{
+  "schema_version": "1",
+  "feature": "095-test-time-budgets",
+  "reviewer_model": "",
+  "review_max_chars": 60000,
+  "review_receipt_path": "",
+  "bindings": [
+    {
+      "requirement_id": "095-test-time-budgets:AC-001",
+      "test_id": "tests.test_execution_deadline::test_preparation_and_nested_work_share_one_deadline",
+      "expected": "AC-001: Whole lifecycle shared cap — .specs/features/095-test-time-budgets/spec.md#ac-001",
+      "assertion_path": "tests/test_execution_deadline.py",
+      "start_line": 26,
+      "end_line": 26,
+      "source_sha256": "6a0ae9b00d5624a8f298d63dfe4e5d1a3e1bc0844588d5a4015c93e2ae464e8b",
+      "justification": "Derived from the @spec anchor at tests/test_execution_deadline.py:16"
+    },
+    {
+      "requirement_id": "095-test-time-budgets:AC-002",
+      "test_id": "tests.test_execution_test_budgets::test_frozen_category_defaults_and_exact_exception",
+      "expected": "AC-002: Frozen category limits",
+      "assertion_path": "tests/test_execution_test_budgets.py",
+      "start_line": 80,
+      "end_line": 83,
+      "source_sha256": "b01376eac0f1dc1529551c5e00dfc3713d0cf540255d693743ab300b5ad021c4",
+      "justification": "Derived from the @spec anchor at tests/test_execution_test_budgets.py:78"
+    },
+    {
+      "requirement_id": "095-test-time-budgets:AC-003",
+      "test_id": "tests.test_execution_deadline::test_term_ignoring_descendant_and_inherited_pipe_are_bounded",
+      "expected": "AC-003: Owned execution stops on expiry",
+      "assertion_path": "tests/test_execution_deadline.py",
+      "start_line": 46,
+      "end_line": 46,
+      "source_sha256": "6a0ae9b00d5624a8f298d63dfe4e5d1a3e1bc0844588d5a4015c93e2ae464e8b",
+      "justification": "Derived from the @spec anchor at tests/test_execution_deadline.py:44"
+    },
+    {
+      "requirement_id": "095-test-time-budgets:AC-004",
+      "test_id": "tests.test_test_budgets::test_exact_prior_exception_preserves_other_limits",
+      "expected": "AC-004: Strict prior scoped exceptions",
+      "assertion_path": "tests/test_test_budgets.py",
+      "start_line": 38,
+      "end_line": 42,
+      "source_sha256": "b675d4d979f4fd084f4fa86f210a48c159a54fd299ebb9f9ee3d4f93e4ce81c4",
+      "justification": "Derived from the @spec anchor at tests/test_test_budgets.py:19"
+    },
+    {
+      "requirement_id": "095-test-time-budgets:AC-005",
+      "test_id": "tests.test_test_budget_contracts::test_plan_and_execution_workflows_reach_the_same_budget_contract",
+      "expected": "AC-005: Reachable proportional validation and recovery policy",
+      "assertion_path": "tests/test_test_budget_contracts.py",
+      "start_line": 32,
+      "end_line": 32,
+      "source_sha256": "de42d99a5cfdefa56ce72f237bc4e24b8a8e9244bc09b8bbeca6e341e5f3d8de",
+      "justification": "Derived from the @spec anchor at tests/test_test_budget_contracts.py:20"
+    }
+  ],
+  "derivation": "anchors"
+}

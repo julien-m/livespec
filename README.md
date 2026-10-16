@@ -856,3 +856,7 @@ livespec/
 ## License
 
 MIT — see [LICENSE](LICENSE)
+
+### Bounded, necessary validation
+
+Managed `livespec test` and execution capture share a five-minute command budget, including preparation and cleanup. Supported pytest/Cargo tests default to 2s unit, 10s integration and 30s acceptance; other frameworks explicitly report command-only enforcement. Declare justified exact-scope long cases before execution in `.specs/testing/test-budgets.yaml` (maximum ten minutes). Read [the policy and recovery rules](system/testing/execution-rules.md#validation-budgets) and [necessary test scope](system/minimal-spec-scope.md#necessary-validation): reuse adequate tests and stop when relevant checks pass. Pinned projects receive these guards after their explicit runtime update/migration; this change does not alter existing consumer pins.
