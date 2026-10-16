@@ -72,6 +72,8 @@ def build_batches(
     sections: list[ReviewSection],
     requirements: tuple[ReviewRequirement, ...],
     budget: int,
+    *,
+    legacy_plan_packing: bool = False,
 ) -> tuple[tuple[ReviewBatch, ...], list[str]]:
     """Compare every spec group against every plan group, preserving complete sections."""
     from validator.semantic.review_context import ReviewBatch
@@ -84,6 +86,17 @@ def build_batches(
     specs = [s for s in sections if s not in shared and s not in plans]
     if fits(sections):
         groups = [sections]
+    elif (
+        kind == "plan"
+        and plans
+        and specs
+        and not legacy_plan_packing
+        and all(fits([*shared, spec, *plans]) for spec in specs)
+    ):
+        # Reserve the complete Plan before packing sources; reserving one Plan
+        # section first can multiply every source group by avoidable Plan fragments.
+        spec_groups = _pack(specs, lambda group: fits([*shared, *group, *plans]))
+        groups = [[*shared, *group, *plans] for group in spec_groups]
     elif kind == "plan" and plans and specs:
         # All pairs must fit individually; no requirement is reviewed without its plan evidence.
         if any(not fits([*shared, spec, plan]) for spec in specs for plan in plans):

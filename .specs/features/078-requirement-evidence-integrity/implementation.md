@@ -172,3 +172,9 @@ FR-011: read the [source scope](../../../validator/execution_scope.py) and its [
 ## 2026-10-13 — Review status as lifecycle metadata (spec-fix)
 
 FR-004 / AC-004: [normative identity](../../../validator/normative_identity.py) treats every spec-system status, now including `Review`, as lifecycle metadata. The [clarification inventory](../../../validator/clarify_inventory.py) names a reviewer model mismatch next to `stale_or_incomplete_spec_review`. [The finalize regression](../../../tests/test_finalize_status_review_identity.py) runs `finalize apply --status` through the CLI and then the implement progression: status transitions stay READY, and an AC change makes the review stale.
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-16 | implementation | `tests/test_review_plan_packing.py::test_complete_plan_reservation_prevents_cartesian_review_explosion` | `.specs/.execution/e2d13ae570de416fbc8c6ba40e8e685b/receipt.json` | `.specs/.execution/9f1fbbf9ed264615bf0efd56923a5aba/receipt.json` |

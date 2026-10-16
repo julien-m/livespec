@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-16 — [Feature 078] Bugfix: reserve the full Plan before packing review sources
+
+- Avoid unnecessary Cartesian review expansion and preserve exact historical receipt layouts. Read [the validation record](features/078-requirement-evidence-integrity/checks/2026-10-16-plan-packing.md).
+
 ## 2026-10-16 — [Feature 094] Bugfix: file-fed Git input during revision commit verification
 
 - Avoid the duplex pipe transport implicated in the HandoffBox timeout; preserve raw object verification and the 60-second bound. Read [the validation record](features/094-verified-review-continuity/checks/2026-10-16.md).

@@ -177,6 +177,8 @@ def _scoped_batches(
     requirements: tuple[ReviewRequirement, ...],
     requirement_scope: tuple[str, ...] | None,
     max_chars: int,
+    *,
+    legacy_plan_packing: bool = False,
 ) -> tuple[tuple[ReviewRequirement, ...], tuple[ReviewBatch, ...], list[str]]:
     """Build complete-context batches with optional explicitly limited obligations."""
     from validator.semantic.review_batches import build_batches
@@ -190,7 +192,13 @@ def _scoped_batches(
             "sections remain context; do not invent missing coverage for deliberately unselected "
             "requirements. Report actual blocking issues affecting the selected scope.\n"
         )
-    batches, errors = build_batches(kind, sections, requirements, max_chars - len(scope_prefix))
+    batches, errors = build_batches(
+        kind,
+        sections,
+        requirements,
+        max_chars - len(scope_prefix),
+        legacy_plan_packing=legacy_plan_packing,
+    )
     if scope_prefix:
         batches = tuple(
             batch.model_copy(update={"prompt": scope_prefix + batch.prompt}) for batch in batches

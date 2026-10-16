@@ -243,3 +243,16 @@ Parametrisations reduced to one case per real branch. The tag-legend test now ch
 - **Author:** claude-code (spec-fix, Handy report 2026-10-13)
 
 The Handy report said `finalize apply --status Planned` made the spec and plan reviews stale. A Handy-shaped spec (extra frontmatter keys, explicit `## Header` band) reproduces it end to end only when the status leaving or entering is `Review`. `Review` is a spec-system status, but Normative Identity v2 did not treat it as lifecycle metadata. Draft, Planned and In Progress transitions were already normalized. `Review` is now normalized like the other lifecycle statuses; an AC change after finalization still makes the review stale. When a review is stale and its reviewer model differs from the gate's model, the gate also reports `spec_review_model_mismatch:<receipt>!=<current>`. That was the cause recorded in Handy's 007 planning evidence, where the progression was prepared without the reviewer model. A different `--review-max-chars` budget also changes the identity; the receipt does not record the budget, so it cannot be named.
+
+## 2026-10-16 — [Bugfix]: Reserve the complete Plan before packing review sources and retain exact historical layouts for existing receipts
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/fixtures/review-plan-packing-legacy.json, tests/test_review_plan_packing.py, validator/semantic/review_batches.py, validator/semantic/review_context.py, validator/semantic/review_stability.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_review_plan_packing.py::test_complete_plan_reservation_prevents_cartesian_review_explosion
+- **RED receipt:** `.specs/.execution/e2d13ae570de416fbc8c6ba40e8e685b/receipt.json`
+- **GREEN receipt:** `.specs/.execution/9f1fbbf9ed264615bf0efd56923a5aba/receipt.json`
+<!-- bugfix:9f1fbbf9ed264615bf0efd56923a5aba -->
