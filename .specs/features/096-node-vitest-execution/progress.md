@@ -8,7 +8,7 @@ Read the [approved plan](plan.md) for step contracts.
 | 2 | Done | Genuine transport/provenance and installed-wheel adapter API pass; whole-wheel CLI has unrelated pre-existing template packaging limitation. |
 | 3 | Done | CLI and purpose separation pass; current generic task016 accepted from a real Node observation; historical goal bytes unchanged. |
 | 4 | Done | Fresh 46/55 observations valid; anchored two-run Python verification passes with all original consumer inputs unchanged. |
-| 5 | In Progress | Official ignored-input capture fix integrated; mapping remains strictly current. Fresh complete-diff review and one new bounded87-ID acceptance capture precede finalization/archive. |
+| 5 | In Progress | Grouped CI/async repairs pass; 143 bindings/98 IDs and full-scope native reviews are current. Fresh nine-asset wheel/API and 46/55 observations pass; unique300s mapped capture remains pending. |
 
 Resume at Step 5 final validation. No native goal created (parent instruction); CLI goal rendered. No consumer lifecycle changes.
 
@@ -60,3 +60,36 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Inspect [the final diagnostic](.reviews/implementation-evidence/canonical-junit-diagnostic.json):128 observed,128 passing and128 grounded against the immutable87-case report and364 real assertion callbacks. This is diagnostic only, not execution certification or receipt revalidation. The old capture remains stale for two changed governed inputs; certified ACs remain empty.
 - Current complete-diff review and audit PASS for the frozen42-file scope. The dedicated CI job already runs all five observer modules under300s, binds Node22/local Vitest2.1.9 and rejects any skipped test; consumer receipts remain outside that CI selection.
 - No additional capture is authorized. Parent owns the checkpoint commit and explicitly incomplete DRAFT. Step5 and goal `f9cbd9c9` remain active/In Progress; no finalize, Implemented promotion, successful archive or Test phase occurred.
+
+## Human-authorized final capture envelope after CI helper repair
+
+- Human authorization transmitted by root: « Oui, autoriser cette nouvelle capture de300s ». This authorizes one new final300s capture after current mapping/reviews, diagnostics, draft helper commit/push and coordinator confirmation; no identical retry follows any failure. All earlier budgets, receipts and histories remain unchanged.
+- Parent repaired only the genuine goal fixture: select the exact canonical implementation-step description uniquely instead of assuming ordinal016; retain execution-kind and old/new outcome checks; point only the fixture hook resolver at an absent directory to reproduce CI without personal hooks.
+- Inspect [the real CI-helper repair proof](.reviews/implementation-evidence/ci-canonical-step-repair.json): two genuine cases passed in10.41s within a separately authorized30s envelope; observed receipt `3bc2052b88ab43bbaa645e818fca9f2c` is passed-only and certifies no AC. Targeted Ruff/format/mypy passed.
+- Mapping changes are limited to this helper's current source hash/assertion spans;128 bindings,87 raw IDs and canonical JUnit identities remain unchanged. Native mapping/full-scope reviews must be current before commit/push and the single final capture.
+- Pre-capture diagnostic must identify two real invocations:85 unchanged cases from `bb77dc9596354d47bf8c63637510028b` and two repaired helper cases from `3bc2052b88ab43bbaa645e818fca9f2c`. No trace is translated, merged into a receipt or certified.
+- Implement is resuming In Progress. No Test report, consumer lifecycle or global runtime activation is part of this work.
+
+## Grouped CI repair before the authorized final capture
+
+- Exact canonical task description, unique match and execution kind replace ordinal selection in both affected goal tests; existing purpose assertions remain.
+- CI inventory includes the deterministic `vitest-observer` job. Migration fixture hashing excludes `.git` before file reads; default helper hashing remains complete and non-Git read errors propagate.
+- Six focused checks PASS in0.49s. Real migration PASS in9.06s; Ruff/format/mypy PASS for five touched Python files. Inspect [the grouped proof](.reviews/implementation-evidence/ci-grouped-repair-checks.json) and [conventions PASS](.reviews/implementation-evidence/ci-grouped-conventions.json).
+- Four additional binding hashes and two spans were updated against identical assertion text. Inspect [preservation details](.reviews/implementation-evidence/ci-grouped-mapping-preservation.json). No old trace was rewritten, translated or certified.
+- Mapping/full-scope reviews, checkpoint push and one new authorized300s capture remain before finalization. Any capture failure stops for diagnosis.
+
+## Independent final review blocker: detached asynchronous consumption
+
+- Current full-scope review and audit independently identify AC-002 at `validator/vitest/matcher-observer.ts:129`: any direct `.then()` marks `consumed=true`, while native settlement can set `settled=true` even if that chain is neither awaited nor returned. This is a static control-flow finding; no runtime reproduction is claimed.
+- Inspect [the recorded blocker](.reviews/implementation-evidence/ci-blocking-async-review.json). Official delivery review now records BLOCKED for both kinds. No old review/capture history was removed or reinterpreted.
+- The one authorized final300s capture remains unconsumed. No observer asset changed, consumer recapture, successful goal/archive, finalization, Implemented promotion, Test phase, commit or push occurred in this resumption.
+- Resume only after a genuine bounded regression and a supported consumption correction (or honest unsupported diagnosis), then current reviews and any consumer proofs invalidated by asset changes. Existing CI repair checks need no repeated run without a changed cause.
+
+## Final grouped source freeze before the one authorized capture
+
+- Genuine detached `.then`/resolve/all/race RED:4 failures in6.31s. Genuine finally-overridden return RED:1 failure in2.38s. Inspect [the final23-case GREEN](.reviews/implementation-evidence/async-finally-green.json):23PASS in33.90s.
+- Direct syntax arms the exact owned matcher thenable; actual consumption and independent native settlement remain necessary. Returns under finalizers, nested helpers, Promise compositions and registration modifiers fail closed. Worker bridge records remain in a private closure; no hostile same-user JavaScript sandbox is claimed.
+- Inspect [the final nine-asset wheel](.reviews/implementation-evidence/opaque-wheel-assets.json), [actual installed async API](.reviews/implementation-evidence/opaque-installed-api.json), and [fresh complete46/55 observations](.reviews/implementation-evidence/consumer-opaque-observations.json). Original consumer hashes/Git status remain unchanged; all older runs are retained separately.
+- Inspect [the exact embedded CI static check](.reviews/implementation-evidence/async-exact-ci-static-final.json), [conventions PASS](.reviews/implementation-evidence/opaque-conventions.json), and [current native mapping ingestion](.reviews/implementation-evidence/opaque-mapping-ingestion.json):complete/ready true, errors empty. Full47-file delivery review and audit are officially PASS.
+- Inspect [the final98-ID selection](.reviews/implementation-evidence/final-async-selection.json):143 bindings include all11 new distinct async parameter branches; historical128/87 remains intact. Parent confirmed the sole authorized300s envelope covers this necessary expanded selection.
+- Inspect [the honest pre-capture diagnostic](.reviews/implementation-evidence/opaque-pre-capture-diagnostic.json):143 grounded; historical128 passing/126 exact-current-span observations;108 current source hashes match those old captures. No line translation, trace rewrite, merged receipt or certification is claimed. Fresh execution remains required.

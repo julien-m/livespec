@@ -70,9 +70,30 @@ def _isolated_environment(base: Path) -> dict[str, str]:
 
 def _working_tree_hashes(root: Path) -> dict[str, str]:
     """Full content hash of a fixture tree, git internals excluded."""
-    return {
-        path: value for path, value in tree_hashes(root).items() if not path.startswith(".git/")
-    }
+    return tree_hashes(root, excluded_directories=frozenset({".git"}))
+
+
+def test_working_tree_hashes_never_reads_git_objects(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Ignore volatile Git objects before reading while retaining strict source reads."""
+    source = write(tmp_path / "source.py", "source")
+    volatile = write(tmp_path / ".git/objects/object", "volatile")
+    read_bytes = Path.read_bytes
+    failing_paths = {volatile}
+
+    def read_stable(path: Path) -> bytes:
+        if path in failing_paths:
+            raise FileNotFoundError(path)
+        return read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", read_stable)
+    assert set(_working_tree_hashes(tmp_path)) == {source.name}
+    with pytest.raises(FileNotFoundError):
+        tree_hashes(tmp_path)
+    failing_paths.add(source)
+    with pytest.raises(FileNotFoundError):
+        _working_tree_hashes(tmp_path)
 
 
 def _reference_lines(path: Path) -> list[str]:

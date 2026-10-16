@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-16 — [Feature 096] Bugfix: select canonical goal tasks and repair deterministic CI fixture expectations
+
+- Focused checks, migration and static checks pass; acceptance certification and Implement closure remain pending.
+
 ## 2026-10-16 — Technical plan: five bounded steps, two diagrams and explicit runtime evidence gates
 <!-- finalize:spec-plan:2026-10-16:e06699c9 -->
 

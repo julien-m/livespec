@@ -192,10 +192,15 @@ def restore_write_bits(root: Path) -> None:
         Path(dirpath).chmod(Path(dirpath).stat().st_mode | stat.S_IWUSR)
 
 
-def tree_hashes(root: Path) -> dict[str, str]:
+def tree_hashes(
+    root: Path, *, excluded_directories: frozenset[str] = frozenset()
+) -> dict[str, str]:
     """Map every file/symlink below ``root`` to a content hash (directories skipped)."""
     hashes: dict[str, str] = {}
     for path in sorted(root.rglob("*")):
+        # Exclude volatile metadata before any stat/read; the default still hashes every file.
+        if any(part in excluded_directories for part in path.relative_to(root).parts[:-1]):
+            continue
         if path.is_symlink():
             hashes[path.relative_to(root).as_posix()] = "link:" + os.readlink(path)
         elif path.is_file():

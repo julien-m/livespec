@@ -6,6 +6,7 @@ import { isAbsolute, join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { ConfigEnv } from "vite";
 import type { UserConfig } from "vitest/config";
+import { instrumentAsyncConsumption } from "./async-source";
 import { required } from "./trace-state";
 
 const root = required("LIVESPEC_VITEST_ROOT");
@@ -42,9 +43,13 @@ const timeout = (name: string, existing: number | undefined): number => {
 
 /** Keep root/config environment and all consumer fields except the owned instrumentation. */
 export default async (environment: ConfigEnv): Promise<UserConfig> => {
-	const { loadConfigFromFile } = (await import(
+	const { loadConfigFromFile, parseAst } = (await import(
 		pathToFileURL(vitePath).href
 	)) as typeof import("vite");
+	// MagicString is part of the governed Vitest production dependency closure, not a global tool.
+	const { default: StringEditor } = (await import(
+		localRequire.resolve("magic-string")
+	)) as typeof import("magic-string");
 	const original = process.env.LIVESPEC_VITEST_ORIGINAL_CONFIG;
 	const loaded = original
 		? await loadConfigFromFile(environment, original, root)
@@ -92,6 +97,26 @@ export default async (environment: ConfigEnv): Promise<UserConfig> => {
 		...config,
 		plugins: [
 			...(config.plugins ?? []),
+			{
+				name: "livespec-async-source",
+				enforce: "post",
+				transform(source: string, id: string) {
+					const input = id.split("?")[0];
+					if (
+						!isAbsolute(input) ||
+						input.includes("/node_modules/") ||
+						input.includes("/validator/vitest/")
+					)
+						return null;
+					return instrumentAsyncConsumption(
+						source,
+						id,
+						parseAst,
+						StringEditor,
+						asset("async-consumption.ts"),
+					);
+				},
+			},
 			{
 				name: "livespec-bind-inputs",
 				enforce: "pre",

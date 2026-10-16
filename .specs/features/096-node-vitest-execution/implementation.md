@@ -1,6 +1,6 @@
 # Implementation — Node Vitest Execution Observations
 
-Local implementation is present. Fresh final consumer observations pass. Canonical mapping and independent complete-diff review are current and pass. Fresh acceptance execution certification and finalization remain pending; status is explicitly INCOMPLETE/DRAFT. Inspect the [progress checkpoint](progress.md) and [approved plan](plan.md) before resuming.
+Local implementation and grouped CI/async repairs are present. Fresh nine-asset wheel/API and complete46/55 consumer observations pass. Current143-binding/98-ID mapping and independent complete-diff review/audit pass. Fresh acceptance execution certification and finalization remain pending; status is explicitly INCOMPLETE/DRAFT. Inspect the [progress checkpoint](progress.md) and [approved plan](plan.md) before resuming.
 
 ## Requirement Mapping
 
@@ -31,7 +31,7 @@ Inspect the real Python assertions; parameterized cases retain exact IDs and req
 ## Files Created or Modified
 
 - New Python transport, provenance and inventory reconciliation modules; existing runner, capture and evidence integration.
-- Seven owned TypeScript config, runner, reporter, matcher, callsite, expectation guard and trace assets; setuptools package data includes them.
+- Nine owned TypeScript assets: config, runner, reporter, matcher, callsite, expectation guard, trace, direct async syntax and opaque consumption bridge; setuptools package data includes them.
 - Existing test CLI option and contradiction validation; canonical spec-implement outcome marker and expectations; README usage.
 - Genuine integration fixture/core/boundary/consumer, provenance, phase budget and canonical task016 guard tests; focused CLI and goal-marker regressions.
 - Dedicated Node 22 CI job and locked local Vitest/TypeScript/Biome toolchain; genuine observation witness fixture.
@@ -45,6 +45,9 @@ Inspect the real Python assertions; parameterized cases retain exact IDs and req
 - Original consumer inputs/pins and lifecycle remain untouched. Observations certify zero ACs. This is cooperative local provenance, not a same-user JavaScript sandbox.
 
 - Inspect [installed wheel assets and module identity](.reviews/implementation-evidence/wheel-installation.json), [real installed adapter execution](.reviews/implementation-evidence/installed-wheel-adapter.json) and [source CLI witness](.reviews/implementation-evidence/generic-source-cli.json). Whole-wheel CLI import remains a pre-existing missing driver-template packaging limitation; no installed CLI success is claimed.
+
+- Inspect [current nine-asset wheel identities](.reviews/implementation-evidence/opaque-wheel-assets.json), [current installed async API](.reviews/implementation-evidence/opaque-installed-api.json) and [current complete consumer observations](.reviews/implementation-evidence/consumer-opaque-observations.json). Earlier seven-asset and consumer receipts retain their historical interpretation and cannot certify these changed assets.
+- Inspect [the two-phase async regression proof](.reviews/implementation-evidence/async-finally-green.json) and [current143-binding mapping](.reviews/implementation-evidence/opaque-mapping-ingestion.json). Executed direct await/return syntax only authorizes the exact owned thenable; actual consumption and settlement are separately required. Unsupported compositions, callback ownership and finalizer-return forms fail closed.
 
 ## Incomplete checkpoint after canonical identity correction
 

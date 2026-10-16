@@ -41,9 +41,14 @@ class GoalPair:
 
     def step_task(self) -> dict[str, Any]:
         """Select the actual canonical implementation step, retaining all other obligations."""
-        tasks = [task for task in self.contract["tasks"] if task["id"].startswith("task.016.")]
+        tasks = [
+            task
+            for task in self.contract["tasks"]
+            if task["description"]
+            == "Execute each plan step with code, targeted tests, and step gate verification"
+        ]
         assert len(tasks) == 1
-        assert "Execute each plan step" in tasks[0]["description"]
+        assert tasks[0]["evidence_kind"] == "execution"
         return tasks[0]
 
 
@@ -129,9 +134,14 @@ def _archive_guard(pair: GoalPair, proof: dict[str, Any], project: Path) -> dict
 def test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift(
     vitest_project: VitestProject,
     changed_input: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Prove the real generic step and its receipt guard without completing the full workflow."""
     project = vitest_project.root
+    # Reproduce CI's absent personal hooks without injecting tasks or assuming an ordinal.
+    monkeypatch.setattr(
+        "validator.hook_resolver.GLOBAL_HOOKS_DIR", project.parent / "absent-global-hooks"
+    )
     vitest_project.write("test('observed', () => { expect(1).toBe(1); });")
     old = _prepare_goal(project, "historical", historical=True)
     new = _prepare_goal(project, "canonical", historical=False)
@@ -146,7 +156,7 @@ def test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_rej
     assert observed.valid and observed.certified_acs == [], observed.gaps
     assert not verify_execution_receipt(receipt, project, FEATURE).valid
     proof = _prove(new, project, receipt)
-    # @spec AC-005: The actual compiled task.016 accepts only its genuine passed observation.
+    # @spec AC-005: The actual compiled step accepts only its genuine passed observation.
     # — .specs/features/096-node-vitest-execution/spec.md#ac-005
     assert proof["accepted"], proof
     task_id = new.step_task()["id"]

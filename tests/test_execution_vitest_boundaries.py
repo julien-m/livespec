@@ -166,3 +166,84 @@ def test_setup_failure_without_a_matcher_cannot_qualify_as_red(
     for outcome in ("red", "passed"):
         result = verify_execution_observation(receipt, root, FEATURE, outcome)
         assert not result.valid, f"Setup-only failure qualified as {outcome}"
+
+
+@pytest.mark.parametrize(
+    "expression",
+    [
+        "assertion.then(() => {})",
+        "Promise.resolve(assertion)",
+        "Promise.all([assertion])",
+        "Promise.race([assertion])",
+    ],
+    ids=["then", "resolve", "all", "race"],
+)
+def test_detached_async_consumption_cannot_qualify_as_awaited(
+    vitest_project: VitestProject, expression: str
+) -> None:
+    """Reject detached chains even when native Promise assimilation consumes the thenable."""
+    vitest_project.write(
+        "test('detached', () => { const assertion = "
+        "expect(Promise.resolve(1)).resolves.toBe(1); "
+        f"{expression}; expect(1).toBe(1); }});"
+    )
+    receipt = vitest_project.capture()
+    result = verify_execution_observation(receipt, vitest_project.root, FEATURE, "passed")
+    assert not result.valid, result
+    assert any("consum" in gap.lower() or "await" in gap.lower() for gap in result.gaps)
+
+
+@pytest.mark.parametrize(
+    "source,qualifies",
+    [
+        ("test('implicit', () => expect(Promise.resolve(1)).resolves.toBe(1));", True),
+        (
+            "import {it as caseTest} from 'vitest'; "
+            "caseTest('alias', async () => { "
+            "await expect(Promise.resolve(1)).resolves.toBe(1); });",
+            True,
+        ),
+        (
+            "test('nested', () => { const nested = () => { "
+            "return expect(Promise.resolve(1)).resolves.toBe(1); }; "
+            "Promise.resolve(nested()); expect(1).toBe(1); });",
+            False,
+        ),
+        (
+            "test('composition', async () => { "
+            "await Promise.all([expect(Promise.resolve(1)).resolves.toBe(1)]); });",
+            False,
+        ),
+        (
+            "const identity = value => value; test('identity', () => { "
+            "return identity(expect(Promise.resolve(1)).resolves.toBe(1)); });",
+            False,
+        ),
+        (
+            "test('sequence', () => { return (0, expect(Promise.resolve(1)).resolves.toBe(1)); });",
+            False,
+        ),
+        (
+            "test('discarded return', () => { try { "
+            "return expect(Promise.resolve(1)).resolves.toBe(1); } finally { return; } });",
+            False,
+        ),
+    ],
+    ids=[
+        "implicit-return",
+        "import-alias",
+        "detached-nested-return",
+        "unsupported-composition",
+        "unsupported-identity",
+        "unsupported-sequence",
+        "overridden-finally-return",
+    ],
+)
+def test_async_source_proof_requires_direct_inline_test_ownership(
+    vitest_project: VitestProject, source: str, qualifies: bool
+) -> None:
+    """Preserve direct syntax and aliases; nested returns and compositions fail closed."""
+    vitest_project.write(source)
+    receipt = vitest_project.capture()
+    result = verify_execution_observation(receipt, vitest_project.root, FEATURE, "passed")
+    assert result.valid is qualifies, result

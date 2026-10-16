@@ -164,6 +164,7 @@ jobs:
               "vitest/reporters": "vitest/dist/reporters.d.ts",
               "@vitest/runner": "@vitest/runner/dist/index.d.ts",
               "vite": "vite/dist/node/index.d.ts",
+              "magic-string": "magic-string/dist/magic-string.cjs.d.ts",
           }
           config = {
               "compilerOptions": {

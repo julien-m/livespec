@@ -252,7 +252,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 37,
       "end_line": 37,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -262,7 +262,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 37,
       "end_line": 37,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -272,7 +272,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 37,
       "end_line": 37,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -282,7 +282,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 37,
       "end_line": 37,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -292,7 +292,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 56,
       "end_line": 56,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -302,7 +302,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 56,
       "end_line": 56,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -312,7 +312,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 56,
       "end_line": 56,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -322,7 +322,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 56,
       "end_line": 56,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -332,7 +332,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 85,
       "end_line": 85,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "Nested unsupported async and direct Chai assertions in a real toThrow callback cannot inherit internal framework exemptions. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -342,7 +342,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 85,
       "end_line": 85,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "Nested unsupported async and direct Chai assertions in a real toThrow callback cannot inherit internal framework exemptions. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -352,7 +352,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 103,
       "end_line": 103,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "A real successful retry cannot erase the unsupported unconsumed assertion from its earlier attempt. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -362,7 +362,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 117,
       "end_line": 117,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "Global assertion counters remain compatible with requireAssertions when the real test also executes a supported matcher. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -372,7 +372,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 132,
       "end_line": 132,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "Both genuine supported inner and outer toThrow callback matchers remain in the observed trace. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -382,7 +382,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 145,
       "end_line": 145,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "A genuine successful final retry remains qualifying when earlier failed assertions were supported and settled. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -392,7 +392,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 148,
       "end_line": 148,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "Retry finalization preserves the final actual passed matcher status. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -402,7 +402,7 @@
       "assertion_path": "tests/test_execution_vitest_boundaries.py",
       "start_line": 168,
       "end_line": 168,
-      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
       "justification": "Setup throws before any selected matcher executes; the genuine failed capture qualifies neither red nor passed. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -740,9 +740,9 @@
       "test_id": "tests.test_bugfix_goal::test_implement_generic_execution_has_explicit_passed_purpose",
       "expected": "Official new canonical spec-implement rendering parses task.016 with explicit passed outcome purpose.",
       "assertion_path": "tests/test_bugfix_goal.py",
-      "start_line": 119,
-      "end_line": 119,
-      "source_sha256": "314abb3129abc5b2ff6925813641b3680ea442acd293aa93ca5a80f2b4bcc5ae",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "725630ab243047522b1a067cac8cab306a73f1c65f30072c35acaf6b90a6a00e",
       "justification": "Official new canonical spec-implement rendering parses task.016 with explicit passed outcome purpose. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -750,9 +750,9 @@
       "test_id": "tests.test_bugfix_goal::test_implement_generic_execution_has_explicit_passed_purpose",
       "expected": "Both feature-wide acceptance rows in the same official rendering retain their strict acceptance purpose without a generic passed exemption.",
       "assertion_path": "tests/test_bugfix_goal.py",
-      "start_line": 122,
-      "end_line": 122,
-      "source_sha256": "314abb3129abc5b2ff6925813641b3680ea442acd293aa93ca5a80f2b4bcc5ae",
+      "start_line": 129,
+      "end_line": 129,
+      "source_sha256": "725630ab243047522b1a067cac8cab306a73f1c65f30072c35acaf6b90a6a00e",
       "justification": "Both feature-wide acceptance rows in the same official rendering retain their strict acceptance purpose without a generic passed exemption. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -762,7 +762,7 @@
       "assertion_path": "tests/test_bugfix_goal.py",
       "start_line": 93,
       "end_line": 93,
-      "source_sha256": "314abb3129abc5b2ff6925813641b3680ea442acd293aa93ca5a80f2b4bcc5ae",
+      "source_sha256": "725630ab243047522b1a067cac8cab306a73f1c65f30072c35acaf6b90a6a00e",
       "justification": "The existing policy verifier accepts current genuine passing execution for an explicit generic passed task. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -772,7 +772,7 @@
       "assertion_path": "tests/test_bugfix_goal.py",
       "start_line": 94,
       "end_line": 94,
-      "source_sha256": "314abb3129abc5b2ff6925813641b3680ea442acd293aa93ca5a80f2b4bcc5ae",
+      "source_sha256": "725630ab243047522b1a067cac8cab306a73f1c65f30072c35acaf6b90a6a00e",
       "justification": "The same policy verifier rejects actual failed/stale execution when the generic task explicitly requires passed. Canonical JUnit identity with the exact parameter suffix and complete Python assert span bind this branch to actual integration verification."
     },
     {
@@ -1110,9 +1110,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "A fresh genuine Vitest passed observation proves the actual canonical task.016.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 151,
-      "end_line": 151,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 161,
+      "end_line": 161,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "The test copies the real spec-implement producer unchanged, compiles the actual task.016 and calls native proof with the second fresh receipt; it constructs no replacement task."
     },
     {
@@ -1120,9 +1120,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "A fresh genuine Vitest passed observation proves the actual canonical task.016.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 151,
-      "end_line": 151,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 161,
+      "end_line": 161,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "The test copies the real spec-implement producer unchanged, compiles the actual task.016 and calls native proof with the second fresh receipt; it constructs no replacement task."
     },
     {
@@ -1130,9 +1130,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "The native archive receipt guard verifies actual canonical passed purpose.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 172,
+      "end_line": 172,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "The accepted task state is consumed by existing verify_evidence_receipts and recheck_receipts; its returned real guard entry is verified and retains passed outcome. No full workflow archival is claimed."
     },
     {
@@ -1140,9 +1140,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "The native archive receipt guard verifies actual canonical passed purpose.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 172,
+      "end_line": 172,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "The accepted task state is consumed by existing verify_evidence_receipts and recheck_receipts; its returned real guard entry is verified and retains passed outcome. No full workflow archival is claimed."
     },
     {
@@ -1150,9 +1150,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "Current bound configuration or lock drift rejects actual task.016 proof.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 168,
-      "end_line": 168,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 178,
+      "end_line": 178,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "After genuine successful canonical proof, each actual governed-input mutation prevents reusing its prior receipt at native proof consumption."
     },
     {
@@ -1160,9 +1160,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "Current bound configuration or lock drift rejects actual task.016 proof.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 168,
-      "end_line": 168,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 178,
+      "end_line": 178,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "After genuine successful canonical proof, each actual governed-input mutation prevents reusing its prior receipt at native proof consumption."
     },
     {
@@ -1170,9 +1170,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "Current configuration or lock drift rejects the native archive receipt recheck.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 170,
-      "end_line": 170,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 180,
+      "end_line": 180,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "The same previously verified canonical passed entry is rechecked after actual input drift and must become unverified."
     },
     {
@@ -1180,9 +1180,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "Current configuration or lock drift rejects the native archive receipt recheck.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 170,
-      "end_line": 170,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 180,
+      "end_line": 180,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "The same previously verified canonical passed entry is rechecked after actual input drift and must become unverified."
     },
     {
@@ -1190,9 +1190,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "Only the actual generic implementation step is completed.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 154,
-      "end_line": 158,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 164,
+      "end_line": 168,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "Every other task from the full canonical spec-implement contract remains pending, so the generic witness claims no feature-wide completion or full workflow archive."
     },
     {
@@ -1200,9 +1200,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "Only the actual generic implementation step is completed.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 154,
-      "end_line": 158,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 164,
+      "end_line": 168,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "Every other task from the full canonical spec-implement contract remains pending, so the generic witness claims no feature-wide completion or full workflow archive."
     },
     {
@@ -1210,9 +1210,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "The fresh explicit canonical contract has a distinct hash from historical implicit purpose.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 140,
-      "end_line": 140,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "Both are officially compiled/rendered from isolated producer copies; the historical source differs only in the previously absent outcome marker."
     },
     {
@@ -1220,9 +1220,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "The fresh explicit canonical contract has a distinct hash from historical implicit purpose.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 140,
-      "end_line": 140,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "Both are officially compiled/rendered from isolated producer copies; the historical source differs only in the previously absent outcome marker."
     },
     {
@@ -1230,9 +1230,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "The new canonical passed proof uses a fresh observation invocation.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 144,
-      "end_line": 144,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 154,
+      "end_line": 154,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "The actual Node/Vitest receipt differs from the earlier receipt that supplied only rejected historical proof."
     },
     {
@@ -1240,9 +1240,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "The new canonical passed proof uses a fresh observation invocation.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 144,
-      "end_line": 144,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 154,
+      "end_line": 154,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "The actual Node/Vitest receipt differs from the earlier receipt that supplied only rejected historical proof."
     },
     {
@@ -1250,9 +1250,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "Historical source, rendered contract/state and rejection bytes remain unchanged.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 172,
-      "end_line": 172,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 182,
+      "end_line": 182,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "Both current config/lock scenarios compare every frozen historical byte after actual new proof/guard verification and subsequent drift refusals."
     },
     {
@@ -1260,9 +1260,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "Historical source, rendered contract/state and rejection bytes remain unchanged.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 172,
-      "end_line": 172,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 182,
+      "end_line": 182,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "Both current config/lock scenarios compare every frozen historical byte after actual new proof/guard verification and subsequent drift refusals."
     },
     {
@@ -1270,9 +1270,9 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
       "expected": "The original implicit-purpose contract still rejects the observation.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 173,
-      "end_line": 173,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 183,
+      "end_line": 183,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "After new canonical proof and native archive guard checks, historical empty outcome is never reinterpreted as passed."
     },
     {
@@ -1280,10 +1280,160 @@
       "test_id": "tests.test_execution_vitest_goal::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
       "expected": "The original implicit-purpose contract still rejects the observation.",
       "assertion_path": "tests/test_execution_vitest_goal.py",
-      "start_line": 173,
-      "end_line": 173,
-      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "start_line": 183,
+      "end_line": 183,
+      "source_sha256": "48ac76ee07466668a4a95d227adc629a3f1627de76d98b1afd55d66512af01e0",
       "justification": "After new canonical proof and native archive guard checks, historical empty outcome is never reinterpreted as passed."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_detached_async_consumption_cannot_qualify_as_awaited[then]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 192,
+      "end_line": 192,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_detached_async_consumption_cannot_qualify_as_awaited[then]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 193,
+      "end_line": 193,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_detached_async_consumption_cannot_qualify_as_awaited[resolve]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 192,
+      "end_line": 192,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_detached_async_consumption_cannot_qualify_as_awaited[resolve]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 193,
+      "end_line": 193,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_detached_async_consumption_cannot_qualify_as_awaited[all]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 192,
+      "end_line": 192,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_detached_async_consumption_cannot_qualify_as_awaited[all]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 193,
+      "end_line": 193,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_detached_async_consumption_cannot_qualify_as_awaited[race]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 192,
+      "end_line": 192,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_detached_async_consumption_cannot_qualify_as_awaited[race]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 193,
+      "end_line": 193,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_async_source_proof_requires_direct_inline_test_ownership[implicit-return]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 249,
+      "end_line": 249,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_async_source_proof_requires_direct_inline_test_ownership[import-alias]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 249,
+      "end_line": 249,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_async_source_proof_requires_direct_inline_test_ownership[detached-nested-return]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 249,
+      "end_line": 249,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_async_source_proof_requires_direct_inline_test_ownership[unsupported-composition]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 249,
+      "end_line": 249,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_async_source_proof_requires_direct_inline_test_ownership[unsupported-identity]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 249,
+      "end_line": 249,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_async_source_proof_requires_direct_inline_test_ownership[unsupported-sequence]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 249,
+      "end_line": 249,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests.test_execution_vitest_boundaries::test_async_source_proof_requires_direct_inline_test_ownership[overridden-finally-return]",
+      "expected": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 249,
+      "end_line": 249,
+      "source_sha256": "5db023054546c19aa517e6e1a4fc2549f814dcd14407017c545168be82192f8f",
+      "justification": "Actual direct async syntax and consumption must qualify only for supported inline tests; detached chains, compositions, nested ownership and finalizer-overridden returns refuse. The real observer receipt is independently verified for this exact parameter branch; executed Python assertion compares that actual verdict/diagnostic."
     }
   ],
   "derivation": "review"

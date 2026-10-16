@@ -1,5 +1,26 @@
 # Changelog - 096-node-vitest-execution
 
+## 2026-10-16 — [Bugfix]: Prove direct async consumption without detached-chain false positives
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** Owned executed-JavaScript syntax and opaque worker consumption bridge, focused regressions and CI type paths.
+- **AC impacted:** AC-002; final mapped certification pending.
+- **Author:** Codex
+- Detached chains and finally-overridden returns reproduced RED;23 focused checks pass. Direct syntax authorization, exact thenable consumption and native settlement are independently required; unsupported forms fail closed.
+- Nine current assets match the built wheel; installed async API and fresh46/55 selections pass without original consumer changes. Existing nonblocking conventions warnings remain follow-up debt.
+- Current143/98 manual mapping and complete47-file independent review/audit pass; the single final300s campaign remains unconsumed.
+
+## 2026-10-16 — [Bugfix]: Repair deterministic CI fixtures
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** Canonical goal selection, CI job inventory and migration fixture hashing tests.
+- **AC impacted:** AC-005; final execution certification remains pending.
+- **Author:** Codex
+- Exact canonical task selection replaces hook-dependent ordinals. Only the migration fixture excludes volatile Git metadata before reading; default hashes and other read failures remain strict.
+- Six focused checks and the real migration pass; inspect [current static and migration results](.reviews/implementation-evidence/ci-grouped-repair-checks.json). Historical captures remain unchanged.
+
 ## 2026-10-16 — [Spec]: Feature specification created
 
 - **Type:** Spec Update

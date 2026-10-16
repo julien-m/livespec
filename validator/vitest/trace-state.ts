@@ -48,7 +48,9 @@ export const finalizeTask = (task: Task): void => {
 	);
 	for (const record of records.filter((record) => record.task === task)) {
 		if (!record.settled || !record.consumed)
-			errors.push(`Unconsumed or unsettled matcher: ${identity(task)}`);
+			errors.push(
+				`Unconsumed or unsettled matcher: ${identity(task)}; use direct await/return in an inline imported test/it callback; async helpers and Promise compositions are unsupported`,
+			);
 	}
 	const assertions = current
 		.filter((record) => record.settled && record.consumed)

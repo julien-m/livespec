@@ -114,8 +114,15 @@ def test_implement_generic_execution_has_explicit_passed_purpose(
     )
     assert result.exit_code == 0, result.output
     tasks = json.loads(result.output)["canonical"]["tasks"]
-    generic = next(task for task in tasks if task["id"].startswith("task.016."))
-    assert "Execute each plan step" in generic["description"]
+    generic_tasks = [
+        task
+        for task in tasks
+        if task["description"]
+        == "Execute each plan step with code, targeted tests, and step gate verification"
+    ]
+    assert len(generic_tasks) == 1
+    generic = generic_tasks[0]
+    assert generic["evidence_kind"] == "execution"
     assert generic["evidence_expected_outcome"] == "passed"
     acceptance = [task for task in tasks if task.get("acceptance_scope") == "feature"]
     assert len(acceptance) == 2

@@ -1,5 +1,6 @@
 /** Observe genuine Chai/Vitest dispatch without consuming matcher promises. */
 import { createRequire } from "node:module";
+import { consumeAsyncMatcher, registerAsyncMatcher } from "./async-consumption";
 import { guardExpectation } from "./expect-guard";
 import { matcherCallsite } from "./matcher-callsite";
 import {
@@ -124,15 +125,16 @@ const observe = (
 			},
 		);
 		const promise = returned as Promise<unknown>; // The native promise check above establishes the Vitest thenable boundary.
-		return {
+		const observed = {
 			// biome-ignore lint/suspicious/noThenProperty: An explicit thenable is necessary to distinguish consumer await from framework auto-await.
 			then: (fulfilled: unknown, rejected: unknown) => {
-				record.consumed = true;
+				consumeAsyncMatcher(observed);
 				return Reflect.apply(promise.then, promise, [fulfilled, rejected]);
 			},
 			catch: promise.catch.bind(promise),
 			finally: promise.finally.bind(promise),
 		};
+		return registerAsyncMatcher(observed, record);
 	} catch (error) {
 		record.settled = true;
 		record.assertion.status = "failed";
