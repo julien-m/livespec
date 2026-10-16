@@ -28,6 +28,10 @@ Read the [contract](spec.md), [approved plan](plan.md), [progress](progress.md) 
 | FR-015 | AC-014 | Read [shared progression](../../../validator/progression_gate.py), [pipeline](../../../validator/pipeline.py), [review validation](../../../validator/pipeline_review_validation.py), [approval recovery](../../../validator/pipeline_approval_write.py) and [native protocol](../../../system/review-protocol.md). | Read [direct/nested tests](../../../tests/test_progression_integrity.py), [publication tests](../../../tests/test_pipeline_gate_publication.py), [rollback tests](../../../tests/test_pipeline_approval_rollback.py), [CLI dispatch](../../../tests/test_gate_cli_dispatch.py) and [generation gates](../../../tests/test_spec_test_progression_contract.py). |
 | FR-016 | AC-015, AC-016 | Read [versioned policy](../../../validator/evidence_policy.py), [documentary acceptance review](../../../validator/semantic/acceptance_review.py), [lifecycle finalizer](../../../validator/finalize_spec.py) and [058 amendment](../058-deterministic-finalization/spec.md#fr-002). | Read [legacy policy tests](../../../tests/test_evidence_policy.py), [legacy archive CLI tests](../../../tests/test_verify_output_legacy_policy.py), [review-kind archive compatibility](../../../tests/test_review_kind_archives.py), [finalizer tests](../../../tests/test_finalize_lifecycle.py), [first CLI closure](../../../tests/test_finalize_review_boundary.py) and [077 identity tests](../../../tests/test_penflow_requirement_source.py). |
 
+## Documentary-only acceptance correction
+
+Read [the regression tests](../../../tests/test_documentary_only_acceptance.py): policy2 final acceptance resolves receipt kinds from the nonempty canonical AC inventory. All-review proofs retain complete current review validation at prove, archive and archive-read; mixed/execution requirements, fix selection and RED/GREEN observations keep their previous guards.
+
 ## Acceptance Criteria
 
 Derived from the requirement mapping above (no new claim): each AC is covered by the regression tests listed on its requirement rows; scoped verdicts and receipts remain in the [verification report](verification-report.md). Source anchors use `@spec` comments, for example `# @spec FR-008: Accepted source decisions` in [clarify_decisions.py](../../../validator/clarify_decisions.py).
@@ -172,3 +176,9 @@ FR-011: read the [source scope](../../../validator/execution_scope.py) and its [
 ## 2026-10-13 — Review status as lifecycle metadata (spec-fix)
 
 FR-004 / AC-004: [normative identity](../../../validator/normative_identity.py) treats every spec-system status, now including `Review`, as lifecycle metadata. The [clarification inventory](../../../validator/clarify_inventory.py) names a reviewer model mismatch next to `stale_or_incomplete_spec_review`. [The finalize regression](../../../tests/test_finalize_status_review_identity.py) runs `finalize apply --status` through the CLI and then the implement progression: status transitions stay READY, and an AC change makes the review stale.
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-16 | implementation | `tests/test_documentary_only_acceptance.py::test_documentary_only_goal_proves_archives_and_rechecks[False]`, `tests/test_documentary_only_acceptance.py::test_documentary_only_goal_proves_archives_and_rechecks[True]` | `.specs/.execution/56e45aefdf574871927347a14ea70e0f/receipt.json` | `.specs/.execution/9ad8beec4d00468dbdc5b60e866bfb82/receipt.json` |

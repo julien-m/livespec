@@ -40,7 +40,7 @@ def is_final_acceptance_task(task: Mapping[str, Any]) -> bool:
 def verify_acceptance_evidence(
     task: Mapping[str, Any],
     evidence: Mapping[str, Any],
-    receipt: Path,
+    receipt: Path | None,
     root: Path,
     feature: str,
 ) -> list[str]:
@@ -61,8 +61,13 @@ def verify_acceptance_evidence(
     runtime_ids = tuple(
         item.requirement_id for item in inventory if item.evidence_kind == "execution"
     )
-    result = verify_execution_receipt(receipt, root, feature, required_acs=runtime_ids)
-    missing = [] if result.valid else list(result.gaps)
+    missing: list[str] = []
+    # An all-review inventory has no runtime assertion scope; mixed inventories still do.
+    if runtime_ids:
+        if receipt is None:
+            return ["execution_receipt_path"]
+        result = verify_execution_receipt(receipt, root, feature, required_acs=runtime_ids)
+        missing = [] if result.valid else list(result.gaps)
     if any(item.evidence_kind == "review" for item in inventory):
         missing.extend(_review_acceptance_missing(expected, evidence, root, feature))
     return missing

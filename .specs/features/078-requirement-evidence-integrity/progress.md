@@ -61,3 +61,9 @@ Capture22c6c801 certifies AC007/AC015 with zero gaps and 3875 passing tests. The
 - Read [the pipeline witness helper](../../../tests/integration/helpers/witness_pipeline.py): bind candidate instructions to the snapshot CLI/interpreter; verify terminal progression with explicit feature and archived reviewer identity; reject usage exit 2, output diagnostics, timeouts and incomplete process control.
 - Read [closure regression tests](../../../tests/test_witness_pipeline_closure.py): actual CLI terminal, pending and malformed-option scenarios plus incomplete-control rejection.
 - Runtime replay under a different Python/pytest installation remains rejected. Native v9 requires fresh capture through its unchanged authoritative frozen CLI before independent closure can pass.
+
+## 2026-10-16 — Documentary-only acceptance correction
+
+- Runner-owned RED/GREEN for frozen and reviewed-spec final goals; bugfix ELIGIBLE (5/8 files, 178/300 lines).
+- Targeted regression selection: 55 passed; additional archive transition cases: 2 passed. Independent high review PASS with 49 tests rerun; Ruff, format and Pyright PASS.
+- Acceptance review provenance and all mixed/execution, fix-selection and RED/GREEN observation guards remain in force.
