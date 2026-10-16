@@ -170,18 +170,28 @@ def typed_evidence_missing(
         return ["explicit_evidence_kind_required"]
     feature = contract.get("feature")
     path = evidence.get(f"{kind}_receipt_path")
-    if not isinstance(path, str) or not path:
+    # Final policy2 acceptance chooses its receipt kinds from the canonical AC inventory.
+    final_acceptance = (
+        version == "2"
+        and kind == "execution"
+        and task.get("acceptance_scope") == "feature"
+        and task.get("evidence_expected_outcome") not in ("red", "passed")
+    )
+    if (not isinstance(path, str) or not path) and not final_acceptance:
         return [f"{kind}_receipt_path"]
     if project_root is None or not isinstance(feature, str) or not feature:
         return ["project_and_feature_scope_required"]
-    receipt = Path(path)
-    receipt = receipt if receipt.is_absolute() else project_root / receipt
+    receipt = Path(path) if isinstance(path, str) and path else None
+    receipt = receipt if receipt is None or receipt.is_absolute() else project_root / receipt
     try:
-        receipt.resolve().relative_to(project_root.resolve())
+        if receipt is not None:
+            receipt.resolve().relative_to(project_root.resolve())
         if kind == "execution":
             return _execution_missing(
                 task, receipt, project_root, feature, policy=str(version), evidence=evidence
             )
+        if receipt is None:
+            return ["review_receipt_path"]
         return _semantic_review_missing(task, receipt, project_root, feature)
     except (OSError, ValueError, TypeError) as exc:
         return [f"{kind}_receipt_invalid:{exc}"]
@@ -212,7 +222,7 @@ def _semantic_review_missing(
 
 def _execution_missing(
     task: Mapping[str, Any],
-    receipt: Path,
+    receipt: Path | None,
     project_root: Path,
     feature: str,
     *,
@@ -226,6 +236,16 @@ def _execution_missing(
     if selection_missing := _fix_selection_missing(task, project_root, feature):
         return selection_missing
     expected_outcome = task.get("evidence_expected_outcome")
+    if (
+        policy == "2"
+        and task.get("acceptance_scope") == "feature"
+        and expected_outcome not in ("red", "passed")
+    ):
+        from .acceptance_evidence import verify_acceptance_evidence
+
+        return verify_acceptance_evidence(task, evidence or {}, receipt, project_root, feature)
+    if receipt is None:
+        return ["execution_receipt_path"]
     if expected_outcome in ("red", "passed"):
         from .execution_evidence import verify_execution_observation
 
@@ -238,11 +258,6 @@ def _execution_missing(
             evidence_policy="1" if policy == "1" else "2",
         )
         return [] if observed.valid else list(observed.gaps)
-
-    if policy == "2" and task.get("acceptance_scope") == "feature":
-        from .acceptance_evidence import verify_acceptance_evidence
-
-        return verify_acceptance_evidence(task, evidence or {}, receipt, project_root, feature)
 
     required = task.get("required_acs", ())
     if task.get("acceptance_scope") == "feature":

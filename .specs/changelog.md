@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-16 — [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution
+
+- Nonempty all-review inventories require complete current reviews at proof, archive and archive-read; mixed/runtime inventories retain execution receipts. Explicit success criteria and remote delivery evidence remain required.
+
 ## 2026-10-16 — [Feature 094] Bugfix: prevent Git revision batch pipe deadlocks
 
 - Feed revision queries from a temporary file; raw commit verification, Git environment guards and the 60-second bound remain. Real 605-object duplex regression RED/GREEN and 22 targeted tests pass.
