@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-16 — Technical plan: five bounded steps, two diagrams and explicit runtime evidence gates
+<!-- finalize:spec-plan:2026-10-16:e06699c9 -->
+
+## 2026-10-16 — Spec created: Node Vitest Execution Observations - 3 stories, 6 AC, 6 FR
+<!-- finalize:spec-specify:2026-10-16:f1165a0a -->
+
 ## 2026-10-16 — [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution
 
 - Nonempty all-review inventories require complete current reviews at proof, archive and archive-read; mixed/runtime inventories retain execution receipts. Explicit success criteria and remote delivery evidence remain required.

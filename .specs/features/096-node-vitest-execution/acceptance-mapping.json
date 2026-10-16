@@ -1,0 +1,1290 @@
+{
+  "schema_version": "1",
+  "feature": "096-node-vitest-execution",
+  "reviewer_model": "gpt-6.1-sol",
+  "review_max_chars": 200000,
+  "review_receipt_path": ".specs/features/096-node-vitest-execution/.reviews/acceptance-mapping-review.json",
+  "bindings": [
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[1-passed]",
+      "expected": "Genuine Node22/local Vitest synchronous pass and failed supported matcher each verify only for the requested observation purpose.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 41,
+      "end_line": 41,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Genuine Node22/local Vitest synchronous pass and failed supported matcher each verify only for the requested observation purpose. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[2-red]",
+      "expected": "Genuine Node22/local Vitest synchronous pass and failed supported matcher each verify only for the requested observation purpose.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 41,
+      "end_line": 41,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Genuine Node22/local Vitest synchronous pass and failed supported matcher each verify only for the requested observation purpose. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[1-passed]",
+      "expected": "Stored actual matcher status is passed for the successful case and failed for the unsuccessful case, never fabricated success.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 48,
+      "end_line": 48,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Stored actual matcher status is passed for the successful case and failed for the unsuccessful case, never fabricated success. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[2-red]",
+      "expected": "Stored actual matcher status is passed for the successful case and failed for the unsuccessful case, never fabricated success.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 48,
+      "end_line": 48,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Stored actual matcher status is passed for the successful case and failed for the unsuccessful case, never fabricated success. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[1-passed]",
+      "expected": "Observed matcher source path equals the actual selected test file relative to the governed project.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 47,
+      "end_line": 47,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Observed matcher source path equals the actual selected test file relative to the governed project. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[2-red]",
+      "expected": "Observed matcher source path equals the actual selected test file relative to the governed project.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 47,
+      "end_line": 47,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Observed matcher source path equals the actual selected test file relative to the governed project. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[1-passed]",
+      "expected": "Observed matcher source line equals line two of the actual generated test.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 46,
+      "end_line": 46,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Observed matcher source line equals line two of the actual generated test. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[2-red]",
+      "expected": "Observed matcher source line equals line two of the actual generated test.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 46,
+      "end_line": 46,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Observed matcher source line equals line two of the actual generated test. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_every_selected_test_requires_an_executed_matcher[bare-expect]",
+      "expected": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 74,
+      "end_line": 74,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_every_selected_test_requires_an_executed_matcher[no-assertion]",
+      "expected": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 74,
+      "end_line": 74,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_every_selected_test_requires_an_executed_matcher[skip-only]",
+      "expected": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 74,
+      "end_line": 74,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_every_selected_test_requires_an_executed_matcher[mixed-empty]",
+      "expected": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 74,
+      "end_line": 74,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_every_selected_test_requires_an_executed_matcher[zero-tests]",
+      "expected": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 74,
+      "end_line": 74,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All five real bare-expect/no-assertion/skip-only/mixed-empty/zero-test selections reject both passed and red proof. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_async_matcher_requires_consumer_await_or_return_not_vitest_autoawait[await -Promise.resolve(1)).resolves-1-passed-True]",
+      "expected": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_async_matcher_requires_consumer_await_or_return_not_vitest_autoawait[return -Promise.resolve(1)).resolves-2-red-True]",
+      "expected": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_async_matcher_requires_consumer_await_or_return_not_vitest_autoawait[-Promise.resolve(1)).resolves-1-passed-False]",
+      "expected": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_async_matcher_requires_consumer_await_or_return_not_vitest_autoawait[-Promise.resolve(1)).resolves-2-red-False]",
+      "expected": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_async_matcher_requires_consumer_await_or_return_not_vitest_autoawait[await -Promise.reject(1)).rejects-1-passed-True]",
+      "expected": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_async_matcher_requires_consumer_await_or_return_not_vitest_autoawait[return -Promise.reject(1)).rejects-2-red-True]",
+      "expected": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_async_matcher_requires_consumer_await_or_return_not_vitest_autoawait[-Promise.reject(1)).rejects-1-passed-False]",
+      "expected": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_async_matcher_requires_consumer_await_or_return_not_vitest_autoawait[-Promise.reject(1)).rejects-2-red-False]",
+      "expected": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight real resolves/rejects pass/fail branches qualify only when awaited or returned; unawaited assertions fail despite Vitest auto-await. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_unsupported_selected_assertion_paths_fail_closed[custom]",
+      "expected": "Real selected custom matchers, concurrent tests and direct Chai execution each fail closed.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 128,
+      "end_line": 128,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Real selected custom matchers, concurrent tests and direct Chai execution each fail closed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_unsupported_selected_assertion_paths_fail_closed[concurrent]",
+      "expected": "Real selected custom matchers, concurrent tests and direct Chai execution each fail closed.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 128,
+      "end_line": 128,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Real selected custom matchers, concurrent tests and direct Chai execution each fail closed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest.py::test_unsupported_selected_assertion_paths_fail_closed[direct-chai]",
+      "expected": "Real selected custom matchers, concurrent tests and direct Chai execution each fail closed.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 128,
+      "end_line": 128,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Real selected custom matchers, concurrent tests and direct Chai execution each fail closed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_context_expect_unsupported_forms_cannot_hide_behind_a_supported_matcher[extend]",
+      "expected": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 37,
+      "end_line": 37,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_context_expect_unsupported_forms_cannot_hide_behind_a_supported_matcher[poll]",
+      "expected": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 37,
+      "end_line": 37,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_context_expect_unsupported_forms_cannot_hide_behind_a_supported_matcher[soft]",
+      "expected": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 37,
+      "end_line": 37,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_context_expect_unsupported_forms_cannot_hide_behind_a_supported_matcher[equality-testers]",
+      "expected": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 37,
+      "end_line": 37,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "All four local context-expect extend/poll/soft/equality-tester branches reject even beside a supported global matcher. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_negated_async_chain_retains_consumption_tracking[awaited-resolves]",
+      "expected": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_negated_async_chain_retains_consumption_tracking[awaited-rejects]",
+      "expected": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_negated_async_chain_retains_consumption_tracking[unawaited-resolves]",
+      "expected": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_negated_async_chain_retains_consumption_tracking[unawaited-rejects]",
+      "expected": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "All four awaited/unawaited resolves/rejects negated chains retain consumption tracking and qualify exactly when consumed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_nested_user_callback_cannot_inherit_framework_dispatch_exemption[unawaited-async]",
+      "expected": "Nested unsupported async and direct Chai assertions in a real toThrow callback cannot inherit internal framework exemptions.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 85,
+      "end_line": 85,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "Nested unsupported async and direct Chai assertions in a real toThrow callback cannot inherit internal framework exemptions. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_nested_user_callback_cannot_inherit_framework_dispatch_exemption[direct-chai]",
+      "expected": "Nested unsupported async and direct Chai assertions in a real toThrow callback cannot inherit internal framework exemptions.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 85,
+      "end_line": 85,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "Nested unsupported async and direct Chai assertions in a real toThrow callback cannot inherit internal framework exemptions. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_retry_cannot_erase_an_unconsumed_assertion_from_an_earlier_attempt",
+      "expected": "A real successful retry cannot erase the unsupported unconsumed assertion from its earlier attempt.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 103,
+      "end_line": 103,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "A real successful retry cannot erase the unsupported unconsumed assertion from its earlier attempt. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_context_guard_preserves_global_assertion_counting",
+      "expected": "Global assertion counters remain compatible with requireAssertions when the real test also executes a supported matcher.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 117,
+      "end_line": 117,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "Global assertion counters remain compatible with requireAssertions when the real test also executes a supported matcher. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_supported_nested_callback_matchers_remain_observable",
+      "expected": "Both genuine supported inner and outer toThrow callback matchers remain in the observed trace.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 132,
+      "end_line": 132,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "Both genuine supported inner and outer toThrow callback matchers remain in the observed trace. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_supported_failed_retry_attempt_does_not_override_final_success",
+      "expected": "A genuine successful final retry remains qualifying when earlier failed assertions were supported and settled.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 145,
+      "end_line": 145,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "A genuine successful final retry remains qualifying when earlier failed assertions were supported and settled. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_supported_failed_retry_attempt_does_not_override_final_success",
+      "expected": "Retry finalization preserves the final actual passed matcher status.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 148,
+      "end_line": 148,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "Retry finalization preserves the final actual passed matcher status. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_execution_vitest_boundaries.py::test_setup_failure_without_a_matcher_cannot_qualify_as_red",
+      "expected": "Setup throws before any selected matcher executes; the genuine failed capture qualifies neither red nor passed.",
+      "assertion_path": "tests/test_execution_vitest_boundaries.py",
+      "start_line": 168,
+      "end_line": 168,
+      "source_sha256": "2b9801059dfd3d2b149cae694bec40f56cce8d3e522f269ae55f631542783a11",
+      "justification": "Setup throws before any selected matcher executes; the genuine failed capture qualifies neither red nor passed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_execution_vitest.py::test_teardown_failure_is_finalized_as_real_red",
+      "expected": "A passed test body plus a genuinely failing afterEach matcher finalizes as a verified red observation.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 169,
+      "end_line": 169,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "A passed test body plus a genuinely failing afterEach matcher finalizes as a verified red observation. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_current_lock_config_and_runtime_bytes_are_rechecked[package-lock.json]",
+      "expected": "Each initially valid genuine capture becomes invalid after mutating its npm lock, original configuration or installed Vitest entry.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 190,
+      "end_line": 190,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Each initially valid genuine capture becomes invalid after mutating its npm lock, original configuration or installed Vitest entry. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_current_lock_config_and_runtime_bytes_are_rechecked[vitest.config.ts]",
+      "expected": "Each initially valid genuine capture becomes invalid after mutating its npm lock, original configuration or installed Vitest entry.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 190,
+      "end_line": 190,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Each initially valid genuine capture becomes invalid after mutating its npm lock, original configuration or installed Vitest entry. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_current_lock_config_and_runtime_bytes_are_rechecked[node_modules/vitest/vitest.mjs]",
+      "expected": "Each initially valid genuine capture becomes invalid after mutating its npm lock, original configuration or installed Vitest entry.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 190,
+      "end_line": 190,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Each initially valid genuine capture becomes invalid after mutating its npm lock, original configuration or installed Vitest entry. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_artifact_tampering_cannot_reuse_a_passing_receipt[report]",
+      "expected": "Mutated report/assertion/inventory bytes cannot reuse the earlier passing receipt even when artifact metadata is rebound.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 204,
+      "end_line": 204,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Mutated report/assertion/inventory bytes cannot reuse the earlier passing receipt even when artifact metadata is rebound. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_artifact_tampering_cannot_reuse_a_passing_receipt[assertions]",
+      "expected": "Mutated report/assertion/inventory bytes cannot reuse the earlier passing receipt even when artifact metadata is rebound.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 204,
+      "end_line": 204,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Mutated report/assertion/inventory bytes cannot reuse the earlier passing receipt even when artifact metadata is rebound. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_artifact_tampering_cannot_reuse_a_passing_receipt[inventory]",
+      "expected": "Mutated report/assertion/inventory bytes cannot reuse the earlier passing receipt even when artifact metadata is rebound.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 204,
+      "end_line": 204,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Mutated report/assertion/inventory bytes cannot reuse the earlier passing receipt even when artifact metadata is rebound. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_foreign_invocation_artifacts_cannot_be_replayed",
+      "expected": "Two genuine fresh captures have separate identities; transplanting the first inventory into the second fails replay verification.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 218,
+      "end_line": 218,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Two genuine fresh captures have separate identities; transplanting the first inventory into the second fails replay verification. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_duplicate_selected_identity_is_rejected_even_with_rebound_hashes",
+      "expected": "A duplicated selected inventory identity fails semantic reconciliation even with rebound artifact hashes.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 282,
+      "end_line": 282,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "A duplicated selected inventory identity fails semantic reconciliation even with rebound artifact hashes. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest.py::test_ignored_transitive_config_import_remains_bound",
+      "expected": "A loaded transitive config import remains bound despite gitignore; changing it after capture invalidates verification.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 302,
+      "end_line": 302,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "A loaded transitive config import remains bound despite gitignore; changing it after capture invalidates verification. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest.py::test_runner_owned_unknown_and_escaping_arguments_are_rejected",
+      "expected": "All eight runner-owned/unknown/escaping argument branches raise actionable actual Vitest preparation diagnostics.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 239,
+      "end_line": 239,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "All eight runner-owned/unknown/escaping argument branches raise actionable actual Vitest preparation diagnostics. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest.py::test_node_loading_overrides_are_rejected",
+      "expected": "Caller Node loading overrides fail before execution with an actual NODE_OPTIONS diagnostic.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 254,
+      "end_line": 254,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Caller Node loading overrides fail before execution with an actual NODE_OPTIONS diagnostic. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest.py::test_runtime_deadline_cannot_qualify_as_a_matcher_red",
+      "expected": "A real nonsettling test exceeds its explicit 1.5-second capture budget and retains timeout exit124.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 266,
+      "end_line": 266,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "A real nonsettling test exceeds its explicit 1.5-second capture budget and retains timeout exit124. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest.py::test_runtime_deadline_cannot_qualify_as_a_matcher_red",
+      "expected": "A genuine bounded timeout cannot qualify as red even after an earlier supported passing matcher.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 268,
+      "end_line": 268,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "A genuine bounded timeout cannot qualify as red even after an earlier supported passing matcher. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest.py::test_runtime_deadline_cannot_qualify_as_a_matcher_red",
+      "expected": "The same timed-out actual run cannot qualify as a passed observation.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 269,
+      "end_line": 269,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "The same timed-out actual run cannot qualify as a passed observation. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest.py::test_original_config_selection_setup_and_teardown_are_preserved",
+      "expected": "Original Vite environment/include/exclude/setup/teardown selection remains intact; actual selected-test and setup matcher paths are retained.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 158,
+      "end_line": 158,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Original Vite environment/include/exclude/setup/teardown selection remains intact; actual selected-test and setup matcher paths are retained. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_cli_observation_verifies_real_assertions_without_mapping[passed]",
+      "expected": "Both actual public CLI passed and real failed-matcher red cases succeed only through explicit observation verification.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 200,
+      "end_line": 200,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "Both actual public CLI passed and real failed-matcher red cases succeed only through explicit observation verification. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_cli_observation_verifies_real_assertions_without_mapping[red]",
+      "expected": "Both actual public CLI passed and real failed-matcher red cases succeed only through explicit observation verification.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 200,
+      "end_line": 200,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "Both actual public CLI passed and real failed-matcher red cases succeed only through explicit observation verification. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_cli_observation_verifies_real_assertions_without_mapping[passed]",
+      "expected": "The actual public CLI rejects the opposite requested outcome for each genuine passed/red run.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 213,
+      "end_line": 213,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "The actual public CLI rejects the opposite requested outcome for each genuine passed/red run. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_cli_observation_verifies_real_assertions_without_mapping[red]",
+      "expected": "The actual public CLI rejects the opposite requested outcome for each genuine passed/red run.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 213,
+      "end_line": 213,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "The actual public CLI rejects the opposite requested outcome for each genuine passed/red run. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments0]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments1]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments2]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments3]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments4]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments5]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments6]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments7]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-001",
+      "test_id": "tests/test_native_test_option_matrix.py::test_observation_contradictions_reject_before_project_resolution[arguments8]",
+      "expected": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "All nine contradictory or incomplete observation options reject before the patched project resolver can be accessed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_native_test_option_matrix.py::test_cli_observation_verifies_real_assertions_without_mapping[passed]",
+      "expected": "Both actual CLI observation captures carry a null acceptance mapping and bypass acceptance review.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 207,
+      "end_line": 207,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "Both actual CLI observation captures carry a null acceptance mapping and bypass acceptance review. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_native_test_option_matrix.py::test_cli_observation_verifies_real_assertions_without_mapping[red]",
+      "expected": "Both actual CLI observation captures carry a null acceptance mapping and bypass acceptance review.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 207,
+      "end_line": 207,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "Both actual CLI observation captures carry a null acceptance mapping and bypass acceptance review. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_native_test_option_matrix.py::test_cli_observation_verifies_real_assertions_without_mapping[passed]",
+      "expected": "Both actual CLI purposes return an empty certified AC list and do not substitute observation for feature certification.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 203,
+      "end_line": 203,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "Both actual CLI purposes return an empty certified AC list and do not substitute observation for feature certification. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_native_test_option_matrix.py::test_cli_observation_verifies_real_assertions_without_mapping[red]",
+      "expected": "Both actual CLI purposes return an empty certified AC list and do not substitute observation for feature certification.",
+      "assertion_path": "tests/test_native_test_option_matrix.py",
+      "start_line": 203,
+      "end_line": 203,
+      "source_sha256": "f232047f09053d2b263e7f4c9a7120f975ee82ab73b75dd5b97c5baf9be99187",
+      "justification": "Both actual CLI purposes return an empty certified AC list and do not substitute observation for feature certification. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_bugfix_goal.py::test_implement_generic_execution_has_explicit_passed_purpose",
+      "expected": "Official new canonical spec-implement rendering parses task.016 with explicit passed outcome purpose.",
+      "assertion_path": "tests/test_bugfix_goal.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "ae22a2739555646117ce67e602295c64ad4f63fadfc38571b65889bb25606f4b",
+      "justification": "Official new canonical spec-implement rendering parses task.016 with explicit passed outcome purpose. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_bugfix_goal.py::test_implement_generic_execution_has_explicit_passed_purpose",
+      "expected": "Both feature-wide acceptance rows in the same official rendering retain their strict acceptance purpose without a generic passed exemption.",
+      "assertion_path": "tests/test_bugfix_goal.py",
+      "start_line": 121,
+      "end_line": 121,
+      "source_sha256": "ae22a2739555646117ce67e602295c64ad4f63fadfc38571b65889bb25606f4b",
+      "justification": "Both feature-wide acceptance rows in the same official rendering retain their strict acceptance purpose without a generic passed exemption. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_bugfix_goal.py::test_outcome_passed_accepts_current_green_only",
+      "expected": "The existing policy verifier accepts current genuine passing execution for an explicit generic passed task.",
+      "assertion_path": "tests/test_bugfix_goal.py",
+      "start_line": 92,
+      "end_line": 92,
+      "source_sha256": "ae22a2739555646117ce67e602295c64ad4f63fadfc38571b65889bb25606f4b",
+      "justification": "The existing policy verifier accepts current genuine passing execution for an explicit generic passed task. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_bugfix_goal.py::test_outcome_passed_accepts_current_green_only",
+      "expected": "The same policy verifier rejects actual failed/stale execution when the generic task explicitly requires passed.",
+      "assertion_path": "tests/test_bugfix_goal.py",
+      "start_line": 93,
+      "end_line": 93,
+      "source_sha256": "ae22a2739555646117ce67e602295c64ad4f63fadfc38571b65889bb25606f4b",
+      "justification": "The same policy verifier rejects actual failed/stale execution when the generic task explicitly requires passed. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[1-passed]",
+      "expected": "Neither real Vitest passed nor red observation receipt can certify feature acceptance without governed assertion mappings.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 52,
+      "end_line": 52,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Neither real Vitest passed nor red observation receipt can certify feature acceptance without governed assertion mappings. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_vitest.py::test_real_sync_matcher_observes_outcome_without_certifying_acceptance[2-red]",
+      "expected": "Neither real Vitest passed nor red observation receipt can certify feature acceptance without governed assertion mappings.",
+      "assertion_path": "tests/test_execution_vitest.py",
+      "start_line": 52,
+      "end_line": 52,
+      "source_sha256": "adfc5916ab530dcc17fe83c5f8b472d319cd3611911ca22e390cd2c9acf0a10b",
+      "justification": "Neither real Vitest passed nor red observation receipt can certify feature acceptance without governed assertion mappings. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_acceptance_execution_join.py::test_real_execution_and_documentary_review_jointly_prove_archive_and_verify",
+      "expected": "Genuine runtime proof and independently grounded documentary review retain conjunctive proof/archive/terminal verification behavior.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 113,
+      "end_line": 113,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "Genuine runtime proof and independently grounded documentary review retain conjunctive proof/archive/terminal verification behavior. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_acceptance_execution_join.py::test_real_runtime_cannot_replace_missing_forged_or_stale_documentary_review[missing]",
+      "expected": "Genuine runtime execution cannot replace any missing, forged or stale documentary acceptance receipt.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "Genuine runtime execution cannot replace any missing, forged or stale documentary acceptance receipt. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_acceptance_execution_join.py::test_real_runtime_cannot_replace_missing_forged_or_stale_documentary_review[forged]",
+      "expected": "Genuine runtime execution cannot replace any missing, forged or stale documentary acceptance receipt.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "Genuine runtime execution cannot replace any missing, forged or stale documentary acceptance receipt. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_acceptance_execution_join.py::test_real_runtime_cannot_replace_missing_forged_or_stale_documentary_review[stale]",
+      "expected": "Genuine runtime execution cannot replace any missing, forged or stale documentary acceptance receipt.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "Genuine runtime execution cannot replace any missing, forged or stale documentary acceptance receipt. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_acceptance_execution_join.py::test_archive_and_terminal_read_recheck_documentary_review_after_real_execution",
+      "expected": "After genuine runtime and archival, terminal verification rechecks and rejects a subsequently forged documentary receipt.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 141,
+      "end_line": 141,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "After genuine runtime and archival, terminal verification rechecks and rejects a subsequently forged documentary receipt. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_acceptance_execution_join.py::test_unchanged_policy1_real_capture_archives_and_rechecks_without_current_exemption",
+      "expected": "A genuine historical policy-one goal retains its original proof/archive/terminal verification interpretation.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 216,
+      "end_line": 216,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "A genuine historical policy-one goal retains its original proof/archive/terminal verification interpretation. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_acceptance_execution_join.py::test_unchanged_policy1_real_capture_archives_and_rechecks_without_current_exemption",
+      "expected": "Successful historical archive verification never grants an exemption for current strict acceptance of that same legacy capture.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 219,
+      "end_line": 219,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "Successful historical archive verification never grants an exemption for current strict acceptance of that same legacy capture. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_capture_policy.py::test_identical_sources_require_a_new_current_runner_capture[None]",
+      "expected": "Both absent-policy and explicit policy-one immutable capture bytes remain exact after creating new genuine current evidence.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 51,
+      "end_line": 51,
+      "source_sha256": "776d82894ac6515e5ba9cc8f08502df123a99cac567c4040426c723377b59547",
+      "justification": "Both absent-policy and explicit policy-one immutable capture bytes remain exact after creating new genuine current evidence. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_capture_policy.py::test_identical_sources_require_a_new_current_runner_capture[1]",
+      "expected": "Both absent-policy and explicit policy-one immutable capture bytes remain exact after creating new genuine current evidence.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 51,
+      "end_line": 51,
+      "source_sha256": "776d82894ac6515e5ba9cc8f08502df123a99cac567c4040426c723377b59547",
+      "justification": "Both absent-policy and explicit policy-one immutable capture bytes remain exact after creating new genuine current evidence. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_capture_policy.py::test_identical_sources_require_a_new_current_runner_capture[None]",
+      "expected": "Both legacy policy forms verify only under their historical policy and cannot silently become current observations.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 45,
+      "end_line": 45,
+      "source_sha256": "776d82894ac6515e5ba9cc8f08502df123a99cac567c4040426c723377b59547",
+      "justification": "Both legacy policy forms verify only under their historical policy and cannot silently become current observations. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_capture_policy.py::test_identical_sources_require_a_new_current_runner_capture[1]",
+      "expected": "Both legacy policy forms verify only under their historical policy and cannot silently become current observations.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 45,
+      "end_line": 45,
+      "source_sha256": "776d82894ac6515e5ba9cc8f08502df123a99cac567c4040426c723377b59547",
+      "justification": "Both legacy policy forms verify only under their historical policy and cannot silently become current observations. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_evidence.py::test_real_red_receipt_stays_observation_at_goal_and_archive_boundaries",
+      "expected": "The existing archived receipt guard rejects erased explicit red purpose rather than reinterpreting empty historical outcome.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 286,
+      "end_line": 288,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The existing archived receipt guard rejects erased explicit red purpose rather than reinterpreting empty historical outcome. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_cargo.py::test_mapped_integration_assertion_is_certified",
+      "expected": "Existing actual Cargo integration execution still certifies its independently reviewed exact Rust assertion mapping.",
+      "assertion_path": "tests/test_execution_cargo.py",
+      "start_line": 42,
+      "end_line": 42,
+      "source_sha256": "cd5a5c3dfa4e6c7a3a794d093ca94360e6b2b019f99ad52dad33c049566614c5",
+      "justification": "Existing actual Cargo integration execution still certifies its independently reviewed exact Rust assertion mapping. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_consumer.py::test_both_real_consumer_observations_remain_fresh_and_complete",
+      "expected": "One full conjunctive assertion requires both separate genuine valid invocations, all46+55 passing matcher-bearing cases, unchanged captured inputs and exact original consumer hashes/Git status; a representative matcher or copied receipt cannot satisfy it.",
+      "assertion_path": "tests/test_execution_vitest_consumer.py",
+      "start_line": 58,
+      "end_line": 70,
+      "source_sha256": "356c0eca669c090f20a8b72e350d2896c258f70da7c6c314584786a428768340",
+      "justification": "One full conjunctive assertion requires both separate genuine valid invocations, all46+55 passing matcher-bearing cases, unchanged captured inputs and exact original consumer hashes/Git status; a representative matcher or copied receipt cannot satisfy it. Exact collected parameter identity and complete Python assert span bind this branch to actual integration verification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_assertion_counters_and_todo_only_cannot_qualify[counter-only]",
+      "expected": "Counter-only and todo-only genuine green selections cannot qualify.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 129,
+      "end_line": 129,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "Each actual selection exits successfully but contains no supported matcher; the verifier rejects nominal success."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_assertion_counters_and_todo_only_cannot_qualify[todo-only]",
+      "expected": "Counter-only and todo-only genuine green selections cannot qualify.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 129,
+      "end_line": 129,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "Each actual selection exits successfully but contains no supported matcher; the verifier rejects nominal success."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-002",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_report_only_replacement_with_real_package_metadata_cannot_qualify",
+      "expected": "JUnit-only output cannot qualify despite genuine package metadata.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 154,
+      "end_line": 154,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "The replacement installed entry actually executes and writes report XML with exit zero, but no matcher trace; verification rejects."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_substituted_native_runtime_and_script_wrapper_are_rejected[native-python]",
+      "expected": "Substituted native executable and shell wrapper are refused.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 66,
+      "end_line": 66,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "Both real argv branches reach capture preparation and expose an actual Node-identity refusal rather than running a shadow framework."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_substituted_native_runtime_and_script_wrapper_are_rejected[script-wrapper]",
+      "expected": "Substituted native executable and shell wrapper are refused.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 66,
+      "end_line": 66,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "Both real argv branches reach capture preparation and expose an actual Node-identity refusal rather than running a shadow framework."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_initial_shadow_entry_outside_the_local_package_is_rejected",
+      "expected": "A similarly named entry outside the governed local installation is refused.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "The actual capture argv points at the shadow entry; its genuine preparation diagnostic identifies the required package-local Vitest entry."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_installed_vitest_package_cannot_escape_through_a_symlink",
+      "expected": "Installed module symlinks cannot escape the governed project.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 98,
+      "end_line": 98,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "Genuine local package bytes moved outside the project and reached through a symlink are rejected during actual preparation."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_substituted_installed_runner_metadata_is_rejected",
+      "expected": "Substituted installed runner identity is refused.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 111,
+      "end_line": 111,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "The real @vitest/runner metadata is replaced with an unsupported version; preparation rejects before selected execution."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_lock_mutation_during_a_real_matcher_run_invalidates_the_observation",
+      "expected": "During-run lock drift invalidates an otherwise passing real matcher.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 172,
+      "end_line": 172,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "The actual selected test modifies its governed npm lock while executing; equal process success cannot replace stable bound inputs."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_rebound_trace_cannot_claim_a_foreign_assertion_origin[source-path]",
+      "expected": "Wrong source and foreign test identities cannot reuse rebound matcher trace hashes.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 193,
+      "end_line": 193,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "Each exact collected origin branch mutates a genuine assertion trace and rebinds artifact hashes; semantic origin checks still reject."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_rebound_trace_cannot_claim_a_foreign_assertion_origin[foreign-test-id]",
+      "expected": "Wrong source and foreign test identities cannot reuse rebound matcher trace hashes.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 193,
+      "end_line": 193,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "Each exact collected origin branch mutates a genuine assertion trace and rebinds artifact hashes; semantic origin checks still reject."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_integrity.py::test_current_owned_hook_substitution_is_rejected_without_mutating_shared_assets",
+      "expected": "Current owned observer hook drift invalidates the prior passing receipt.",
+      "assertion_path": "tests/test_execution_vitest_integrity.py",
+      "start_line": 220,
+      "end_line": 220,
+      "source_sha256": "8477b9f79172b24a1114c6c40959bf6cb84cf5ca8e48e9b1d9b3ef112ac01f4f",
+      "justification": "A fixture-local copy of the actual owned assets first qualifies; changing its matcher hook then fails current provenance reverification."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest_budgets.py::test_preparation_hash_expiry_never_reaches_test_body",
+      "expected": "Preparation expiry reaches genuine installed-module hashing.",
+      "assertion_path": "tests/test_execution_vitest_budgets.py",
+      "start_line": 61,
+      "end_line": 61,
+      "source_sha256": "b2eb52d9524bcbf4a814a7e4e63d5f3bfa14d264f5e542ba10a693262f6e2d06",
+      "justification": "The recorded64-character identity proves the real module hash completed before the controlled wall-clock delay hit the shared cap; helper checks exit124 and both nonqualifying purposes."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest_budgets.py::test_preparation_hash_expiry_never_reaches_test_body",
+      "expected": "Preparation expiry prevents the selected test body from executing.",
+      "assertion_path": "tests/test_execution_vitest_budgets.py",
+      "start_line": 62,
+      "end_line": 62,
+      "source_sha256": "b2eb52d9524bcbf4a814a7e4e63d5f3bfa14d264f5e542ba10a693262f6e2d06",
+      "justification": "The real two-second preparation cap interrupts hashing before any body marker; the same test also checks genuine timeout status and passed/red refusal."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest_budgets.py::test_runtime_expiry_terminates_owned_descendant_and_heartbeat",
+      "expected": "The runtime deadline case reaches the actual Vitest body.",
+      "assertion_path": "tests/test_execution_vitest_budgets.py",
+      "start_line": 100,
+      "end_line": 100,
+      "source_sha256": "b2eb52d9524bcbf4a814a7e4e63d5f3bfa14d264f5e542ba10a693262f6e2d06",
+      "justification": "The body writes its marker and starts the child before blocking, separating this real runtime expiry from preparation expiry."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest_budgets.py::test_runtime_expiry_terminates_owned_descendant_and_heartbeat",
+      "expected": "Runtime expiry terminates the actual owned child process.",
+      "assertion_path": "tests/test_execution_vitest_budgets.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "b2eb52d9524bcbf4a814a7e4e63d5f3bfa14d264f5e542ba10a693262f6e2d06",
+      "justification": "After the bounded hanging body, the recorded descendant PID must disappear within the cleanup bound; helper checks timeout124 and both observation refusals."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-004",
+      "test_id": "tests/test_execution_vitest_budgets.py::test_runtime_expiry_terminates_owned_descendant_and_heartbeat",
+      "expected": "Runtime cleanup stops descendant heartbeat updates.",
+      "assertion_path": "tests/test_execution_vitest_budgets.py",
+      "start_line": 111,
+      "end_line": 111,
+      "source_sha256": "b2eb52d9524bcbf4a814a7e4e63d5f3bfa14d264f5e542ba10a693262f6e2d06",
+      "justification": "A real child heartbeat is sampled after expiry and must remain unchanged after a delay, proving cleanup beyond a nominal timeout result."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "A fresh genuine Vitest passed observation proves the actual canonical task.016.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 151,
+      "end_line": 151,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "The test copies the real spec-implement producer unchanged, compiles the actual task.016 and calls native proof with the second fresh receipt; it constructs no replacement task."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "A fresh genuine Vitest passed observation proves the actual canonical task.016.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 151,
+      "end_line": 151,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "The test copies the real spec-implement producer unchanged, compiles the actual task.016 and calls native proof with the second fresh receipt; it constructs no replacement task."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "The native archive receipt guard verifies actual canonical passed purpose.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 162,
+      "end_line": 162,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "The accepted task state is consumed by existing verify_evidence_receipts and recheck_receipts; its returned real guard entry is verified and retains passed outcome. No full workflow archival is claimed."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-005",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "The native archive receipt guard verifies actual canonical passed purpose.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 162,
+      "end_line": 162,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "The accepted task state is consumed by existing verify_evidence_receipts and recheck_receipts; its returned real guard entry is verified and retains passed outcome. No full workflow archival is claimed."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "Current bound configuration or lock drift rejects actual task.016 proof.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 168,
+      "end_line": 168,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "After genuine successful canonical proof, each actual governed-input mutation prevents reusing its prior receipt at native proof consumption."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "Current bound configuration or lock drift rejects actual task.016 proof.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 168,
+      "end_line": 168,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "After genuine successful canonical proof, each actual governed-input mutation prevents reusing its prior receipt at native proof consumption."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "Current configuration or lock drift rejects the native archive receipt recheck.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "The same previously verified canonical passed entry is rechecked after actual input drift and must become unverified."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-003",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "Current configuration or lock drift rejects the native archive receipt recheck.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "The same previously verified canonical passed entry is rechecked after actual input drift and must become unverified."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "Only the actual generic implementation step is completed.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 154,
+      "end_line": 158,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "Every other task from the full canonical spec-implement contract remains pending, so the generic witness claims no feature-wide completion or full workflow archive."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "Only the actual generic implementation step is completed.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 154,
+      "end_line": 158,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "Every other task from the full canonical spec-implement contract remains pending, so the generic witness claims no feature-wide completion or full workflow archive."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "The fresh explicit canonical contract has a distinct hash from historical implicit purpose.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "Both are officially compiled/rendered from isolated producer copies; the historical source differs only in the previously absent outcome marker."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "The fresh explicit canonical contract has a distinct hash from historical implicit purpose.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "Both are officially compiled/rendered from isolated producer copies; the historical source differs only in the previously absent outcome marker."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "The new canonical passed proof uses a fresh observation invocation.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 144,
+      "end_line": 144,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "The actual Node/Vitest receipt differs from the earlier receipt that supplied only rejected historical proof."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "The new canonical passed proof uses a fresh observation invocation.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 144,
+      "end_line": 144,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "The actual Node/Vitest receipt differs from the earlier receipt that supplied only rejected historical proof."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "Historical source, rendered contract/state and rejection bytes remain unchanged.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 172,
+      "end_line": 172,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "Both current config/lock scenarios compare every frozen historical byte after actual new proof/guard verification and subsequent drift refusals."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "Historical source, rendered contract/state and rejection bytes remain unchanged.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 172,
+      "end_line": 172,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "Both current config/lock scenarios compare every frozen historical byte after actual new proof/guard verification and subsequent drift refusals."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[config]",
+      "expected": "The original implicit-purpose contract still rejects the observation.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 173,
+      "end_line": 173,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "After new canonical proof and native archive guard checks, historical empty outcome is never reinterpreted as passed."
+    },
+    {
+      "requirement_id": "096-node-vitest-execution:AC-006",
+      "test_id": "tests/test_execution_vitest_goal.py::test_real_canonical_task016_proof_and_archive_guard_preserve_history_and_reject_drift[lock]",
+      "expected": "The original implicit-purpose contract still rejects the observation.",
+      "assertion_path": "tests/test_execution_vitest_goal.py",
+      "start_line": 173,
+      "end_line": 173,
+      "source_sha256": "c4f53e3f267f3e255eb98e278a22e452cc1f20190fa0d71568d6919849bff3b9",
+      "justification": "After new canonical proof and native archive guard checks, historical empty outcome is never reinterpreted as passed."
+    }
+  ],
+  "derivation": "review"
+}

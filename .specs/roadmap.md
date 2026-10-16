@@ -76,6 +76,8 @@
 - [x] **Cargo Execution Runner** — trusted `cargo test` runner certifying Rust tests at the pytest level: Cargo target runner and workspace wrapper, one process per test, stable LLVM coverage assertion trace, faithful failed/ignored/filtered outcomes · Roles: Maintainer, Consumer-project developer · Scope: M · Priority: P1 · Deps: 078 → [085-cargo-execution-runner](features/085-cargo-execution-runner/spec.md)
 - [x] **Locate ai-ressources Without Hard-Coded Paths** — One shared resolution of the ai-ressources root (`AIRESOURCES`, then the path recorded in `.conventions/`, else an explicit setup error) used by every validator consumer, with no `~/projects/ai-ressources` or sibling fallback · Roles: Developer, Maintainer · Scope: M · Priority: P1 → [085-localiser-ai-ressources-sans-chemin-en-dur](features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md)
 - [x] **Configured Review Identity** — goal render, progressions and the delivery lane take the reviewer model and budget from `--model`/`--review-max-chars`, else `.specs/semantic/config.yaml`, else stop with `review_model_required`; out-of-bounds budgets refused · Roles: Maintainer, Agent · Scope: S · Priority: P2 · Deps: 089 → [093-configured-review-identity](features/093-configured-review-identity/spec.md)
+- [x] **Node Vitest Execution Observations** - Genuine Node 22/local Vitest execution observations without AC certification. Scope: M; Deps: 078, 095 -> [096-node-vitest-execution](features/096-node-vitest-execution/spec.md)
+
 <!-- roadmap:mvp:end -->
 
 ---

@@ -22,6 +22,8 @@ from .execution_reports import (
 )
 from .execution_runner import runner_provenance
 from .execution_scope import EXECUTION_SCOPE_POLICY, digest, read_regular, source_manifest
+from .execution_vitest_provenance import current_vitest_provenance
+from .execution_vitest_results import verify_vitest_results
 
 
 class ExecutionReceipt(BaseModel):
@@ -181,6 +183,8 @@ def _read_results(
         test.assertion_count = sum(
             test.test_id in (item.test_id, junit_test_id(item.test_id)) for item in trace.assertions
         )
+    if capture.runner_provenance.get("runner") == "vitest":
+        verify_vitest_results(capture, directory, root, tests, trace.assertions)
     return tests, trace.assertions
 
 
@@ -216,6 +220,8 @@ def _inspect(
 
 def _current_provenance(recorded: dict[str, str]) -> dict[str, str]:
     """Recompute the provenance of the runner kind the capture recorded."""
+    if recorded.get("runner") == "vitest":
+        return current_vitest_provenance(recorded)
     if recorded.get("runner") == "cargo":
         return current_cargo_provenance(recorded)
     return runner_provenance()

@@ -716,7 +716,7 @@ For UI certification closures, forward the same independent `--build-manifest <r
 - [always] Build ordered todo list from plan.md steps <!-- evidence:documentary -->
 - [always] Run Step 0a behavioral TDD if `## Behavioral AC` present (RED phase required) <!-- evidence:execution applicable:behavioral-ac outcome:red -->
 - [always] Create progress.md before any step transitions to Done <!-- evidence:documentary -->
-- [always] Execute each plan step with code, targeted tests, and step gate verification <!-- evidence:execution -->
+- [always] Execute each plan step with code, targeted tests, and step gate verification <!-- evidence:execution outcome:passed -->
 - [always] Run only tests, lint, format and conventions per step; dispatch no per-step reviewer or audit <!-- evidence:documentary -->
 - [always] Write checkpoint to progress.md after every step <!-- evidence:documentary -->
 - [always] Block step advancement on failing tests until iteration limit or Blocked status <!-- evidence:documentary -->
