@@ -27,14 +27,19 @@ _ENV = {**os.environ, "GIT_NO_REPLACE_OBJECTS": "1", "GIT_LITERAL_PATHSPECS": "1
 
 
 def _git(root: Path, *args: str, stdin: bytes | None = None) -> subprocess.CompletedProcess[bytes]:
-    return subprocess.run(
-        ["git", "-C", str(root), *args],
-        input=stdin,
-        capture_output=True,
-        check=False,
-        timeout=60,
-        env=_ENV,
-    )
+    # A file-backed feed avoids a macOS duplex pipe stall that can block inside
+    # communicate()'s write and prevent its timeout from being checked.
+    with tempfile.TemporaryFile() as feed:
+        feed.write(stdin or b"")
+        feed.seek(0)
+        return subprocess.run(
+            ["git", "-C", str(root), *args],
+            stdin=feed,
+            capture_output=True,
+            check=False,
+            timeout=60,
+            env=_ENV,
+        )
 
 
 def _output(root: Path, *args: str) -> str | None:

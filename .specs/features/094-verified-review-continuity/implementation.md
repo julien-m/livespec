@@ -3,7 +3,7 @@ created: 2026-10-14
 feature: 094-verified-review-continuity
 title: 'Implementation Map: Verified Review Continuity'
 type: implementation
-updated: 2026-10-14
+updated: 2026-10-16
 ---
 
 # Implementation — Verified Review Continuity
@@ -15,7 +15,7 @@ updated: 2026-10-14
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
 | [FR-001: stored source roles](spec.md#fr-001) | `validator/semantic/review_context.py`, `validator/semantic/review_stability.py::reviewed_roles` | `@spec FR-001: Stored source roles` | ✅ Implemented | 2026-10-14 |
-| [FR-002: commit at open](spec.md#fr-002) | `validator/delivery/revision_commit.py`, `validator/delivery/revision.py::open_revision` | `@spec FR-002: Reviewed sources at the opening commit` | ✅ Implemented | 2026-10-14 |
+| [FR-002: commit at open](spec.md#fr-002) | `validator/delivery/revision_commit.py`, `validator/delivery/revision.py::open_revision`, `tests/test_revision_git_duplex.py` | `@spec FR-002: Reviewed sources at the opening commit` | ✅ Implemented | 2026-10-16 |
 | [FR-003: verified acceptance](spec.md#fr-003) | `validator/delivery/revision.py::accepted_reviews`, `validator/progression_gate.py`, `system/review-protocol.md` | `@spec FR-003: Verified acceptance of recorded receipts`, `@spec FR-003: Verified revision record` | ✅ Implemented | 2026-10-14 |
 
 ## Acceptance Criteria Mapping
@@ -30,3 +30,9 @@ updated: 2026-10-14
 |---|---|
 | `validator/delivery/revision_commit.py` | HEAD, ancestry and reviewed sources at a commit. |
 | `tests/stable_review_support.py`, `tests/test_review_continuity.py` | Committed fixture and 21 tests. |
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-16 | implementation | `tests/test_revision_git_duplex.py::test_revision_git_batch_completes_with_large_duplex_payload` | `.specs/.execution/b0a8bb3f1e4a41b9913d24d0ba62d88a/receipt.json` | `.specs/.execution/92278e2da2e04c058c8111f7be46b14e/receipt.json` |

@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-16 — [Feature 094] Bugfix: prevent Git revision batch pipe deadlocks
+
+- Feed revision queries from a temporary file; raw commit verification, Git environment guards and the 60-second bound remain. Real 605-object duplex regression RED/GREEN and 22 targeted tests pass.
+
 ## 2026-10-16 — [Feature 063] Bugfix: resolve mapped CI/configuration and documentation scopes
 
 - CI-only mappings now produce conventions receipts; source/AST support and declared-linter failures stay unchanged. Scope, mixed mappings, missing files and canonical path boundaries covered; independent native review PASS.
