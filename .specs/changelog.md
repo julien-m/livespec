@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-16 — [Feature 094] Bugfix: file-fed Git input during revision commit verification
+
+- Avoid the duplex pipe transport implicated in the HandoffBox timeout; preserve raw object verification and the 60-second bound. Read [the validation record](features/094-verified-review-continuity/checks/2026-10-16.md).
+
 ## 2026-10-16 — Bound test execution and require only necessary validation with declared long-running exceptions
 <!-- finalize:spec-feature:2026-10-16:d775ec24 -->
 

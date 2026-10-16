@@ -20,3 +20,16 @@
 - Delivery review round 2 (review and audit BLOCKED) fixed: `git archive` broke projects in a repository subdirectory and applied local smudge filters, which let a hand-written record pass; the commit's tree is now written from raw objects (`ls-tree`, `cat-file --batch`) with literal pathspecs, a configuration differing only in line endings matches, and a symlink loop at the commit is refused without crashing.
 - Delivery review round 3 (review BLOCKED, audit PASS with a matching warning) fixed: a crafted tree whose chained symlinks passed the lexical check let the writer create a file outside the temporary directory. Regular blobs are now written first, nothing is written under a symlink and a link resolving physically outside the tree is removed; chained links resolve; the cat-file output is parsed by offset. Refusals for committed `ident`/smudge attributes are documented.
 - Delivery review round 4: review PASS, audit PASS. Known limits, all failing closed with `spec_revision_uncommitted`: a source reached through a directory symlink, or a link whose target normalizes to `..`, cannot open a revision; an escaping link is dropped (the record is refused only when that changes the reviewed sources).
+
+## 2026-10-16 — [Bugfix]: Avoid duplex stdin pipes during raw commit extraction using the existing macOS file-feed workaround
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_revision_git_transport.py, validator/delivery/revision_commit.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_revision_git_transport.py::test_batch_extraction_does_not_require_a_duplex_pipe
+- **RED receipt:** `.specs/.execution/10a162cb552b4b7382be9de29d775d66/receipt.json`
+- **GREEN receipt:** `.specs/.execution/0d793e1aeeb449d699a96f71cffbb018/receipt.json`
+<!-- bugfix:0d793e1aeeb449d699a96f71cffbb018 -->

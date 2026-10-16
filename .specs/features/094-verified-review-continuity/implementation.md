@@ -30,3 +30,9 @@ updated: 2026-10-14
 |---|---|
 | `validator/delivery/revision_commit.py` | HEAD, ancestry and reviewed sources at a commit. |
 | `tests/stable_review_support.py`, `tests/test_review_continuity.py` | Committed fixture and 21 tests. |
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-16 | implementation | `tests/test_revision_git_transport.py::test_batch_extraction_does_not_require_a_duplex_pipe` | `.specs/.execution/10a162cb552b4b7382be9de29d775d66/receipt.json` | `.specs/.execution/0d793e1aeeb449d699a96f71cffbb018/receipt.json` |
