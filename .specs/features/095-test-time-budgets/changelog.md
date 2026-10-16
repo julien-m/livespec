@@ -40,3 +40,12 @@
 - **Author:** Codex.
 
 <!-- finalize:spec-feature:2026-10-16:d775ec24 -->
+
+## 2026-10-16 — Bugfix: CI-compatible generator annotations
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `validator/execution_deadline.py`, `validator/execution_test_budget.py`; four annotation/import lines only, preserving behavior.
+- **AC impacted:** AC-001, AC-002; all five acceptance criteria recertified with 15 observed assertions.
+- **Validation:** Ruff/format, local Pyright, current conventions and refreshed independent delivery review PASS; newer CI Pyright rechecked after push.
+- **Author:** Codex

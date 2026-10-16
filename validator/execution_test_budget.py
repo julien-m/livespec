@@ -8,7 +8,7 @@ import json
 import os
 import threading
 import time
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from typing import cast
 
@@ -51,7 +51,7 @@ def hard_timeout(budget: dict[str, object], started: float) -> None:
 
 
 @contextmanager
-def test_watchdog(budget: dict[str, object]) -> Iterator[None]:
+def test_watchdog(budget: dict[str, object]) -> Generator[None, None, None]:
     """Cover setup, body and teardown with a hard watchdog owned by the runner."""
     timer = threading.Timer(
         cast("float", budget["test_seconds"]), hard_timeout, (budget, time.monotonic())

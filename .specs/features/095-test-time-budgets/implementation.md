@@ -38,12 +38,14 @@ Local implementation and targeted checks are recorded below. All implementation 
 - Initial driver/capture regression: 57 PASS in 7.45s.
 - Consolidated policy/deadline/instrumentation/contracts/Cargo/CLI selection: 31 PASS with one cleanup EPERM failure in 13.49s; after handling this observed kernel error as an explicit cleanup diagnostic, affected Cargo/deadline checks: 4 PASS in 2.11s. No assertion or timeout was weakened.
 - Final changed-scope Ruff/format and full configured Pyright pass with 0 errors. Atomic SIGALRM restoration was checked after its final source change; final acceptance capture is current.
-- Doctor: 0 errors, 23 pre-existing warnings. Inspect [the current conventions receipt](../../conventions/runs/20261016T032725Z/receipt.json): PASS, no errors or blockers.
+- Doctor: 0 errors, 23 pre-existing warnings. Inspect [the current conventions receipt](../../conventions/runs/20261016T033714Z/receipt.json): PASS, no errors or blockers.
 - A kernel denial while terminating an owned group remains a visible cleanup gap and an unsuccessful timeout. Detached/remote jobs and direct shell/SDK/device surfaces are outside executable interception; unsupported individual hooks report command-only enforcement.
 - Independent delivery review is recorded and verified PASS; deterministic feature finalization is verified PASS. Git records repository delivery.
 
 ## Current acceptance execution
 
 - Inspect [the test report](.reviews/test-report.md) and [the derived mapping](checks/acceptance-mapping.json): 5/5 AC certified, 5 tests PASS in 0.62s, 0 tests generated.
-- Inspect [the current execution receipt](../../.execution/0ed329104ea04f78969f1235f3025157/receipt.json): valid=true, all five AC, gaps=[].
-- Inspect [the current conventions receipt](../../conventions/runs/20261016T032725Z/receipt.json): PASS, no errors or blockers. Delivery review and feature finalization are recorded and verified PASS.
+- Inspect [the current execution receipt](../../.execution/04dc499588af44249212d3064a2c8dbe/receipt.json): valid=true, all five AC, gaps=[].
+- Inspect [the current conventions receipt](../../conventions/runs/20261016T033714Z/receipt.json): PASS, no errors or blockers. Delivery review and feature finalization are recorded and verified PASS.
+
+- Latest acceptance recapture follows annotation-only compatibility correction for CI Pyright 1.1.411 (`Iterator` to `Generator` on two context managers); behavior unchanged. Inspect [the current report](.reviews/test-report.md): all five AC certified with current source bytes.

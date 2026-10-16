@@ -9,7 +9,7 @@ import signal
 import subprocess
 import threading
 import time
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -89,7 +89,7 @@ def _expired(_signum: int, _frame: object) -> None:
 @contextmanager
 def command_scope(
     root: Path, argv: list[str], timeout: float | None = None
-) -> Iterator[ExecutionDeadline]:
+) -> Generator[ExecutionDeadline, None, None]:
     """Bound Python preparation as well as subprocesses, preserving prior alarm state."""
     parent = _CURRENT.get()
     policy = parent.policy if parent else load_budget_policy(root)
