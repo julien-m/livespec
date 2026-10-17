@@ -4,7 +4,7 @@ import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import type { ConfigEnv } from "vite";
+import type { ConfigEnv, Plugin } from "vite";
 import type { UserConfig } from "vitest/config";
 import { instrumentAsyncConsumption } from "./async-source";
 import { isObserverAsset, required } from "./trace-state";
@@ -39,6 +39,27 @@ const timeout = (name: string, existing: number | undefined): number => {
 	const limit = Number(required(name));
 	if (!Number.isFinite(limit) || limit <= 0) throw new Error(`Invalid ${name}`);
 	return Math.min(existing ?? limit, limit);
+};
+
+/** Normalize known PluginOption containers before checking every concrete lifecycle boundary. */
+const checkedPlugins = (option: unknown): Plugin[] => {
+	if (option === false || option == null) return [];
+	if (Array.isArray(option)) return option.flatMap(checkedPlugins);
+	if (!option || typeof option !== "object" || "then" in option)
+		throw new Error(
+			"Unsupported configuration plugin option: Promise or unknown wrapper",
+		);
+	if (
+		"config" in option ||
+		"configResolved" in option ||
+		("apply" in option && typeof option.apply === "function")
+	)
+		throw new Error("Unsupported configuration lifecycle plugin");
+	if (!("name" in option) || typeof option.name !== "string" || !option.name)
+		throw new Error(
+			"Unsupported configuration plugin option: unnamed or unknown wrapper",
+		);
+	return [option as Plugin];
 };
 
 /** Keep root/config environment and all consumer fields except the owned instrumentation. */
@@ -78,17 +99,7 @@ export default async (environment: ConfigEnv): Promise<UserConfig> => {
 		throw new Error(
 			"Unsupported custom runner/reporter/workspace/browser/pool configuration",
 		);
-	if (config.plugins?.length) {
-		// Config plugins can replace owned runner/reporter after this overlay; reject lifecycle hooks.
-		for (const plugin of config.plugins as unknown[]) {
-			if (
-				plugin &&
-				typeof plugin === "object" &&
-				("config" in plugin || "configResolved" in plugin)
-			)
-				throw new Error("Unsupported configuration lifecycle plugin");
-		}
-	}
+	const plugins = checkedPlugins(config.plugins);
 	if (original) bindInput(original);
 	writeFileSync(required("LIVESPEC_VITEST_INPUTS"), JSON.stringify(tracked), {
 		mode: 0o600,
@@ -96,7 +107,7 @@ export default async (environment: ConfigEnv): Promise<UserConfig> => {
 	return {
 		...config,
 		plugins: [
-			...(config.plugins ?? []),
+			...plugins,
 			{
 				name: "livespec-async-source",
 				enforce: "post",

@@ -120,3 +120,16 @@
 - **RED receipt:** `.specs/.execution/5056fd0acc8047728ba51b73dd2a20d6/receipt.json`
 - **GREEN receipt:** `.specs/.execution/0a3fa7ba7b2944968880e32520331bea/receipt.json`
 <!-- bugfix:0a3fa7ba7b2944968880e32520331bea -->
+
+## 2026-10-17 — [Bugfix]: Inspect every concrete plugin option, reject configuration callbacks and cover all observer regressions in Node CI
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .github/workflows/ci.yml, tests/test_execution_vitest_asset_paths.py, validator/vitest/config.ts
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[apply-nested-array], tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[apply-promise], tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[config-nested-array], tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[config-promise], tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[configResolved-nested-array], tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[configResolved-promise]
+- **RED receipt:** `.specs/.execution/f3932551a4b848c19902c8a3d97e0f67/receipt.json`
+- **GREEN receipt:** `.specs/.execution/5301576c58a44fea9ea1d64b1a1997c0/receipt.json`
+<!-- bugfix:5301576c58a44fea9ea1d64b1a1997c0 -->

@@ -71,6 +71,7 @@ Inspect [the actual closure summary](.reviews/implementation-evidence/implement-
 |---|---|---|---|---|
 | 2026-10-17 | implementation | `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[array-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[catch-property-key]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[parameter-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[parameter-property-key]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[property-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[property-key]` | `.specs/.execution/79c6132a0bf04d3a8f79e915844f52e6/receipt.json` | `.specs/.execution/426e1c14745247efb68ab9421427b4fd/receipt.json` |
 | 2026-10-17 | implementation | `tests/test_execution_vitest_asset_paths.py::test_consumer_asset_names_remain_instrumented_and_bound[project-root]`, `tests/test_execution_vitest_asset_paths.py::test_consumer_asset_names_remain_instrumented_and_bound[test-subdirectory]` | `.specs/.execution/5056fd0acc8047728ba51b73dd2a20d6/receipt.json` | `.specs/.execution/0a3fa7ba7b2944968880e32520331bea/receipt.json` |
+| 2026-10-17 | implementation | `tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[apply-nested-array]`, `tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[apply-promise]`, `tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[config-nested-array]`, `tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[config-promise]`, `tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[configResolved-nested-array]`, `tests/test_execution_vitest_asset_paths.py::test_wrapped_configuration_lifecycle_plugins_fail_closed[configResolved-promise]` | `.specs/.execution/f3932551a4b848c19902c8a3d97e0f67/receipt.json` | `.specs/.execution/5301576c58a44fea9ea1d64b1a1997c0/receipt.json` |
 
 ## Current Source Ownership
 
@@ -106,3 +107,11 @@ Inspect the current source ownership additions; the previous dated source map re
 | 2026-10-17 | Inspect [matcher-callsite.ts](../../../validator/vitest/matcher-callsite.ts) |
 | 2026-10-17 | Inspect [trace-state.ts](../../../validator/vitest/trace-state.ts) |
 | 2026-10-17 | Inspect [test_execution_vitest_asset_paths.py](../../../tests/test_execution_vitest_asset_paths.py) |
+
+## Plugin Options and CI Wiring Correction
+
+PluginOption arrays and false/null/undefined retain ordinary plugin support. Promise/thenable and unknown wrapper options are explicitly unsupported; config/configResolved and function-valued apply callbacks are rejected. String apply:serve/build remain supported. This confined bugfix does not recertify the full feature. The initial seven-module local command collected95 cases with zero skips,94 passes and one fixture failure; final changed tests pass separately. Full final-head GitHub CI is required before merge.
+
+| Date | Owned source |
+|---|---|
+| 2026-10-17 | Inspect [the Node observer workflow](../../../.github/workflows/ci.yml) |

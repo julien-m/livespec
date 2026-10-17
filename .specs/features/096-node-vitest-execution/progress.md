@@ -117,3 +117,5 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - 2026-10-17 Bugfix4302205927: explicit AST pattern bindings; six-case official RED/GREEN, five actual shadow controls and26 adjacent async checks pass. Original invalid controls and failed receipts remain preserved; no whole-feature recertification claimed.
 
 - 2026-10-17 Bugfix4302244158: canonical observer directory membership replaces three substring filters; official three-case GREEN and38 adjacent integrity/async checks pass. Earlier full feature/consumer certificates remain historical.
+
+- 2026-10-17 Grouped bugfix4302269467/4302269471: six wrapped lifecycle cases pass official GREEN; unknown wrappers and serve/build ordinary plugins pass targeted controls. CI now lists all seven runtime modules; initial local95-case zero-skip run retains its one fixture failure and is not reported as full CI PASS. Final GitHub CI is pending.
