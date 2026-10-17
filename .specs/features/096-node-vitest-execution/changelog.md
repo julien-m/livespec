@@ -83,7 +83,14 @@
 - Integrated main #52 with both changelog histories and the strict root Git-internals hashing fix. No Vitest asset or consumer source changed.
 - Actual integration capture:98/98 passed,6/6 AC certified, valid=true in226.776s under300s; previous Implement and Test artifacts remain historical.
 - Targeted integration checks:3 worktree regressions and21 migration/specify-review tests pass; Ruff and repo/feature conventions pass.
-- Inspect [the exact integration execution reference](summary.json), [the immutable execution receipt](../../../../.execution/82d9844e6e834858aeb7a2b4a6d3f199/receipt.json) and [the frozen independent Test report](../../checks/2026-10-17-test.md).
+- Inspect [the exact integration execution reference](.reviews/integration-evidence/summary.json), [the immutable execution receipt](../../.execution/82d9844e6e834858aeb7a2b4a6d3f199/receipt.json) and [the frozen independent Test report](checks/2026-10-17-test.md).
 - Independent full-scope review and audit:53 files each, PASS; advisory conventions warnings remain existing follow-up debt. Official delivery review verification passes.
 
 <!-- finalize:spec-feature:2026-10-17:35d03aca -->
+
+## 2026-10-17 — [Documentation]: Correct final delivery evidence links
+
+- Corrected the three final delivery references relative to this feature changelog; execution and review artifacts are unchanged.
+- Inspect [the integration summary](.reviews/integration-evidence/summary.json), [the execution receipt](../../.execution/82d9844e6e834858aeb7a2b4a6d3f199/receipt.json) and [the frozen Test report](checks/2026-10-17-test.md).
+
+<!-- finalize:spec-feature:2026-10-17:de973d5e -->

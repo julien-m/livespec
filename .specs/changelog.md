@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-10-17 — Feature 096: correct final delivery evidence links
+<!-- finalize:spec-feature:2026-10-17:de973d5e -->
+
 ## 2026-10-17 — Node/Vitest execution observations validated with six acceptance criteria and independent test review
 <!-- finalize:spec-feature:2026-10-17:35d03aca -->
 
