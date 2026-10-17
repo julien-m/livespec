@@ -1,8 +1,8 @@
 /** Shared invocation identities and exclusive worker trace publication. */
 
 import { randomUUID } from "node:crypto";
-import { writeFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { realpathSync, writeFileSync } from "node:fs";
+import { isAbsolute, join, relative, sep } from "node:path";
 import type { Task } from "@vitest/runner";
 
 /** Settled matcher evidence matching the Python assertion schema. */
@@ -29,6 +29,17 @@ export const required = (name: string): string => {
 	const value = process.env[name];
 	if (!value) throw new Error(`Missing ${name}`);
 	return value;
+};
+/** Only files inside the canonical observer asset directory are runner-owned. */
+export const isObserverAsset = (path: string): boolean => {
+	const local = relative(
+		realpathSync(required("LIVESPEC_VITEST_ASSETS")),
+		realpathSync(path),
+	);
+	return (
+		local === "" ||
+		(local !== ".." && !local.startsWith(`..${sep}`) && !isAbsolute(local))
+	);
 };
 /** Construct the same full-name identity as the owned JUnit reporter. */
 export const identity = (task: Task): string => {

@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 import type { ConfigEnv } from "vite";
 import type { UserConfig } from "vitest/config";
 import { instrumentAsyncConsumption } from "./async-source";
-import { required } from "./trace-state";
+import { isObserverAsset, required } from "./trace-state";
 
 const root = required("LIVESPEC_VITEST_ROOT");
 const localRequire = createRequire(`${root}/package.json`);
@@ -105,7 +105,7 @@ export default async (environment: ConfigEnv): Promise<UserConfig> => {
 					if (
 						!isAbsolute(input) ||
 						input.includes("/node_modules/") ||
-						input.includes("/validator/vitest/")
+						isObserverAsset(input)
 					)
 						return null;
 					return instrumentAsyncConsumption(
@@ -125,7 +125,7 @@ export default async (environment: ConfigEnv): Promise<UserConfig> => {
 					if (
 						isAbsolute(input) &&
 						!input.includes("/node_modules/") &&
-						!input.includes("/validator/vitest/")
+						!isObserverAsset(input)
 					)
 						bindInput(input);
 					return null;

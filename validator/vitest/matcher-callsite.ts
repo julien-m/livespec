@@ -1,7 +1,7 @@
 /** Classify the immediate external dispatch origin, including nested user callbacks. */
 import { isAbsolute, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { required } from "./trace-state";
+import { isObserverAsset, required } from "./trace-state";
 
 /** First non-owned, non-Chai frame identifies user dispatch or framework delegation. */
 export interface MatcherCallsite {
@@ -19,11 +19,7 @@ export const matcherCallsite = (): MatcherCallsite | undefined => {
 		const path = match[1].startsWith("file:")
 			? fileURLToPath(match[1])
 			: match[1];
-		if (
-			path.includes("/validator/vitest/") ||
-			path.includes("/node_modules/chai/")
-		)
-			continue;
+		if (isObserverAsset(path) || path.includes("/node_modules/chai/")) continue;
 		const local = relative(required("LIVESPEC_EXECUTION_PROJECT"), path);
 		return {
 			path: local.split("\\").join("/"),

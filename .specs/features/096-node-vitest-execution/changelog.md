@@ -107,3 +107,16 @@
 - **RED receipt:** `.specs/.execution/79c6132a0bf04d3a8f79e915844f52e6/receipt.json`
 - **GREEN receipt:** `.specs/.execution/426e1c14745247efb68ab9421427b4fd/receipt.json`
 <!-- bugfix:426e1c14745247efb68ab9421427b4fd -->
+
+## 2026-10-17 — [Bugfix]: Recognize observer assets by canonical directory ownership rather than consumer folder names
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_execution_vitest_asset_paths.py, validator/vitest/config.ts, validator/vitest/matcher-callsite.ts, validator/vitest/trace-state.ts
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_vitest_asset_paths.py::test_consumer_asset_names_remain_instrumented_and_bound[project-root], tests/test_execution_vitest_asset_paths.py::test_consumer_asset_names_remain_instrumented_and_bound[test-subdirectory]
+- **RED receipt:** `.specs/.execution/5056fd0acc8047728ba51b73dd2a20d6/receipt.json`
+- **GREEN receipt:** `.specs/.execution/0a3fa7ba7b2944968880e32520331bea/receipt.json`
+<!-- bugfix:0a3fa7ba7b2944968880e32520331bea -->

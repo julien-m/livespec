@@ -115,3 +115,5 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Supervisor owns the independent Test phase and pipeline transition. No consumer042 lifecycle, merge or global activation was performed.
 
 - 2026-10-17 Bugfix4302205927: explicit AST pattern bindings; six-case official RED/GREEN, five actual shadow controls and26 adjacent async checks pass. Original invalid controls and failed receipts remain preserved; no whole-feature recertification claimed.
+
+- 2026-10-17 Bugfix4302244158: canonical observer directory membership replaces three substring filters; official three-case GREEN and38 adjacent integrity/async checks pass. Earlier full feature/consumer certificates remain historical.

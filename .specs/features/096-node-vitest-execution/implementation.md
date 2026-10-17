@@ -70,6 +70,7 @@ Inspect [the actual closure summary](.reviews/implementation-evidence/implement-
 | Date | Requirement | Regression tests | RED receipt | GREEN receipt |
 |---|---|---|---|---|
 | 2026-10-17 | implementation | `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[array-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[catch-property-key]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[parameter-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[parameter-property-key]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[property-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[property-key]` | `.specs/.execution/79c6132a0bf04d3a8f79e915844f52e6/receipt.json` | `.specs/.execution/426e1c14745247efb68ab9421427b4fd/receipt.json` |
+| 2026-10-17 | implementation | `tests/test_execution_vitest_asset_paths.py::test_consumer_asset_names_remain_instrumented_and_bound[project-root]`, `tests/test_execution_vitest_asset_paths.py::test_consumer_asset_names_remain_instrumented_and_bound[test-subdirectory]` | `.specs/.execution/5056fd0acc8047728ba51b73dd2a20d6/receipt.json` | `.specs/.execution/0a3fa7ba7b2944968880e32520331bea/receipt.json` |
 
 ## Current Source Ownership
 
@@ -95,3 +96,13 @@ The dated map retains every previously mapped source and includes both files of 
 | 2026-10-17 | Inspect [async-source.ts](../../../validator/vitest/async-source.ts) |
 | 2026-10-17 | Inspect [config.ts](../../../validator/vitest/config.ts) |
 | 2026-10-17 | Inspect [matcher-observer.ts](../../../validator/vitest/matcher-observer.ts) |
+
+## Observer Path Ownership Correction
+
+Inspect the current source ownership additions; the previous dated source map remains in force.
+
+| Date | Owned source |
+|---|---|
+| 2026-10-17 | Inspect [matcher-callsite.ts](../../../validator/vitest/matcher-callsite.ts) |
+| 2026-10-17 | Inspect [trace-state.ts](../../../validator/vitest/trace-state.ts) |
+| 2026-10-17 | Inspect [test_execution_vitest_asset_paths.py](../../../tests/test_execution_vitest_asset_paths.py) |
