@@ -26,7 +26,7 @@
 
 
 <!-- roadmap:mvp:start -->
-- [x] **Root Feature Delivery Review** — Review the complete bootstrap tree from its original parentless spec-creation commit without history edits · Scope: S · Priority: P1 → [096-root-feature-delivery-review](features/096-root-feature-delivery-review/spec.md)
+- [ ] **Root Feature Delivery Review** — Review the complete bootstrap tree from its original parentless spec-creation commit without history edits · Scope: S · Priority: P1 → [097-root-feature-delivery-review](features/097-root-feature-delivery-review/spec.md)
 - [x] **Test Time Budgets** — Bound ordinary validation, declare long-running exceptions and stop timeout escalation · Scope: M · Priority: P1 → [095-test-time-budgets](features/095-test-time-budgets/spec.md)
 - [ ] **Validator CI Prerequisites** — Repair lint, typing and real dependency provisioning while preserving all checks; local checks verified, complete stable CI and independent delivery gates remain pending. Read [079-validator-ci-prerequisites](features/079-validator-ci-prerequisites/spec.md). · Scope: M · Priority: P1
 - [x] **Requirement Evidence Integrity** — Complete contract context, semantic conclusions, real execution proof, consequential clarification and independent generation evaluation · Roles: Maintainer · Scope: L · Deps: 052, 069, 070, 076, 077 → [078-requirement-evidence-integrity](features/078-requirement-evidence-integrity/spec.md)
@@ -77,6 +77,8 @@
 - [x] **Cargo Execution Runner** — trusted `cargo test` runner certifying Rust tests at the pytest level: Cargo target runner and workspace wrapper, one process per test, stable LLVM coverage assertion trace, faithful failed/ignored/filtered outcomes · Roles: Maintainer, Consumer-project developer · Scope: M · Priority: P1 · Deps: 078 → [085-cargo-execution-runner](features/085-cargo-execution-runner/spec.md)
 - [x] **Locate ai-ressources Without Hard-Coded Paths** — One shared resolution of the ai-ressources root (`AIRESOURCES`, then the path recorded in `.conventions/`, else an explicit setup error) used by every validator consumer, with no `~/projects/ai-ressources` or sibling fallback · Roles: Developer, Maintainer · Scope: M · Priority: P1 → [085-localiser-ai-ressources-sans-chemin-en-dur](features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md)
 - [x] **Configured Review Identity** — goal render, progressions and the delivery lane take the reviewer model and budget from `--model`/`--review-max-chars`, else `.specs/semantic/config.yaml`, else stop with `review_model_required`; out-of-bounds budgets refused · Roles: Maintainer, Agent · Scope: S · Priority: P2 · Deps: 089 → [093-configured-review-identity](features/093-configured-review-identity/spec.md)
+- [x] **Node Vitest Execution Observations** - Genuine Node 22/local Vitest execution observations without AC certification. Scope: M; Deps: 078, 095 -> [096-node-vitest-execution](features/096-node-vitest-execution/spec.md)
+
 <!-- roadmap:mvp:end -->
 
 ---

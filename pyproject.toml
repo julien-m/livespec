@@ -58,6 +58,9 @@ markers = [
     "real_stop_condition: run the goal stop condition subprocess instead of the test stub",
 ]
 
+[tool.setuptools.package-data]
+validator = ["vitest/*.ts"]
+
 [tool.setuptools.packages.find]
 include = ["validator*"]
 

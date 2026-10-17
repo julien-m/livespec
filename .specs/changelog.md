@@ -7,18 +7,37 @@
 
 ---
 
-## 2026-10-17 — [Feature 096] Test: 100% AC covered (6/6), 0 tests generated; existing 16-test proof verified
-<!-- finalize:spec-test:2026-10-17:e9ebbe26 -->
+## 2026-10-17 — Feature096 bugfix: reject late Chai matcher and prototype registration
 
-## 2026-10-17 — 096 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state
-<!-- finalize:spec-implement:2026-10-17:6e077b09 -->
+- Official seven-case RED/GREEN and37 adjacent checks pass; scoped regression proof only.
 
-## 2026-10-17 — [Feature 096] Plan created: Root Feature Delivery Review — 2 local steps, 2 diagrams; root scope integrity and bounded acceptance evidence
-<!-- finalize:spec-plan:2026-10-17:0518dc0e -->
+## 2026-10-17 — Feature096 CI fixture fix: actual Typer Result annotation and exact outer deadline; normal AC004-filtered proof18 tests, previous110/six-AC proof historical
+<!-- finalize:spec-fix:2026-10-17:340e3e18 -->
 
-## 2026-10-17 — [Feature 096] Spec created: Root Feature Delivery Review — 1 story, 6 AC, 4 FR
-<!-- finalize:spec-specify:2026-10-17:cc406fb7 -->
+## 2026-10-17 — Feature096 Fix: bounded consumer timeouts and same-deadline CLI final verification; normal spec-fix after scoped fallback,110 current tests and six ACs certified
+<!-- finalize:spec-fix:2026-10-17:24d6777c -->
 
+## 2026-10-17 — Feature 096: correct final delivery evidence links
+<!-- finalize:spec-feature:2026-10-17:de973d5e -->
+
+## 2026-10-17 — Node/Vitest execution observations validated with six acceptance criteria and independent test review
+<!-- finalize:spec-feature:2026-10-17:35d03aca -->
+
+## 2026-10-17 — Test:100% AC covered (6/6),0 tests generated,98/98 passed; final frozen report bound to current execution receipt
+<!-- finalize:spec-test:2026-10-17:8377a967 -->
+
+## 2026-10-17 — [Feature 096] ## [Feature]: Genuine Node22 and Vitest execution observations implemented
+<!-- finalize:spec-implement:2026-10-17:ca975a13 -->
+
+## 2026-10-16 — [Feature 096] Bugfix: select canonical goal tasks and repair deterministic CI fixture expectations
+
+- Focused checks, migration and static checks pass; acceptance certification and Implement closure remain pending.
+
+## 2026-10-16 — Technical plan: five bounded steps, two diagrams and explicit runtime evidence gates
+<!-- finalize:spec-plan:2026-10-16:e06699c9 -->
+
+## 2026-10-16 — Spec created: Node Vitest Execution Observations - 3 stories, 6 AC, 6 FR
+<!-- finalize:spec-specify:2026-10-16:f1165a0a -->
 ## 2026-10-17 — [Feature 081] Bugfix: honor spec-specify review opt-out in goals
 
 - `--no-review` and `-N` select specification preparation without a spec-review task or receipt; default review, other commands and semantic progression guards remain required. Read the [regressions](../tests/test_specify_review_goal.py) for contract/checklist selection, native goal closure and review boundaries.
@@ -1054,3 +1073,15 @@ Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/
 ## 2026-10-16 — Feature 078: ignored acceptance inputs
 
 - Bugfix: execution capture explicitly binds mapping and raw review bytes stored in ignored caches; strict verification and tamper rejection remain unchanged. RED/GREEN receipts recorded in the feature implementation map.
+
+- 2026-10-17 [Feature096] Test:100% AC covered (6/6),0 tests generated; observed Implement98/98 PASS. Inspect [the frozen report](features/096-node-vitest-execution/checks/2026-10-17-test.md); final Test evidence follows separately.
+
+- 2026-10-17 [Feature096] Bugfix: preserve direct async observations with harmless destructuring/default expressions; runner-owned six-case RED/GREEN and five actual shadow-registration controls verified.
+
+- 2026-10-17 [Feature096] Bugfix: compare canonical observer asset ownership, retaining consumer root/subdirectory instrumentation and loaded-source bindings. Scoped runner-owned RED/GREEN and38 adjacent integrity/async checks pass.
+
+- 2026-10-17 [Feature096] Bugfix: recursively check Vite PluginOption containers and config/configResolved/apply callbacks; include binding/path/plugin regressions in the seven-module Node CI job. Scoped final RED/GREEN and ordinary plugin controls pass; full final-head remote CI remains required.
+
+- 2026-10-17: Fix096 unsafe consumer timeouts and CLI final-verification deadline/completion boundary; scoped eleven-case RED/GREEN evidence recorded, historical full-feature certificates preserved.
+
+- 2026-10-17: Feature096 Check reviewed grouped timeout/final-verification corrections; inspect [the independent report](features/096-node-vitest-execution/checks/2026-10-17.md). Fresh acceptance remains a separate gate.

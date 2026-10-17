@@ -28,6 +28,7 @@ def _historical_run(root: Path, monkeypatch: pytest.MonkeyPatch, policy: str | N
         return run(root)
 
 
+@pytest.mark.integration
 @pytest.mark.parametrize("historical_policy", [None, "1"])
 def test_identical_sources_require_a_new_current_runner_capture(
     project: Path, monkeypatch: pytest.MonkeyPatch, historical_policy: str | None

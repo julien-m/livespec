@@ -30,7 +30,7 @@ def test_registered_events_keep_deterministic_jobs_without_model_inputs() -> Non
     assert workflow["on"]["pull_request"]["branches"] == ["main"]
     assert workflow["on"]["release"]["types"] == ["published"]
     assert not workflow["on"]["workflow_dispatch"]
-    assert set(workflow["jobs"]) == {"unit-tests", "integration-3a"}
+    assert set(workflow["jobs"]) == {"unit-tests", "integration-3a", "vitest-observer"}
 
 
 @pytest.mark.parametrize(

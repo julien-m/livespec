@@ -134,7 +134,7 @@
 | 093 | Configured Review Identity | In Progress | 2026-10-13 | 2026-10-15 | [spec](features/093-configured-review-identity/spec.md), [plan](features/093-configured-review-identity/plan.md), [implementation](features/093-configured-review-identity/implementation.md) |
 | 094 | Verified Review Continuity | In Progress | 2026-10-14 | 2026-10-14 | [spec](features/094-verified-review-continuity/spec.md), [plan](features/094-verified-review-continuity/plan.md), [implementation](features/094-verified-review-continuity/implementation.md) |
 | 095 | Test Time Budgets | Implemented | 2026-10-16 | 2026-10-16 | [spec](features/095-test-time-budgets/spec.md) |
-| 096 | Root Feature Delivery Review | Implemented | 2026-10-17 | 2026-10-17 | [spec](features/096-root-feature-delivery-review/spec.md) |
+| 096 | Node Vitest Execution Observations | Implemented | 2026-10-16 | 2026-10-17 | [spec](features/096-node-vitest-execution/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -159,16 +159,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-10-17 | Feature | [Feature 096] Test: 100% AC covered (6/6), 0 tests generated; existing 16-test proof verified |
-| 2026-10-17 | Feature | 096 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state |
-| 2026-10-17 | Plan | [Feature 096] Plan created: Root Feature Delivery Review — 2 local steps, 2 diagrams; root scope integrity and bounded acceptance evidence |
-| 2026-10-17 | Spec | [Feature 096] Spec created: Root Feature Delivery Review — 1 story, 6 AC, 4 FR |
+| 2026-10-17 | Feature | Feature096 CI fixture fix: actual Typer Result annotation and exact outer deadline; normal AC004-filtered proof18 tests, previous110/six-AC proof historical |
+| 2026-10-17 | Bugfix | Feature096 Fix: bounded consumer timeouts and same-deadline CLI final verification; normal spec-fix after scoped fallback,110 current tests and six ACs certified |
+| 2026-10-17 | Feature | Feature 096: correct final delivery evidence links |
+| 2026-10-17 | Feature | Node/Vitest execution observations validated with six acceptance criteria and independent test review |
+| 2026-10-17 | Feature | Test:100% AC covered (6/6),0 tests generated,98/98 passed; final frozen report bound to current execution receipt |
+| 2026-10-17 | Feature | [Feature 096] ## [Feature]: Genuine Node22 and Vitest execution observations implemented |
+| 2026-10-16 | Bugfix | [Feature 096] Bugfix: select canonical goal tasks and repair deterministic CI fixture expectations |
+| 2026-10-16 | Feature | Technical plan: five bounded steps, two diagrams and explicit runtime evidence gates |
+| 2026-10-16 | Spec | Spec created: Node Vitest Execution Observations - 3 stories, 6 AC, 6 FR |
 | 2026-10-17 | Bugfix | [Feature 081] Bugfix: honor spec-specify review opt-out in goals |
-| 2026-10-17 | Feature | [Feature 083] Test Hardening: ignore Git churn before worktree hashing |
-| 2026-10-16 | Bugfix | [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution |
-| 2026-10-16 | Bugfix | [Feature 094] Bugfix: prevent Git revision batch pipe deadlocks |
-| 2026-10-16 | Bugfix | [Feature 063] Bugfix: resolve mapped CI/configuration and documentation scopes |
-| 2026-10-16 | Feature | Bound test execution and require only necessary validation with declared long-running exceptions |
 <!-- readme:activity:end -->
 
 ---
@@ -348,10 +348,18 @@
 
 <!-- finalize:spec-feature:2026-10-16:d775ec24 -->
 
-<!-- finalize:spec-specify:2026-10-17:cc406fb7 -->
+<!-- finalize:spec-specify:2026-10-16:f1165a0a -->
 
-<!-- finalize:spec-plan:2026-10-17:0518dc0e -->
+<!-- finalize:spec-plan:2026-10-16:e06699c9 -->
 
-<!-- finalize:spec-implement:2026-10-17:6e077b09 -->
+<!-- finalize:spec-implement:2026-10-17:ca975a13 -->
 
-<!-- finalize:spec-test:2026-10-17:e9ebbe26 -->
+<!-- finalize:spec-test:2026-10-17:8377a967 -->
+
+<!-- finalize:spec-feature:2026-10-17:35d03aca -->
+
+<!-- finalize:spec-feature:2026-10-17:de973d5e -->
+
+<!-- finalize:spec-fix:2026-10-17:24d6777c -->
+
+<!-- finalize:spec-fix:2026-10-17:340e3e18 -->

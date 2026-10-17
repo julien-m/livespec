@@ -122,6 +122,7 @@ def check_execution_options(
     no_coverage: bool,
     debug: bool,
     derive: bool = False,
+    observation: str | None = None,
 ) -> bool:
     """Validate native test selection before resolving project inputs.
 
@@ -136,6 +137,7 @@ def check_execution_options(
         no_coverage: Legacy driver coverage suppression was requested.
         debug: Legacy driver tracebacks were requested.
         derive: Anchor-derived mapping generation was requested (feature 087).
+        observation: Explicit passed/red observation without an acceptance mapping.
     Returns:
         True for a complete native request, False for an unchanged legacy request.
     Raises:
@@ -143,6 +145,8 @@ def check_execution_options(
     Side effects:
         None; supplied values and referenced files remain untouched.
     """
+    if observation is not None:
+        _check_observation_options(feature, command, mapping, prepare, ingest, derive, observation)
     active = sum((command is not None, prepare, ingest is not None, derive))
     native = bool(active or mapping is not None or adapter != "junit")
     if not native:
@@ -151,7 +155,7 @@ def check_execution_options(
         raise ValueError(
             "select exactly one native test operation: derive, prepare, ingest or execution"
         )
-    if mapping is None or not feature or not feature.strip():
+    if observation is None and (mapping is None or not feature or not feature.strip()):
         raise ValueError("native test operations require --feature and --acceptance-mapping")
     if command is not None and not command.strip():
         raise ValueError("--execution-command must not be empty")
@@ -162,3 +166,24 @@ def check_execution_options(
     if command is None and adapter != "junit":
         raise ValueError("--report-adapter requires --execution-command")
     return True
+
+
+def _check_observation_options(
+    feature: str | None,
+    command: str | None,
+    mapping: Path | None,
+    prepare: bool,
+    ingest: Path | None,
+    derive: bool,
+    observation: str,
+) -> None:
+    """Keep observation purpose exclusive before accessing project or mapping inputs."""
+    if observation not in ("passed", "red"):
+        raise ValueError("--execution-observation must be passed or red")
+    if command is None or not feature or not feature.strip():
+        raise ValueError("--execution-observation requires --feature and --execution-command")
+    if mapping is not None or prepare or ingest is not None or derive:
+        raise ValueError(
+            "--execution-observation cannot be combined with --acceptance-mapping, "
+            "--derive-mapping, --prepare-mapping-review or --ingest-mapping-review"
+        )

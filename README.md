@@ -862,3 +862,17 @@ MIT — see [LICENSE](LICENSE)
 ### Bounded, necessary validation
 
 Managed `livespec test` and execution capture share a five-minute command budget, including preparation and cleanup. Supported pytest/Cargo tests default to 2s unit, 10s integration and 30s acceptance; other frameworks explicitly report command-only enforcement. Declare justified exact-scope long cases before execution in `.specs/testing/test-budgets.yaml` (maximum ten minutes). Read [the policy and recovery rules](system/testing/execution-rules.md#validation-budgets) and [necessary test scope](system/minimal-spec-scope.md#necessary-validation): reuse adequate tests and stop when relevant checks pass. Pinned projects receive these guards after their explicit runtime update/migration; this change does not alter existing consumer pins.
+
+### Local Vitest execution observations
+
+Observe an existing Node 22/local Vitest 2.1.x selection through the native test command:
+
+```bash
+livespec test --feature <feature> --execution-command '<node22> <package>/node_modules/vitest/vitest.mjs run --root <package>' --execution-observation passed --report-adapter junit
+```
+
+Use `red` for a genuinely failed supported matcher. Observations retain test and matcher outcomes and always return `certified_acs=[]`; they require no acceptance mapping. Feature acceptance still requires its complete existing requirement evidence. A new official goal render gives the generic implementation task its explicit passed purpose; historical goal files retain their original interpretation.
+
+The observer uses installed local dependencies and preserves governed configuration and selections. It supports built-in sequential matchers and explicitly awaited or returned `resolves`/`rejects` assertions. Bare expect, missing matcher evidence, unawaited async assertions (including Vitest auto-await), custom matchers, concurrent tests, direct Chai, unknown options and changed inputs cannot qualify. Runtime, dependencies, configuration, lock, hooks and captured artifacts are bound to the invocation. The shared command deadline includes preparation and cleanup; framework limits can only tighten it. This is cooperative local provenance, without a same-user JavaScript sandbox.
+
+Async consumption requires both executed JavaScript syntax and actual consumption of the exact matcher thenable: direct `await`, explicit `return` or concise-arrow return in an inline callback of a bare, unshadowed Vitest `test()`/`it()` import. Import aliases are supported. Detached `.then()` and Promise assimilation never establish consumption. Async helper callbacks, hooks, registration modifiers, Promise compositions and returns inside `try/finally` remain unsupported; use a direct inline test assertion instead.
