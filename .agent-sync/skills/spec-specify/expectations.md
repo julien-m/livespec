@@ -1,7 +1,7 @@
 ---
 command: spec-specify
 contract_version: "1.0"
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 ---
 
 # Expectations — /spec-specify
@@ -9,6 +9,8 @@ last_reviewed: 2026-10-13
 ## 1. Purpose
 
 Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
+
+`--no-review` / `-N` removes the spec-review obligation from the goal and its checklist. Preparation may close after structural validation and the remaining receipts; no semantic review receipt or readiness is created, and progression gates continue to require current review evidence. Without either flag, a real current spec review remains required.
 
 ## 2. Preconditions
 

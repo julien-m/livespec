@@ -716,7 +716,9 @@ If validation fails, fix the issues before presenting.
 
 ### Step 6.5 — LLM Spec Review (default, unless `--no-review`)
 
-Unless the `--no-review` flag is set:
+With `--no-review` or `-N`, report that semantic review was skipped, create no review receipt and keep the result a structurally validated Draft. This completes specification preparation only; it cannot certify semantic readiness. Read [the progression protocol](../../../system/review-protocol.md) before planning or implementation; their review gates still apply.
+
+Otherwise:
 
 1. Read the generated `spec.md` content
 2. Load reviewer models from `.specs/semantic/config.yaml` → `review_reviewers` list
@@ -954,6 +956,7 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 > Machine-readable task inventory parsed by `livespec goal render`.
 > Format: `- [branch] task description`
 > Active branches per run:
+> `specify-review` (default; inactive with --no-review or -N).
 > `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
 
 ### Phase 0 — Goal
@@ -993,7 +996,7 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 - [always] Inject `## Behavioral AC` section via LLM signal extraction and detect_traits() if UI signals found <!-- evidence:documentary -->
 - [visual] Inject visual state assertions for detected traits with visual_states defined <!-- evidence:documentary -->
 - [always] Run `livespec validate` structural validation; retry on failure (max 2) <!-- evidence:documentary -->
-- [always] Run LLM spec review unless --no-review; retry on blocking findings <!-- evidence:review review-kind:spec -->
+- [specify-review] Run LLM spec review unless --no-review; retry on blocking findings <!-- evidence:review review-kind:spec -->
 - [always] Run direct Clarify gate (Step 5.9): retain all vague/ambiguous spec items, present <=5 questions at a time, block unresolved critical items, write accepted decisions in ## Clarifications, preserve AC/FR/SC numbering, then re-validate <!-- evidence:documentary -->
 
 ### Phase 5 — Mockups and Surface Annotation

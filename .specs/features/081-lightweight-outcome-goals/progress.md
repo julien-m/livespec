@@ -11,6 +11,7 @@ Read the [approved plan](plan.md) and [implementation map](implementation.md).
 | 5 | Prompts and docs | Done | Anti-drift §5 rewritten; STEP 0 short goal step in 8 skills, removed from 12; inventory rows, spec-feature Verify, expectations reference, README, spec-system updated. |
 | 6 | Tests and dead code | Done | `tests/test_lightweight_goals.py`; goal tests adapted; child-goal and per-task convention code deleted. |
 | Bugfix | Caller runtime import priority | Done | `python -P` excludes consumer cwd from module lookup; real `validate` and `init-from-code --verify-only` subprocess regressions reject a consumer-local validator returning exit 0. |
+| Bugfix | Specify review opt-out | Done | Read [regressions](../../../tests/test_specify_review_goal.py): runner-owned RED (7 failures) then GREEN (14 passes), closing bugfix gate ELIGIBLE (5 files / 252 lines), independent native review PASS, conventions feature/repo PASS. Default spec review and semantic progression remain guarded. |
 
 ## Goal Lock of this run
 

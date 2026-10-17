@@ -185,6 +185,11 @@ def _fix_execution_branches(flag_names: set[str]) -> set[str]:
 
 def _command_task_branches(command: str | None, flags: set[str], executes: bool) -> set[str]:
     """Retain audit reporting while excluding preview and generation-only publication."""
+    # @spec FR-002: Only active receipt obligations
+    #   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-002
+    # Specify's opt-out skips its spec review only; other commands keep their guards.
+    if command == "spec-specify":
+        return set() if flags & {"--no-review", "-N"} else {"specify-review"}
     # @spec FR-004: Honest init profiles
     #   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-004
     # Aliases select the same new inventory; old saved contracts are never rewritten.

@@ -45,6 +45,13 @@ updated: 2026-10-10
 
 ## Bugfix Receipts
 
+Read the current fix mapping and [regression tests](../../../tests/test_specify_review_goal.py): `--no-review` / `-N` selects preparation without a spec-review obligation; normal specify still consumes a current real spec review. No semantic readiness or progression guard is changed.
+
+| Requirement | Current fix sources | Verified |
+|---|---|---|
+| FR-002 | Read [branch selection](../../../validator/goal_inventory.py), [branch vocabulary](../../../validator/goal_contract_model.py), [specify](../../../.agent-sync/skills/spec-specify/SKILL.md), [expectations](../../../.agent-sync/skills/spec-specify/expectations.md) and [tests](../../../tests/test_specify_review_goal.py). | 2026-10-17 |
+
 | Date | Requirement | Regression tests | RED receipt | GREEN receipt |
 |---|---|---|---|---|
 | 2026-10-12 | implementation | `tests/test_goal_outcome_runtime.py::test_stop_condition_rejects_consumer_validator_shadow[init-from-code]`, `tests/test_goal_outcome_runtime.py::test_stop_condition_rejects_consumer_validator_shadow[validate]` | `.specs/.execution/ecdd63efc0304b2db2865cf69ef8cddd/receipt.json` | `.specs/.execution/8cc6c57f4f854191baa743e989f7f3bf/receipt.json` |
+| 2026-10-17 | implementation | `tests/test_specify_review_goal.py::test_no_review_goal_closes_without_creating_semantic_receipts[--no-review]`, `tests/test_specify_review_goal.py::test_no_review_goal_closes_without_creating_semantic_receipts[-N]`, `tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--auto --no-review --no-review --review-max-chars=30000-False]`, `tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--auto --no-review --no-visual --model=gpt-6.1-sol-False]`, `tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--auto -N --no-visual-False]`, `tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--no-review-False]`, `tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[flags3-False]` | `.specs/.execution/a80090db69ba4e33ab0dfd6460ea3b78/receipt.json` | `.specs/.execution/ca5d18a649f14cba99e4750a1b586cfb/receipt.json` |

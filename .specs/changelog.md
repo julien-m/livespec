@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-15
+> Last updated: 2026-10-17
 
 ---
+
+## 2026-10-17 — [Feature 081] Bugfix: honor spec-specify review opt-out in goals
+
+- `--no-review` and `-N` select specification preparation without a spec-review task or receipt; default review, other commands and semantic progression guards remain required. Read the [regressions](../tests/test_specify_review_goal.py) for contract/checklist selection, native goal closure and review boundaries.
 
 ## 2026-10-16 — [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution
 
