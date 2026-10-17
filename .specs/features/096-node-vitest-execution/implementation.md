@@ -29,12 +29,12 @@ Inspect the real Python assertions; parameterized cases retain exact IDs and req
 
 | AC | Python tests | Current status |
 |---|---|---|
-| [AC-001](spec.md#ac-001) | [real transport cases](../../../tests/test_execution_vitest.py), [CLI option cases](../../../tests/test_native_test_option_matrix.py) | ✅ Certified by current98-test receipt |
-| [AC-002](spec.md#ac-002) | [actual dispatch/settlement cases](../../../tests/test_execution_vitest.py), [boundary regressions](../../../tests/test_execution_vitest_boundaries.py) | ✅ Certified by current98-test receipt |
-| [AC-003](spec.md#ac-003) | [provenance/tamper cases](../../../tests/test_execution_vitest.py), [substitution and drift cases](../../../tests/test_execution_vitest_integrity.py), [archive guard drift](../../../tests/test_execution_vitest_goal.py) | ✅ Certified by current98-test receipt |
-| [AC-004](spec.md#ac-004) | [arguments/deadline cases](../../../tests/test_execution_vitest.py), [preparation and child cleanup](../../../tests/test_execution_vitest_budgets.py) | ✅ Certified by current98-test receipt |
-| [AC-005](spec.md#ac-005) | [observation separation](../../../tests/test_execution_vitest.py), [canonical marker](../../../tests/test_bugfix_goal.py), [acceptance joins](../../../tests/test_acceptance_execution_join.py), [canonical task016 guard](../../../tests/test_execution_vitest_goal.py) | ✅ Certified by current98-test receipt |
-| [AC-006](spec.md#ac-006) | [both unchanged selections](../../../tests/test_execution_vitest_consumer.py) | ✅ Certified by current98-test receipt |
+| [AC-001](spec.md#ac-001) | [real transport cases](../../../tests/test_execution_vitest.py), [CLI option cases](../../../tests/test_native_test_option_matrix.py) | ✅ Covered; observed Implement98-test receipt |
+| [AC-002](spec.md#ac-002) | [actual dispatch/settlement cases](../../../tests/test_execution_vitest.py), [boundary regressions](../../../tests/test_execution_vitest_boundaries.py) | ✅ Covered; observed Implement98-test receipt |
+| [AC-003](spec.md#ac-003) | [provenance/tamper cases](../../../tests/test_execution_vitest.py), [substitution and drift cases](../../../tests/test_execution_vitest_integrity.py), [archive guard drift](../../../tests/test_execution_vitest_goal.py) | ✅ Covered; observed Implement98-test receipt |
+| [AC-004](spec.md#ac-004) | [arguments/deadline cases](../../../tests/test_execution_vitest.py), [preparation and child cleanup](../../../tests/test_execution_vitest_budgets.py) | ✅ Covered; observed Implement98-test receipt |
+| [AC-005](spec.md#ac-005) | [observation separation](../../../tests/test_execution_vitest.py), [canonical marker](../../../tests/test_bugfix_goal.py), [acceptance joins](../../../tests/test_acceptance_execution_join.py), [canonical task016 guard](../../../tests/test_execution_vitest_goal.py) | ✅ Covered; observed Implement98-test receipt |
+| [AC-006](spec.md#ac-006) | [both unchanged selections](../../../tests/test_execution_vitest_consumer.py) | ✅ Covered; observed Implement98-test receipt |
 
 ## Files Created or Modified
 
