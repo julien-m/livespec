@@ -192,16 +192,18 @@ def restore_write_bits(root: Path) -> None:
         Path(dirpath).chmod(Path(dirpath).stat().st_mode | stat.S_IWUSR)
 
 
-def tree_hashes(root: Path) -> dict[str, str]:
-    """Map every file/symlink below ``root`` to a content hash (directories skipped)."""
+def tree_hashes(root: Path, *, excluded_prefixes: tuple[str, ...] = ()) -> dict[str, str]:
+    """Hash files/symlinks below ``root``, without reading explicitly excluded paths."""
     hashes: dict[str, str] = {}
     for path in sorted(root.rglob("*")):
+        relative = path.relative_to(root).as_posix()
+        # Worktree-only callers must skip volatile Git internals before any file read.
+        if relative.startswith(excluded_prefixes):
+            continue
         if path.is_symlink():
-            hashes[path.relative_to(root).as_posix()] = "link:" + os.readlink(path)
+            hashes[relative] = "link:" + os.readlink(path)
         elif path.is_file():
-            hashes[path.relative_to(root).as_posix()] = hashlib.sha256(
-                path.read_bytes()
-            ).hexdigest()
+            hashes[relative] = hashlib.sha256(path.read_bytes()).hexdigest()
     return hashes
 
 

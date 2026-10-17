@@ -11,6 +11,10 @@
 
 - `--no-review` and `-N` select specification preparation without a spec-review task or receipt; default review, other commands and semantic progression guards remain required. Read the [regressions](../tests/test_specify_review_goal.py) for contract/checklist selection, native goal closure and review boundaries.
 
+## 2026-10-17 — [Feature 083] Test Hardening: ignore Git churn before worktree hashing
+
+- Read [the deterministic regressions](../tests/test_runtime_worktree_hashes.py): migration-fixture comparisons exclude `.git/` before reading volatile objects. Generic complete hashing and protected-content checks retain their scope. No runtime product behavior or consumer project changes.
+
 ## 2026-10-16 — [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution
 
 - Nonempty all-review inventories require complete current reviews at proof, archive and archive-read; mixed/runtime inventories retain execution receipts. Explicit success criteria and remote delivery evidence remain required.
