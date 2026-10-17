@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-10-17 — [Feature 078] Cloud command-discovery correction: 28 checks pass; AC-007/009/010 certified. Action purposes bind every test command; opaque identity grants no unsupported assertion adapter. Read [the current correction scope](features/078-requirement-evidence-integrity/implementation.md#cloud-command-discovery-correction--2026-10-17).
+<!-- finalize:spec-fix:2026-10-17:96cf0f5a -->
+
+## 2026-10-17 — [Feature 096] CI timeout-test correction: 10 checks pass, AC-004 certified; preserve the 1.5-second cap and published/no-fresh-receipt outcomes. Read [the correction scope](features/096-node-vitest-execution/implementation.md#ci-timeout-test-correction--2026-10-17).
+<!-- finalize:spec-fix:2026-10-17:f981b487 -->
+
+## 2026-10-17 — [Feature 078] Bind generic suite observations to every resolved original command, actual cwd and supported literal alias; reject mixed suite/final-acceptance metadata and command-cell applicability false positives. Read [implementation evidence](features/078-requirement-evidence-integrity/implementation.md) and [the repair checkpoint](features/078-requirement-evidence-integrity/progress.md). Genuine five-test RED/GREEN preserves independent final acceptance and legacy semantics. Normal filtered FR-009/FR-011 evidence follows the printed FALLBACK; this does not certify all historical sixteen ACs.
+<!-- finalize:spec-fix:2026-10-17:caf10d18 -->
+
+## 2026-10-17 — [Feature 096] Confined direct Vitest invocation cwd preserves governing-root authority and historical root defaults. Read [the independent check](features/096-node-vitest-execution/checks/2026-10-17.md) and [implementation ownership](features/096-node-vitest-execution/implementation.md). The source-owned 40-test checkpoint passed six ACs; current source closure is independently recorded by CLI goals and archives. Producer consumer-copy observations remain distinct from consumer042 delivery.
+<!-- finalize:spec-fix:2026-10-17:c1b7f27f -->
+
 ## 2026-10-17 — [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture
 <!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
 
@@ -1103,6 +1115,10 @@ Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/
 
 - 2026-10-17 [Feature096] Bugfix: recursively check Vite PluginOption containers and config/configResolved/apply callbacks; include binding/path/plugin regressions in the seven-module Node CI job. Scoped final RED/GREEN and ordinary plugin controls pass; full final-head remote CI remains required.
 
+- 2026-10-17 [Feature 078] Bugfix: distinguish generic Test observations and explicit absent suite commands; preserve final acceptance and historical contracts.
+
 - 2026-10-17: Fix096 unsafe consumer timeouts and CLI final-verification deadline/completion boundary; scoped eleven-case RED/GREEN evidence recorded, historical full-feature certificates preserved.
 
 - 2026-10-17: Feature096 Check reviewed grouped timeout/final-verification corrections; inspect [the independent report](features/096-node-vitest-execution/checks/2026-10-17.md). Fresh acceptance remains a separate gate.
+
+- 2026-10-17 [Feature 078] Review fix: bind each suite and the DoD aggregate to frozen resolved commands; parse suite applicability from Action cells.

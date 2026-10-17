@@ -41,15 +41,23 @@ def execution_io(
     adapter: str,
     derive: bool = False,
     observation: Literal["passed", "red"] | None = None,
+    execution_cwd: Path | None = None,
 ) -> None:
     """Expose mapping derivation, reviewer preparation/ingestion and certified capture."""
-    # @spec FR-001: Explicit observations without AC mapping
+    # @spec FR-001, FR-005: Explicit observations preserve strict acceptance
     # — .specs/features/096-node-vitest-execution/spec.md#fr-001
-    # @spec FR-005: Preserve strict acceptance beside observation
-    # — .specs/features/096-node-vitest-execution/spec.md#fr-005
     if observation is not None:
         _observe(
-            root, feature, command, mapping_path, prepare, ingest, adapter, derive, observation
+            root,
+            feature,
+            command,
+            mapping_path,
+            prepare,
+            ingest,
+            adapter,
+            derive,
+            observation,
+            execution_cwd,
         )
     if not feature or mapping_path is None:
         raise ValueError("execution_feature_and_acceptance_mapping_required")
@@ -66,7 +74,7 @@ def execution_io(
     if anchored and (prepare or ingest):
         raise ValueError("anchored_mapping_needs_no_review")
     if anchored:
-        _capture(root, feature, command, mapping_path, adapter)
+        _capture(root, feature, command, mapping_path, adapter, execution_cwd=execution_cwd)
     prepared = prepare_mapping_review(root, feature, mapping_path)
     if prepare:
         typer.echo(
@@ -81,7 +89,7 @@ def execution_io(
         receipt = ingest_mapping_review(prepared, raw.raw_results, receipt_path, raw.synthesis)
         typer.echo(json.dumps({"receipt_path": str(receipt_path), **receipt.model_dump()}))
         raise typer.Exit(0 if receipt.complete and receipt.ready else 1)
-    _capture(root, feature, command, mapping_path, adapter)
+    _capture(root, feature, command, mapping_path, adapter, execution_cwd=execution_cwd)
 
 
 def _observe(
@@ -94,6 +102,7 @@ def _observe(
     adapter: str,
     derive: bool,
     observation: Literal["passed", "red"],
+    execution_cwd: Path | None = None,
 ) -> None:
     """Validate observation purpose before any mapping read and capture without certification."""
     from .operation_options import check_execution_options
@@ -110,10 +119,11 @@ def _observe(
         debug=False,
         derive=derive,
         observation=observation,
+        execution_cwd=execution_cwd,
     )
     if feature:
         # Observation must bypass mapping reads and independent acceptance review entirely.
-        _capture(root, feature, command, None, adapter, observation)
+        _capture(root, feature, command, None, adapter, observation, execution_cwd)
 
 
 def _derive(root: Path, feature: str, mapping_path: Path) -> None:
@@ -160,6 +170,7 @@ def _capture(
     mapping_path: Path | None,
     adapter: str,
     observation: Literal["passed", "red"] | None = None,
+    execution_cwd: Path | None = None,
 ) -> None:
     if not command:
         raise ValueError("execution_command_required")
@@ -177,6 +188,7 @@ def _capture(
                 if mapping_path
                 else None,
                 verification_pending=True,
+                execution_cwd=execution_cwd,
             )
             if scope.timed_out or capture.exit_code == 124:
                 raise BudgetExpired("Execution exceeded the original command deadline")

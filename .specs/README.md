@@ -115,7 +115,7 @@
 | 075 | Design Direction Carry | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/075-design-direction-carry/spec.md), [plan](features/075-design-direction-carry/plan.md), [implementation](features/075-design-direction-carry/implementation.md) |
 | 076 | Spec Init Goal Bootstrap | Implemented | 2026-09-04 | 2026-09-08 | Read [spec](features/076-spec-init-goal-bootstrap/spec.md), [plan](features/076-spec-init-goal-bootstrap/plan.md), and [implementation](features/076-spec-init-goal-bootstrap/implementation.md) |
 | 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-10-12 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
-| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-10-12 | [spec](features/078-requirement-evidence-integrity/spec.md) |
+| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-10-17 | [spec](features/078-requirement-evidence-integrity/spec.md) |
 | 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-10-13 | [spec](features/079-validator-ci-prerequisites/spec.md) |
 | 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-12 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
 | 081 | Lightweight Outcome-Based Goals | Implemented | 2026-10-10 | 2026-10-10 | Read [spec](features/081-lightweight-outcome-goals/spec.md) |
@@ -160,16 +160,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-17 | Feature | [Feature 078] Cloud command-discovery correction: 28 checks pass; AC-007/009/010 certified. Action purposes bind every test command; opaque identity grants no unsupported assertion adapter. Read [the current correction scope](features/078-requirement-evidence-integrity/implementation.md#cloud-command-discovery-correction--2026-10-17). |
+| 2026-10-17 | Feature | [Feature 096] CI timeout-test correction: 10 checks pass, AC-004 certified; preserve the 1.5-second cap and published/no-fresh-receipt outcomes. Read [the correction scope](features/096-node-vitest-execution/implementation.md#ci-timeout-test-correction--2026-10-17). |
+| 2026-10-17 | Feature | [Feature 078] Bind generic suite observations to every resolved original command, actual cwd and supported literal alias; reject mixed suite/final-acceptance metadata and command-cell applicability false positives. Read [implementation evidence](features/078-requirement-evidence-integrity/implementation.md) and [the repair checkpoint](features/078-requirement-evidence-integrity/progress.md). Genuine five-test RED/GREEN preserves independent final acceptance and legacy semantics. Normal filtered FR-009/FR-011 evidence follows the printed FALLBACK; this does not certify all historical sixteen ACs. |
+| 2026-10-17 | Feature | [Feature 096] Confined direct Vitest invocation cwd preserves governing-root authority and historical root defaults. Read [the independent check](features/096-node-vitest-execution/checks/2026-10-17.md) and [implementation ownership](features/096-node-vitest-execution/implementation.md). The source-owned 40-test checkpoint passed six ACs; current source closure is independently recorded by CLI goals and archives. Producer consumer-copy observations remain distinct from consumer042 delivery. |
 | 2026-10-17 | Feature | [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture |
 | 2026-10-17 | Feature | 097: preserve exact Git index bytes while reviewing complete root bootstrap scope; current six-AC certification and independent full reviews pass. |
 | 2026-10-17 | Feature | [Feature 097] Test BLOCKED: 15 passed, 1 failed; Git index integrity assertion |
 | 2026-10-17 | Feature | [Feature 097] Test: 100% AC covered (6/6), 0 tests generated |
 | 2026-10-17 | Feature | 097 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state |
 | 2026-10-17 | Feature | Plan097: two bounded steps and new independent review; owner-bound acceptance remains pending |
-| 2026-10-17 | Spec | Spec identity097: root bootstrap review contract, renumbered from the historical root096 allocation; new independent review ready |
-| 2026-10-17 | Feature | Feature096 bugfix: reject late Chai matcher and prototype registration |
-| 2026-10-17 | Feature | Feature096 CI fixture fix: actual Typer Result annotation and exact outer deadline; normal AC004-filtered proof18 tests, previous110/six-AC proof historical |
-| 2026-10-17 | Bugfix | Feature096 Fix: bounded consumer timeouts and same-deadline CLI final verification; normal spec-fix after scoped fallback,110 current tests and six ACs certified |
 <!-- readme:activity:end -->
 
 ---
@@ -378,3 +378,11 @@
 <!-- finalize:spec-implement:2026-10-17:1bab7ffb -->
 
 <!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
+
+<!-- finalize:spec-fix:2026-10-17:c1b7f27f -->
+
+<!-- finalize:spec-fix:2026-10-17:caf10d18 -->
+
+<!-- finalize:spec-fix:2026-10-17:f981b487 -->
+
+<!-- finalize:spec-fix:2026-10-17:96cf0f5a -->

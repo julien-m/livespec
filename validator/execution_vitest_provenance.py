@@ -43,7 +43,12 @@ def _tree_identity(root: Path) -> str:
 # @spec FR-003: Bind native runtime, installed modules, package lock and owned assets
 # — .specs/features/096-node-vitest-execution/spec.md#fr-003
 def vitest_provenance(
-    node: Path, package: Path, config: Path | None, project: Path | None = None
+    node: Path,
+    package: Path,
+    config: Path | None,
+    project: Path | None = None,
+    *,
+    execution_cwd: Path | None = None,
 ) -> dict[str, str]:
     """Bind every installed module, native interpreter, package lock and owned asset."""
     project = project or package
@@ -66,7 +71,19 @@ def vitest_provenance(
     assets = Path(__file__).with_name("vitest")
     if not (assets / "config.ts").is_file():
         raise ValueError("Packaged Vitest observation assets are unavailable")
+    cwd_identity: dict[str, str] = {}
+    if execution_cwd is not None:
+        from .execution_working_directory import resolve_execution_cwd
+
+        cwd = resolve_execution_cwd(project, execution_cwd)
+        stat = cwd.stat()
+        cwd_identity = {
+            "execution_cwd": str(cwd),
+            "cwd_device": str(stat.st_dev),
+            "cwd_inode": str(stat.st_ino),
+        }
     return {
+        **cwd_identity,
         "runner": "vitest",
         "project_root": str(project),
         "node_path": str(node),
@@ -95,4 +112,5 @@ def current_vitest_provenance(recorded: dict[str, str]) -> dict[str, str]:
         Path(recorded["package_root"]),
         Path(config) if config else None,
         Path(recorded["project_root"]),
+        execution_cwd=Path(recorded["execution_cwd"]) if "execution_cwd" in recorded else None,
     )

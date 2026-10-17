@@ -81,6 +81,12 @@ _FEATURE_HELP = (
 )
 
 
+ExecutionCwdOption = Annotated[
+    Path | None,
+    typer.Option("--execution-cwd", help="Confined working directory for direct Vitest execution"),
+]
+
+
 def test_command(
     feature: str | None = typer.Option(None, "--feature", help=_FEATURE_HELP),
     mutation: bool = typer.Option(
@@ -121,6 +127,7 @@ def test_command(
         "junit", "--report-adapter", help="Structured execution result adapter"
     ),
     debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
+    execution_cwd: ExecutionCwdOption = None,
 ) -> None:
     """Run bounded driver tests or prepare, ingest and certify mapped evidence."""
     _dispatch_test(
@@ -135,6 +142,7 @@ def test_command(
         report_adapter,
         debug,
         execution_observation,
+        execution_cwd,
     )
 
 
@@ -150,6 +158,7 @@ def _dispatch_test(
     report_adapter: str,
     debug: bool,
     execution_observation: Literal["passed", "red"] | None = None,
+    execution_cwd: Path | None = None,
 ) -> None:
     """Validate mode exclusivity and dispatch to native capture or bounded driver execution."""
     from .operation_options import check_execution_options
@@ -167,6 +176,7 @@ def _dispatch_test(
             debug=debug,
             derive=derive_mapping,
             observation=execution_observation,
+            execution_cwd=execution_cwd,
         )
     except ValueError as exc:
         typer.echo(f"Error: {exc}", err=True)
@@ -181,6 +191,7 @@ def _dispatch_test(
             report_adapter,
             derive_mapping,
             execution_observation,
+            execution_cwd,
         )
 
     run_with_debug(
@@ -282,6 +293,7 @@ def _run_execution_io(
     report_adapter: str,
     derive_mapping: bool = False,
     execution_observation: Literal["passed", "red"] | None = None,
+    execution_cwd: Path | None = None,
 ) -> None:
     from .execution_io import execution_io
 
@@ -296,6 +308,7 @@ def _run_execution_io(
             adapter=report_adapter,
             derive=derive_mapping,
             observation=execution_observation,
+            execution_cwd=execution_cwd,
         )
     except (OSError, ValueError) as exc:
         typer.echo(f"BLOCKED: {exc}", err=True)
