@@ -1,5 +1,12 @@
 # Changelog - 083-pinned-runtime-isolation
 
+## 2026-10-17 — [Test Hardening]: Exclude volatile Git internals before hashing
+
+- **Type:** Test Hardening
+- **Cause:** two PR #52 CI runs read a loose Git object after `is_file()` and before Git maintenance deleted it; the migration test filtered `.git/` only after hashing.
+- Read [the regressions](../../../tests/test_runtime_worktree_hashes.py): the volatile-object case fails before the fix and passes after it; protected content/mutation/error checks and the generic helper's complete default scope remain intact. Read [the helper](../../../tests/runtime_support.py) and [migration assertions](../../../tests/test_runtime_docs.py), which are unchanged apart from moving the existing exclusion before file reads.
+- **Independent native review:** PASS. No product runtime or consumer project is modified; no review or progression protection is disabled.
+
 ## 2026-10-11 — [Spec]: Feature specification created
 
 - **Type:** Spec Update

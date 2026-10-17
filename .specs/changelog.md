@@ -3,7 +3,7 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-15
+> Last updated: 2026-10-17
 
 ---
 
@@ -22,6 +22,14 @@
 
 ## 2026-10-16 — Spec created: Node Vitest Execution Observations - 3 stories, 6 AC, 6 FR
 <!-- finalize:spec-specify:2026-10-16:f1165a0a -->
+## 2026-10-17 — [Feature 081] Bugfix: honor spec-specify review opt-out in goals
+
+- `--no-review` and `-N` select specification preparation without a spec-review task or receipt; default review, other commands and semantic progression guards remain required. Read the [regressions](../tests/test_specify_review_goal.py) for contract/checklist selection, native goal closure and review boundaries.
+- Generic `--pre-impl` flags retain command-specific obligations, preventing an unintended default-review bypass while preserving preparation branch compatibility.
+
+## 2026-10-17 — [Feature 083] Test Hardening: ignore Git churn before worktree hashing
+
+- Read [the deterministic regressions](../tests/test_runtime_worktree_hashes.py): migration-fixture comparisons exclude `.git/` before reading volatile objects. Generic complete hashing and protected-content checks retain their scope. No runtime product behavior or consumer project changes.
 
 ## 2026-10-16 — [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution
 

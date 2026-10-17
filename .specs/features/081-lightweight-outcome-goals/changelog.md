@@ -45,8 +45,36 @@
 - **Code modified:** tests/test_goal_outcome_runtime.py, validator/goal_outcome.py
 - **AC impacted:** implementation
 - **Author:** livespec bugfix record
+- **Validation:** 4327 unit cases passed (4249 in the complete parallel run, then the 78 Penflow-dependent failures passed after installing CI-pinned Penflow); 23 skipped. Integration level 3A: 72 passed, 1 skipped (the UI witness passed after installing locked npm dependencies). Ruff, Pyright, mypy, command audit, independent native review and feature/repo conventions gates passed.
+- **Existing repository debt:** global structural validation still rejects the missing frontmatter in Feature 095; read its [implementation map](../095-test-time-budgets/implementation.md), byte-identical to the base revision. Feature 081 validation passes (6 files, no errors or warnings). This bugfix certifies its regressions only.
 - **Base revision:** HEAD
 - **Regression tests:** tests/test_goal_outcome_runtime.py::test_stop_condition_rejects_consumer_validator_shadow[init-from-code], tests/test_goal_outcome_runtime.py::test_stop_condition_rejects_consumer_validator_shadow[validate]
 - **RED receipt:** `.specs/.execution/ecdd63efc0304b2db2865cf69ef8cddd/receipt.json`
 - **GREEN receipt:** `.specs/.execution/8cc6c57f4f854191baa743e989f7f3bf/receipt.json`
 <!-- bugfix:8cc6c57f4f854191baa743e989f7f3bf -->
+
+## 2026-10-17 — [Bugfix]: Honor spec-specify --no-review and -N without granting semantic readiness
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-specify/SKILL.md, .agent-sync/skills/spec-specify/expectations.md, tests/test_specify_review_goal.py, validator/goal_contract_model.py, validator/goal_inventory.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_specify_review_goal.py::test_no_review_goal_closes_without_creating_semantic_receipts[--no-review], tests/test_specify_review_goal.py::test_no_review_goal_closes_without_creating_semantic_receipts[-N], tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--auto --no-review --no-review --review-max-chars=30000-False], tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--auto --no-review --no-visual --model=gpt-6.1-sol-False], tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--auto -N --no-visual-False], tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--no-review-False], tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[flags3-False]
+- **RED receipt:** `.specs/.execution/a80090db69ba4e33ab0dfd6460ea3b78/receipt.json`
+- **GREEN receipt:** `.specs/.execution/ca5d18a649f14cba99e4750a1b586cfb/receipt.json`
+<!-- bugfix:ca5d18a649f14cba99e4750a1b586cfb -->
+
+## 2026-10-17 — [Bugfix]: Keep default specify review active with pre-impl flags
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_specify_review_goal.py, validator/goal_inventory.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--pre-impl-True], tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--pre-impl=check-True]
+- **RED receipt:** `.specs/.execution/5871a3741c0a4add8760ac7f5c82472d/receipt.json`
+- **GREEN receipt:** `.specs/.execution/ce826598e6c947d786ea90ba124ec8a5/receipt.json`
+<!-- bugfix:ce826598e6c947d786ea90ba124ec8a5 -->
