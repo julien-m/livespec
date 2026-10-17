@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-10-17 — [Feature 096] ## [Feature]: Genuine Node22 and Vitest execution observations implemented
+<!-- finalize:spec-implement:2026-10-17:ca975a13 -->
+
 ## 2026-10-16 — [Feature 096] Bugfix: select canonical goal tasks and repair deterministic CI fixture expectations
 
 - Focused checks, migration and static checks pass; acceptance certification and Implement closure remain pending.

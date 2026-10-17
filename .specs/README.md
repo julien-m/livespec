@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-10-16
+> Last updated: 2026-10-17
 
 
 ---
@@ -134,7 +134,7 @@
 | 093 | Configured Review Identity | In Progress | 2026-10-13 | 2026-10-15 | [spec](features/093-configured-review-identity/spec.md), [plan](features/093-configured-review-identity/plan.md), [implementation](features/093-configured-review-identity/implementation.md) |
 | 094 | Verified Review Continuity | In Progress | 2026-10-14 | 2026-10-14 | [spec](features/094-verified-review-continuity/spec.md), [plan](features/094-verified-review-continuity/plan.md), [implementation](features/094-verified-review-continuity/implementation.md) |
 | 095 | Test Time Budgets | Implemented | 2026-10-16 | 2026-10-16 | [spec](features/095-test-time-budgets/spec.md) |
-| 096 | Node Vitest Execution Observations | Planned | 2026-10-16 | 2026-10-16 | [spec](features/096-node-vitest-execution/spec.md) |
+| 096 | Node Vitest Execution Observations | Implemented | 2026-10-16 | 2026-10-17 | [spec](features/096-node-vitest-execution/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -159,6 +159,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-17 | Feature | [Feature 096] ## [Feature]: Genuine Node22 and Vitest execution observations implemented |
+| 2026-10-16 | Bugfix | [Feature 096] Bugfix: select canonical goal tasks and repair deterministic CI fixture expectations |
 | 2026-10-16 | Feature | Technical plan: five bounded steps, two diagrams and explicit runtime evidence gates |
 | 2026-10-16 | Spec | Spec created: Node Vitest Execution Observations - 3 stories, 6 AC, 6 FR |
 | 2026-10-16 | Bugfix | [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution |
@@ -167,8 +169,6 @@
 | 2026-10-16 | Feature | Bound test execution and require only necessary validation with declared long-running exceptions |
 | 2026-10-16 | Feature | [Feature 095] Test: 100% AC covered (5/5), 0 tests generated |
 | 2026-10-16 | Plan | Plan created: Test Time Budgets — 3 implementation steps, 1 state diagram; necessary tests and bounded recovery |
-| 2026-10-16 | Spec | [Feature 095] Spec created: Test Time Budgets — 3 stories, 5 AC, 7 FR |
-| 2026-10-15 | Bugfix | Bugfix: [093](features/093-configured-review-identity/changelog.md): a goal `--model` flag without value raises `review_model_required` instead of binding the configured model. |
 <!-- readme:activity:end -->
 
 ---
@@ -351,3 +351,5 @@
 <!-- finalize:spec-specify:2026-10-16:f1165a0a -->
 
 <!-- finalize:spec-plan:2026-10-16:e06699c9 -->
+
+<!-- finalize:spec-implement:2026-10-17:ca975a13 -->

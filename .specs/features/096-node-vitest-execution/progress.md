@@ -8,7 +8,7 @@ Read the [approved plan](plan.md) for step contracts.
 | 2 | Done | Genuine transport/provenance and installed-wheel adapter API pass; whole-wheel CLI has unrelated pre-existing template packaging limitation. |
 | 3 | Done | CLI and purpose separation pass; current generic task016 accepted from a real Node observation; historical goal bytes unchanged. |
 | 4 | Done | Fresh 46/55 observations valid; anchored two-run Python verification passes with all original consumer inputs unchanged. |
-| 5 | In Progress | Grouped CI/async repairs pass; 143 bindings/98 IDs and full-scope native reviews are current. Fresh nine-asset wheel/API and 46/55 observations pass; unique300s mapped capture remains pending. |
+| 5 | Done | Fresh corrected98-test capture certifies all6ACs;143 assertion bindings and full-scope reviews PASS. Machine finalization and goal closure recorded below. |
 
 Resume at Step 5 final validation. No native goal created (parent instruction); CLI goal rendered. No consumer lifecycle changes.
 
@@ -93,3 +93,23 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Inspect [the exact embedded CI static check](.reviews/implementation-evidence/async-exact-ci-static-final.json), [conventions PASS](.reviews/implementation-evidence/opaque-conventions.json), and [current native mapping ingestion](.reviews/implementation-evidence/opaque-mapping-ingestion.json):complete/ready true, errors empty. Full47-file delivery review and audit are officially PASS.
 - Inspect [the final98-ID selection](.reviews/implementation-evidence/final-async-selection.json):143 bindings include all11 new distinct async parameter branches; historical128/87 remains intact. Parent confirmed the sole authorized300s envelope covers this necessary expanded selection.
 - Inspect [the honest pre-capture diagnostic](.reviews/implementation-evidence/opaque-pre-capture-diagnostic.json):143 grounded; historical128 passing/126 exact-current-span observations;108 current source hashes match those old captures. No line translation, trace rewrite, merged receipt or certification is claimed. Fresh execution remains required.
+
+## Sole final capture consumed: genuine98PASS, certification BLOCKED
+
+- Inspect [the immutable final result](.reviews/implementation-evidence/final-98-capture.json) and [the exact read-only diagnosis](.reviews/implementation-evidence/final-98-failure-diagnostic.json). Invocation `a442fdeecd0a4259a30585f1c6e18af3` used132.468779s of300s; pytest returned0 with98PASS in127.96s. No tests failed and no timeout occurred.
+- The CLI shim kept Homebrew Python3.14.7 while the selected test command used uv Python3.14.5. The trusted runner intentionally refused the mismatched interpreter: command-only enforcement, no report or assertion trace, verification false and certified ACs empty. This is an execution-surface error, not a failing096 assertion.
+- Read-only recognition confirms the exact98-ID argv is trusted under the repo interpreter. The corrected source CLI command is prepared externally, but the remaining167.531221s arithmetic is not authorization; the coordinator requires a new explicit human decision. No second capture was executed.
+- Current code/mapping/delivery reviews remain PASS; current nine-asset installed API and fresh46/55 consumer observations remain valid. No finalization, Implemented promotion, successful goal/archive, Test phase, merge or runtime activation is claimed.
+
+## Corrected capture after explicit new authorization
+
+- Human authorization: « Oui go » for one corrected300s capture. The CLI and pytest both resolve to uv Python3.14.5; read-only recognition/provenance was verified before launch.
+- Inspect [the fresh qualifying capture](.reviews/implementation-evidence/corrected-98-capture.json):98 tests PASS, valid true, all6ACs certified. No retry followed this execution; earlier a442 and every historical artifact remain unchanged.
+- The nine-asset installed API, fresh46/55 consumer observations and current native mapping/review/audit remain PASS. No Test phase, consumer042 lifecycle, merge or global activation was performed.
+
+## Implement closure verified
+
+- Machine finalization is PASS and persisted status is Implemented. CLI goal `f9cbd9c9` is complete, including the actual archive.run proof; verify-output returned success.
+- Inspect [the exact archived run](../../.runs/spec-implement-2026-10-17T09-04-17.879580-f9cbd9c9-policy2.json) and [closure receipts](.reviews/implementation-evidence/implement-closure-summary.json). Both repo and feature conventions gates pass.
+- Only the generated implementation metadata required a frontmatter correction after capture; no governed application/test/mapping input changed. The complete archived evidence still verifies.
+- Supervisor owns the independent Test phase and pipeline transition. No consumer042 lifecycle, merge or global activation was performed.

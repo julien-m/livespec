@@ -1,6 +1,14 @@
+---
+created: 2026-10-16
+feature: 096-node-vitest-execution
+title: 'Implementation Map: Node Vitest Execution Observations'
+type: implementation
+updated: 2026-10-17
+---
+
 # Implementation — Node Vitest Execution Observations
 
-Local implementation and grouped CI/async repairs are present. Fresh nine-asset wheel/API and complete46/55 consumer observations pass. Current143-binding/98-ID mapping and independent complete-diff review/audit pass. Fresh acceptance execution certification and finalization remain pending; status is explicitly INCOMPLETE/DRAFT. Inspect the [progress checkpoint](progress.md) and [approved plan](plan.md) before resuming.
+All six execution ACs are certified by the fresh runner-owned98-test capture. Current143 bindings, independent mapping/full-scope reviews, nine-asset installed API and unchanged46/55 consumer observations pass. Inspect [the final capture](.reviews/implementation-evidence/corrected-98-capture.json) and [the progress checkpoint](progress.md). Earlier failed and stale runs remain historical; no consumer lifecycle or global runtime was changed.
 
 ## Requirement Mapping
 
@@ -12,7 +20,7 @@ Inspect the linked source files and their requirement anchors.
 | [FR-002](spec.md#fr-002) | [matcher observer](../../../validator/vitest/matcher-observer.ts), [selected results](../../../validator/execution_vitest_results.py) | `@spec FR-002` | Implemented; four review findings corrected, 14 boundary cases pass |
 | [FR-003](spec.md#fr-003) | [runtime provenance](../../../validator/execution_vitest_provenance.py), [governed configuration](../../../validator/vitest/config.ts) | `@spec FR-003` | Implemented; runtime/config/setup and artifact refusal tests pass |
 | [FR-004](spec.md#fr-004) | [bounded preparation](../../../validator/execution_vitest.py) | `@spec FR-004` | Implemented; native body/hook caps plus shared command cap; enforcement reports command-only |
-| [FR-005](spec.md#fr-005) | [observation branch](../../../validator/cli_commands/execution_io.py), [generic goal marker](../../../.agent-sync/skills/spec-implement/SKILL.md) | `@spec FR-005` | Implemented; acceptance unchanged; generic passed proof accepted; archive pending |
+| [FR-005](spec.md#fr-005) | [observation branch](../../../validator/cli_commands/execution_io.py), [generic goal marker](../../../.agent-sync/skills/spec-implement/SKILL.md) | `@spec FR-005` | Implemented; acceptance unchanged; generic passed proof and current goal archive verified |
 | [FR-006](spec.md#fr-006) | [two-run verification](../../../tests/test_execution_vitest_consumer.py) | `@spec FR-006` | Fresh final 46/55 observations pass; original input identity check passes |
 
 ## Acceptance Criteria Mapping
@@ -21,12 +29,12 @@ Inspect the real Python assertions; parameterized cases retain exact IDs and req
 
 | AC | Python tests | Current status |
 |---|---|---|
-| [AC-001](spec.md#ac-001) | [real transport cases](../../../tests/test_execution_vitest.py), [CLI option cases](../../../tests/test_native_test_option_matrix.py) | Passing targeted cases; final mapped capture pending |
-| [AC-002](spec.md#ac-002) | [actual dispatch/settlement cases](../../../tests/test_execution_vitest.py), [boundary regressions](../../../tests/test_execution_vitest_boundaries.py) | Four findings reproduced RED, then 14 boundary cases GREEN |
-| [AC-003](spec.md#ac-003) | [provenance/tamper cases](../../../tests/test_execution_vitest.py), [substitution and drift cases](../../../tests/test_execution_vitest_integrity.py), [archive guard drift](../../../tests/test_execution_vitest_goal.py) | Twelve additional real provenance cases pass; final mapped capture pending |
-| [AC-004](spec.md#ac-004) | [arguments/deadline cases](../../../tests/test_execution_vitest.py), [preparation and child cleanup](../../../tests/test_execution_vitest_budgets.py) | Two distinct real timeout 124 cases pass; final mapped capture pending |
-| [AC-005](spec.md#ac-005) | [observation separation](../../../tests/test_execution_vitest.py), [canonical marker](../../../tests/test_bugfix_goal.py), [acceptance joins](../../../tests/test_acceptance_execution_join.py), [canonical task016 guard](../../../tests/test_execution_vitest_goal.py) | Real canonical task proof and native archive guard pass; full goal archive pending |
-| [AC-006](spec.md#ac-006) | [both unchanged selections](../../../tests/test_execution_vitest_consumer.py) | Fresh final two-run manifest and current Python verification pass |
+| [AC-001](spec.md#ac-001) | [real transport cases](../../../tests/test_execution_vitest.py), [CLI option cases](../../../tests/test_native_test_option_matrix.py) | ✅ Certified by current98-test receipt |
+| [AC-002](spec.md#ac-002) | [actual dispatch/settlement cases](../../../tests/test_execution_vitest.py), [boundary regressions](../../../tests/test_execution_vitest_boundaries.py) | ✅ Certified by current98-test receipt |
+| [AC-003](spec.md#ac-003) | [provenance/tamper cases](../../../tests/test_execution_vitest.py), [substitution and drift cases](../../../tests/test_execution_vitest_integrity.py), [archive guard drift](../../../tests/test_execution_vitest_goal.py) | ✅ Certified by current98-test receipt |
+| [AC-004](spec.md#ac-004) | [arguments/deadline cases](../../../tests/test_execution_vitest.py), [preparation and child cleanup](../../../tests/test_execution_vitest_budgets.py) | ✅ Certified by current98-test receipt |
+| [AC-005](spec.md#ac-005) | [observation separation](../../../tests/test_execution_vitest.py), [canonical marker](../../../tests/test_bugfix_goal.py), [acceptance joins](../../../tests/test_acceptance_execution_join.py), [canonical task016 guard](../../../tests/test_execution_vitest_goal.py) | ✅ Certified by current98-test receipt |
+| [AC-006](spec.md#ac-006) | [both unchanged selections](../../../tests/test_execution_vitest_consumer.py) | ✅ Certified by current98-test receipt |
 
 ## Files Created or Modified
 
@@ -52,3 +60,7 @@ Inspect the real Python assertions; parameterized cases retain exact IDs and req
 ## Incomplete checkpoint after canonical identity correction
 
 Inspect [the identity/assertion/citation diagnostic](.reviews/implementation-evidence/canonical-junit-diagnostic.json):128/128 observed, passing and grounded against an existing genuine87-case run. The mapping now uses the existing canonical JUnit identity API and has current native raw review/synthesis. This diagnostic does not certify execution: governed mapping/review bytes changed after that run, so its receipt remains stale and certified ACs are empty. A future fresh capture requires an explicitly authorized envelope. No successful goal/archive, finalization or delivery is claimed.
+
+## Final certified closure
+
+Inspect [the actual closure summary](.reviews/implementation-evidence/implement-closure-summary.json): all6 execution ACs certified, machine finalization PASS, both conventions gates PASS, goal complete and archived verify-output success. Earlier incomplete checkpoints above remain historical.

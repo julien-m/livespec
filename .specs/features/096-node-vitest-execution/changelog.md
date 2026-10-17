@@ -42,3 +42,17 @@
 - Five implementation steps, one sequence diagram and one state diagram; blocking real async feasibility, bound local observer, observation/acceptance separation and two unchanged consumer selections.
 
 <!-- finalize:spec-plan:2026-10-16:e06699c9 -->
+
+## 2026-10-17 — [Feature]: Genuine Node22 and Vitest execution observations implemented
+
+- **Type:** Feature
+- **Spec modified:** Lifecycle status only
+- **Code modified:** Owned Node/Vitest observation transport, provenance, nine packaged TypeScript assets, explicit CLI mode, goal purpose, regression tests and deterministic CI.
+- **AC impacted:** AC-001 through AC-006
+- **Author:** Codex
+- Genuine matcher dispatch, independently settled async consumption, complete selection and current provenance reject unsupported or substituted evidence. Generic observations retain empty certified ACs.
+- Direct async syntax authorizes the exact matcher thenable; actual consumption and settlement remain necessary. Detached chains, unknown compositions, callback ownership and finalizer returns fail closed.
+- Both unchanged consumer selections account for46/55 tests; current wheel assets and installed async adapter are verified. The unrelated whole-wheel CLI template limitation and cooperative local threat boundary remain explicit.
+- Current manual acceptance mapping binds143 assertions across98 executed test IDs, with fresh native mapping and full-scope review/audit. Existing nonblocking conventions warnings remain documented follow-up debt.
+
+<!-- finalize:spec-implement:2026-10-17:ca975a13 -->
