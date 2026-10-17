@@ -325,3 +325,7 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 ## 2026-10-17 — [Bugfix]: Bind generic suite observations to every resolved original command, actual cwd and supported literal alias; reject mixed suite/final-acceptance metadata and command-cell applicability false positives. Read [implementation evidence](implementation.md) and [the repair checkpoint](progress.md). Genuine five-test RED/GREEN preserves independent final acceptance and legacy semantics. Normal filtered FR-009/FR-011 evidence follows the printed FALLBACK; this does not certify all historical sixteen ACs.
 
 <!-- finalize:spec-fix:2026-10-17:caf10d18 -->
+
+## 2026-10-17 — [Bugfix]: Cloud command-discovery correction: 28 genuine checks pass, 95 bindings certify AC-007/009/010. Read [the execution receipt](../../.execution/1ea13b21907b47e3848486ee536c55ed/receipt.json) and [the current correction scope](implementation.md#cloud-command-discovery-correction--2026-10-17). Explicit Action suites precede non-test vocabulary; installation/build/quality precede broad test-purpose aliases; ambiguous actions remain required. Unknown commands preserve exact opaque cwd/argv identity without a new assertion adapter, while real custom execution remains noncertifying. Historical certificates and the other thirteen criteria are not upgraded.
+
+<!-- finalize:spec-fix:2026-10-17:96cf0f5a -->

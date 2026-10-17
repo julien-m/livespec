@@ -200,3 +200,19 @@ Read [canonical Test tasks](../../../.agent-sync/skills/spec-test/SKILL.md), [co
 - Read [the binding and immutable plan identity](../../../validator/evidence_applicability.py), [typed suite metadata guards](../../../validator/evidence_policy.py) and [five real regressions](../../../tests/test_spec_test_observations.py). Commands bind actual cwd, explicit direct transport, canonical local CLI, package/config identities and every supported filter. Literal npm aliases resolve only a genuine local shim; unresolved, chained or forwarded commands block.
 - RED `d90a624ad7fc4857a5ac8d08e4b7433b` and GREEN `41521b0767034ce18fb84cce829f6d5f` pass the same final five-test selection; both initial exploit assertions and the independent suite/acceptance guard are preserved. This pair is regression evidence, not an ELIGIBLE lane claim: normal filtered FR-009/FR-011 closure follows the printed FALLBACK.
 - Final acceptance remains independent; observed zero-AC tests never certify six review ACs. Current policy2 archive checks preserve every declaration, leaving unrelated tasks pending in the regression artifact rather than inventing completion. Historical goal markers and old receipt policies keep their original interpretation.
+
+
+## Cloud command-discovery correction — 2026-10-17
+
+| Date | Requirements | Owned source / existing requirement anchors | Behavior |
+|---|---|---|---|
+| 2026-10-17 | [FR-009](spec.md#fr-009), [AC-007](spec.md#ac-007), [AC-009](spec.md#ac-009) | Read [evidence_applicability.py](../../../validator/evidence_applicability.py), `@spec FR-009`, and [the command-discovery regressions](../../../tests/test_suite_command_discovery.py), `@spec AC-007` / `@spec AC-009` | One shared Action classifier freezes every declared test purpose and preserves typed unit/suite/aggregate proof boundaries. |
+| 2026-10-17 | [FR-011](spec.md#fr-011), [AC-010](spec.md#ac-010) | Read [evidence_applicability.py](../../../validator/evidence_applicability.py), `@spec FR-011`, and [the genuine custom-execution regression](../../../tests/test_suite_command_discovery.py), `@spec AC-010` | Unknown command identity preserves canonical cwd and exact original argv; unsupported assertion certification remains an explicit gap. |
+
+Explicit unit/integration/E2E Action labels take priority. Clear install/build/bootstrap/package-generation and quality actions are excluded before broad focused/test/regression/compatibility purposes. Command arguments never infer a suite; ambiguous execution actions stay required and unresolved. DoD binds the union, including every applicable integration/E2E command.
+
+Opaque identity is planning metadata, not a new Playwright, Bun, uv or npx assertion adapter. Custom commands retain real execution availability, but mandatory runner-owned passing-observation verification still precedes identity comparison. An opaque required command reports `suite_assertion_adapter_unsupported`; a genuine unit receipt cannot stand in for it or certify the aggregate. Strict known-runner parse/alias errors are not downgraded into opaque fallback. No wrapper is unwrapped and no unsupported command becomes N/A or PASS.
+
+This normal correction targets AC-007, AC-009 and AC-010 only. AC-015 and the other historical acceptance criteria are not recertified. Earlier closed controls and source-bound archives remain unchanged.
+
+- Current scoped proof: read [the runner-owned execution receipt](../../.execution/1ea13b21907b47e3848486ee536c55ed/receipt.json), with 28 passing cases, zero skips and 95 independently reviewed assertion bindings for AC-007/009/010. The actual custom driver executes without qualifying; genuine unit proof cannot cover its opaque identity or the complete aggregate. This does not recertify the other thirteen criteria or every unchanged historical clause.

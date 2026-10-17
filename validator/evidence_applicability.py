@@ -44,18 +44,43 @@ def _command_rows(commands: str) -> list[tuple[str, str]]:
             continue
         cells = re.split(r"(?<!\\)\|", line.strip().strip("|"))
         cells = [cell.strip().strip("`").replace("\\|", "|") for cell in cells]
-        rows.append((cells[0], cells[1]) if len(cells) > 1 else (line, "unresolved"))
+        if len(cells) < 2 or cells[0].casefold() == "action":
+            continue
+        if re.fullmatch(r":?-{3,}:?", cells[0]):
+            continue
+        rows.append((cells[0], cells[1]))
     return rows
+
+
+def _action_suites(action: str) -> set[str] | None:
+    """Classify declared purposes; unknown execution actions stay unresolved."""
+    text = " ".join(action.casefold().split())
+    explicit = {name for name in ("unit", "integration", "e2e") if re.search(rf"\b{name}\b", text)}
+    if explicit:
+        return explicit
+    non_test = (
+        r"\b(?:lint|format(?:ting)?|types?|type[- ]?check(?:s|ing)?|"
+        r"static (?:analysis|checks?)|install(?:ation)?|build|bootstrap|"
+        r"(?:package|code) generation|conventions?)\b"
+    )
+    if re.search(non_test, text) or text in {"spec", "spec validation"}:
+        return set()
+    if re.search(r"^focused\b|\b(?:tests?|regressions?|compatibility)\b", text):
+        return {"unit"}
+    return None
 
 
 def _declares_command(commands: str, token: str) -> bool:
     """Require an action declaration, retaining unresolved commands conservatively."""
     return any(
-        re.search(rf"\b{token}\b", action, re.I) and command.casefold() not in _ABSENT
+        command.casefold() not in _ABSENT
+        and ((labels := _action_suites(action)) is None or token in labels)
         for action, command in _command_rows(commands)
     )
 
 
+# @spec FR-011: Preserve custom execution without fabricated proof.
+# — .specs/features/078-requirement-evidence-integrity/spec.md#fr-011
 def _command_key(root: Path, argv: list[str], cwd: Path, *, alias: bool = True) -> list[str]:
     """Normalize supported real aliases without executing scripts or inventing selections."""
     from .execution_cargo_command import is_cargo, parse_cargo_test
@@ -64,6 +89,8 @@ def _command_key(root: Path, argv: list[str], cwd: Path, *, alias: bool = True) 
 
     cwd = cwd.resolve(strict=True)
     cwd.relative_to(root)
+    if not argv or not argv[0].strip():
+        raise ValueError("suite_command_unresolved")
     if argv[0] == "npm" and alias:
         if argv != ["npm", "test"] and not (len(argv) == 3 and argv[1] == "run"):
             raise ValueError("suite_npm_arguments_require_explicit_resolved_command")
@@ -96,7 +123,9 @@ def _command_key(root: Path, argv: list[str], cwd: Path, *, alias: bool = True) 
     args = _pytest_args(argv)
     if args is not None:
         return ["pytest", cwd.relative_to(root).as_posix(), *args]
-    raise ValueError("suite_command_unresolved")
+    # Identity does not grant an assertion adapter: custom commands still execute
+    # through the existing boundary, whose observed-proof check precedes matching.
+    return ["opaque", cwd.relative_to(root).as_posix(), *argv]
 
 
 def _vitest_command_key(root: Path, argv: list[str], cwd: Path) -> list[str]:
@@ -147,10 +176,14 @@ def suite_binding(root: Path | None, feature: str | None, suite: str) -> dict[st
         if root is None or not feature or suite not in {"unit", "integration", "e2e", "all"}:
             raise ValueError("suite_context_unresolved")
         plan = (root / ".specs/features" / feature / "plan.md").read_text()
-        token = "(?:unit|integration|e2e)" if suite == "all" else suite
         commands = []
         for action, command in _command_rows(section(plan, "Resolved Test Commands") or ""):
-            if not re.search(rf"\b{token}\b", action, re.I) or command.casefold() in _ABSENT:
+            if command.casefold() in _ABSENT:
+                continue
+            labels = _action_suites(action)
+            if labels is None:
+                raise ValueError(f"suite_action_unresolved:{action}")
+            if not labels or (suite != "all" and suite not in labels):
                 continue
             match = re.search(r"\s+\(([^()]+)\)$", command)
             cwd = root if not match or match[1] == "root" else root / match[1]
@@ -174,8 +207,13 @@ def suite_evidence_missing(
     from .execution_evidence import _read_capture, verify_execution_observation
     from .execution_working_directory import capture_execution_cwd
 
+    unsupported = [
+        f"suite_assertion_adapter_unsupported:{command[2]}"
+        for command in binding.get("commands", [])
+        if command[0] == "opaque"
+    ]
     if receipt is None:
-        return ["execution_receipt_path"]
+        return ["execution_receipt_path", *unsupported]
     if binding != suite_binding(root, feature, binding["suite"]):
         return ["suite_commands_changed_recompile_required"]
     if "error" in binding:
@@ -184,7 +222,7 @@ def suite_evidence_missing(
     for path in [receipt, *[root / p for p in (evidence or {}).get("execution_receipt_paths", [])]]:
         result = verify_execution_observation(path, root, feature, "passed", evidence_policy="2")
         if not result.valid:
-            return list(result.gaps)
+            return [*unsupported, *result.gaps]
         capture, _ = _read_capture(path.absolute(), root, feature)
         argv = capture.budget.get("scope") if capture.budget else None
         if not isinstance(argv, list) or not all(isinstance(arg, str) for arg in argv):
@@ -208,8 +246,8 @@ def suite_evidence_missing(
             observed.append([key[0], "native-node22", *key[2:]])
     return (
         []
-        if all(command in observed for command in binding["commands"])
-        else ["suite_commands_unproven"]
+        if not unsupported and all(command in observed for command in binding["commands"])
+        else [*unsupported, "suite_commands_unproven"]
     )
 
 

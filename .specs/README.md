@@ -160,6 +160,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-17 | Feature | [Feature 078] Cloud command-discovery correction: 28 checks pass; AC-007/009/010 certified. Action purposes bind every test command; opaque identity grants no unsupported assertion adapter. Read [the current correction scope](features/078-requirement-evidence-integrity/implementation.md#cloud-command-discovery-correction--2026-10-17). |
+| 2026-10-17 | Feature | [Feature 096] CI timeout-test correction: 10 checks pass, AC-004 certified; preserve the 1.5-second cap and published/no-fresh-receipt outcomes. Read [the correction scope](features/096-node-vitest-execution/implementation.md#ci-timeout-test-correction--2026-10-17). |
 | 2026-10-17 | Feature | [Feature 078] Bind generic suite observations to every resolved original command, actual cwd and supported literal alias; reject mixed suite/final-acceptance metadata and command-cell applicability false positives. Read [implementation evidence](features/078-requirement-evidence-integrity/implementation.md) and [the repair checkpoint](features/078-requirement-evidence-integrity/progress.md). Genuine five-test RED/GREEN preserves independent final acceptance and legacy semantics. Normal filtered FR-009/FR-011 evidence follows the printed FALLBACK; this does not certify all historical sixteen ACs. |
 | 2026-10-17 | Feature | [Feature 096] Confined direct Vitest invocation cwd preserves governing-root authority and historical root defaults. Read [the independent check](features/096-node-vitest-execution/checks/2026-10-17.md) and [implementation ownership](features/096-node-vitest-execution/implementation.md). The source-owned 40-test checkpoint passed six ACs; current source closure is independently recorded by CLI goals and archives. Producer consumer-copy observations remain distinct from consumer042 delivery. |
 | 2026-10-17 | Feature | [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture |
@@ -168,8 +170,6 @@
 | 2026-10-17 | Feature | [Feature 097] Test: 100% AC covered (6/6), 0 tests generated |
 | 2026-10-17 | Feature | 097 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state |
 | 2026-10-17 | Feature | Plan097: two bounded steps and new independent review; owner-bound acceptance remains pending |
-| 2026-10-17 | Spec | Spec identity097: root bootstrap review contract, renumbered from the historical root096 allocation; new independent review ready |
-| 2026-10-17 | Feature | Feature096 bugfix: reject late Chai matcher and prototype registration |
 <!-- readme:activity:end -->
 
 ---
@@ -382,3 +382,7 @@
 <!-- finalize:spec-fix:2026-10-17:c1b7f27f -->
 
 <!-- finalize:spec-fix:2026-10-17:caf10d18 -->
+
+<!-- finalize:spec-fix:2026-10-17:f981b487 -->
+
+<!-- finalize:spec-fix:2026-10-17:96cf0f5a -->

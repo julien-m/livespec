@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-17 — [Feature 078] Cloud command-discovery correction: 28 checks pass; AC-007/009/010 certified. Action purposes bind every test command; opaque identity grants no unsupported assertion adapter. Read [the current correction scope](features/078-requirement-evidence-integrity/implementation.md#cloud-command-discovery-correction--2026-10-17).
+<!-- finalize:spec-fix:2026-10-17:96cf0f5a -->
+
+## 2026-10-17 — [Feature 096] CI timeout-test correction: 10 checks pass, AC-004 certified; preserve the 1.5-second cap and published/no-fresh-receipt outcomes. Read [the correction scope](features/096-node-vitest-execution/implementation.md#ci-timeout-test-correction--2026-10-17).
+<!-- finalize:spec-fix:2026-10-17:f981b487 -->
+
 ## 2026-10-17 — [Feature 078] Bind generic suite observations to every resolved original command, actual cwd and supported literal alias; reject mixed suite/final-acceptance metadata and command-cell applicability false positives. Read [implementation evidence](features/078-requirement-evidence-integrity/implementation.md) and [the repair checkpoint](features/078-requirement-evidence-integrity/progress.md). Genuine five-test RED/GREEN preserves independent final acceptance and legacy semantics. Normal filtered FR-009/FR-011 evidence follows the printed FALLBACK; this does not certify all historical sixteen ACs.
 <!-- finalize:spec-fix:2026-10-17:caf10d18 -->
 

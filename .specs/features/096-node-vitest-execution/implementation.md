@@ -151,3 +151,14 @@ Consumer zero, negative and nonfinite numeric test/hook timeouts use the positiv
 | 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [test_execution_vitest_consumer.py](../../../tests/test_execution_vitest_consumer.py) |
 | 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [ci.yml](../../../.github/workflows/ci.yml) |
 | 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [README.md](../../../README.md) |
+
+
+## CI timeout-test correction — 2026-10-17
+
+| Date | Requirement | Owned test and anchor | Scope |
+|---|---|---|---|
+| 2026-10-17 | [FR-004](spec.md#fr-004), [AC-004](spec.md#ac-004) | Read [the runtime deadline test](../../../tests/test_execution_vitest.py), `@spec AC-004` | Assert the public timeout result before branching on receipt publication; retain the 1.5-second limit and both observation refusals for published receipts. |
+
+CI on `3cc9ac50da18e968a0b3b1d595523e9f36007f72` exposed the legitimate no-fresh-receipt timeout result. The test previously required publication through a convenience helper. Runtime behavior and normative requirements are unchanged. The local pre-edit attempt passed through the other legitimate branch; the official bugfix gate printed FALLBACK rather than qualifying a fabricated RED. The normal correction targets AC-004. Earlier 40-test/six-AC and 31-test/four-AC certificates remain bound to their original source trees.
+
+- Current AC-004 scope: 10 passing real cases and 30 independently reviewed bindings; inspect [the execution receipt](../../.execution/cd926fb097c44fe282ed333ca49b8f56/receipt.json). It includes separate preparation-expiry and owned-descendant/heartbeat cleanup witnesses. Other acceptance criteria are not recertified by this correction.

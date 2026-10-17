@@ -259,10 +259,24 @@ def test_runtime_deadline_cannot_qualify_as_a_matcher_red(vitest_project: Vitest
     vitest_project.write(
         "test('never settles', async () => { expect(1).toBe(1); await new Promise(() => {}); });"
     )
-    receipt = vitest_project.capture(timeout=1.5)
-    capture = json.loads((receipt.parent / "capture.json").read_text())
+    result = capture_execution(
+        vitest_project.command(),
+        project_root=vitest_project.root,
+        feature=FEATURE,
+        adapter="junit",
+        env=dict(os.environ),
+        timeout=1.5,
+    )
     # @spec AC-004: The shared hard cap includes setup and runtime; timeout never qualifies.
     # — .specs/features/096-node-vitest-execution/spec.md#ac-004
+    assert result.exit_code == 124
+    assert result.budget is not None and result.budget["timed_out"]
+    if not result.receipt_path:
+        assert "no fresh receipt" in result.stderr
+        assert result.gaps
+        return
+    receipt = Path(result.receipt_path)
+    capture = json.loads((receipt.parent / "capture.json").read_text())
     assert capture["exit_code"] == 124
     assert capture["budget"]["timed_out"]
     assert not _observe(vitest_project, receipt, "red").valid

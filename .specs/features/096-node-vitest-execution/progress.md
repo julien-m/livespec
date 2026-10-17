@@ -138,3 +138,13 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Official delivery revision reviewed current spec/plan and retained all six FR/AC identifiers. Real 40-test acceptance checkpoint `a8bec69844e94013ae9e99eeb410c18d` passed six ACs with zero skips and108 assertion bindings. This predates the final cross-owner source freeze and retains that historical scope.
 - Full mypy (802 files), Pyright, Ruff and formatting passed after stable PR53 integration. The Node22 CI job now includes the cwd module and the actual Test-goal observation module, with its zero-skip guard unchanged.
 - The independent check report and final CLI contract/state/archive provide separate current closure authority; source checkpoints, producer consumer copies and historical archives never imply consumer042 delivery.
+
+
+### 2026-10-17 — Post-delivery CI timeout-test correction
+
+- CI on `3cc9ac50` reported 127 passes and one failure: a correct timeout without a published receipt failed the test helper's mandatory-receipt assertion.
+- The isolated local pre-edit observation passed via a published timeout receipt; preserve that evidence as a failed RED attempt. The CLI printed FALLBACK and current normal implement readiness passed.
+- Read [the corrected test](../../../tests/test_execution_vitest.py): direct public result, unchanged 1.5-second limit, timeout exit/budget required in both branches, real diagnostic and gaps when no receipt exists, both observation refusals retained when it does.
+- Full mypy and Pyright, changed-file Ruff and formatting pass. The independent current AC-004 mapping and bounded execution remain separate from historical full-feature certificates.
+
+- Current scoped execution: read [the genuine AC-004 receipt](../../.execution/cd926fb097c44fe282ed333ca49b8f56/receipt.json): 10 passed, zero skipped, 30 independently reviewed bindings, AC-004 certified, no gaps. This local run observed the published-timeout branch; the no-receipt branch is supported by the public API and the original CI failure, not claimed as locally observed.
