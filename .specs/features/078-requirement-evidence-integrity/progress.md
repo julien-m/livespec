@@ -73,3 +73,9 @@ Capture22c6c801 certifies AC007/AC015 with zero gaps and 3875 passing tests. The
 - RED reproduced the forced JSON parse on approved Markdown Review inputs; GREEN passes three focused tests. Six scoped tests pass in 0.48 seconds, including strict generated-inventory validation and changed-source rejection.
 - Read-only HandoffBox012 preparation passes: AC-006, four declared Markdown inputs with exact hashes and canonical roles, 583 sections, four batches, zero errors. Preparation does not certify the independent review or consumer completion.
 - Closing bugfix gate ELIGIBLE (132 lines, three files); feature/repo conventions, scoped Ruff/format/Pyright pass. Read the [implementation and runner-owned receipts](implementation.md#bugfix-receipts).
+
+## 2026-10-17 — Confined balanced fallback correction
+
+- RED/GREEN regression proves fewer paired review calls; three new focused tests and eleven neighbors pass in 0.21 seconds. Read the [runner-owned bugfix receipts](implementation.md#bugfix-receipts).
+- Read-only real012 preparation preserves 49 source hashes, 627 sections, AC-006 and 35,230 pairs: 24→10 lots, maximum 199,719/200,000 characters, cumulative 4,559,515→1,974,725 characters. The historical24-lot snapshot remains authentic.
+- Closing gate ELIGIBLE (198 counted lines, two files); feature/repo conventions PASS after extracting the unchanged cartesian helper to keep the entry point within the function-size limit. Initial failed fixture/lint/conventions diagnostics remain in runner-owned captures and local command transcripts.

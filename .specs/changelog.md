@@ -1033,3 +1033,7 @@ Read the [078 correction](features/078-requirement-evidence-integrity/implementa
 ## 2026-10-17 — [Bugfix]: Direct Markdown acceptance inputs
 
 Read the [078 correction](features/078-requirement-evidence-integrity/implementation.md): documentary acceptance now loads explicitly linked Markdown contracts directly and preserves canonical roles and exact source identity. Generated JSON inventories retain strict schema and freshness validation. HandoffBox012 preparation was verified read-only; no consumer review verdict is inferred.
+
+## 2026-10-17 — [Bugfix]: Bounded balanced paired-review fallback
+
+Read the [078 correction](features/078-requirement-evidence-integrity/implementation.md): fallback packing selects a strictly smaller valid layout from bounded balanced candidates while preserving sections, all source/Plan pairs, obligations, exact prompt budgets and historical layouts. Frozen HandoffBox012 preparation drops from 24 to 10 lots; this does not certify its consumer review or product execution.

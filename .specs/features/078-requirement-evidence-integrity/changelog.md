@@ -282,3 +282,16 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/4298be9d7688405896ffcf814709f379/receipt.json`
 - **GREEN receipt:** `.specs/.execution/1ba4db750185419cbced4a099c475cdc/receipt.json`
 <!-- bugfix:1ba4db750185419cbced4a099c475cdc -->
+
+## 2026-10-17 — [Bugfix]: Choose a bounded balanced fallback only when it reduces paired review calls without losing source coverage
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_review_balanced_fallback.py, validator/semantic/review_batches.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_review_balanced_fallback.py::test_balanced_fallback_reduces_calls_with_complete_exact_coverage
+- **RED receipt:** `.specs/.execution/a619a75310c84c1aa4a3c77d639b40b3/receipt.json`
+- **GREEN receipt:** `.specs/.execution/8a2ab913493c43ab851d28763e7ee38c/receipt.json`
+<!-- bugfix:8a2ab913493c43ab851d28763e7ee38c -->
