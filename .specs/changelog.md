@@ -1045,3 +1045,7 @@ Read the [078 correction](features/078-requirement-evidence-integrity/implementa
 ## 2026-10-17 — [Feature 078] Bugfix: distinguish explicitly absent E2E commands
 
 - Read [the correction and regression receipts](features/078-requirement-evidence-integrity/implementation.md#2026-10-17--explicit-absent-e2e-commands-spec-fix): an explicit absent command cell no longer creates a separate execution obligation; real commands, ambiguity and visual requirements remain governed.
+
+## 2026-10-17 — [Feature 078] Bugfix: project successive README finalization markers
+
+- Read [the correction and regression receipts](features/078-requirement-evidence-integrity/implementation.md#2026-10-17--successive-readme-finalization-markers-spec-fix): generated marker lines no longer retain alternating entries through overlapping separators; real repeated finalization, manual inputs and fenced examples remain checked.

@@ -52,7 +52,9 @@ def _project(relative: str, text: str, feature: str) -> str:
             text,
             flags=re.M,
         )
-    text = re.sub(rf"\n\n{_MARKER}\n", "\n", text)
+    # Consume each generated line and its following blank, never the newline
+    # required to recognize the next marker. Fenced content was separated above.
+    text = re.sub(rf"^{_MARKER}\n(?:\n)?", "", text, flags=re.M)
     text = re.sub(
         r"^> Last updated: \d{4}-\d{2}-\d{2}$", "> Last updated: <generated>", text, flags=re.M
     )

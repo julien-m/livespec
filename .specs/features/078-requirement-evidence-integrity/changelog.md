@@ -321,3 +321,16 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/31c0df499a554e21b543e35db3957de8/receipt.json`
 - **GREEN receipt:** `.specs/.execution/2ddb5942af364e6880ff96666ac4803e/receipt.json`
 <!-- bugfix:2ddb5942af364e6880ff96666ac4803e -->
+
+## 2026-10-17 — [Bugfix]: Project successive standalone README finalization markers without overlapping separators
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_execution_readme_markers.py, validator/execution_registry.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_readme_markers.py::test_marker_lines_preserve_manual_boundaries_idempotence_and_fenced_examples, tests/test_execution_readme_markers.py::test_successive_real_implement_test_check_finalizations_preserve_execution
+- **RED receipt:** `.specs/.execution/bfbbae2f92994218b7e174550987c3ac/receipt.json`
+- **GREEN receipt:** `.specs/.execution/4561324f2ef24aee902f89f8f19f9cbf/receipt.json`
+<!-- bugfix:4561324f2ef24aee902f89f8f19f9cbf -->
