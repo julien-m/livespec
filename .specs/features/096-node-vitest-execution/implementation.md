@@ -8,20 +8,21 @@ updated: 2026-10-17
 
 # Implementation — Node Vitest Execution Observations
 
-All six execution ACs are certified by the fresh runner-owned98-test capture. Current143 bindings, independent mapping/full-scope reviews, nine-asset installed API and unchanged46/55 consumer observations pass. Inspect [the final capture](.reviews/implementation-evidence/corrected-98-capture.json) and [the progress checkpoint](progress.md). Earlier failed and stale runs remain historical; no consumer lifecycle or global runtime was changed.
+The original six-AC delivery remains historical. The confined-cwd revision is under current verification; its spec and plan reviews were refreshed and the official revision closed. Current capture, consumer, acceptance and delivery evidence will be recorded below before claiming revised completion. Inspect [the checkpoint](progress.md); all earlier artifacts are preserved.
 
 ## Requirement Mapping
 
 Inspect the linked source files and their requirement anchors.
 
-| Requirement | Source | Anchor | Current status |
-|---|---|---|---|
-| [FR-001](spec.md#fr-001) | [CLI observation](../../../validator/cli_commands/execution_io.py), [Vitest preparation](../../../validator/execution_vitest.py) | `@spec FR-001` | Implemented; real passed/red and option tests pass |
-| [FR-002](spec.md#fr-002) | [matcher observer](../../../validator/vitest/matcher-observer.ts), [selected results](../../../validator/execution_vitest_results.py) | `@spec FR-002` | Implemented; four review findings corrected, 14 boundary cases pass |
-| [FR-003](spec.md#fr-003) | [runtime provenance](../../../validator/execution_vitest_provenance.py), [governed configuration](../../../validator/vitest/config.ts) | `@spec FR-003` | Implemented; runtime/config/setup and artifact refusal tests pass |
-| [FR-004](spec.md#fr-004) | [bounded preparation](../../../validator/execution_vitest.py) | `@spec FR-004` | Implemented; native body/hook caps plus shared command cap; enforcement reports command-only |
-| [FR-005](spec.md#fr-005) | [observation branch](../../../validator/cli_commands/execution_io.py), [generic goal marker](../../../.agent-sync/skills/spec-implement/SKILL.md) | `@spec FR-005` | Implemented; acceptance unchanged; generic passed proof and current goal archive verified |
-| [FR-006](spec.md#fr-006) | [two-run verification](../../../tests/test_execution_vitest_consumer.py) | `@spec FR-006` | Fresh final 46/55 observations pass; original input identity check passes |
+| Date | Requirement | Source | Anchor | Current status |
+|---|---|---|---|---|
+| 2026-10-17 | [FR-003](spec.md#fr-003), [FR-004](spec.md#fr-004) | [execution_capture.py](../../../validator/execution_capture.py), [execution_runner.py](../../../validator/execution_runner.py), [execution_vitest.py](../../../validator/execution_vitest.py), [execution_vitest_provenance.py](../../../validator/execution_vitest_provenance.py), [execution_evidence.py](../../../validator/execution_evidence.py), [execution_working_directory.py](../../../validator/execution_working_directory.py), [execution_timeout_capture.py](../../../validator/execution_timeout_capture.py), [test_cmd.py](../../../validator/cli_commands/test_cmd.py), [operation_options.py](../../../validator/cli_commands/operation_options.py), [execution_io.py](../../../validator/cli_commands/execution_io.py), [test_execution_working_directory.py](../../../tests/test_execution_working_directory.py), [test_execution_vitest_consumer.py](../../../tests/test_execution_vitest_consumer.py) | `@spec FR-003`, `@spec FR-004`, `@spec AC-003` | Confined single-invocation cwd; current verification in progress |
+| Historical | [FR-001](spec.md#fr-001) | [CLI observation](../../../validator/cli_commands/execution_io.py), [Vitest preparation](../../../validator/execution_vitest.py) | `@spec FR-001` | Implemented; real passed/red and option tests pass |
+| Historical | [FR-002](spec.md#fr-002) | [matcher observer](../../../validator/vitest/matcher-observer.ts), [selected results](../../../validator/execution_vitest_results.py) | `@spec FR-002` | Implemented; four review findings corrected, 14 boundary cases pass |
+| Historical | [FR-003](spec.md#fr-003) | [runtime provenance](../../../validator/execution_vitest_provenance.py), [governed configuration](../../../validator/vitest/config.ts) | `@spec FR-003` | Implemented; runtime/config/setup and artifact refusal tests pass |
+| Historical | [FR-004](spec.md#fr-004) | [bounded preparation](../../../validator/execution_vitest.py) | `@spec FR-004` | Implemented; native body/hook caps plus shared command cap; enforcement reports command-only |
+| Historical | [FR-005](spec.md#fr-005) | [observation branch](../../../validator/cli_commands/execution_io.py), [generic goal marker](../../../.agent-sync/skills/spec-implement/SKILL.md) | `@spec FR-005` | Implemented; acceptance unchanged; generic passed proof and current goal archive verified |
+| Historical | [FR-006](spec.md#fr-006) | [two-run verification](../../../tests/test_execution_vitest_consumer.py) | `@spec FR-006` | Fresh final 46/55 observations pass; original input identity check passes |
 
 ## Acceptance Criteria Mapping
 

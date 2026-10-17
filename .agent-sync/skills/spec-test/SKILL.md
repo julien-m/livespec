@@ -1344,13 +1344,13 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 ### Phase 4 — Execute Test Suite
 
-Generic suite tasks require a current passed execution observation; AC mapping remains required only by the separate feature acceptance task. Explicit absent commands in the resolved table deactivate their suite task. Existing immutable contracts keep their original proof purpose.
+Generic suite tasks freeze resolved plan commands and require passing receipts for every command/selection; include additional real receipts as `execution_receipt_paths` alongside the primary `execution_receipt_path`. The regression DoD requires the union of all applicable suites. Multiple unit rows (for example dashboard and slides) each require their own matching receipt, including the actual invocation cwd. For a nested Vitest command use `--execution-cwd <directory>`; `--root` alone cannot replace that cwd. Plan changes require goal recompilation; Vitest bindings also freeze the selected package/script and config bytes. Every runner still requires a current source/config-verified observation. npm aliases resolve only simple literal local scripts; forwarded options, lifecycle hooks or shell syntax require an explicit resolved direct command; AC mapping remains required only by the separate feature acceptance task. Explicit absent commands in the resolved table deactivate their suite task. Existing immutable contracts keep their original proof purpose.
 
 - [test-suite] Run type checker if resolved (e.g. npx tsc --noEmit) <!-- evidence:documentary -->
 - [test-suite] Run linter if resolved (e.g. npx eslint src/) <!-- evidence:documentary -->
-- [test-suite] Run unit tests with resolved unit command <!-- evidence:execution outcome:passed -->
-- [test-suite] Run integration tests with resolved integration command if present <!-- evidence:execution outcome:passed applicable:integration-command -->
-- [test-suite] Run E2E tests with resolved E2E command (e.g. npx playwright test) <!-- evidence:execution outcome:passed applicable:e2e-command -->
+- [test-suite] Run unit tests with resolved unit command <!-- evidence:execution outcome:passed suite:unit -->
+- [test-suite] Run integration tests with resolved integration command if present <!-- evidence:execution outcome:passed applicable:integration-command suite:integration -->
+- [test-suite] Run E2E tests with resolved E2E command (e.g. npx playwright test) <!-- evidence:execution outcome:passed applicable:e2e-command suite:e2e -->
 - [test-suite] Map each test result back to its AC: track Pass / Fail / Regression / Blocked per AC <!-- evidence:execution ac-scope:feature -->
 - [test-suite] Report generated tests that fail as "Generated — Fail" (implementation bug, do not fix here — surface for /spec-implement --resume) <!-- evidence:documentary -->
 - [test-suite] Report existing tests that fail as "Regression" (not spec-test responsibility) <!-- evidence:documentary -->
@@ -1406,7 +1406,7 @@ Generic suite tasks require a current passed execution observation; AC mapping r
 
 - [ ] Coverage matrix produced for all AC <!-- evidence:documentary -->
 - [ ] [generate] Missing tests generated <!-- evidence:documentary -->
-- [ ] [test-suite] Necessary regression selection executed (full suite only when justified) <!-- evidence:execution outcome:passed -->
+- [ ] [test-suite] Necessary regression selection executed (full suite only when justified) <!-- evidence:execution outcome:passed suite:all -->
 - [ ] [visual] Visual baselines captured for missing screens (or `--no-visual` / non-UI feature) <!-- evidence:documentary -->
 - [ ] [visual] `baselines/baseline.manifest.yml` written after every baseline approval (or `--no-visual`) <!-- evidence:documentary -->
 - [ ] [test-report] Test report saved to `checks/YYYY-MM-DD-test.md` <!-- evidence:documentary -->

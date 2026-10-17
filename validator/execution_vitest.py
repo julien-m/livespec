@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -17,10 +18,13 @@ def is_vitest(argv: list[str]) -> bool:
 
 # @spec FR-004: Confine validated file and name selections without shell interpolation
 # — .specs/features/096-node-vitest-execution/spec.md#fr-004
-def _selection(argv: list[str], project: Path) -> tuple[Path, Path | None, list[str]]:
+def _selection(
+    argv: list[str], project: Path, cwd: Path | None = None
+) -> tuple[Path, Path | None, list[str]]:
     if len(argv) < 3 or argv[2] != "run":
         raise ValueError("Vitest observations require direct node <local-vitest.mjs> run")
-    package = project
+    cwd = cwd or project
+    package = cwd
     config: Path | None = None
     selected: list[str] = []
     index = 3
@@ -36,9 +40,9 @@ def _selection(argv: list[str], project: Path) -> tuple[Path, Path | None, list[
             if not value or "\0" in value:
                 raise ValueError("Empty or invalid Vitest selection")
             if option == "--root":
-                package = (project / value).resolve(strict=True)
+                package = (cwd / value).resolve(strict=True)
             elif option in {"--config", "-c"}:
-                config = (project / value).resolve(strict=True)
+                config = (cwd / value).resolve(strict=True)
             else:
                 selected.extend(["--testNamePattern", value])
         elif arg.startswith("-"):
@@ -72,7 +76,10 @@ def _validate_vitest_runtime(
     argv: list[str], project: Path, package: Path, env: dict[str, str]
 ) -> tuple[Path, Path]:
     """Verify the confined local entry and native Node identity within the shared deadline."""
-    executable = shutil.which(argv[0])
+    # Resolve executable paths and relative PATH entries as the actual child would from cwd.
+    candidate = str(project / argv[0]) if "/" in argv[0] else argv[0]
+    search_path = os.pathsep.join(str(project / entry) for entry in os.get_exec_path(env))
+    executable = shutil.which(candidate, path=search_path)
     if executable is None:
         raise ValueError("Node 22 executable is unavailable")
     node = Path(executable).resolve(strict=True)
@@ -110,15 +117,22 @@ def _validate_vitest_runtime(
 # @spec FR-001: Observe genuine direct Node 22 and local Vitest execution
 # — .specs/features/096-node-vitest-execution/spec.md#fr-001
 def prepare_vitest(
-    argv: list[str], adapter: str, report: Path, project: Path, env: dict[str, str]
+    argv: list[str],
+    adapter: str,
+    report: Path,
+    project: Path,
+    env: dict[str, str],
+    *,
+    execution_cwd: Path | None = None,
 ) -> tuple[list[str], dict[str, str]]:
     """Validate the local runtime, freeze dependencies and inject only owned paths."""
     if adapter != "junit":
         raise ValueError("Vitest observations require --report-adapter junit")
     project = project.resolve(strict=True)
-    package, config, selected = _selection(argv, project)
-    node, cli = _validate_vitest_runtime(argv, project, package, env)
-    provenance = vitest_provenance(node, package, config, project)
+    cwd = execution_cwd or project
+    package, config, selected = _selection(argv, project, cwd)
+    node, cli = _validate_vitest_runtime(argv, cwd, package, env)
+    provenance = vitest_provenance(node, package, config, project, execution_cwd=cwd)
     assets = Path(__file__).with_name("vitest")
     env.update(
         LIVESPEC_VITEST_ROOT=str(package),

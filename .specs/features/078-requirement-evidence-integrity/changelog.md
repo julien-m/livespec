@@ -295,3 +295,29 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/453c6a2bc1354d1eaf4f244639e7943d/receipt.json`
 - **GREEN receipt:** `.specs/.execution/91c842aea1e34caa815c911e359e812e/receipt.json`
 <!-- bugfix:91c842aea1e34caa815c911e359e812e -->
+
+## 2026-10-17 — [Bugfix]: Bind Test suite observations to every resolved command and match applicability by action cell
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-test/SKILL.md, .agent-sync/skills/spec-test/expectations.md, tests/test_spec_test_observations.py, validator/evidence_applicability.py, validator/evidence_policy.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** 3559326f811dfa8d315082405e13065b69b920f8
+- **Regression tests:** tests/test_spec_test_observations.py::test_explicit_absence_and_resolved_commands_have_distinct_applicability, tests/test_spec_test_observations.py::test_suite_observations_reject_wrong_selection_and_require_complete_aggregate
+- **RED receipt:** `.specs/.execution/59f06396b43048b68f0c9baf2c5a0171/receipt.json`
+- **GREEN receipt:** `.specs/.execution/7c63ea90132a45a09b0cbd79e7093122/receipt.json`
+<!-- bugfix:7c63ea90132a45a09b0cbd79e7093122 -->
+
+## 2026-10-17 — [Bugfix]: Bind every resolved suite invocation and aggregate required observations; classify applicability by action
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-test/SKILL.md, .agent-sync/skills/spec-test/expectations.md, tests/test_spec_test_observations.py, validator/evidence_applicability.py, validator/evidence_policy.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** 3559326f811dfa8d315082405e13065b69b920f8
+- **Regression tests:** tests/test_spec_test_observations.py::test_explicit_absence_and_resolved_commands_have_distinct_applicability, tests/test_spec_test_observations.py::test_suite_observations_reject_wrong_selection_and_require_complete_aggregate
+- **RED receipt:** `.specs/.execution/59f06396b43048b68f0c9baf2c5a0171/receipt.json`
+- **GREEN receipt:** `.specs/.execution/b4206a7d50f944b1820c971a22cba070/receipt.json`
+<!-- bugfix:b4206a7d50f944b1820c971a22cba070 -->

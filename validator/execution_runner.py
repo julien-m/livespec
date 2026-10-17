@@ -63,6 +63,7 @@ def prepare_runner(
     *,
     root: Path | None = None,
     env: dict[str, str] | None = None,
+    execution_cwd: Path | None = None,
 ) -> tuple[list[str], dict[str, str]]:
     """Wrap a trusted pytest or `cargo test` command; other commands run unchanged.
 
@@ -74,7 +75,7 @@ def prepare_runner(
     if scope is not None and env is not None:
         env["LIVESPEC_TEST_BUDGET"] = json.dumps(scope.policy.frozen(scope.argv, scope.seconds))
     if is_vitest(argv):
-        return _prepare_vitest_observation(argv, adapter, report, root, env)
+        return _prepare_vitest_observation(argv, adapter, report, root, env, execution_cwd)
     if is_cargo(argv):
         prepared = _prepare_cargo(argv, adapter, root or Path.cwd(), dict(env or os.environ))
         if scope is not None:
@@ -123,10 +124,16 @@ def _prepare_vitest_observation(
     report: Path,
     root: Path | None,
     env: dict[str, str] | None,
+    execution_cwd: Path | None = None,
 ) -> tuple[list[str], dict[str, str]]:
     """Prepare Vitest while retaining honest whole-command enforcement evidence."""
     prepared = prepare_vitest(
-        argv, adapter, report, root or Path.cwd(), env if env is not None else dict(os.environ)
+        argv,
+        adapter,
+        report,
+        root or Path.cwd(),
+        env if env is not None else dict(os.environ),
+        execution_cwd=execution_cwd,
     )
     scope = current_deadline()
     if scope is not None:

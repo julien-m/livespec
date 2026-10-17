@@ -31,7 +31,7 @@ Before generating or repairing AC/visual tests, the existing progression CLI mus
 **stderr:**
 - "_(none expected on happy path)_"
 
-Generic suite and regression tasks consume a current passed observation with no AC mapping; final feature acceptance retains its complete execution/review conjunction. Explicit absent command cells deactivate integration/E2E tasks; unresolved declarations remain required. Historical immutable contracts keep their original meaning.
+Generic suite tasks consume current passed observations bound to every frozen resolved command/selection, with `execution_receipt_paths` for additional commands; regression DoD requires all applicable suites. Plan changes require recompile; npm aliases use actual local package scripts. No AC mapping is needed; final feature acceptance retains its complete execution/review conjunction. Explicit absent command cells deactivate integration/E2E tasks; unresolved declarations remain required. Historical immutable contracts keep their original meaning.
 
 Collection and test failures are established by runner-owned execution receipts and exit status, not by quoted diagnostic words. Policy 2 rejects failed, missing, empty or entirely skipped results even when a wrapper returns exit 0; documentary mentions cannot establish execution outcomes.
 

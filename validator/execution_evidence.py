@@ -151,6 +151,9 @@ def _read_capture(path: Path, root: Path, feature: str) -> tuple[ExecutionCaptur
         from .execution_verification import require_completion
 
         require_completion(directory, root, receipt.capture_sha256)
+    from .execution_working_directory import capture_execution_cwd
+
+    capture_execution_cwd(capture)
     return capture, directory
 
 

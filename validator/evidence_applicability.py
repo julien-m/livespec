@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
+import shlex
 from pathlib import Path
+from typing import Any
 
 
 def section(text: str, title: str) -> str | None:
@@ -27,30 +30,132 @@ def section(text: str, title: str) -> str | None:
 
 # @spec FR-009: Explicit execution applicability
 # — .specs/features/078-requirement-evidence-integrity/spec.md#fr-009
-def _declares_command(commands: str, token: str) -> bool:
-    """Ignore explicit absent-command rows without hiding resolved or unknown declarations."""
+_ABSENT = {"n/a", "not applicable", "not run", "none", "—", "-"}
+
+
+def _command_rows(commands: str) -> list[tuple[str, str]]:
+    """Read action/command cells; command arguments never declare a suite."""
+    rows = []
     fenced = False
     for line in commands.splitlines():
         if line.lstrip().startswith(("```", "~~~")):
             fenced = not fenced
-        if fenced or not re.search(rf"\b{token}\b", line, re.IGNORECASE):
+        if fenced:
             continue
-        if line.strip().startswith("|"):
-            cells = [cell.strip().strip("`").strip() for cell in line.strip().strip("|").split("|")]
-            # An absent command is authoritative. A real command still wins even
-            # when its status is "Not run" or a separate row declares N/A.
-            if len(cells) > 1 and cells[1].casefold() in {
-                "n/a",
-                "not applicable",
-                "not run",
-                "none",
-                "—",
-                "-",
-            }:
+        cells = re.split(r"(?<!\\)\|", line.strip().strip("|"))
+        cells = [cell.strip().strip("`").replace("\\|", "|") for cell in cells]
+        rows.append((cells[0], cells[1]) if len(cells) > 1 else (line, "unresolved"))
+    return rows
+
+
+def _declares_command(commands: str, token: str) -> bool:
+    """Require an action declaration, retaining unresolved commands conservatively."""
+    return any(
+        re.search(rf"\b{token}\b", action, re.I) and command.casefold() not in _ABSENT
+        for action, command in _command_rows(commands)
+    )
+
+
+def _command_key(root: Path, argv: list[str], cwd: Path, *, alias: bool = True) -> list[str]:
+    """Normalize supported real aliases without executing scripts or inventing selections."""
+    from .execution_cargo_command import is_cargo, parse_cargo_test
+    from .execution_runner import _pytest_args
+    from .execution_vitest import _selection, is_vitest
+
+    cwd = cwd.resolve(strict=True)
+    cwd.relative_to(root)
+    if argv[0] == "npm" and alias:
+        if argv != ["npm", "test"] and not (len(argv) == 3 and argv[1] == "run"):
+            raise ValueError("suite_npm_arguments_require_explicit_resolved_command")
+        name = argv[2] if argv[1] == "run" else "test" if argv[1:] == ["test"] else ""
+        scripts = json.loads((cwd / "package.json").read_text())["scripts"]
+        if any(prefix + name in scripts for prefix in ("pre", "post")):
+            raise ValueError("suite_npm_lifecycle_requires_explicit_resolved_command")
+        script = scripts[name]
+        if re.search(r"[;&|`$<>\r\n#*?\[\]{}()!~]", script):
+            raise ValueError("suite_script_requires_explicit_resolved_command")
+        return _command_key(root, shlex.split(script), cwd, alias=False)
+    if argv[0] == "vitest" or is_vitest(argv):
+        raw = (
+            ["node", str(cwd / "node_modules/vitest/vitest.mjs"), *argv[1:]]
+            if argv[0] == "vitest"
+            else argv
+        )
+        package, config, selected = _selection(raw, root, cwd)
+        return [
+            "vitest",
+            cwd.relative_to(root).as_posix(),
+            package.relative_to(root).as_posix(),
+            config.relative_to(root).as_posix() if config else "",
+            *selected,
+            "config-sha256",
+            hashlib.sha256(config.read_bytes()).hexdigest() if config else "",
+            "package-sha256",
+            hashlib.sha256((package / "package.json").read_bytes()).hexdigest(),
+        ]
+    if is_cargo(argv):
+        parse_cargo_test(argv)
+        return ["cargo", cwd.relative_to(root).as_posix(), *argv[1:]]
+    args = _pytest_args(argv)
+    if args is not None:
+        return ["pytest", cwd.relative_to(root).as_posix(), *args]
+    raise ValueError("suite_command_unresolved")
+
+
+def suite_binding(root: Path | None, feature: str | None, suite: str) -> dict[str, Any]:
+    """Freeze plan bytes and every applicable command/selection in canonical goal JSON."""
+    try:
+        if root is None or not feature or suite not in {"unit", "integration", "e2e", "all"}:
+            raise ValueError("suite_context_unresolved")
+        plan = (root / ".specs/features" / feature / "plan.md").read_text()
+        token = "(?:unit|integration|e2e)" if suite == "all" else suite
+        commands = []
+        for action, command in _command_rows(section(plan, "Resolved Test Commands") or ""):
+            if not re.search(rf"\b{token}\b", action, re.I) or command.casefold() in _ABSENT:
                 continue
-        # Unknown declarations remain required so discovery fails closed.
-        return True
-    return False
+            match = re.search(r"\s+\(([^()]+)\)$", command)
+            cwd = root if not match or match[1] == "root" else root / match[1]
+            text = command[: match.start()] if match else command
+            commands.append(_command_key(root, shlex.split(text.strip("`")), cwd))
+        if not commands:
+            raise ValueError("suite_commands_missing")
+        return {
+            "suite": suite,
+            "plan_sha256": hashlib.sha256(plan.encode()).hexdigest(),
+            "commands": commands,
+        }
+    except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:
+        return {"suite": suite, "error": str(exc)}
+
+
+def suite_evidence_missing(
+    binding: dict[str, Any], receipt: Path | None, root: Path, feature: str, evidence: Any
+) -> list[str]:
+    """Require genuine passing receipts covering every frozen original invocation."""
+    from .execution_evidence import _read_capture, verify_execution_observation
+    from .execution_working_directory import capture_execution_cwd
+
+    if receipt is None:
+        return ["execution_receipt_path"]
+    if binding != suite_binding(root, feature, binding["suite"]):
+        return ["suite_commands_changed_recompile_required"]
+    if "error" in binding:
+        return ["suite_command_unresolved:" + binding["error"]]
+    observed = []
+    for path in [receipt, *[root / p for p in (evidence or {}).get("execution_receipt_paths", [])]]:
+        result = verify_execution_observation(path, root, feature, "passed", evidence_policy="2")
+        if not result.valid:
+            return list(result.gaps)
+        capture, _ = _read_capture(path.absolute(), root, feature)
+        argv = capture.budget.get("scope") if capture.budget else None
+        if not isinstance(argv, list) or not all(isinstance(arg, str) for arg in argv):
+            return ["suite_original_command_missing"]
+        observed.append(_command_key(root, argv, capture_execution_cwd(capture)))
+    return (
+        []
+        if all(command in observed for command in binding["commands"])
+        else ["suite_commands_unproven"]
+    )
 
 
 def resolve_applicability(

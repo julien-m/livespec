@@ -125,3 +125,10 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Current grouped-fix follow-up: independent review identified terminal-alarm and concurrent-publication windows after the preliminary GREEN. Staging plus atomic completion publication addresses both in current source; current six-file310-line delta leaves the scoped lane. Official complete readiness returned READY. Preliminary GREEN remains historical; final changed bytes are not yet executed or certified. Inspect [fallback evidence](.reviews/timeout-finalize-fix/fallback-readiness.json).
 
 - 2026-10-17 Late Chai registration P1: seven genuine RED cases become seven GREEN cases after sealing the installed matcher surface;37 adjacent checks and fresh consumer46/55 pass. Scoped bugfix gate ELIGIBLE3 files/122 lines. Whole-feature certificates remain historical; final-head CI remains required.
+
+## 2026-10-17 — Confined cwd revision checkpoint
+
+- Official revision opened after reingesting real hash-compatible spec/plan raw reviews, then closed only after independently refreshed native spec/plan reviews ingested ready.
+- Single direct Vitest invocation gains explicit cwd; governing feature/project, manifests, storage and budget remain root-owned. Capture and provenance bind cwd/device/inode; archive reads recheck them. Omitted historical cwd means root exclusively.
+- Early genuine RED and GREEN diagnostic receipts are preserved externally; final current source/test bytes, consumer runs and qualities remain to close. Prior whole-feature delivery assertions are historical, not certification of this delta.
+- Additional capability budget: 300 seconds cumulative; the independent 078 correction retains 600 seconds cumulative including its prior approximately 288.2 seconds. No global runtime or consumer pin changed.

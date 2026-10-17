@@ -96,3 +96,19 @@ RED a5afa5c4 and GREEN 01917bd3 prove real mapped assertions in Git-ignored cach
 - Current GREEN `91c842aea1e34caa815c911e359e812e` passes the exact RED command with unchanged regression bytes; closing bugfix gate ELIGIBLE and trace recorded. Real four-file conventions scope PASS. Fresh goal state is isolated under a process-only TMPDIR; old control pairs remain untouched. Archive and final independent metadata review precede publication.
 
 - Fresh goal complete 4/4; inspect [the current successful archive](../../.runs/spec-fix-2026-10-17T13-25-21.082948-0a082a99-policy2.json). Receipt rechecks and `verify-output spec-fix` pass. The independent final review refresh covers changed metadata and delivered-base context; unchanged source/test hashes retain their reviewed content identity. No full feature acceptance is claimed.
+
+## 2026-10-17 — PR54 command-scope review corrections
+
+- P1 freezes each explicit suite command/selection, plan bytes and local package/config identities. Genuine extra receipts aggregate multiple unit commands and every required suite for DoD; npm aliases read actual scripts without execution. Unmarked historical contracts retain their meaning.
+- P2 matches suite names only in Action cells, so unit exclusion paths cannot activate integration/E2E. Read [the regression](../../../tests/test_spec_test_observations.py) and [binding](../../../validator/evidence_applicability.py).
+- Current regression bytes reproduce both findings against committed pre-fix `3559326f811dfa8d315082405e13065b69b920f8`: RED `59f06396b43048b68f0c9baf2c5a0171`, pre-edit gate READY. One fixture-token cleanup required a fresh RED; prior captures remain historical. Scope and the original cumulative 300-second ceiling are unchanged.
+
+- Adversarial reviewers found and corrected npm forwarded-argument loss, lifecycle/chain expansion ambiguity and missing Cargo normalization before final freeze. Exact literal aliases only; Cargo retains all parsed argv. Plan bindings cover all runners, while additional package/script/config compile-time binding is Vitest-specific; every receipt still requires current source/config verification.
+- Final current GREEN `b4206a7d50f944b1820c971a22cba070` matches RED59f06396 test bytes/command; prior GREEN7c63 remains historical after the skill-scope clarification. Necessary selection 54 passed with real observations, no skips; full qualities and five-file conventions pass. Main53 integration and PR54 merge remain pending the coordinated order.
+
+## 2026-10-17 — Review repair cwd checkpoint (not closed)
+
+- Codex P1/P2 review repair now binds original command selections and actual capture cwd; separate dashboard/slides packages and wrong-root receipt refusal replace the earlier same-package-only regression.
+- Native mapping preparation identified missing negative bindings and a weak consumer-copy conjunction; current096 mapping108/40 was corrected and independently reviewed. Product preflight copies passed46/55 unchanged tests, without consumer042 closure or runtime pin changes.
+- Current078 correction naturally exceeds the bugfix lane300-line cap; preserve all changes and use the actual gate/FALLBACK authority. Do not reinterpret prior PASS archives as proof of this repair.
+- Final RED/GREEN, current final reviews/qualities, owner gates and archive remain pending integration of stablePR53; no publication or completion claim at this checkpoint.

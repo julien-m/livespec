@@ -192,3 +192,7 @@ Inspect [the independent gap report](checks/2026-10-17.md): six FRs align static
 - **RED receipt:** `.specs/.execution/4e64d2dbb4fd44ecbf03f38e321fe43d/receipt.json`
 - **GREEN receipt:** `.specs/.execution/237a4d011b7d4506aa7fdf940486488d/receipt.json`
 <!-- bugfix:237a4d011b7d4506aa7fdf940486488d -->
+
+## 2026-10-17 — Confined invocation cwd revision
+
+- Revised FR-003/004 and AC-003/004 through the official open/review/close protocol. Added optional confined cwd to direct Vitest capture and CLI, preserving root authority and historical root interpretation. Current implementation validation remains in progress.

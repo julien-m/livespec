@@ -1087,3 +1087,5 @@ Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/
 - 2026-10-17: Fix096 unsafe consumer timeouts and CLI final-verification deadline/completion boundary; scoped eleven-case RED/GREEN evidence recorded, historical full-feature certificates preserved.
 
 - 2026-10-17: Feature096 Check reviewed grouped timeout/final-verification corrections; inspect [the independent report](features/096-node-vitest-execution/checks/2026-10-17.md). Fresh acceptance remains a separate gate.
+
+- 2026-10-17 [Feature 078] Review fix: bind each suite and the DoD aggregate to frozen resolved commands; parse suite applicability from Action cells.
