@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-10-16
+> Last updated: 2026-10-17
 
 
 ---
@@ -134,6 +134,7 @@
 | 093 | Configured Review Identity | In Progress | 2026-10-13 | 2026-10-15 | [spec](features/093-configured-review-identity/spec.md), [plan](features/093-configured-review-identity/plan.md), [implementation](features/093-configured-review-identity/implementation.md) |
 | 094 | Verified Review Continuity | In Progress | 2026-10-14 | 2026-10-14 | [spec](features/094-verified-review-continuity/spec.md), [plan](features/094-verified-review-continuity/plan.md), [implementation](features/094-verified-review-continuity/implementation.md) |
 | 095 | Test Time Budgets | Implemented | 2026-10-16 | 2026-10-16 | [spec](features/095-test-time-budgets/spec.md) |
+| 096 | Root Feature Delivery Review | Implemented | 2026-10-17 | 2026-10-17 | [spec](features/096-root-feature-delivery-review/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -158,16 +159,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-17 | Feature | [Feature 096] Test: 100% AC covered (6/6), 0 tests generated; existing 16-test proof verified |
+| 2026-10-17 | Feature | 096 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state |
+| 2026-10-17 | Plan | [Feature 096] Plan created: Root Feature Delivery Review — 2 local steps, 2 diagrams; root scope integrity and bounded acceptance evidence |
+| 2026-10-17 | Spec | [Feature 096] Spec created: Root Feature Delivery Review — 1 story, 6 AC, 4 FR |
+| 2026-10-17 | Bugfix | [Feature 081] Bugfix: honor spec-specify review opt-out in goals |
+| 2026-10-17 | Feature | [Feature 083] Test Hardening: ignore Git churn before worktree hashing |
+| 2026-10-16 | Bugfix | [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution |
+| 2026-10-16 | Bugfix | [Feature 094] Bugfix: prevent Git revision batch pipe deadlocks |
+| 2026-10-16 | Bugfix | [Feature 063] Bugfix: resolve mapped CI/configuration and documentation scopes |
 | 2026-10-16 | Feature | Bound test execution and require only necessary validation with declared long-running exceptions |
-| 2026-10-16 | Feature | [Feature 095] Test: 100% AC covered (5/5), 0 tests generated |
-| 2026-10-16 | Plan | Plan created: Test Time Budgets — 3 implementation steps, 1 state diagram; necessary tests and bounded recovery |
-| 2026-10-16 | Spec | [Feature 095] Spec created: Test Time Budgets — 3 stories, 5 AC, 7 FR |
-| 2026-10-15 | Bugfix | Bugfix: [093](features/093-configured-review-identity/changelog.md): a goal `--model` flag without value raises `review_model_required` instead of binding the configured model. |
-| 2026-10-15 | Bugfix | [Feature 083] Fix: install applies the installed commit's conventions evidence rules and refuses an incomplete snapshot (FR-001, FR-003) |
-| 2026-10-15 | Feature | [093](features/093-configured-review-identity/changelog.md): spec and plan reviews complete and ready (native, `claude-opus-5-5`); delivery lane now light. |
-| 2026-10-15 | Feature | [093](features/093-configured-review-identity/changelog.md): goal render, progressions and the delivery lane take the reviewer model and budget from `.specs/semantic/config.yaml` when no option names them, and stop with `review_model_required` otherwise; out-of-bounds budgets are refused, never clamped. |
-| 2026-10-15 | Bugfix | [Feature 083] Fix: 2/2 review gaps closed (shim exit-3 recovery uses LiveSpec's venv with --source/--ref; AC-016 dev-lock wording aligned with D-04); spec and plan reviews refreshed at 120000 characters, implement progression READY |
-| 2026-10-15 | Feature | [Feature 083] Spec refined: user approvals of `--no-activate`, the `.livespec-path` pin warning and plan decisions D-01 to D-15 recorded in Clarifications; plan D-11 uses LiveSpec's venv; spec and plan reviews refreshed at 120000 characters, implement progression READY |
 <!-- readme:activity:end -->
 
 ---
@@ -346,3 +347,11 @@
 <!-- finalize:spec-plan:2026-10-16:bb751413 -->
 
 <!-- finalize:spec-feature:2026-10-16:d775ec24 -->
+
+<!-- finalize:spec-specify:2026-10-17:cc406fb7 -->
+
+<!-- finalize:spec-plan:2026-10-17:0518dc0e -->
+
+<!-- finalize:spec-implement:2026-10-17:6e077b09 -->
+
+<!-- finalize:spec-test:2026-10-17:e9ebbe26 -->

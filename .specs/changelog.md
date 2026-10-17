@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-10-17 — [Feature 096] Test: 100% AC covered (6/6), 0 tests generated; existing 16-test proof verified
+<!-- finalize:spec-test:2026-10-17:e9ebbe26 -->
+
+## 2026-10-17 — 096 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state
+<!-- finalize:spec-implement:2026-10-17:6e077b09 -->
+
+## 2026-10-17 — [Feature 096] Plan created: Root Feature Delivery Review — 2 local steps, 2 diagrams; root scope integrity and bounded acceptance evidence
+<!-- finalize:spec-plan:2026-10-17:0518dc0e -->
+
+## 2026-10-17 — [Feature 096] Spec created: Root Feature Delivery Review — 1 story, 6 AC, 4 FR
+<!-- finalize:spec-specify:2026-10-17:cc406fb7 -->
+
 ## 2026-10-17 — [Feature 081] Bugfix: honor spec-specify review opt-out in goals
 
 - `--no-review` and `-N` select specification preparation without a spec-review task or receipt; default review, other commands and semantic progression guards remain required. Read the [regressions](../tests/test_specify_review_goal.py) for contract/checklist selection, native goal closure and review boundaries.

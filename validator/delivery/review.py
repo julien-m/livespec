@@ -44,13 +44,15 @@ __all__ = [
 ]
 
 
+# @spec FR-003: Share root scope at every review stage
+#   — .specs/features/096-root-feature-delivery-review/spec.md#fr-003
 def prepare_scope(root: Path, feature: str, base: str, lane: Lane) -> tuple[dict[str, Any], str]:
     """Write and return the review scope; the second value is an error code or ''."""
     target = scope_path(root, feature)
     try:
         commit = resolve_commit(root, base)
         problem = base_problem(root, feature, commit)
-        files = current_scope(root, commit) if not problem else {}
+        files = current_scope(root, commit, feature) if not problem else {}
     except DiffUnavailableError as exc:
         return {"feature": feature, "detail": str(exc)}, "diff_unavailable"
     if problem:
@@ -126,7 +128,7 @@ def record_report(root: Path, feature: str, kind: Kind, report_file: Path) -> Re
     prepared = cast(dict[str, str], files)
     try:
         problem = base_problem(root, feature, str(scope.get("base_commit")))
-        now = current_scope(root, str(scope.get("base_commit"))) if not problem else {}
+        now = current_scope(root, str(scope.get("base_commit")), feature) if not problem else {}
     except DiffUnavailableError as exc:
         outcome.reasons.append(LaneReason("diff_unavailable", str(exc)))
         return outcome
@@ -187,7 +189,7 @@ def _latest_pass(
         return [LaneReason(f"receipt_invalid:{kind}", r.code) for r in inconsistent], ""
     try:
         problem = base_problem(root, feature, str(latest.get("base_commit")))
-        now = current_scope(root, str(latest.get("base_commit"))) if not problem else {}
+        now = current_scope(root, str(latest.get("base_commit")), feature) if not problem else {}
     except DiffUnavailableError as exc:
         return [LaneReason("diff_unavailable", str(exc))], ""
     if problem:

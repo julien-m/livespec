@@ -1,0 +1,309 @@
+{
+  "schema_version": "1",
+  "feature": "096-root-feature-delivery-review",
+  "reviewer_model": "gpt-6.1-sol",
+  "review_max_chars": 200000,
+  "review_receipt_path": ".specs/features/096-root-feature-delivery-review/checks/acceptance-mapping-review.json",
+  "bindings": [
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-001",
+      "test_id": "tests.test_delivery_review_root::test_root_baseline_covers_bootstrap_and_preserves_identity[feature-only]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 71,
+      "end_line": 71,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Successful prepare preserves the original parentless SHA across root-only and mixed bootstrap layouts."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-001",
+      "test_id": "tests.test_delivery_review_root::test_root_baseline_covers_bootstrap_and_preserves_identity[bootstrap]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 71,
+      "end_line": 71,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Successful prepare preserves the original parentless SHA across root-only and mixed bootstrap layouts."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-001",
+      "test_id": "tests.test_delivery_review_root::test_root_baseline_covers_bootstrap_and_preserves_identity[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 71,
+      "end_line": 71,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Successful prepare preserves the original parentless SHA across root-only and mixed bootstrap layouts."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-002",
+      "test_id": "tests.test_delivery_review_root::test_root_baseline_covers_bootstrap_and_preserves_identity[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 67,
+      "end_line": 70,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Original recursive tree plus untracked calc source is present, including unchanged spec/plan/bootstrap paths."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-002",
+      "test_id": "tests.test_delivery_review_root::test_root_baseline_covers_bootstrap_and_preserves_identity[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 75,
+      "end_line": 75,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Bootstrap path deleted after the root remains present as deleted."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_baseline_covers_bootstrap_and_preserves_identity[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 72,
+      "end_line": 72,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Ordinary bytes have the exact SHA-256."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_baseline_covers_bootstrap_and_preserves_identity[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 73,
+      "end_line": 73,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Root spec remains included with normative identity."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_cycle_preserves_git_and_covers_bootstrap[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 152,
+      "end_line": 152,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Symlink identity is its target without following it."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_cycle_preserves_git_and_covers_bootstrap[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 153,
+      "end_line": 153,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Gitlink identity is the staged submodule commit."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_lifecycle_stability_and_normative_currency[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 189,
+      "end_line": 189,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Lifecycle-only spec and plan changes keep the recorded review current."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_lifecycle_stability_and_normative_currency[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 190,
+      "end_line": 190,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Record uses the same stable lifecycle identity."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_lifecycle_stability_and_normative_currency[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 199,
+      "end_line": 199,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Source, spec and plan normative changes each make verify stale."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_lifecycle_stability_and_normative_currency[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 200,
+      "end_line": 200,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Source, spec and plan normative changes each make record stale."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_root::test_root_feature_rejects_newer_base[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 93,
+      "end_line": 93,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Later descendant base is ineligible."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_root::test_root_newer_base_cannot_be_forged_into_scope_or_receipt[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 110,
+      "end_line": 110,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Forged saved scope base is refused by record."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_root::test_root_newer_base_cannot_be_forged_into_scope_or_receipt[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Forged receipt base is refused by verify."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-005",
+      "test_id": "tests.test_delivery_review_root::test_root_report_cannot_omit_bootstrap[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 168,
+      "end_line": 170,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Omitting bootstrap.py from the report is rejected as scope_not_covered."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-005",
+      "test_id": "tests.test_delivery_review_root::test_root_cycle_preserves_git_and_covers_bootstrap[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 156,
+      "end_line": 156,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Complete distinct review and audit reports record and verify successfully."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-006",
+      "test_id": "tests.test_delivery_review_root::test_root_cycle_preserves_git_and_covers_bootstrap[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 157,
+      "end_line": 157,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Complete object inventory, raw index bytes, HEAD, refs and reachable commit-parent history equal their pre-cycle snapshot."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_lifecycle_stability_and_normative_currency[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 205,
+      "end_line": 205,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "A newly added or deleted scoped path makes the existing record/verify scope stale."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_lifecycle_stability_and_normative_currency[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 206,
+      "end_line": 206,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "A newly added or deleted scoped path makes the existing record/verify scope stale."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_lifecycle_stability_and_normative_currency[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 210,
+      "end_line": 210,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "A newly added or deleted scoped path makes the existing record/verify scope stale."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-003",
+      "test_id": "tests.test_delivery_review_root::test_root_lifecycle_stability_and_normative_currency[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 211,
+      "end_line": 211,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "A newly added or deleted scoped path makes the existing record/verify scope stale."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_root::test_root_newer_base_cannot_be_forged_into_scope_or_receipt[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 121,
+      "end_line": 121,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Unrelated root commit is refused at prepare, record and verify."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_root::test_root_newer_base_cannot_be_forged_into_scope_or_receipt[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 124,
+      "end_line": 124,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Unrelated root commit is refused at prepare, record and verify."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_root::test_root_newer_base_cannot_be_forged_into_scope_or_receipt[code]",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_root.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "52b96ae619a210edc9c7b46a522b3d7e5c6f6d621356324ed79e0b0972afaef0",
+      "justification": "Unrelated root commit is refused at prepare, record and verify."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_base::test_commit_creating_spec_and_code_is_not_a_base",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_base.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "700974eb9af20d81c2da092417a07256bf870984c05ba7adf3eee5e9a110f50e",
+      "justification": "Ordinary mixed creating commit is refused while its parent is eligible."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_base::test_commit_creating_spec_and_code_is_not_a_base",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_base.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "700974eb9af20d81c2da092417a07256bf870984c05ba7adf3eee5e9a110f50e",
+      "justification": "Ordinary mixed creating commit is refused while its parent is eligible."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_base::test_uncommitted_spec_has_no_base",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_base.py",
+      "start_line": 68,
+      "end_line": 68,
+      "source_sha256": "700974eb9af20d81c2da092417a07256bf870984c05ba7adf3eee5e9a110f50e",
+      "justification": "A never-committed selected spec remains refused."
+    },
+    {
+      "requirement_id": "096-root-feature-delivery-review:AC-004",
+      "test_id": "tests.test_delivery_review_base::test_uncommitted_spec_has_no_base",
+      "expected": "passed",
+      "assertion_path": "tests/test_delivery_review_base.py",
+      "start_line": 69,
+      "end_line": 69,
+      "source_sha256": "700974eb9af20d81c2da092417a07256bf870984c05ba7adf3eee5e9a110f50e",
+      "justification": "A never-committed selected spec remains refused."
+    }
+  ]
+}
