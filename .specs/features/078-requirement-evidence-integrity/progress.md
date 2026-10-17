@@ -86,3 +86,13 @@ RED a5afa5c4 and GREEN 01917bd3 prove real mapped assertions in Git-ignored cach
 
 - Necessary current selection: 53 passed, zero skipped through a runner-owned passed-observation receipt; no AC certified. Conventions PASS on all four mapped files; Ruff/format and full Pyright PASS.
 - Test-only helper extraction preserves every assertion while meeting the 60-line error threshold. Conventions retain nonblocking function-length warnings (57-line scenario and existing 41-line resolver); no waiver or parser change. Historical RED/GREEN is not current proof after these test bytes changed; final closure awaits delivered main.
+
+## 2026-10-17 — Delivered main final closure
+
+- Integrated delivered main `eedd866ab2b2faff31ab5e216a71e9c72d01f799`; its tree matches the independently reviewed PR51 base exactly.
+- Final current regression bytes reproduce both defects against an exact baseline of the three 078 production files only: RED `453c6a2bc1354d1eaf4f244639e7943d`, pre-edit gate READY. Tests and all PR51 sources remain unchanged between RED and the restored correction.
+- Existing 53-test compatibility observation remains current after main integration; full `mypy .` reports no issues in 799 files, full Ruff/format and Pyright pass. Fresh GREEN, closing trace, conventions and goal/archive checks follow. Old receipts and goals are preserved as history.
+
+- Current GREEN `91c842aea1e34caa815c911e359e812e` passes the exact RED command with unchanged regression bytes; closing bugfix gate ELIGIBLE and trace recorded. Real four-file conventions scope PASS. Fresh goal state is isolated under a process-only TMPDIR; old control pairs remain untouched. Archive and final independent metadata review precede publication.
+
+- Fresh goal complete 4/4; inspect [the current successful archive](../../.runs/spec-fix-2026-10-17T13-25-21.082948-0a082a99-policy2.json). Receipt rechecks and `verify-output spec-fix` pass. The independent final review refresh covers changed metadata and delivered-base context; unchanged source/test hashes retain their reviewed content identity. No full feature acceptance is claimed.
