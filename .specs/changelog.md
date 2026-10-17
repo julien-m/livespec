@@ -7,6 +7,27 @@
 
 ---
 
+## 2026-10-17 — [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture
+<!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
+
+## 2026-10-17 — 097: preserve exact Git index bytes while reviewing complete root bootstrap scope; current six-AC certification and independent full reviews pass.
+<!-- finalize:spec-implement:2026-10-17:1bab7ffb -->
+
+## 2026-10-17 — [Feature 097] Test BLOCKED: 15 passed, 1 failed; Git index integrity assertion
+<!-- finalize:spec-test:2026-10-17:e503d74b -->
+
+## 2026-10-17 — [Feature 097] Test: 100% AC covered (6/6), 0 tests generated
+<!-- finalize:spec-test:2026-10-17:18760dd5 -->
+
+## 2026-10-17 — 097 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state
+<!-- finalize:spec-implement:2026-10-17:b4afe262 -->
+
+## 2026-10-17 — Plan097: two bounded steps and new independent review; owner-bound acceptance remains pending
+<!-- finalize:spec-plan:2026-10-17:3820eacd -->
+
+## 2026-10-17 — Spec identity097: root bootstrap review contract, renumbered from the historical root096 allocation; new independent review ready
+<!-- finalize:spec-specify:2026-10-17:ef92291b -->
+
 ## 2026-10-17 — Feature096 bugfix: reject late Chai matcher and prototype registration
 
 - Official seven-case RED/GREEN and37 adjacent checks pass; scoped regression proof only.

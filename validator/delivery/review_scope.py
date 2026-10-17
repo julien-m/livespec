@@ -66,21 +66,50 @@ def _identity(root: Path, relative: str) -> str:
 
 # @spec FR-004: Complete feature diff scope
 #   — .specs/features/086-risk-proportional-delivery/spec.md#fr-004
-def current_scope(root: Path, base_commit: str) -> dict[str, str]:
-    """Hash every counted path of the feature diff against ``base_commit``.
+# @spec FR-002: Include bootstrap and later identities
+#   — .specs/features/097-root-feature-delivery-review/spec.md#fr-002
+def current_scope(root: Path, base_commit: str, feature: str | None = None) -> dict[str, str]:
+    """Hash every counted path against the base, including a root-created feature tree.
+
+    ``feature`` binds the logical pre-root baseline; absent it, use the ordinary diff.
 
     Raises:
         DiffUnavailableError: The diff or one of its paths cannot be read.
     """
     try:
+        paths = {entry.path for entry in collect_diff(root, base_commit)}
+        root_baseline = feature is not None and _root_feature_base(root, feature, base_commit)
+        if root_baseline:
+            # The logical state before the root is empty. Keep root paths as well
+            # as later changes, including deletions, without creating Git objects.
+            paths.update(
+                raw.decode()
+                for raw in _git(root, "ls-tree", "-r", "--name-only", "-z", base_commit).split(
+                    b"\0"
+                )
+                if raw
+            )
         return {
-            entry.path: _identity(root, entry.path)
-            for entry in collect_diff(root, base_commit)
-            if not is_traceability_artifact(entry.path)
-            and not _lifecycle_only(root, base_commit, entry.path)
+            path: _identity(root, path)
+            for path in sorted(paths)
+            if not is_traceability_artifact(path)
+            and (root_baseline or not _lifecycle_only(root, base_commit, path))
         }
     except (OSError, ValueError) as exc:
         raise DiffUnavailableError(f"unreadable diff path: {exc}") from exc
+
+
+# @spec FR-001: Preserve exact root baseline eligibility
+#   — .specs/features/097-root-feature-delivery-review/spec.md#fr-001
+# @spec FR-004: Preserve Git storage and original SHA
+#   — .specs/features/097-root-feature-delivery-review/spec.md#fr-004
+def _root_feature_base(root: Path, feature: str, commit: str) -> bool:
+    """True only for a parentless commit containing this feature's original spec."""
+    parents = _git(root, "rev-list", "--parents", "-n", "1", commit).decode().split()[1:]
+    if parents:
+        return False
+    spec = f".specs/features/{feature}/spec.md"
+    return bool(_git(root, "ls-tree", "--name-only", commit, "--", spec).strip())
 
 
 def _feature_only(root: Path, feature: str, commit: str) -> bool:
@@ -95,7 +124,8 @@ def base_problem(root: Path, feature: str, commit: str) -> str:
     """Why ``commit`` cannot be the base of the feature diff, or '' when it can.
 
     The base is the parent of the commit that created the feature spec, or older; the
-    creating commit itself is accepted only when it touches the feature directory alone.
+    creating commit itself is accepted when feature-only, or when it is the root;
+    a root baseline includes its entire tree in the review scope.
 
     Raises:
         DiffUnavailableError: git cannot answer.
@@ -107,7 +137,9 @@ def base_problem(root: Path, feature: str, commit: str) -> str:
     if not created:
         return f"{spec} is not committed: commit it so the start of the feature is known"
     first = created[-1]
-    if commit == first and _feature_only(root, feature, first):
+    if commit == first and (
+        _root_feature_base(root, feature, first) or _feature_only(root, feature, first)
+    ):
         return ""
     parents = _git(root, "rev-list", "--parents", "-n", "1", first).decode().split()[1:]
     if parents and is_ancestor(root, commit, parents[0]):
