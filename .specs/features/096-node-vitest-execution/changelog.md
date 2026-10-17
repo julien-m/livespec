@@ -133,3 +133,28 @@
 - **RED receipt:** `.specs/.execution/f3932551a4b848c19902c8a3d97e0f67/receipt.json`
 - **GREEN receipt:** `.specs/.execution/5301576c58a44fea9ea1d64b1a1997c0/receipt.json`
 <!-- bugfix:5301576c58a44fea9ea1d64b1a1997c0 -->
+
+## 2026-10-17 — [Bugfix]: Normalize unsafe consumer timeouts and finish CLI capture verification inside its original deadline with fail-closed completion evidence
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_execution_vitest_budgets.py, validator/cli_commands/execution_io.py, validator/execution_capture.py, validator/execution_evidence.py, validator/execution_verification.py, validator/vitest/config.ts
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_vitest_budgets.py::test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout[completion-write-error], tests/test_execution_vitest_budgets.py::test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout[expired-verification], tests/test_execution_vitest_budgets.py::test_consumer_timeouts_cannot_disable_owned_limits[hook-0-120], tests/test_execution_vitest_budgets.py::test_consumer_timeouts_cannot_disable_owned_limits[hook-NaN-120], tests/test_execution_vitest_budgets.py::test_consumer_timeouts_cannot_disable_owned_limits[test-'invalid'-None], tests/test_execution_vitest_budgets.py::test_consumer_timeouts_cannot_disable_owned_limits[test--1-120], tests/test_execution_vitest_budgets.py::test_consumer_timeouts_cannot_disable_owned_limits[test-0-120]
+- **RED receipt:** `.specs/.execution/c173b4c641d74ae48ee8e282e6fc1cbb/receipt.json`
+- **GREEN receipt:** `.specs/.execution/0026d3d8618343dbbf796fdd27ac569a/receipt.json`
+<!-- bugfix:0026d3d8618343dbbf796fdd27ac569a -->
+
+## 2026-10-17 — Check: grouped timeout and final verification correction
+
+Inspect [the independent gap report](checks/2026-10-17.md): six FRs align statically; current acceptance certification is a separate pending execution gate. Historical observations remain distinct.
+
+## 2026-10-17 — [Fix]: safe timeout bounds and complete CLI verification deadline
+
+- Normalize zero, negative and nonfinite numeric test/hook timeouts to owned ceilings; keep stricter positive limits and reject invalid types.
+- Keep CLI capture and final provenance verification within the same absolute deadline. Public completion requires an atomic accepted marker; timeout or publication failure removes both fresh markers. No stronger transaction or hostile-code sandbox guarantee is claimed.
+- The scoped lane exceeded its300-line limit, so the final workflow is normal spec-fix after official fallback readiness. Inspect [the frozen independent report](checks/2026-10-17.md) and [the current110-test capture](.reviews/timeout-finalize-fix/final-capture.json): all110 pass and all six ACs are certified. Fresh consumer observations cover46dashboard and55slides tests. All historical failed/preliminary receipts remain preserved.
+
+<!-- finalize:spec-fix:2026-10-17:24d6777c -->
