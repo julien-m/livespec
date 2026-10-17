@@ -146,11 +146,11 @@ AC-002: Observations identify actual built-in matcher dispatch, exact test/sourc
 
 **Evidence:** execution
 
-AC-003: Every qualifying receipt is bound to a fresh invocation and genuine Node binary, local Vitest/runner/expect modules, owned observation hooks, project, source/test/configuration and npm lock identity, arguments and artifacts. Substituted executables/modules/hooks, stale/replayed or tampered receipts/artifacts, changed bound inputs during execution or before consumption/archive, and mismatched test origins fail closed. Retain the existing local threat model; do not claim a JavaScript same-process sandbox against arbitrary hostile code.
+AC-003: Every qualifying receipt is bound to a fresh invocation and genuine Node binary, local Vitest/runner/expect modules, owned observation hooks, project, source/test/configuration and npm lock identity, arguments, execution working directory and artifacts. An explicit Vitest working directory must resolve to an existing directory confined beneath the governing project root; its identity is rechecked before proof and archive. The project/feature, source manifests, storage and provenance authority remain at the governing root. Omitted working directory, including historical receipts without that field, means the project root exclusively. Substituted executables/modules/hooks, stale/replayed or tampered receipts/artifacts, changed bound inputs during execution or before consumption/archive, and mismatched test origins fail closed. Retain the existing local threat model; do not claim a JavaScript same-process sandbox against arbitrary hostile code.
 
 **Evidence:** execution
 
-AC-004: Test file/name selection uses validated argument vectors with bounded subprocess execution, never shell interpolation or a shadow executable. No automatic installation or consumer dependency/configuration/source/test/filter rewriting is allowed. Preparation and runtime share the existing execution budgets and cancellation/timeout cleanup; over-budget preparation or execution yields nonqualifying evidence and an actionable diagnostic.
+AC-004: The existing capture API and test CLI accept an optional explicit working directory for a single Vitest invocation; non-root working directories for other adapters are rejected. Relative arguments/configuration and the actual process use that directory. Unused CLI working-directory options are rejected. Test file/name selection uses validated argument vectors with bounded subprocess execution, never shell interpolation or a shadow executable. No automatic installation or consumer dependency/configuration/source/test/filter rewriting is allowed. Preparation and runtime share the existing execution budgets and cancellation/timeout cleanup; over-budget preparation or execution yields nonqualifying evidence and an actionable diagnostic.
 
 **Evidence:** execution
 
@@ -167,8 +167,8 @@ AC-006: Delivery uses two official test commands and demonstrates fresh separate
 
 - **FR-001:** Add opt-in passed/red execution observations to the existing test command for genuine local Node 22/Vitest 2.1.x execution; retain test outcomes and diagnostics (AC-001).
 - **FR-002:** Observe supported matcher dispatch and settlement with exact test/source attribution, reject the non-evidence and unsupported forms in AC-002, and distinguish explicit async consumption from automatic settlement (AC-002).
-- **FR-003:** Bind and verify invocation, runtime, observation hooks, inputs and artifacts at production, proof and archive boundaries; reject substitution, mutation, stale or tampered evidence (AC-003).
-- **FR-004:** Validate bounded local selection arguments, retain shared preparation/execution budgets and preserve consumer files/dependencies without automatic installation (AC-004).
+- **FR-003:** Bind and verify invocation, confined working directory, runtime, observation hooks, inputs and artifacts at production, proof and archive boundaries; reject substitution, mutation, stale or tampered evidence (AC-003).
+- **FR-004:** Expose an optional confined single-invocation Vitest working directory with root-default compatibility; validate bounded local selection arguments, retain shared preparation/execution budgets and preserve consumer files/dependencies without automatic installation (AC-004).
 - **FR-005:** Support explicit generic `outcome:passed` observation proofs without AC mapping, preserve final acceptance and other adapters, and use official new-run/recompile paths without retroactively changing immutable history (AC-005).
 - **FR-006:** Account separately for every requested consumer run, including the 46-test and 55-test Brainstorm selections, without consumer modifications (AC-006).
 
