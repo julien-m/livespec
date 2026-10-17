@@ -7,17 +7,21 @@ import os
 import time
 from collections.abc import Callable
 from pathlib import Path
+from typing import ParamSpec
 
 import pytest
-from click.testing import Result
+from typer.testing import Result
 
 from tests.execution_vitest_fixture import FEATURE, VitestProject
 from tests.execution_vitest_fixture import vitest_dependencies as vitest_dependencies
 from tests.execution_vitest_fixture import vitest_project as vitest_project
 from validator import execution_vitest_provenance
+from validator.execution_capture import CaptureResult
+from validator.execution_deadline import current_deadline
 from validator.execution_evidence import EvidenceVerification, verify_execution_observation
 
 pytestmark = pytest.mark.integration
+_P = ParamSpec("_P")
 
 
 def _assert_timeout(project: VitestProject, receipt: Path) -> None:
@@ -178,10 +182,11 @@ def test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout(
 
     from validator import execution_capture_storage, execution_evidence, test_budgets
     from validator.cli import app
-    from validator.execution_deadline import current_deadline
+    from validator.cli_commands import execution_io
 
     vitest_project.write("test('actual matcher', () => {expect(1).toBe(1);});")
     captured: list[tuple[Path, bytes]] = []
+    capture_ends: list[float] = []
     real_provenance = execution_evidence._current_provenance
     real_write = execution_capture_storage._write_new
     expire = mode in {"expired-verification", "completion-late"}
@@ -193,9 +198,9 @@ def test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout(
             for p in vitest_project.root.glob(".specs/.execution/*/receipt.json")
         )
         scope = current_deadline()
-        if scope is not None:
-            assert scope.argv == vitest_project.command()
-            assert scope.end <= started + 4.05
+        assert scope is not None
+        assert scope.argv == vitest_project.command()
+        assert scope.end == capture_ends[0], "Final verification reset the original deadline"
         time.sleep(4.3 if mode == "expired-verification" else 0.01)
         return real_provenance(recorded)
 
@@ -211,6 +216,11 @@ def test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout(
     with monkeypatch.context() as scoped:
         scoped.chdir(vitest_project.root)
         scoped.setattr(test_budgets, "DEFAULT_COMMAND_SECONDS", 4.0)
+        scoped.setattr(
+            execution_io,
+            "capture_execution",
+            _capture_outer_deadline(capture_ends, execution_io.capture_execution),
+        )
         scoped.setattr(execution_capture_storage, "_write_new", write_completion)
         if mode == "completion-late":
             scoped.setattr(os, "link", _late_completion_link(os.link))
@@ -220,6 +230,20 @@ def test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout(
         elapsed = time.monotonic() - started
     fresh = _assert_final_capture(captured, vitest_project, result, elapsed, expire, write_error)
     assert fresh.valid is not (expire or write_error), fresh.gaps
+
+
+def _capture_outer_deadline(
+    ends: list[float], invoke: Callable[_P, CaptureResult]
+) -> Callable[_P, CaptureResult]:
+    """Record the actual outer command scope after CLI argument parsing completes."""
+
+    def capture(*args: _P.args, **kwargs: _P.kwargs) -> CaptureResult:
+        scope = current_deadline()
+        assert scope is not None
+        ends.append(scope.end)
+        return invoke(*args, **kwargs)
+
+    return capture
 
 
 def _late_completion_link(real_link: Callable[..., None]) -> Callable[..., None]:

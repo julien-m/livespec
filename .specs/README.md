@@ -159,6 +159,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-17 | Feature | Feature096 CI fixture fix: actual Typer Result annotation and exact outer deadline; normal AC004-filtered proof18 tests, previous110/six-AC proof historical |
 | 2026-10-17 | Bugfix | Feature096 Fix: bounded consumer timeouts and same-deadline CLI final verification; normal spec-fix after scoped fallback,110 current tests and six ACs certified |
 | 2026-10-17 | Feature | Feature 096: correct final delivery evidence links |
 | 2026-10-17 | Feature | Node/Vitest execution observations validated with six acceptance criteria and independent test review |
@@ -168,7 +169,6 @@
 | 2026-10-16 | Feature | Technical plan: five bounded steps, two diagrams and explicit runtime evidence gates |
 | 2026-10-16 | Spec | Spec created: Node Vitest Execution Observations - 3 stories, 6 AC, 6 FR |
 | 2026-10-17 | Bugfix | [Feature 081] Bugfix: honor spec-specify review opt-out in goals |
-| 2026-10-17 | Feature | [Feature 083] Test Hardening: ignore Git churn before worktree hashing |
 <!-- readme:activity:end -->
 
 ---
@@ -361,3 +361,5 @@
 <!-- finalize:spec-feature:2026-10-17:de973d5e -->
 
 <!-- finalize:spec-fix:2026-10-17:24d6777c -->
+
+<!-- finalize:spec-fix:2026-10-17:340e3e18 -->
