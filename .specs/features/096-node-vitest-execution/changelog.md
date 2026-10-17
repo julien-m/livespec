@@ -166,3 +166,16 @@ Inspect [the independent gap report](checks/2026-10-17.md): six FRs align static
 - This normal spec-fix is filtered to AC-004. Inspect [the current18-test capture](.reviews/type-import-fix/capture.json):18 tests pass and only AC-004 is certified. The previous110-test/six-AC archive remains historical before this test-source correction. Inspect [the frozen grouped gap report](checks/2026-10-17.md). No claim is made for the separate late-custom-matcher finding.
 
 <!-- finalize:spec-fix:2026-10-17:340e3e18 -->
+
+## 2026-10-17 — [Bugfix]: Reject late Chai matcher registration and prototype mutation after observer bootstrap
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .github/workflows/ci.yml, tests/test_execution_vitest_extensions.py, validator/vitest/matcher-observer.ts
+- **AC impacted:** AC-002
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[chainable], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[getter], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[method], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[parent], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[plugin-setup], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[plugin-test], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[replace-built-in]
+- **RED receipt:** `.specs/.execution/4e64d2dbb4fd44ecbf03f38e321fe43d/receipt.json`
+- **GREEN receipt:** `.specs/.execution/ec4b03a2c9824b2a930ef252401d0383/receipt.json`
+<!-- bugfix:ec4b03a2c9824b2a930ef252401d0383 -->

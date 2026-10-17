@@ -182,7 +182,7 @@ jobs:
           timeout 60s "$LIVESPEC_VITEST_NODE_MODULES/.bin/biome" check validator/vitest
       - name: Run real observer tests and reject skipped coverage
         run: |
-          timeout 300s pytest tests/test_execution_vitest.py tests/test_execution_vitest_boundaries.py tests/test_execution_vitest_integrity.py tests/test_execution_vitest_budgets.py tests/test_execution_vitest_goal.py tests/test_execution_vitest_bindings.py tests/test_execution_vitest_asset_paths.py -q --junitxml="$RUNNER_TEMP/vitest-observer.xml"
+          timeout 300s pytest tests/test_execution_vitest.py tests/test_execution_vitest_boundaries.py tests/test_execution_vitest_integrity.py tests/test_execution_vitest_budgets.py tests/test_execution_vitest_goal.py tests/test_execution_vitest_bindings.py tests/test_execution_vitest_asset_paths.py tests/test_execution_vitest_extensions.py -q --junitxml="$RUNNER_TEMP/vitest-observer.xml"
           python - <<'PYTHON'
           import os
           import xml.etree.ElementTree as ET

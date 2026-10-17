@@ -143,6 +143,37 @@ const observe = (
 };
 
 /** Install once per worker before importing consumer setup and tests. */
+// @spec FR-002: keep the installed matcher boundary stable after Vitest bootstrap.
+const sealMatcherSurface = (): void => {
+	const prototype = chai.Assertion.prototype;
+	const registry: unknown = Reflect.get(prototype, "__methods");
+	if (registry !== null && typeof registry === "object") {
+		for (const key of Object.getOwnPropertyNames(registry)) {
+			const entry: unknown = Reflect.get(registry, key);
+			if (entry !== null && typeof entry === "object") Object.freeze(entry);
+		}
+		Object.freeze(registry);
+	}
+	for (const name of [
+		"addMethod",
+		"addProperty",
+		"addChainableMethod",
+		"overwriteMethod",
+		"overwriteProperty",
+		"overwriteChainableMethod",
+	]) {
+		Object.defineProperty(chai.Assertion, name, {
+			value: () => {
+				const diagnostic = `Unsupported late Chai registration: ${name}`;
+				errors.push(diagnostic);
+				throw new Error(diagnostic);
+			},
+		});
+	}
+	Object.freeze(prototype);
+	Object.defineProperty(chai.Assertion, "prototype", { writable: false });
+};
+
 export const installObserver = (): void => {
 	const internal = new Set([
 		"constructor",
@@ -265,4 +296,5 @@ export const installObserver = (): void => {
 		);
 	}
 	guardExpectation(expect);
+	sealMatcherSurface();
 };
