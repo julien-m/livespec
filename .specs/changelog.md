@@ -1029,3 +1029,7 @@ Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/
 ## 2026-10-17 — [Bugfix]: Execution freshness after registry finalization
 
 Read the [078 correction](features/078-requirement-evidence-integrity/implementation.md): versioned generated-registry projection preserves ordinary finalize completion while retaining normative prose, links, source, tests and configuration inputs. Legacy raw manifests require fresh capture; no historical receipt is rewritten.
+
+## 2026-10-17 — [Bugfix]: Direct Markdown acceptance inputs
+
+Read the [078 correction](features/078-requirement-evidence-integrity/implementation.md): documentary acceptance now loads explicitly linked Markdown contracts directly and preserves canonical roles and exact source identity. Generated JSON inventories retain strict schema and freshness validation. HandoffBox012 preparation was verified read-only; no consumer review verdict is inferred.

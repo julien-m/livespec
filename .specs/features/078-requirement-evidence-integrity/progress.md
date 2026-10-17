@@ -67,3 +67,9 @@ Capture22c6c801 certifies AC007/AC015 with zero gaps and 3875 passing tests. The
 - RED: real capture plus finalize changes referenced README/changelog fingerprints; closing bugfix gate ELIGIBLE (185 lines, 3 files, no reasons).
 - GREEN: 3 targeted tests pass; 29 scoped regressions pass; scoped Ruff/Pyright and feature/repo conventions pass. Read the [bounded correction](implementation.md#2026-10-17--finalization-of-referenced-registries-spec-fix) and [recorded receipts](implementation.md#bugfix-receipts).
 - Frozen HandoffBox dataset read-only: both registry projections remain invariant through actual finalizer builders. Existing capture is stale; the added tool-defect document and future runtime lock update also require recapture. No consumer files changed.
+
+## 2026-10-17 — Confined direct documentary input correction
+
+- RED reproduced the forced JSON parse on approved Markdown Review inputs; GREEN passes three focused tests. Six scoped tests pass in 0.48 seconds, including strict generated-inventory validation and changed-source rejection.
+- Read-only HandoffBox012 preparation passes: AC-006, four declared Markdown inputs with exact hashes and canonical roles, 583 sections, four batches, zero errors. Preparation does not certify the independent review or consumer completion.
+- Closing bugfix gate ELIGIBLE (132 lines, three files); feature/repo conventions, scoped Ruff/format/Pyright pass. Read the [implementation and runner-owned receipts](implementation.md#bugfix-receipts).

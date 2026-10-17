@@ -269,3 +269,16 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/336e380ead6e49d8973ab2a8953ade97/receipt.json`
 - **GREEN receipt:** `.specs/.execution/c1913d7924774dbe893a3bd30146f239/receipt.json`
 <!-- bugfix:c1913d7924774dbe893a3bd30146f239 -->
+
+## 2026-10-17 — [Bugfix]: Load declared Markdown acceptance contracts directly while preserving canonical source roles and strict JSON inventories
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** system/review-protocol.md, tests/test_acceptance_direct_inputs.py, validator/semantic/acceptance_review.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_acceptance_direct_inputs.py::test_direct_markdown_cli_preserves_roles_bytes_and_freshness
+- **RED receipt:** `.specs/.execution/4298be9d7688405896ffcf814709f379/receipt.json`
+- **GREEN receipt:** `.specs/.execution/1ba4db750185419cbced4a099c475cdc/receipt.json`
+<!-- bugfix:1ba4db750185419cbced4a099c475cdc -->

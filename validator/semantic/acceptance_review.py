@@ -53,7 +53,8 @@ def prepare_acceptance_review(
     paths = {path for item in obligations for path in item.review_inputs}
     for path in sorted(paths):
         for name, content in _manifest_sources(root, feature, path).items():
-            sources[name], roles[name] = content, "plan"
+            sources[name] = content
+            roles.setdefault(name, "plan")
     return prepare_review_context(
         feature,
         sources,
@@ -102,8 +103,11 @@ def verify_acceptance_review(
 
 
 def _manifest_sources(root: Path, feature: str, name: str) -> dict[str, str]:
+    """Read direct Markdown contracts; retain strict generated-inventory validation."""
     manifest_path = _contained(root, name)
     raw = manifest_path.read_bytes().decode("utf-8")
+    if manifest_path.suffix.lower() == ".md":
+        return {name: raw}
     manifest = AcceptanceReviewInputs.model_validate_json(raw)
     _verify_current_inputs(root, feature, manifest)
     if not manifest.source_paths:
