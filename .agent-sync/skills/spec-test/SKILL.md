@@ -1344,11 +1344,13 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 ### Phase 4 — Execute Test Suite
 
+Generic suite tasks require a current passed execution observation; AC mapping remains required only by the separate feature acceptance task. Explicit absent commands in the resolved table deactivate their suite task. Existing immutable contracts keep their original proof purpose.
+
 - [test-suite] Run type checker if resolved (e.g. npx tsc --noEmit) <!-- evidence:documentary -->
 - [test-suite] Run linter if resolved (e.g. npx eslint src/) <!-- evidence:documentary -->
-- [test-suite] Run unit tests with resolved unit command <!-- evidence:execution -->
-- [test-suite] Run integration tests with resolved integration command if present <!-- evidence:execution applicable:integration-command -->
-- [test-suite] Run E2E tests with resolved E2E command (e.g. npx playwright test) <!-- evidence:execution applicable:e2e-command -->
+- [test-suite] Run unit tests with resolved unit command <!-- evidence:execution outcome:passed -->
+- [test-suite] Run integration tests with resolved integration command if present <!-- evidence:execution outcome:passed applicable:integration-command -->
+- [test-suite] Run E2E tests with resolved E2E command (e.g. npx playwright test) <!-- evidence:execution outcome:passed applicable:e2e-command -->
 - [test-suite] Map each test result back to its AC: track Pass / Fail / Regression / Blocked per AC <!-- evidence:execution ac-scope:feature -->
 - [test-suite] Report generated tests that fail as "Generated — Fail" (implementation bug, do not fix here — surface for /spec-implement --resume) <!-- evidence:documentary -->
 - [test-suite] Report existing tests that fail as "Regression" (not spec-test responsibility) <!-- evidence:documentary -->
@@ -1404,7 +1406,7 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 - [ ] Coverage matrix produced for all AC <!-- evidence:documentary -->
 - [ ] [generate] Missing tests generated <!-- evidence:documentary -->
-- [ ] [test-suite] Necessary regression selection executed (full suite only when justified) <!-- evidence:execution -->
+- [ ] [test-suite] Necessary regression selection executed (full suite only when justified) <!-- evidence:execution outcome:passed -->
 - [ ] [visual] Visual baselines captured for missing screens (or `--no-visual` / non-UI feature) <!-- evidence:documentary -->
 - [ ] [visual] `baselines/baseline.manifest.yml` written after every baseline approval (or `--no-visual`) <!-- evidence:documentary -->
 - [ ] [test-report] Test report saved to `checks/YYYY-MM-DD-test.md` <!-- evidence:documentary -->

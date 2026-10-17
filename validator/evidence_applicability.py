@@ -25,6 +25,34 @@ def section(text: str, title: str) -> str | None:
     return "\n".join(lines) if active else None
 
 
+# @spec FR-009: Explicit execution applicability
+# — .specs/features/078-requirement-evidence-integrity/spec.md#fr-009
+def _declares_command(commands: str, token: str) -> bool:
+    """Ignore explicit absent-command rows without hiding resolved or unknown declarations."""
+    fenced = False
+    for line in commands.splitlines():
+        if line.lstrip().startswith(("```", "~~~")):
+            fenced = not fenced
+        if fenced or not re.search(rf"\b{token}\b", line, re.IGNORECASE):
+            continue
+        if line.strip().startswith("|"):
+            cells = [cell.strip().strip("`").strip() for cell in line.strip().strip("|").split("|")]
+            # An absent command is authoritative. A real command still wins even
+            # when its status is "Not run" or a separate row declares N/A.
+            if len(cells) > 1 and cells[1].casefold() in {
+                "n/a",
+                "not applicable",
+                "not run",
+                "none",
+                "—",
+                "-",
+            }:
+                continue
+        # Unknown declarations remain required so discovery fails closed.
+        return True
+    return False
+
+
 def resolve_applicability(
     root: Path | None, feature: str | None, predicate: str
 ) -> dict[str, object]:
@@ -58,7 +86,7 @@ def resolve_applicability(
             return {"predicate": predicate, "applicable": True, "reason": "test_discovery_required"}
         token = "integration" if predicate == "integration-command" else "e2e"
         # This is an explicit declaration predicate, not task-purpose inference.
-        applicable = bool(re.search(rf"\b{token}\b", commands, re.IGNORECASE))
+        applicable = _declares_command(commands, token)
     return {
         "predicate": predicate,
         "applicable": applicable,

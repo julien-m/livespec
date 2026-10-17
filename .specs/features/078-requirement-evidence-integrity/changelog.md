@@ -269,3 +269,16 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/a5afa5c4870749d0bfcf0b35f80bc286/receipt.json`
 - **GREEN receipt:** `.specs/.execution/01917bd3a4b445ceac4993164733cdbe/receipt.json`
 <!-- bugfix:01917bd3a4b445ceac4993164733cdbe -->
+
+## 2026-10-17 — [Bugfix]: Separate generic Test observations from acceptance and ignore explicit absent suite commands
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-test/SKILL.md, .agent-sync/skills/spec-test/expectations.md, tests/test_spec_test_observations.py, validator/evidence_applicability.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_spec_test_observations.py::test_canonical_test_goal_proves_real_observation_without_certifying_review_acs, tests/test_spec_test_observations.py::test_explicit_absence_and_resolved_commands_have_distinct_applicability
+- **RED receipt:** `.specs/.execution/1f051d7a14a14812974a52a41c8f9f93/receipt.json`
+- **GREEN receipt:** `.specs/.execution/ec3f3e562184495fbfd7862261d79d83/receipt.json`
+<!-- bugfix:ec3f3e562184495fbfd7862261d79d83 -->

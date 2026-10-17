@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-10-16
+last_reviewed: 2026-10-17
 ---
 
 <!-- @spec(FR-004) -->
@@ -30,6 +30,8 @@ Before generating or repairing AC/visual tests, the existing progression CLI mus
 
 **stderr:**
 - "_(none expected on happy path)_"
+
+Generic suite and regression tasks consume a current passed observation with no AC mapping; final feature acceptance retains its complete execution/review conjunction. Explicit absent command cells deactivate integration/E2E tasks; unresolved declarations remain required. Historical immutable contracts keep their original meaning.
 
 Collection and test failures are established by runner-owned execution receipts and exit status, not by quoted diagnostic words. Policy 2 rejects failed, missing, empty or entirely skipped results even when a wrapper returns exit 0; documentary mentions cannot establish execution outcomes.
 

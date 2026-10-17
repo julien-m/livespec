@@ -71,3 +71,9 @@ Capture22c6c801 certifies AC007/AC015 with zero gaps and 3875 passing tests. The
 ## 2026-10-16 — Governed cache capture bugfix
 
 RED a5afa5c4 and GREEN 01917bd3 prove real mapped assertions in Git-ignored caches and reject later mapping/review tampering. Closing bugfix gate ELIGIBLE; 29 adjacent tests pass. Existing feature acceptance/status remains unchanged.
+
+## 2026-10-17 — Test observations and explicit absent commands
+
+- Final regression bytes reproduce both defects in runner-owned RED `1f051d7a14a14812974a52a41c8f9f93`; pre-edit gate READY.
+- Necessary selection: 53 passed, zero skipped with real Node 22/Vitest 2.1.9; Ruff/format and full Pyright pass. Native high review found no blockers. GREEN and closing receipts follow through the bugfix trace.
+- Full feature acceptance/status and consumer lifecycle remain unchanged.

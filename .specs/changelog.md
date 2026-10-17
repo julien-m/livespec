@@ -1071,3 +1071,5 @@ Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/
 - 2026-10-17 [Feature096] Bugfix: compare canonical observer asset ownership, retaining consumer root/subdirectory instrumentation and loaded-source bindings. Scoped runner-owned RED/GREEN and38 adjacent integrity/async checks pass.
 
 - 2026-10-17 [Feature096] Bugfix: recursively check Vite PluginOption containers and config/configResolved/apply callbacks; include binding/path/plugin regressions in the seven-module Node CI job. Scoped final RED/GREEN and ordinary plugin controls pass; full final-head remote CI remains required.
+
+- 2026-10-17 [Feature 078] Bugfix: distinguish generic Test observations and explicit absent suite commands; preserve final acceptance and historical contracts.
