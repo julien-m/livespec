@@ -1065,3 +1065,5 @@ Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/
 - Bugfix: execution capture explicitly binds mapping and raw review bytes stored in ignored caches; strict verification and tamper rejection remain unchanged. RED/GREEN receipts recorded in the feature implementation map.
 
 - 2026-10-17 [Feature096] Test:100% AC covered (6/6),0 tests generated; observed Implement98/98 PASS. Inspect [the frozen report](features/096-node-vitest-execution/checks/2026-10-17-test.md); final Test evidence follows separately.
+
+- 2026-10-17 [Feature096] Bugfix: preserve direct async observations with harmless destructuring/default expressions; runner-owned six-case RED/GREEN and five actual shadow-registration controls verified.

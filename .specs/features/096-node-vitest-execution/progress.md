@@ -113,3 +113,5 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Inspect [the exact archived run](../../.runs/spec-implement-2026-10-17T09-04-17.879580-f9cbd9c9-policy2.json) and [closure receipts](.reviews/implementation-evidence/implement-closure-summary.json). Both repo and feature conventions gates pass.
 - Only the generated implementation metadata required a frontmatter correction after capture; no governed application/test/mapping input changed. The complete archived evidence still verifies.
 - Supervisor owns the independent Test phase and pipeline transition. No consumer042 lifecycle, merge or global activation was performed.
+
+- 2026-10-17 Bugfix4302205927: explicit AST pattern bindings; six-case official RED/GREEN, five actual shadow controls and26 adjacent async checks pass. Original invalid controls and failed receipts remain preserved; no whole-feature recertification claimed.

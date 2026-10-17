@@ -94,3 +94,16 @@
 - Inspect [the integration summary](.reviews/integration-evidence/summary.json), [the execution receipt](../../.execution/82d9844e6e834858aeb7a2b4a6d3f199/receipt.json) and [the frozen Test report](checks/2026-10-17-test.md).
 
 <!-- finalize:spec-feature:2026-10-17:de973d5e -->
+
+## 2026-10-17 — [Bugfix]: Distinguish AST pattern bindings from property keys and default expressions
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_execution_vitest_bindings.py, validator/vitest/async-source.ts
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[array-default], tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[catch-property-key], tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[parameter-default], tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[parameter-property-key], tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[property-default], tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[property-key]
+- **RED receipt:** `.specs/.execution/79c6132a0bf04d3a8f79e915844f52e6/receipt.json`
+- **GREEN receipt:** `.specs/.execution/426e1c14745247efb68ab9421427b4fd/receipt.json`
+<!-- bugfix:426e1c14745247efb68ab9421427b4fd -->

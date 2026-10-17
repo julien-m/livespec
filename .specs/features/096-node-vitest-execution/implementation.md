@@ -64,3 +64,34 @@ Inspect [the identity/assertion/citation diagnostic](.reviews/implementation-evi
 ## Final certified closure
 
 Inspect [the actual closure summary](.reviews/implementation-evidence/implement-closure-summary.json): all6 execution ACs certified, machine finalization PASS, both conventions gates PASS, goal complete and archived verify-output success. Earlier incomplete checkpoints above remain historical.
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-17 | implementation | `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[array-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[catch-property-key]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[parameter-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[parameter-property-key]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[property-default]`, `tests/test_execution_vitest_bindings.py::test_async_import_tracking_only_uses_pattern_bindings[property-key]` | `.specs/.execution/79c6132a0bf04d3a8f79e915844f52e6/receipt.json` | `.specs/.execution/426e1c14745247efb68ab9421427b4fd/receipt.json` |
+
+## Current Source Ownership
+
+The dated map retains every previously mapped source and includes both files of the confined binding-pattern correction.
+
+| Date | Owned source |
+|---|---|
+| 2026-10-17 | Inspect [SKILL.md](../../../.agent-sync/skills/spec-implement/SKILL.md) |
+| 2026-10-17 | Inspect [test_acceptance_execution_join.py](../../../tests/test_acceptance_execution_join.py) |
+| 2026-10-17 | Inspect [test_bugfix_goal.py](../../../tests/test_bugfix_goal.py) |
+| 2026-10-17 | Inspect [test_execution_vitest.py](../../../tests/test_execution_vitest.py) |
+| 2026-10-17 | Inspect [test_execution_vitest_bindings.py](../../../tests/test_execution_vitest_bindings.py) |
+| 2026-10-17 | Inspect [test_execution_vitest_boundaries.py](../../../tests/test_execution_vitest_boundaries.py) |
+| 2026-10-17 | Inspect [test_execution_vitest_budgets.py](../../../tests/test_execution_vitest_budgets.py) |
+| 2026-10-17 | Inspect [test_execution_vitest_consumer.py](../../../tests/test_execution_vitest_consumer.py) |
+| 2026-10-17 | Inspect [test_execution_vitest_goal.py](../../../tests/test_execution_vitest_goal.py) |
+| 2026-10-17 | Inspect [test_execution_vitest_integrity.py](../../../tests/test_execution_vitest_integrity.py) |
+| 2026-10-17 | Inspect [test_native_test_option_matrix.py](../../../tests/test_native_test_option_matrix.py) |
+| 2026-10-17 | Inspect [execution_io.py](../../../validator/cli_commands/execution_io.py) |
+| 2026-10-17 | Inspect [execution_vitest.py](../../../validator/execution_vitest.py) |
+| 2026-10-17 | Inspect [execution_vitest_provenance.py](../../../validator/execution_vitest_provenance.py) |
+| 2026-10-17 | Inspect [execution_vitest_results.py](../../../validator/execution_vitest_results.py) |
+| 2026-10-17 | Inspect [async-source.ts](../../../validator/vitest/async-source.ts) |
+| 2026-10-17 | Inspect [config.ts](../../../validator/vitest/config.ts) |
+| 2026-10-17 | Inspect [matcher-observer.ts](../../../validator/vitest/matcher-observer.ts) |

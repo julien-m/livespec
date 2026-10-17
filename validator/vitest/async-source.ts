@@ -18,8 +18,26 @@ const children = (node: Node): Node[] =>
 	});
 
 const bindingNames = (node: Node): string[] => {
-	if (node.type === "Identifier") return [node.name];
-	return children(node).flatMap(bindingNames);
+	switch (node.type) {
+		case "Identifier":
+			return [node.name];
+		case "ObjectPattern":
+			return node.properties.flatMap((property) =>
+				bindingNames(
+					property.type === "RestElement" ? property.argument : property.value,
+				),
+			);
+		case "ArrayPattern":
+			return node.elements.flatMap((element) =>
+				element ? bindingNames(element) : [],
+			);
+		case "AssignmentPattern":
+			return bindingNames(node.left);
+		case "RestElement":
+			return bindingNames(node.argument);
+		default:
+			return [];
+	}
 };
 
 const imports = (program: Program): Set<string> => {
