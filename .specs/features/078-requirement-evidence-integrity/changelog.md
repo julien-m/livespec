@@ -256,3 +256,16 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/e2d13ae570de416fbc8c6ba40e8e685b/receipt.json`
 - **GREEN receipt:** `.specs/.execution/9f1fbbf9ed264615bf0efd56923a5aba/receipt.json`
 <!-- bugfix:9f1fbbf9ed264615bf0efd56923a5aba -->
+
+## 2026-10-17 — [Bugfix]: Preserve execution evidence across generated registry finalization while binding normative references
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_execution_finalize_scope.py, validator/execution_registry.py, validator/execution_scope.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_finalize_scope.py::test_actual_finalize_preserves_referenced_execution_inputs
+- **RED receipt:** `.specs/.execution/336e380ead6e49d8973ab2a8953ade97/receipt.json`
+- **GREEN receipt:** `.specs/.execution/c1913d7924774dbe893a3bd30146f239/receipt.json`
+<!-- bugfix:c1913d7924774dbe893a3bd30146f239 -->

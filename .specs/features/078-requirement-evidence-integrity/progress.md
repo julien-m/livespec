@@ -61,3 +61,9 @@ Capture22c6c801 certifies AC007/AC015 with zero gaps and 3875 passing tests. The
 - Read [the pipeline witness helper](../../../tests/integration/helpers/witness_pipeline.py): bind candidate instructions to the snapshot CLI/interpreter; verify terminal progression with explicit feature and archived reviewer identity; reject usage exit 2, output diagnostics, timeouts and incomplete process control.
 - Read [closure regression tests](../../../tests/test_witness_pipeline_closure.py): actual CLI terminal, pending and malformed-option scenarios plus incomplete-control rejection.
 - Runtime replay under a different Python/pytest installation remains rejected. Native v9 requires fresh capture through its unchanged authoritative frozen CLI before independent closure can pass.
+
+## 2026-10-17 — Confined registry finalization correction
+
+- RED: real capture plus finalize changes referenced README/changelog fingerprints; closing bugfix gate ELIGIBLE (185 lines, 3 files, no reasons).
+- GREEN: 3 targeted tests pass; 29 scoped regressions pass; scoped Ruff/Pyright and feature/repo conventions pass. Read the [bounded correction](implementation.md#2026-10-17--finalization-of-referenced-registries-spec-fix) and [recorded receipts](implementation.md#bugfix-receipts).
+- Frozen HandoffBox dataset read-only: both registry projections remain invariant through actual finalizer builders. Existing capture is stale; the added tool-defect document and future runtime lock update also require recapture. No consumer files changed.

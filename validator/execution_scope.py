@@ -10,6 +10,7 @@ import subprocess
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from .execution_registry import REGISTRY_PROJECTION_VERSION, registry_text
 from .normative_identity import normative_hash
 
 # Generated caches and runner-owned results are not application inputs. Every
@@ -169,7 +170,9 @@ def _referenced_inputs(root: Path, feature: str) -> dict[str, str]:
         seen.add(document)
         if len(seen) > 128:
             raise ValueError("Referenced execution input inventory exceeds 128 documents")
-        content = read_regular(document, root).decode()
+        content = registry_text(
+            document.relative_to(root).as_posix(), read_regular(document, root).decode(), feature
+        )
         for match in _LINK.finditer(content):
             target = urlsplit(unquote(match.group(1)))
             if target.scheme or target.netloc or not target.path:
@@ -185,7 +188,13 @@ def _referenced_inputs(root: Path, feature: str) -> dict[str, str]:
                 for parent in (path, *path.parents)
                 if parent != root and root in parent.parents
             ):
-                included[relative] = digest(read_regular(path, root))
+                data = read_regular(path, root)
+                if relative in {".specs/README.md", ".specs/changelog.md"}:
+                    projected = registry_text(relative, data.decode(), feature)
+                    data = (
+                        f"registry-projection:{REGISTRY_PROJECTION_VERSION}\n{projected}".encode()
+                    )
+                included[relative] = digest(data)
             if path.suffix == ".md":
                 pending.append(path)
     return included

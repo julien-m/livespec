@@ -178,3 +178,12 @@ FR-004 / AC-004: [normative identity](../../../validator/normative_identity.py) 
 | Date | Requirement | Regression tests | RED receipt | GREEN receipt |
 |---|---|---|---|---|
 | 2026-10-16 | implementation | `tests/test_review_plan_packing.py::test_complete_plan_reservation_prevents_cartesian_review_explosion` | `.specs/.execution/e2d13ae570de416fbc8c6ba40e8e685b/receipt.json` | `.specs/.execution/9f1fbbf9ed264615bf0efd56923a5aba/receipt.json` |
+| 2026-10-17 | implementation | `tests/test_execution_finalize_scope.py::test_actual_finalize_preserves_referenced_execution_inputs` | `.specs/.execution/336e380ead6e49d8973ab2a8953ade97/receipt.json` | `.specs/.execution/c1913d7924774dbe893a3bd30146f239/receipt.json` |
+
+## 2026-10-17 — Finalization of referenced registries (spec-fix)
+
+| Date | Scoped correction | Regression |
+|---|---|---|
+| 2026-10-17 | Read [registry projection](../../../validator/execution_registry.py) and [execution scope](../../../validator/execution_scope.py): retain referenced registry prose, feature identity and normative links; project only generated activity, marked global summaries and selected feature lifecycle cells. | Read [real capture/finalize regressions](../../../tests/test_execution_finalize_scope.py). |
+
+Execution scope policy remains `078.2`; registry projection has its own version in the SHA-256 preimage. Old raw registry hashes cannot equal the new projected identity and require a fresh capture. No historical capture is rewritten. Runtime lock, source, tests, configuration and referenced normative documents remain bound. Fenced examples and unmarked history stay bound. Missing/rebuilt registries and archive rotation can still require fresh evidence; this correction covers ordinary existing-registry finalization.

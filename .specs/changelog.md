@@ -1025,3 +1025,7 @@ Read the [implementation checkpoint](features/079-validator-ci-prerequisites/imp
 ### 2026-09-08 — Feature079 v5 independent verification
 
 Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/2026-09-08-v5-postcheck.md): the bounded fixture-isolation cause is fixed, with45/45 targeted tests and16 preserved node IDs. AC-005 remains pending and AC-006 partial; feature076 and final delivery remain separate.
+
+## 2026-10-17 — [Bugfix]: Execution freshness after registry finalization
+
+Read the [078 correction](features/078-requirement-evidence-integrity/implementation.md): versioned generated-registry projection preserves ordinary finalize completion while retaining normative prose, links, source, tests and configuration inputs. Legacy raw manifests require fresh capture; no historical receipt is rewritten.
