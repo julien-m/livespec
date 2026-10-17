@@ -112,3 +112,9 @@ RED a5afa5c4 and GREEN 01917bd3 prove real mapped assertions in Git-ignored cach
 - Native mapping preparation identified missing negative bindings and a weak consumer-copy conjunction; current096 mapping108/40 was corrected and independently reviewed. Product preflight copies passed46/55 unchanged tests, without consumer042 closure or runtime pin changes.
 - Current078 correction naturally exceeds the bugfix lane300-line cap; preserve all changes and use the actual gate/FALLBACK authority. Do not reinterpret prior PASS archives as proof of this repair.
 - Final RED/GREEN, current final reviews/qualities, owner gates and archive remain pending integration of stablePR53; no publication or completion claim at this checkpoint.
+
+## Current command-scope repair evidence
+
+- Main53 `b20ff49d8645e8281e17cd20259019fc4bccff92` is normally merged; its tree matches the integrated reviewed base. Current regression pair RED `d90a624ad7fc4857a5ac8d08e4b7433b` and GREEN `41521b0767034ce18fb84cce829f6d5f` uses identical five-test bytes and command: five passed, no skips. Earlier invalid or failed attempts retain their original receipts.
+- Typed suite declarations require original execution + passed outcome and prohibit acceptance-scope/binding combinations before applicability may deactivate a suite. Npm literals require the real local Vitest shim/entry; direct argv preserves executable identity and every selection token. Only independently verified native Node22 observations gain the declared alias transport.
+- The actual closing lane is FALLBACK because revised096 and delivered097 normative content differs from base3559326; current full078 SPEC/PLAN readiness is READY with actual200000-character plan review budget. Normal filtered FR-009 and FR-011 repair proofs cover AC007/009/010/015; the other twelve ACs are unexamined by this repair, not newly certified. Current mapping review and goal archives determine proof readiness.

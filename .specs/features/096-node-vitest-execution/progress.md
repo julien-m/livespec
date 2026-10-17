@@ -132,3 +132,9 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Single direct Vitest invocation gains explicit cwd; governing feature/project, manifests, storage and budget remain root-owned. Capture and provenance bind cwd/device/inode; archive reads recheck them. Omitted historical cwd means root exclusively.
 - Early genuine RED and GREEN diagnostic receipts are preserved externally; final current source/test bytes, consumer runs and qualities remain to close. Prior whole-feature delivery assertions are historical, not certification of this delta.
 - Additional capability budget: 300 seconds cumulative; the independent 078 correction retains 600 seconds cumulative including its prior approximately 288.2 seconds. No global runtime or consumer pin changed.
+
+## Confined cwd revision checkpoint
+
+- Official delivery revision reviewed current spec/plan and retained all six FR/AC identifiers. Real 40-test acceptance checkpoint `a8bec69844e94013ae9e99eeb410c18d` passed six ACs with zero skips and108 assertion bindings. This predates the final cross-owner source freeze and retains that historical scope.
+- Full mypy (802 files), Pyright, Ruff and formatting passed after stable PR53 integration. The Node22 CI job now includes the cwd module and the actual Test-goal observation module, with its zero-skip guard unchanged.
+- The independent check report and final CLI contract/state/archive provide separate current closure authority; source checkpoints, producer consumer copies and historical archives never imply consumer042 delivery.

@@ -321,3 +321,7 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/59f06396b43048b68f0c9baf2c5a0171/receipt.json`
 - **GREEN receipt:** `.specs/.execution/b4206a7d50f944b1820c971a22cba070/receipt.json`
 <!-- bugfix:b4206a7d50f944b1820c971a22cba070 -->
+
+## 2026-10-17 — [Bugfix]: Bind generic suite observations to every resolved original command, actual cwd and supported literal alias; reject mixed suite/final-acceptance metadata and command-cell applicability false positives. Read [implementation evidence](implementation.md) and [the repair checkpoint](progress.md). Genuine five-test RED/GREEN preserves independent final acceptance and legacy semantics. Normal filtered FR-009/FR-011 evidence follows the printed FALLBACK; this does not certify all historical sixteen ACs.
+
+<!-- finalize:spec-fix:2026-10-17:caf10d18 -->

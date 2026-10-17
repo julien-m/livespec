@@ -196,3 +196,18 @@ Inspect [the independent gap report](checks/2026-10-17.md): six FRs align static
 ## 2026-10-17 — Confined invocation cwd revision
 
 - Revised FR-003/004 and AC-003/004 through the official open/review/close protocol. Added optional confined cwd to direct Vitest capture and CLI, preserving root authority and historical root interpretation. Current implementation validation remains in progress.
+
+## 2026-10-17 — [Check]: Independent confined-cwd revision audit
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **AC impacted:** AC-001 through AC-006; current execution checkpoint, final freshness pending
+- Inspect [the frozen full check report](checks/2026-10-17.md): six FRs and six ACs align with actual code and the observed 40-pass, zero-skip, 108-binding checkpoint. Both unchanged consumer observations account separately for 46 and 55 tests.
+- Effective process cwd, package root and governing authority remain distinct; cwd identity, root-default history and proof/archive verification are explicit. Earlier certificates retain their historical interpretation.
+- The persisted conventions receipt collided with 078; a fresh sequential 096 gate and final cross-owner source freeze/capture remain required. Child goal `508ef695` is not yet closed; no final delivery certification is claimed.
+- **Author:** Codex independent spec-check reviewer (`gpt-6.1-sol`, high)
+
+## 2026-10-17 — [Bugfix]: Confined direct Vitest invocation cwd preserves governing-root authority and historical root defaults. Read [the independent check](checks/2026-10-17.md) and [implementation ownership](implementation.md). The source-owned 40-test checkpoint passed six ACs; current source closure is independently recorded by CLI goals and archives. Producer consumer-copy observations remain distinct from consumer042 delivery.
+
+<!-- finalize:spec-fix:2026-10-17:c1b7f27f -->

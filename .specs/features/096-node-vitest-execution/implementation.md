@@ -129,3 +129,25 @@ Consumer zero, negative and nonfinite numeric test/hook timeouts use the positiv
 | 2026-10-17 | Inspect [execution_capture.py](../../../validator/execution_capture.py) |
 | 2026-10-17 | Inspect [execution_evidence.py](../../../validator/execution_evidence.py) |
 | 2026-10-17 | Inspect [execution_verification.py](../../../validator/execution_verification.py) |
+
+## Confined Invocation Working Directory Revision
+
+- FR-003/004 keep the governing project, feature and storage root fixed while one direct Vitest invocation uses an explicit existing directory confined beneath that root. CLI and API omit cwd by default; historical captures still mean root. Archive reads recheck the same directory identity and runtime provenance.
+- Read [the current independent check](checks/2026-10-17.md) and [the real cwd regressions](../../../tests/test_execution_working_directory.py). The source-owned 40-test/108-binding checkpoint passed all six ACs; later source closure belongs to the current CLI goal archive, never to an older certificate. Producer copies observed 46/55 unchanged consumer tests and do not close consumer042.
+
+| Date | Requirement | Owned source |
+|---|---|---|
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_working_directory.py](../../../validator/execution_working_directory.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_capture.py](../../../validator/execution_capture.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_evidence.py](../../../validator/execution_evidence.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_runner.py](../../../validator/execution_runner.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_timeout_capture.py](../../../validator/execution_timeout_capture.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_vitest.py](../../../validator/execution_vitest.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_vitest_provenance.py](../../../validator/execution_vitest_provenance.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_io.py](../../../validator/cli_commands/execution_io.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [operation_options.py](../../../validator/cli_commands/operation_options.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [test_cmd.py](../../../validator/cli_commands/test_cmd.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [test_execution_working_directory.py](../../../tests/test_execution_working_directory.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [test_execution_vitest_consumer.py](../../../tests/test_execution_vitest_consumer.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [ci.yml](../../../.github/workflows/ci.yml) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [README.md](../../../README.md) |

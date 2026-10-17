@@ -85,6 +85,13 @@ def apply_evidence_policy(
         )
         kind = "documentary" if specialized else declared.get(description, "unclassified")
         attributes = metadata.get(description, {})
+        if "suite" in attributes and (
+            kind != "execution"
+            or attributes.get("outcome") != "passed"
+            or "ac-scope" in attributes
+            or "ac-binding" in attributes
+        ):
+            raise ValueError("suite_requires_unscoped_passing_execution_observation")
         if "applicable" in attributes:
             from .evidence_applicability import resolve_applicability
 

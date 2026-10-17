@@ -60,7 +60,7 @@ def _command_key(root: Path, argv: list[str], cwd: Path, *, alias: bool = True) 
     """Normalize supported real aliases without executing scripts or inventing selections."""
     from .execution_cargo_command import is_cargo, parse_cargo_test
     from .execution_runner import _pytest_args
-    from .execution_vitest import _selection, is_vitest
+    from .execution_vitest import is_vitest
 
     cwd = cwd.resolve(strict=True)
     cwd.relative_to(root)
@@ -74,32 +74,71 @@ def _command_key(root: Path, argv: list[str], cwd: Path, *, alias: bool = True) 
         script = scripts[name]
         if re.search(r"[;&|`$<>\r\n#*?\[\]{}()!~]", script):
             raise ValueError("suite_script_requires_explicit_resolved_command")
-        return _command_key(root, shlex.split(script), cwd, alias=False)
+        resolved = shlex.split(script)
+        if not resolved or resolved[0] != "vitest":
+            raise ValueError("suite_npm_script_requires_literal_local_vitest")
+        return _command_key(root, resolved, cwd, alias=False)
+    if argv[0] == "vitest" and alias:
+        raise ValueError("suite_direct_vitest_requires_explicit_resolved_command")
     if argv[0] == "vitest" or is_vitest(argv):
-        raw = (
-            ["node", str(cwd / "node_modules/vitest/vitest.mjs"), *argv[1:]]
-            if argv[0] == "vitest"
-            else argv
-        )
-        package, config, selected = _selection(raw, root, cwd)
-        return [
-            "vitest",
-            cwd.relative_to(root).as_posix(),
-            package.relative_to(root).as_posix(),
-            config.relative_to(root).as_posix() if config else "",
-            *selected,
-            "config-sha256",
-            hashlib.sha256(config.read_bytes()).hexdigest() if config else "",
-            "package-sha256",
-            hashlib.sha256((package / "package.json").read_bytes()).hexdigest(),
-        ]
+        return _vitest_command_key(root, argv, cwd)
     if is_cargo(argv):
         parse_cargo_test(argv)
-        return ["cargo", cwd.relative_to(root).as_posix(), *argv[1:]]
+        import os
+        import shutil
+
+        candidate = str(cwd / argv[0]) if "/" in argv[0] else argv[0]
+        search = os.pathsep.join(str(cwd / entry) for entry in os.get_exec_path())
+        program = shutil.which(candidate, path=search)
+        if program is None:
+            raise ValueError("suite_cargo_proxy_unresolved")
+        return ["cargo", str(Path(program).absolute()), cwd.relative_to(root).as_posix(), *argv[1:]]
     args = _pytest_args(argv)
     if args is not None:
         return ["pytest", cwd.relative_to(root).as_posix(), *args]
     raise ValueError("suite_command_unresolved")
+
+
+def _vitest_command_key(root: Path, argv: list[str], cwd: Path) -> list[str]:
+    """Keep direct transport identity; only the literal Vitest alias leaves Node unspecified."""
+    import os
+    import shutil
+
+    from .execution_vitest import _selection
+
+    alias = argv[0] == "vitest"
+    raw = ["node", str(cwd / "node_modules/vitest/vitest.mjs"), *argv[1:]] if alias else argv
+    package, config, selected = _selection(raw, root, cwd)
+    modules = (package / "node_modules").resolve(strict=True)
+    cli = (cwd / raw[1]).resolve(strict=True)
+    if not modules.is_relative_to(package) or cli != (modules / "vitest/vitest.mjs").resolve(
+        strict=True
+    ):
+        raise ValueError("suite_requires_selected_package_local_vitest_entry")
+    shim = cwd / "node_modules/.bin/vitest"
+    if alias and (not shim.is_file() or shim.resolve(strict=True) != cli):
+        raise ValueError("suite_npm_vitest_shim_requires_canonical_local_entry")
+    candidate = str(cwd / raw[0]) if "/" in raw[0] else raw[0]
+    search = os.pathsep.join(str(cwd / entry) for entry in os.get_exec_path())
+    executable = shutil.which(candidate, path=search) if not alias else None
+    transport = "native-node22"
+    if not alias:
+        if executable is None:
+            raise ValueError("suite_direct_node_executable_unresolved")
+        transport = str(Path(executable).resolve(strict=True))
+    return [
+        "vitest",
+        transport,
+        cli.relative_to(root).as_posix(),
+        cwd.relative_to(root).as_posix(),
+        package.relative_to(root).as_posix(),
+        config.relative_to(root).as_posix() if config else "",
+        *selected,
+        "config-sha256",
+        hashlib.sha256(config.read_bytes()).hexdigest() if config else "",
+        "package-sha256",
+        hashlib.sha256((package / "package.json").read_bytes()).hexdigest(),
+    ]
 
 
 def suite_binding(root: Path | None, feature: str | None, suite: str) -> dict[str, Any]:
@@ -150,7 +189,23 @@ def suite_evidence_missing(
         argv = capture.budget.get("scope") if capture.budget else None
         if not isinstance(argv, list) or not all(isinstance(arg, str) for arg in argv):
             return ["suite_original_command_missing"]
-        observed.append(_command_key(root, argv, capture_execution_cwd(capture)))
+        from .execution_vitest import is_vitest
+
+        if is_vitest(argv):
+            node = capture.runner_provenance.get("node_path")
+            if not isinstance(node, str) or not Path(node).is_absolute():
+                return ["suite_actual_node_provenance_missing"]
+            argv = [node, *argv[1:]]
+        elif capture.runner_provenance.get("runner") == "cargo":
+            cargo = capture.runner_provenance.get("cargo_path")
+            if not isinstance(cargo, str) or not Path(cargo).is_absolute():
+                return ["suite_actual_cargo_provenance_missing"]
+            argv = [cargo, *argv[1:]]
+        key = _command_key(root, argv, capture_execution_cwd(capture))
+        observed.append(key)
+        if key[0] == "vitest":
+            # The independently verified receipt establishes native Node22 for literal npm aliases.
+            observed.append([key[0], "native-node22", *key[2:]])
     return (
         []
         if all(command in observed for command in binding["commands"])

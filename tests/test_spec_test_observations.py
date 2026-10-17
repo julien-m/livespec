@@ -6,6 +6,7 @@ import json
 import os
 import re
 import shutil
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -76,6 +77,7 @@ def _prepare_review_only_observation(
     (directory / "plan.md").write_text(PLAN.split("| Integration / E2E")[0])
     package = project / "package.json"
     data = json.loads(package.read_text())
+    _prepare_local_alias(project)
     data["scripts"] = {"test": "vitest run"}
     package.write_text(json.dumps(data))
     monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", project / "absent-hooks")
@@ -168,7 +170,7 @@ def _suite_archive_errors(
     extra: list[Path] | None = None,
 ) -> list[str]:
     """Recheck canonical suite scope at the existing policy2 archive boundary."""
-    # The same immutable declaration is rechecked at both archive and archive-read boundaries.
+    # Preserve all declarations; unrelated pending tasks keep this partial goal incomplete.
     from validator.acceptance_evidence import archived_policy2_evidence_errors
 
     artifact = {
@@ -180,6 +182,9 @@ def _suite_archive_errors(
         "command": "spec-test",
         "goal": {
             "tasks": [
+                {"id": t["id"], "status": "pending"} for t in contract["tasks"] if t not in generic
+            ]
+            + [
                 {
                     "id": t["id"],
                     "status": "complete",
@@ -195,9 +200,17 @@ def _suite_archive_errors(
     return archived_policy2_evidence_errors(artifact, root)
 
 
+def _prepare_local_alias(root: Path) -> None:
+    """Install the ordinary local npm shim inside this owned fixture only."""
+    shim = root / "node_modules/.bin/vitest"
+    shim.parent.mkdir(exist_ok=True)
+    shim.symlink_to("../vitest/vitest.mjs")
+
+
 def _prepare_suite_commands(vitest_project: VitestProject) -> tuple[str, ...]:
     """Prepare two real package cwd units and distinct root integration/E2E selections."""
     root = vitest_project.root
+    _prepare_local_alias(root)
     names = ("dashboard", "slides", "integration", "e2e")
     for index, name in enumerate(names):
         cwd = root / name if index < 2 else root
@@ -205,7 +218,7 @@ def _prepare_suite_commands(vitest_project: VitestProject) -> tuple[str, ...]:
             cwd.mkdir()
             for file in ("package.json", "package-lock.json", "vitest.config.ts"):
                 shutil.copy2(root / file, cwd / file)
-            shutil.copytree(root / "node_modules", cwd / "node_modules")
+            shutil.copytree(root / "node_modules", cwd / "node_modules", symlinks=True)
         VitestProject(cwd, vitest_project.node).write(
             "test('observed', () => { expect(1).toBe(1); });", name + ".test.ts"
         )
@@ -226,11 +239,19 @@ def _prepare_suite_commands(vitest_project: VitestProject) -> tuple[str, ...]:
     return names
 
 
-def _capture_suite(project: VitestProject, name: str) -> Path:
+def _capture_suite(project: VitestProject, name: str, *, root_cwd: bool = False) -> Path:
     """Capture declared cwd while keeping governing evidence at the project root."""
-    cwd = project.root / name if name in {"dashboard", "slides"} else project.root
+    package = project.root / name if name in {"dashboard", "slides"} else project.root
+    cwd = project.root if root_cwd else package
+    selection = ["--root", str(package)] if root_cwd else []
     result = capture_execution(
-        [str(project.node), str(cwd / "node_modules/vitest/vitest.mjs"), "run", name + ".test.ts"],
+        [
+            str(project.node),
+            str(package / "node_modules/vitest/vitest.mjs"),
+            "run",
+            *selection,
+            name + ".test.ts",
+        ],
         project_root=project.root,
         feature=FEATURE,
         adapter="junit",
@@ -261,7 +282,7 @@ def test_suite_observations_reject_wrong_selection_and_require_complete_aggregat
     contract = json.loads(render_goal_contract_file(goal))
     state = json.loads(render_goal_state_file(goal))
     receipts = [_capture_suite(vitest_project, name) for name in names]
-    wrong_cwd = vitest_project.capture("--root", "dashboard", "dashboard.test.ts")
+    wrong_cwd = _capture_suite(vitest_project, "dashboard", root_cwd=True)
     generic = [
         t
         for t in contract["tasks"]
@@ -296,3 +317,52 @@ def test_suite_observations_reject_wrong_selection_and_require_complete_aggregat
     assert not prove_goal_task(contract, state, generic[0]["id"], evidence, project_root=root)[
         "accepted"
     ]
+
+
+def test_vitest_binding_retains_explicit_transport_and_rejects_other_entry(
+    vitest_project: VitestProject,
+) -> None:
+    """A direct command cannot borrow a genuine receipt from another executable or CLI."""
+    from validator.evidence_applicability import _command_key
+
+    root = vitest_project.root
+    real = vitest_project.command()
+    other = root / "tools/vitest.mjs"
+    other.parent.mkdir()
+    other.write_text("throw new Error('another program');\n")
+    rejected = False
+    try:
+        _command_key(root, [real[0], str(other), "run"], root)
+    except ValueError:
+        rejected = True
+    assert rejected
+    rejected = False
+    try:
+        _command_key(root, ["vitest", "run"], root)
+    except ValueError:
+        rejected = True
+    assert rejected
+    different = [sys.executable, *real[1:]]
+    assert _command_key(root, real, root) != _command_key(root, different, root)
+
+
+def test_suite_metadata_cannot_override_acceptance_or_evidence_category(tmp_path: Path) -> None:
+    """Suite observations cannot replace final acceptance or reinterpret another evidence kind."""
+    from validator.evidence_policy import apply_evidence_policy
+
+    declarations = [
+        "execution ac-scope:feature outcome:passed suite:unit",
+        "execution ac-binding:reviewed-spec suite:unit outcome:passed",
+        "review review-kind:spec outcome:passed suite:unit",
+        "execution suite:unit",
+    ]
+    rejected = []
+    skill = tmp_path / "SKILL.md"
+    for declaration in declarations:
+        skill.write_text("- [full] Observe <!-- evidence:" + declaration + " -->\n")
+        tasks = [{"id": "test.observe", "description": "Observe", "required_evidence": []}]
+        try:
+            apply_evidence_policy(tasks, skill, project_root=tmp_path, feature=FEATURE)
+        except ValueError:
+            rejected.append(declaration)
+    assert rejected == declarations

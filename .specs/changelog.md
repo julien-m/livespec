@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-17 — [Feature 078] Bind generic suite observations to every resolved original command, actual cwd and supported literal alias; reject mixed suite/final-acceptance metadata and command-cell applicability false positives. Read [implementation evidence](features/078-requirement-evidence-integrity/implementation.md) and [the repair checkpoint](features/078-requirement-evidence-integrity/progress.md). Genuine five-test RED/GREEN preserves independent final acceptance and legacy semantics. Normal filtered FR-009/FR-011 evidence follows the printed FALLBACK; this does not certify all historical sixteen ACs.
+<!-- finalize:spec-fix:2026-10-17:caf10d18 -->
+
+## 2026-10-17 — [Feature 096] Confined direct Vitest invocation cwd preserves governing-root authority and historical root defaults. Read [the independent check](features/096-node-vitest-execution/checks/2026-10-17.md) and [implementation ownership](features/096-node-vitest-execution/implementation.md). The source-owned 40-test checkpoint passed six ACs; current source closure is independently recorded by CLI goals and archives. Producer consumer-copy observations remain distinct from consumer042 delivery.
+<!-- finalize:spec-fix:2026-10-17:c1b7f27f -->
+
 ## 2026-10-17 — [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture
 <!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
 
