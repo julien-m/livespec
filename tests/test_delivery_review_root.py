@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 from typing import cast
 
@@ -50,8 +51,8 @@ def root_project(
     return project
 
 
-# @spec AC-001: Preserve root SHA — .specs/features/096-root-feature-delivery-review/spec.md#ac-001
-# @spec AC-002: Complete root tree — .specs/features/096-root-feature-delivery-review/spec.md#ac-002
+# @spec AC-001: Preserve root SHA — .specs/features/097-root-feature-delivery-review/spec.md#ac-001
+# @spec AC-002: Complete root tree — .specs/features/097-root-feature-delivery-review/spec.md#ac-002
 def test_root_baseline_covers_bootstrap_and_preserves_identity(
     root_project: DeliveryProject,
 ) -> None:
@@ -82,7 +83,7 @@ def test_root_baseline_covers_bootstrap_and_preserves_identity(
     assert "scope_changed" in _record(project, "review", sorted(files), "reviewer")
 
 
-# @spec AC-004: Reject newer bases — .specs/features/096-root-feature-delivery-review/spec.md#ac-004
+# @spec AC-004: Reject newer bases — .specs/features/097-root-feature-delivery-review/spec.md#ac-004
 def test_root_feature_rejects_newer_base(root_project: DeliveryProject) -> None:
     project = root_project
     root_commit = git(project.root, "rev-parse", "HEAD").strip()
@@ -137,7 +138,7 @@ def _git_state(project: DeliveryProject) -> tuple[str, bytes, str, str]:
     )
 
 
-# @spec AC-006: Preserve Git state — .specs/features/096-root-feature-delivery-review/spec.md#ac-006
+# @spec AC-006: Preserve Git state — .specs/features/097-root-feature-delivery-review/spec.md#ac-006
 @pytest.mark.parametrize("root_project", ["code"], indirect=True)
 def test_root_cycle_preserves_git_and_covers_bootstrap(root_project: DeliveryProject) -> None:
     project = root_project
@@ -145,6 +146,11 @@ def test_root_cycle_preserves_git_and_covers_bootstrap(root_project: DeliveryPro
     (project.root / "link.py").symlink_to("bootstrap.py")
     git(project.root, "update-index", "--add", "--cacheinfo", f"160000,{root_commit},sub")
     (project.root / "sub").mkdir()
+    git(project.root, "config", "diff.autoRefreshIndex", "true")
+    bootstrap = project.root / "bootstrap.py"
+    stat = bootstrap.stat()
+    # A two-second mtime shift makes the index cache stale without changing file bytes.
+    os.utime(bootstrap, ns=(stat.st_atime_ns, stat.st_mtime_ns + 2_000_000_000))
     before = _git_state(project)
     code, scope = _prepare(project, root_commit)
     assert code == 0, scope
@@ -157,7 +163,7 @@ def test_root_cycle_preserves_git_and_covers_bootstrap(root_project: DeliveryPro
     assert _git_state(project) == before
 
 
-# @spec AC-005: Coverage — .specs/features/096-root-feature-delivery-review/spec.md#ac-005
+# @spec AC-005: Coverage — .specs/features/097-root-feature-delivery-review/spec.md#ac-005
 @pytest.mark.parametrize("root_project", ["code"], indirect=True)
 def test_root_report_cannot_omit_bootstrap(root_project: DeliveryProject) -> None:
     project = root_project
@@ -170,7 +176,7 @@ def test_root_report_cannot_omit_bootstrap(root_project: DeliveryProject) -> Non
     ]
 
 
-# @spec AC-003: Currency — .specs/features/096-root-feature-delivery-review/spec.md#ac-003
+# @spec AC-003: Currency — .specs/features/097-root-feature-delivery-review/spec.md#ac-003
 @pytest.mark.parametrize("root_project", ["code"], indirect=True)
 def test_root_lifecycle_stability_and_normative_currency(root_project: DeliveryProject) -> None:
     project = root_project

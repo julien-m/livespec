@@ -45,7 +45,7 @@ __all__ = [
 
 
 # @spec FR-003: Share root scope at every review stage
-#   — .specs/features/096-root-feature-delivery-review/spec.md#fr-003
+#   — .specs/features/097-root-feature-delivery-review/spec.md#fr-003
 def prepare_scope(root: Path, feature: str, base: str, lane: Lane) -> tuple[dict[str, Any], str]:
     """Write and return the review scope; the second value is an error code or ''."""
     target = scope_path(root, feature)

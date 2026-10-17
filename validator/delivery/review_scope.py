@@ -67,7 +67,7 @@ def _identity(root: Path, relative: str) -> str:
 # @spec FR-004: Complete feature diff scope
 #   — .specs/features/086-risk-proportional-delivery/spec.md#fr-004
 # @spec FR-002: Include bootstrap and later identities
-#   — .specs/features/096-root-feature-delivery-review/spec.md#fr-002
+#   — .specs/features/097-root-feature-delivery-review/spec.md#fr-002
 def current_scope(root: Path, base_commit: str, feature: str | None = None) -> dict[str, str]:
     """Hash every counted path against the base, including a root-created feature tree.
 
@@ -100,9 +100,9 @@ def current_scope(root: Path, base_commit: str, feature: str | None = None) -> d
 
 
 # @spec FR-001: Preserve exact root baseline eligibility
-#   — .specs/features/096-root-feature-delivery-review/spec.md#fr-001
+#   — .specs/features/097-root-feature-delivery-review/spec.md#fr-001
 # @spec FR-004: Preserve Git storage and original SHA
-#   — .specs/features/096-root-feature-delivery-review/spec.md#fr-004
+#   — .specs/features/097-root-feature-delivery-review/spec.md#fr-004
 def _root_feature_base(root: Path, feature: str, commit: str) -> bool:
     """True only for a parentless commit containing this feature's original spec."""
     parents = _git(root, "rev-list", "--parents", "-n", "1", commit).decode().split()[1:]

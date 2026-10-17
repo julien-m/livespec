@@ -72,6 +72,8 @@ def resolve_commit(root: Path, base: str) -> str:
 
 # @spec FR-006: Bugfix diff collection
 #   — .specs/features/084-bugfix-lane/spec.md#fr-006
+# @spec FR-004: Preserve Git index bytes during scope reads
+#   — .specs/features/097-root-feature-delivery-review/spec.md#fr-004
 def collect_diff(root: Path, base: str) -> list[DiffEntry]:
     """Return tracked changes versus `base` (staged or not) plus untracked non-ignored files.
 
@@ -82,7 +84,19 @@ def collect_diff(root: Path, base: str) -> list[DiffEntry]:
     entries: dict[str, DiffEntry] = {}
     # --relative keeps paths project-relative (and scoped) when .specs/ lives in a
     # subdirectory of a larger repository, matching ls-files and receipt manifests.
-    numstat = _git(root, "diff", "--numstat", "-z", "--no-renames", "--relative", base, "--")
+    # Git diff can refresh cached stats even with optional locks disabled.
+    numstat = _git(
+        root,
+        "-c",
+        "diff.autoRefreshIndex=false",
+        "diff",
+        "--numstat",
+        "-z",
+        "--no-renames",
+        "--relative",
+        base,
+        "--",
+    )
     for record in numstat.split(b"\0"):
         if not record:
             continue

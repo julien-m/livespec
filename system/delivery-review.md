@@ -1,6 +1,6 @@
 <!-- @spec FR-008: End-of-feature delivery review protocol — .specs/features/086-risk-proportional-delivery/spec.md#fr-008 -->
 
-<!-- @spec FR-004: Original root SHA and read-only review — .specs/features/096-root-feature-delivery-review/spec.md#fr-004 -->
+<!-- @spec FR-004: Original root SHA and read-only review — .specs/features/097-root-feature-delivery-review/spec.md#fr-004 -->
 
 # Delivery Review — once per feature, on the complete diff
 

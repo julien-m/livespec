@@ -13,7 +13,7 @@ scope: M
 
 Treat the exact original spec-creation root SHA as the logical pre-root baseline. Reuse existing delivery scope identities and exclusions, union the root tree with the later working diff, and recompute the same scope at prepare, record and verify. Two local steps; no new command, dependency, receipt field or Git mutation.
 
-Informative: inspect the [candidate scope code](../../../../validator/delivery/review_scope.py), [review consumers](../../../../validator/delivery/review.py), [root regressions](../../../../tests/test_delivery_review_root.py) and [ordinary base regressions](../../../../tests/test_delivery_review_base.py). These uncommitted candidates and their earlier passing checks are implementation context, not feature 096 acceptance evidence.
+Informative: inspect the [candidate scope code](../../../validator/delivery/review_scope.py), [review consumers](../../../validator/delivery/review.py), [root regressions](../../../tests/test_delivery_review_root.py) and [ordinary base regressions](../../../tests/test_delivery_review_base.py). These uncommitted candidates and their earlier passing checks are implementation context, not feature 097 acceptance evidence.
 
 ## Technical Context
 
@@ -37,7 +37,7 @@ Informative: inspect the [candidate scope code](../../../../validator/delivery/r
 | Fail fast | Pass: retain `diff_unavailable`, `base_not_feature_start`, `scope_changed`, `scope_not_covered` and existing exits |
 | Minimal composable surface | Pass: no new flag/command/schema, cache, retry layer or abstraction |
 | Local operation | Pass: temporary-repository proof; no hosted service or new dependency |
-| Test isolation and traceability | Pass: tests stay in temporary repositories; qualified 096 mappings bind exact executed assertions |
+| Test isolation and traceability | Pass: tests stay in temporary repositories; qualified 097 mappings bind exact executed assertions |
 
 ## Scope Decisions
 
@@ -118,8 +118,8 @@ No ER diagram or API contract: no new data entity/table or external endpoint is 
 **FR covered:** FR-001.1: Preserve root and ordinary eligibility; FR-002.1: Union root paths and existing identities; FR-003.1: Share scope across review stages; FR-004.1: Keep original SHA and read-only Git.
 
 **Prerequisite:** Current spec/plan reviews and shared Analyze readiness.
-**Required inputs:** Approved 096 spec, current scope consumers and existing exclusions/identity helper.
-**Action:** Inspect and retain or minimally correct the existing candidate in `validator/delivery/review_scope.py` (`base_problem`, `_root_feature_base`, `current_scope`) and `validator/delivery/review.py` (prepare, record, latest-pass verification). Update `system/delivery-review.md` to explain root SHA semantics, the root-tree union, exclusions and reviewer inputs (`git show --format= --root <root-sha>` plus later diff and untracked content). Add 096 traceability where the exception is implemented; leave 086's unrelated spec/plan rules untouched.
+**Required inputs:** Approved 097 spec, current scope consumers and existing exclusions/identity helper.
+**Action:** Inspect and retain or minimally correct the existing candidate in `validator/delivery/review_scope.py` (`base_problem`, `_root_feature_base`, `current_scope`) and `validator/delivery/review.py` (prepare, record, latest-pass verification). Update `system/delivery-review.md` to explain root SHA semantics, the root-tree union, exclusions and reviewer inputs (`git show --format= --root <root-sha>` plus later diff and untracked content). Add 097 traceability where the exception is implemented; leave 086's unrelated spec/plan rules untouched.
 **Execution evidence:** Bounded diff against the baseline, Ruff/Pyright outputs and targeted eligibility/identity regressions from Step 2.
 **Success criteria:** AC-001 through AC-005 use identical root semantics; ordinary bases and report policies retain their prior behavior. No added dependency, public command or receipt field.
 **Failure handling:** Fix only observed eligibility/identity/consumer failures, rerun affected checks after the change, and stop for a remaining shared progression or review blocker.
@@ -130,7 +130,7 @@ No ER diagram or API contract: no new data entity/table or external endpoint is 
 
 **Prerequisite:** Step 1 candidate matches the reviewed design.
 **Required inputs:** Existing root/base tests and temporary-repository fixtures; final test assertion sources.
-**Action:** Extend `tests/test_delivery_review_root.py` only for missing distinct proof: root spec and plan lifecycle-only stability, real normative and source changes refused by record/verify, root symlink/gitlink identity, omitted-bootstrap report refusal, and byte-for-byte Git state equality across a complete successful cycle. Reuse the existing root-only/mixed/code variants and forged-newer-base cases; reuse ordinary base, uncommitted-spec, unrelated-base and report-policy tests where sufficient. Add a small nonparametrized temporary-repository case only when it supplies an uncovered assertion. For AC-006, snapshot the local fixture's complete object-ID inventory, raw index bytes, HEAD and refs/history after fixture setup and compare after prepare, record and verify; all setup mutations precede the snapshot. Observe no Git operations beyond existing read-only queries and no writes outside existing feature caches.
+**Action:** Inspect the current `tests/test_delivery_review_root.py` candidate and retain its existing assertions; extend only for proof still missing: root spec and plan lifecycle-only stability, real normative and source changes refused by record/verify, root symlink/gitlink identity, omitted-bootstrap report refusal, and byte-for-byte Git state equality across a complete successful cycle. Reuse the existing root-only/mixed/code variants and forged-newer-base cases; reuse ordinary base, uncommitted-spec, unrelated-base and report-policy tests where sufficient. Add a small nonparametrized temporary-repository case only when it supplies an uncovered assertion. For AC-006, snapshot the local fixture's complete object-ID inventory, raw index bytes, HEAD and refs/history after fixture setup and compare after prepare, record and verify; all setup mutations precede the snapshot. Observe no Git operations beyond existing read-only queries and no writes outside existing feature caches.
 **Execution evidence:** Current pytest outcomes, exact AC-to-assertion mapping and its real independent review receipt, runner-owned JUnit execution receipt, conventions receipt, independent final delivery reports and verification.
 **Success criteria:** AC-001 through AC-006 and SC-001, SC-002 have current exact assertion proof; required reports omit no bootstrap paths; Git snapshots are equal. Old root feature-only receipts missing bootstrap paths are rejected as stale. Existing ordinary lifecycle-only and non-root base behavior remains proven.
 **Failure handling:** Diagnose a failing assertion from its actual source/output before changing code. Do not enlarge matrices or repeat passing suites without a new change or unresolved risk. Stop when required mapping/execution/review evidence is unavailable; do not manufacture readiness.
@@ -144,7 +144,7 @@ No ER diagram or API contract: no new data entity/table or external endpoint is 
 | FR-003; AC-003, AC-004, AC-005 | Same map/base at prepare/record/verify; complete independent reports pass; omitted bootstrap reports fail `scope_not_covered`; forged bases and stale receipts refuse | Root tests plus existing delivery report-policy tests |
 | FR-004; AC-001, AC-005, AC-006; SC-002 | Complete successful review cycle preserves object-ID inventory, raw index bytes and HEAD/refs/history; CLI/cache schema unchanged | Root cycle snapshot assertions and existing report/CLI tests |
 
-Parameterization cannot use anchor-derived certification. Build the existing reviewed acceptance mapping with final qualified 096 AC IDs, actual executed node IDs (including variant IDs), exact single-assertion source spans/SHA and outcome justifications. Prepare mapping review with `python3 -m validator.cli test --feature 096-root-feature-delivery-review --acceptance-mapping <project-mapping-path> --prepare-mapping-review`; dispatch the complete prepared prompts/schema to an independent native reviewer, ingest its actual raw bundle with `--ingest-mapping-review <actual-bundle-path>`, then capture execution with `--execution-command '<resolved-test-command>' --report-adapter junit`. No test name, source anchor or passing percentage substitutes for observed reviewed assertions. Keep generated mapping/capture artifacts in the existing feature run area; introduce no new evidence format.
+Parameterization cannot use anchor-derived certification. Build the existing reviewed acceptance mapping with final qualified 097 AC IDs, actual executed node IDs (including variant IDs), exact single-assertion source spans/SHA and outcome justifications. Prepare mapping review with `python3 -m validator.cli test --feature 097-root-feature-delivery-review --acceptance-mapping <project-mapping-path> --prepare-mapping-review`; dispatch the complete prepared prompts/schema to an independent native reviewer, ingest its actual raw bundle with `--ingest-mapping-review <actual-bundle-path>`, then capture execution with `--execution-command '<resolved-test-command>' --report-adapter junit`. No test name, source anchor or passing percentage substitutes for observed reviewed assertions. Keep generated mapping/capture artifacts in the existing feature run area; introduce no new evidence format.
 
 ### Resolved Test Commands
 
@@ -155,7 +155,7 @@ Parameterization cannot use anchor-derived certification. Build the existing rev
 | Lint | `ruff check validator/delivery/review.py validator/delivery/review_scope.py tests/test_delivery_review_root.py` | Ruff executable verified |
 | Format | `ruff format --check validator/delivery/review.py validator/delivery/review_scope.py tests/test_delivery_review_root.py` | Ruff executable verified |
 | Type check | `pyright validator/` | Existing strict configuration; executable verified |
-| Feature conventions | `python3 -m validator.cli conventions verify --feature 096-root-feature-delivery-review --json` | Existing CLI; implementation mapping determines changed scope |
+| Feature conventions | `python3 -m validator.cli conventions verify --feature 097-root-feature-delivery-review --json` | Existing CLI; implementation mapping determines changed scope |
 | UI/E2E/release | Not applicable | Local CLI-only change; no UI, remote API or release-only proof |
 
 ### Quality Engineering and Validation Budget
@@ -164,7 +164,7 @@ Parameterization cannot use anchor-derived certification. Build the existing rev
 - P1 compatibility: reuse existing ordinary-base, lifecycle and report-policy checks; final native review judges the complete bounded diff and mapping semantics.
 - Local functional proof uses the existing three root variants, one successful cycle per needed case and only missing distinct assertions. Expected root/base run is below 90 seconds; if the broader family is justified, its observed candidate duration is about 111 seconds, so declare a 180-second aggregate cap including capture preparation and cleanup before running it. Do not repeat it after PASS without new cause.
 - Preserve the existing per-query 60-second Git timeout. A timeout means stop, inspect the exact failed phase and revise a justified execution plan; no identical rerun or automatic timeout inflation.
-- Remaining gaps at planning: final assertions, independent reviewed mapping, runner-owned certification, conventions and final delivery reviews. Earlier 111-test evidence establishes candidate regression context only.
+- Remaining gates at planning: verify the final assertions, obtain a current owner-097 reviewed mapping and runner-owned certification, conventions and final delivery reviews. Existing candidate assertions and prior owner evidence are context only; never duplicate adequate cases or relabel their receipts. Earlier 111-test evidence establishes candidate regression context only.
 
 ## Risks and Considerations
 
