@@ -38,7 +38,13 @@ const asset = (name: string): string =>
 const timeout = (name: string, existing: number | undefined): number => {
 	const limit = Number(required(name));
 	if (!Number.isFinite(limit) || limit <= 0) throw new Error(`Invalid ${name}`);
-	return Math.min(existing ?? limit, limit);
+	if (existing !== undefined && typeof existing !== "number")
+		throw new Error(`Invalid configured timeout: ${name}`);
+	const configured =
+		typeof existing === "number" && Number.isFinite(existing) && existing > 0
+			? existing
+			: limit;
+	return Math.min(configured, limit);
 };
 
 /** Normalize known PluginOption containers before checking every concrete lifecycle boundary. */

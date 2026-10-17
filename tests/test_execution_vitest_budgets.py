@@ -5,15 +5,17 @@ from __future__ import annotations
 import json
 import os
 import time
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
+from click.testing import Result
 
 from tests.execution_vitest_fixture import FEATURE, VitestProject
 from tests.execution_vitest_fixture import vitest_dependencies as vitest_dependencies
 from tests.execution_vitest_fixture import vitest_project as vitest_project
 from validator import execution_vitest_provenance
-from validator.execution_evidence import verify_execution_observation
+from validator.execution_evidence import EvidenceVerification, verify_execution_observation
 
 pytestmark = pytest.mark.integration
 
@@ -110,3 +112,170 @@ def test_runtime_expiry_terminates_owned_descendant_and_heartbeat(
     time.sleep(0.08)
     assert heartbeat.read_bytes() == before
     _assert_timeout(vitest_project, receipt)
+
+
+@pytest.mark.parametrize(
+    "phase,value,milliseconds",
+    [
+        ("test", "0", 120),
+        ("hook", "0", 120),
+        ("test", "-1", 120),
+        ("hook", "NaN", 120),
+        ("test", "Infinity", 120),
+        ("test", "30", 30),
+        ("hook", "300", 120),
+        ("test", "'invalid'", None),
+    ],
+)
+def test_consumer_timeouts_cannot_disable_owned_limits(
+    vitest_project: VitestProject,
+    monkeypatch: pytest.MonkeyPatch,
+    phase: str,
+    value: str,
+    milliseconds: int | None,
+) -> None:
+    """Observe native test/hook expiry with nonpositive, nonfinite and tighter options."""
+    from validator import test_budgets
+
+    monkeypatch.setitem(test_budgets.DEFAULT_TEST_SECONDS, "unit", 0.12)
+    field = "testTimeout" if phase == "test" else "hookTimeout"
+    (vitest_project.root / "vitest.config.ts").write_text(
+        "export default {test:{maxWorkers:1,minWorkers:1," + field + ":" + value + "}};"
+    )
+    delay = "await new Promise(resolve => setTimeout(resolve,400));"
+    body = "test('bounded', async () => { " + delay + "expect(1).toBe(1); });"
+    if phase == "hook":
+        body = "import {beforeEach} from 'vitest'; beforeEach(async () => { " + delay + "}); "
+        body += "test('bounded', () => {expect(1).toBe(1);});"
+    vitest_project.write(body)
+    receipt = vitest_project.capture(timeout=3)
+    capture = json.loads((receipt.parent / "capture.json").read_text())
+    assert capture["exit_code"] == 1, (receipt.parent / "stdout").read_text()
+    diagnostic = (receipt.parent / "stderr").read_text() + (receipt.parent / "stdout").read_text()
+    if (receipt.parent / "report").is_file():
+        diagnostic += (receipt.parent / "report").read_text()
+    if milliseconds is None:
+        assert "Invalid configured timeout" in diagnostic, diagnostic
+    else:
+        label = "Test" if phase == "test" else "Hook"
+        assert f"{label} timed out in {milliseconds}ms" in diagnostic, diagnostic
+    assert not verify_execution_observation(receipt, vitest_project.root, FEATURE, "passed").valid
+
+
+@pytest.mark.parametrize(
+    "mode",
+    ["within-deadline", "expired-verification", "completion-write-error", "completion-late"],
+)
+def test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout(
+    vitest_project: VitestProject,
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+) -> None:
+    """Use actual capture/watchdog and later public reads, including failed completion writes."""
+    import errno
+
+    from typer.testing import CliRunner
+
+    from validator import execution_capture_storage, execution_evidence, test_budgets
+    from validator.cli import app
+    from validator.execution_deadline import current_deadline
+
+    vitest_project.write("test('actual matcher', () => {expect(1).toBe(1);});")
+    captured: list[tuple[Path, bytes]] = []
+    real_provenance = execution_evidence._current_provenance
+    real_write = execution_capture_storage._write_new
+    expire = mode in {"expired-verification", "completion-late"}
+    write_error = mode == "completion-write-error"
+
+    def hash_with_cost(recorded: dict[str, str]) -> dict[str, str]:
+        captured.extend(
+            (p, p.read_bytes())
+            for p in vitest_project.root.glob(".specs/.execution/*/receipt.json")
+        )
+        scope = current_deadline()
+        if scope is not None:
+            assert scope.argv == vitest_project.command()
+            assert scope.end <= started + 4.05
+        time.sleep(4.3 if mode == "expired-verification" else 0.01)
+        return real_provenance(recorded)
+
+    def write_completion(descriptor: int, name: str, data: bytes) -> None:
+        if write_error and name == "verification-complete.json":
+            real_write(descriptor, name, data)
+            assert not verify_execution_observation(
+                captured[0][0], vitest_project.root, FEATURE, "passed"
+            ).valid, "Incomplete publication qualified during the storage failure window"
+            raise OSError(errno.ENOSPC, "controlled completion storage exhaustion")
+        real_write(descriptor, name, data)
+
+    with monkeypatch.context() as scoped:
+        scoped.chdir(vitest_project.root)
+        scoped.setattr(test_budgets, "DEFAULT_COMMAND_SECONDS", 4.0)
+        scoped.setattr(execution_capture_storage, "_write_new", write_completion)
+        if mode == "completion-late":
+            scoped.setattr(os, "link", _late_completion_link(os.link))
+        scoped.setattr(execution_evidence, "_current_provenance", hash_with_cost)
+        started = time.monotonic()
+        result = CliRunner().invoke(app, _observation_arguments(vitest_project))
+        elapsed = time.monotonic() - started
+    fresh = _assert_final_capture(captured, vitest_project, result, elapsed, expire, write_error)
+    assert fresh.valid is not (expire or write_error), fresh.gaps
+
+
+def _late_completion_link(real_link: Callable[..., None]) -> Callable[..., None]:
+    """Publish the actual link, then hold its syscall wrapper across the owned deadline."""
+
+    def delayed(
+        src: str, dst: str, *, src_dir_fd: int, dst_dir_fd: int, follow_symlinks: bool
+    ) -> None:
+        real_link(
+            src, dst, src_dir_fd=src_dir_fd, dst_dir_fd=dst_dir_fd, follow_symlinks=follow_symlinks
+        )
+        time.sleep(4.3)
+
+    return delayed
+
+
+def _assert_final_capture(
+    captured: list[tuple[Path, bytes]],
+    vitest_project: VitestProject,
+    result: Result,
+    elapsed: float,
+    expire: bool,
+    write_error: bool,
+) -> EvidenceVerification:
+    """Re-read actual public evidence after success or failed final publication."""
+    receipt, original_reference = captured[0]
+    fresh = verify_execution_observation(receipt, vitest_project.root, FEATURE, "passed")
+    assert receipt.read_bytes() == original_reference, "Historical capture reference was rewritten"
+    assert result.exit_code == (124 if expire else 1 if write_error else 0), result.output
+    assert elapsed < 4.2, (elapsed, result.output)
+    if expire or write_error:
+        assert all(
+            not (receipt.parent / name).exists()
+            for name in ("verification-complete.json", "verification-accepted.json")
+        )
+        marker = receipt.parent / "verification-accepted.json"
+        if not marker.exists():
+            marker.write_text("{")
+        assert not verify_execution_observation(
+            receipt, vitest_project.root, FEATURE, "passed"
+        ).valid
+    return fresh
+
+
+def _observation_arguments(project: VitestProject) -> list[str]:
+    """Use the exact real Node command through the public observation CLI."""
+    import shlex
+
+    return [
+        "test",
+        "--feature",
+        FEATURE,
+        "--execution-command",
+        shlex.join(project.command()),
+        "--execution-observation",
+        "passed",
+        "--report-adapter",
+        "junit",
+    ]

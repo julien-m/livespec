@@ -147,6 +147,10 @@ def _read_capture(path: Path, root: Path, feature: str) -> tuple[ExecutionCaptur
     directory_stat = directory.stat(follow_symlinks=False)
     if capture.directory_identity != (directory_stat.st_dev, directory_stat.st_ino):
         raise ValueError("Runner directory replaced")
+    if capture.verification_pending:
+        from .execution_verification import require_completion
+
+        require_completion(directory, root, receipt.capture_sha256)
     return capture, directory
 
 

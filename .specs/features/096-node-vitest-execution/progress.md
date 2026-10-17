@@ -119,3 +119,7 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - 2026-10-17 Bugfix4302244158: canonical observer directory membership replaces three substring filters; official three-case GREEN and38 adjacent integrity/async checks pass. Earlier full feature/consumer certificates remain historical.
 
 - 2026-10-17 Grouped bugfix4302269467/4302269471: six wrapped lifecycle cases pass official GREEN; unknown wrappers and serve/build ordinary plugins pass targeted controls. CI now lists all seven runtime modules; initial local95-case zero-skip run retains its one fixture failure and is not reported as full CI PASS. Final GitHub CI is pending.
+
+- 2026-10-17 Grouped bugfix4302311857/4302311859: official frozen eleven-case RED7FAIL4PASS then GREEN11PASS; unsafe native Vitest timeouts bounded, CLI final verification shares original deadline, and expired/ENOSPC/malformed completion remains publicly invalid. Historical certificates preserved; independent review and current-head GitHub CI remain delivery gates.
+
+- Current grouped-fix follow-up: independent review identified terminal-alarm and concurrent-publication windows after the preliminary GREEN. Staging plus atomic completion publication addresses both in current source; current six-file310-line delta leaves the scoped lane. Official complete readiness returned READY. Preliminary GREEN remains historical; final changed bytes are not yet executed or certified. Inspect [fallback evidence](.reviews/timeout-finalize-fix/fallback-readiness.json).

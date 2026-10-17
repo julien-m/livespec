@@ -67,6 +67,7 @@ class ExecutionCapture(BaseModel):
     # @spec FR-005: Effective limits and timeout provenance
     # — .specs/features/095-test-time-budgets/spec.md#fr-005
     budget: dict[str, object] | None = None
+    verification_pending: bool = False
     gaps: list[str] = Field(default_factory=list)
 
 
@@ -91,6 +92,7 @@ def capture_execution(
     timeout: float | None = None,
     acceptance_mapping: str | None = None,
     required_report_path: str | None = None,
+    verification_pending: bool = False,
 ) -> CaptureResult:
     """Include runner preparation and evidence capture in the managed deadline."""
     from .execution_timeout_capture import timeout_capture
@@ -102,10 +104,11 @@ def capture_execution(
                 project_root=project_root,
                 feature=feature,
                 adapter=adapter,
-                env=env,
+                env=dict(env),
                 timeout=timeout,
                 acceptance_mapping=acceptance_mapping,
                 required_report_path=required_report_path,
+                verification_pending=verification_pending,
             )
         except BudgetExpired as exc:
             scope.timed_out = True
@@ -134,9 +137,9 @@ def _capture_execution(
     timeout: float | None = None,
     acceptance_mapping: str | None = None,
     required_report_path: str | None = None,
+    verification_pending: bool = False,
 ) -> CaptureResult:
     """Execute once with fresh report env; retain honest gaps on insufficient proof."""
-    env = dict(env)
     root = project_root.resolve(strict=True)
     directory, directory_identity = _run_directory(root)
     report = directory / "runner-report"
@@ -153,8 +156,7 @@ def _capture_execution(
     code, stdout, stderr = _invoke(
         argv, root, directory, feature, env, timeout, required_report_path, gaps
     )
-    finished = time.time_ns()
-    scope = current_deadline()
+    finished, scope = time.time_ns(), current_deadline()
     if scope is not None and scope.timed_out:
         raw_after: dict[str, str] = {}
         after: dict[str, str] = {}
@@ -181,6 +183,7 @@ def _capture_execution(
         stdout_sha256=digest(stdout.encode()),
         stderr_sha256=digest(stderr.encode()),
         acceptance_mapping=acceptance_mapping,
+        verification_pending=verification_pending,
         gaps=gaps,
     )
     return _finish_capture(directory, capture, stdout, stderr)

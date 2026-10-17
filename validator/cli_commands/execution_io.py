@@ -11,7 +11,8 @@ from typing import Literal
 
 import typer
 
-from validator.execution_capture import capture_execution
+from validator.execution_capture import CaptureResult, capture_execution
+from validator.execution_deadline import BudgetExpired, command_scope
 from validator.execution_evidence import (
     EvidenceVerification,
     verify_execution_observation,
@@ -23,6 +24,7 @@ from validator.execution_mapping import (
     prepare_mapping_review,
 )
 from validator.execution_mapping_anchors import derived_mapping
+from validator.execution_verification import complete_verification, provisional_verification
 from validator.semantic.review_contract import REVIEW_SCHEMA
 
 from .review_io import NativeReviewInput
@@ -161,25 +163,52 @@ def _capture(
 ) -> None:
     if not command:
         raise ValueError("execution_command_required")
-    capture = capture_execution(
-        shlex.split(command),
-        project_root=root,
-        feature=feature,
-        adapter=adapter,
-        env=dict(os.environ),
-        acceptance_mapping=mapping_path.relative_to(root).as_posix() if mapping_path else None,
-    )
-    if capture.receipt_path and observation is not None:
-        result = verify_execution_observation(
-            Path(capture.receipt_path), root, feature, observation
-        )
-    else:
-        result = (
-            verify_execution_receipt(Path(capture.receipt_path), root, feature)
-            if capture.receipt_path
-            else EvidenceVerification(
-                valid=False, certified_acs=[], gaps=capture.gaps or ["No fresh execution receipt"]
+    argv = shlex.split(command)
+    capture: CaptureResult | None = None
+    with command_scope(root, argv) as scope:
+        try:
+            capture = capture_execution(
+                argv,
+                project_root=root,
+                feature=feature,
+                adapter=adapter,
+                env=dict(os.environ),
+                acceptance_mapping=mapping_path.relative_to(root).as_posix()
+                if mapping_path
+                else None,
+                verification_pending=True,
             )
+            if scope.timed_out or capture.exit_code == 124:
+                raise BudgetExpired("Execution exceeded the original command deadline")
+            result = _verify_capture(capture, root, feature, observation)
+            if scope.timed_out:
+                raise BudgetExpired("Final verification exceeded the original command deadline")
+            payload = json.dumps(
+                {"execution_receipt_path": capture.receipt_path, **result.model_dump()}
+            )
+            if result.valid:
+                complete_verification(Path(capture.receipt_path), root)
+            status = 0 if result.valid else capture.exit_code or 1
+        except BudgetExpired as exc:
+            result = EvidenceVerification(valid=False, certified_acs=[], gaps=[f"TIMEOUT: {exc}"])
+            receipt_path = capture.receipt_path if capture else None
+            payload = json.dumps({"execution_receipt_path": receipt_path, **result.model_dump()})
+            status = 124
+    typer.echo(payload)
+    raise typer.Exit(status)
+
+
+def _verify_capture(
+    capture: CaptureResult,
+    root: Path,
+    feature: str,
+    observation: Literal["passed", "red"] | None,
+) -> EvidenceVerification:
+    """Keep provisional access internal to the live CLI; public reads require completion."""
+    receipt = Path(capture.receipt_path)
+    with provisional_verification(receipt, root):
+        return (
+            verify_execution_observation(receipt, root, feature, observation)
+            if observation is not None
+            else verify_execution_receipt(receipt, root, feature)
         )
-    typer.echo(json.dumps({"execution_receipt_path": capture.receipt_path, **result.model_dump()}))
-    raise typer.Exit(0 if result.valid else capture.exit_code or 1)

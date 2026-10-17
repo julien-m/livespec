@@ -159,6 +159,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-17 | Bugfix | Feature096 Fix: bounded consumer timeouts and same-deadline CLI final verification; normal spec-fix after scoped fallback,110 current tests and six ACs certified |
 | 2026-10-17 | Feature | Feature 096: correct final delivery evidence links |
 | 2026-10-17 | Feature | Node/Vitest execution observations validated with six acceptance criteria and independent test review |
 | 2026-10-17 | Feature | Test:100% AC covered (6/6),0 tests generated,98/98 passed; final frozen report bound to current execution receipt |
@@ -168,7 +169,6 @@
 | 2026-10-16 | Spec | Spec created: Node Vitest Execution Observations - 3 stories, 6 AC, 6 FR |
 | 2026-10-17 | Bugfix | [Feature 081] Bugfix: honor spec-specify review opt-out in goals |
 | 2026-10-17 | Feature | [Feature 083] Test Hardening: ignore Git churn before worktree hashing |
-| 2026-10-16 | Bugfix | [Feature 078] Bugfix: verify documentary-only acceptance without unrelated execution |
 <!-- readme:activity:end -->
 
 ---
@@ -359,3 +359,5 @@
 <!-- finalize:spec-feature:2026-10-17:35d03aca -->
 
 <!-- finalize:spec-feature:2026-10-17:de973d5e -->
+
+<!-- finalize:spec-fix:2026-10-17:24d6777c -->
