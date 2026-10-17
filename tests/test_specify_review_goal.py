@@ -42,6 +42,10 @@ QE = {
         ("--auto --all-reviewers", True),
         ("--auto --model=no-review", True),
         ("--auto --no-review-extra", True),
+        ("--pre-impl", True),
+        ("--pre-impl=check", True),
+        ("--pre-impl --no-review", False),
+        ("--pre-impl=check -N", False),
     ],
 )
 def test_specify_review_obligation_matches_flags(
@@ -197,7 +201,8 @@ def _close_archive(runner: CliRunner, common: list[str]) -> None:
     assert "complete" in status.output
 
 
-def test_default_review_rejects_a_skip_claim(tmp_path: Path) -> None:
+@pytest.mark.parametrize("extra_flags", ["", "--pre-impl", "--pre-impl=check"])
+def test_default_review_rejects_a_skip_claim(tmp_path: Path, extra_flags: str) -> None:
     from tests.review_support import grounded_response
     from validator.goal_contracts import render_goal_state_file
     from validator.semantic.review_api import ingest_feature_review, prepare_feature_review
@@ -208,7 +213,7 @@ def test_default_review_rejects_a_skip_claim(tmp_path: Path) -> None:
         project_root=tmp_path,
         livespec_root=ROOT,
         feature=FEATURE,
-        flags="--auto --model=reviewer/v1",
+        flags=f"--auto --model=reviewer/v1 {extra_flags}",
     )
     contract = json.loads(render_goal_contract_file(goal))
     review = next(task for task in contract["tasks"] if task["evidence_kind"] == "review")

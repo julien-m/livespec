@@ -65,3 +65,16 @@
 - **RED receipt:** `.specs/.execution/a80090db69ba4e33ab0dfd6460ea3b78/receipt.json`
 - **GREEN receipt:** `.specs/.execution/ca5d18a649f14cba99e4750a1b586cfb/receipt.json`
 <!-- bugfix:ca5d18a649f14cba99e4750a1b586cfb -->
+
+## 2026-10-17 — [Bugfix]: Keep default specify review active with pre-impl flags
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_specify_review_goal.py, validator/goal_inventory.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--pre-impl-True], tests/test_specify_review_goal.py::test_specify_review_obligation_matches_flags[--pre-impl=check-True]
+- **RED receipt:** `.specs/.execution/5871a3741c0a4add8760ac7f5c82472d/receipt.json`
+- **GREEN receipt:** `.specs/.execution/ce826598e6c947d786ea90ba124ec8a5/receipt.json`
+<!-- bugfix:ce826598e6c947d786ea90ba124ec8a5 -->

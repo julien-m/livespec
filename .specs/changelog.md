@@ -10,6 +10,7 @@
 ## 2026-10-17 — [Feature 081] Bugfix: honor spec-specify review opt-out in goals
 
 - `--no-review` and `-N` select specification preparation without a spec-review task or receipt; default review, other commands and semantic progression guards remain required. Read the [regressions](../tests/test_specify_review_goal.py) for contract/checklist selection, native goal closure and review boundaries.
+- Generic `--pre-impl` flags retain command-specific obligations, preventing an unintended default-review bypass while preserving preparation branch compatibility.
 
 ## 2026-10-17 — [Feature 083] Test Hardening: ignore Git churn before worktree hashing
 

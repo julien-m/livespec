@@ -109,7 +109,7 @@ def _active_execution_task_branches(
         active.add("pre-impl")
         if is_visual and has_penflow:
             active.add("pre-impl-penflow")
-        return active
+        return active | _command_task_branches(command, flag_names, False)
     active.add("full-check")
     generate_active, execute_active = _execution_modes(flag_names, audit_only, no_generate, command)
     active |= _command_task_branches(command, flag_names, execute_active)
