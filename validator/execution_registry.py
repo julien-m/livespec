@@ -45,9 +45,9 @@ def registry_text(relative: str, text: str, feature: str) -> str:
 def _project(relative: str, text: str, feature: str) -> str:
     if relative == ".specs/changelog.md":
         # Match the exact two-line global summary emitted by build_global_changelog,
-        # including its adjacent spacing; any manual body remains in the projection.
+        # and following blank line, never the separator before a manual heading/body.
         return re.sub(
-            rf"(?:\n\n)?^## \d{{4}}-\d{{2}}-\d{{2}} — [^\n]+\n{_MARKER}\n(?:\n)?",
+            rf"^## \d{{4}}-\d{{2}}-\d{{2}} — [^\n]+\n{_MARKER}\n(?:\n)?",
             "",
             text,
             flags=re.M,

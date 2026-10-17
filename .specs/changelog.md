@@ -1037,3 +1037,7 @@ Read the [078 correction](features/078-requirement-evidence-integrity/implementa
 ## 2026-10-17 — [Bugfix]: Bounded balanced paired-review fallback
 
 Read the [078 correction](features/078-requirement-evidence-integrity/implementation.md): fallback packing selects a strictly smaller valid layout from bounded balanced candidates while preserving sections, all source/Plan pairs, obligations, exact prompt budgets and historical layouts. Frozen HandoffBox012 preparation drops from 24 to 10 lots; this does not certify its consumer review or product execution.
+
+## 2026-10-17 — [Bugfix]: Manual changelog separators survive finalization
+
+Read the [078 correction](features/078-requirement-evidence-integrity/implementation.md): projecting generated history preserves adjacent manual headings, bodies and separators, keeping execution evidence stable across ordinary finalization. A true manual edit remains governed; policy versions and historical captures stay unchanged.

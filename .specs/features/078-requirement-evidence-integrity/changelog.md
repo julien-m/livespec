@@ -295,3 +295,16 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/a619a75310c84c1aa4a3c77d639b40b3/receipt.json`
 - **GREEN receipt:** `.specs/.execution/8a2ab913493c43ab851d28763e7ee38c/receipt.json`
 <!-- bugfix:8a2ab913493c43ab851d28763e7ee38c -->
+
+## 2026-10-17 — [Bugfix]: Preserve manual changelog separators when projecting generated finalization entries
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_execution_registry_boundaries.py, validator/execution_registry.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_registry_boundaries.py::test_actual_finalize_before_manual_entry_preserves_execution_receipt, tests/test_execution_registry_boundaries.py::test_generated_entry_preserves_manual_heading_body_and_separator
+- **RED receipt:** `.specs/.execution/66d1c847c06644d9b09995334710b3ec/receipt.json`
+- **GREEN receipt:** `.specs/.execution/ca301ef49128447aaea9f4232e78da31/receipt.json`
+<!-- bugfix:ca301ef49128447aaea9f4232e78da31 -->

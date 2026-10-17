@@ -181,6 +181,7 @@ FR-004 / AC-004: [normative identity](../../../validator/normative_identity.py) 
 | 2026-10-17 | implementation | `tests/test_execution_finalize_scope.py::test_actual_finalize_preserves_referenced_execution_inputs` | `.specs/.execution/336e380ead6e49d8973ab2a8953ade97/receipt.json` | `.specs/.execution/c1913d7924774dbe893a3bd30146f239/receipt.json` |
 | 2026-10-17 | implementation | `tests/test_acceptance_direct_inputs.py::test_direct_markdown_cli_preserves_roles_bytes_and_freshness` | `.specs/.execution/4298be9d7688405896ffcf814709f379/receipt.json` | `.specs/.execution/1ba4db750185419cbced4a099c475cdc/receipt.json` |
 | 2026-10-17 | implementation | `tests/test_review_balanced_fallback.py::test_balanced_fallback_reduces_calls_with_complete_exact_coverage` | `.specs/.execution/a619a75310c84c1aa4a3c77d639b40b3/receipt.json` | `.specs/.execution/8a2ab913493c43ab851d28763e7ee38c/receipt.json` |
+| 2026-10-17 | implementation | `tests/test_execution_registry_boundaries.py::test_actual_finalize_before_manual_entry_preserves_execution_receipt`, `tests/test_execution_registry_boundaries.py::test_generated_entry_preserves_manual_heading_body_and_separator` | `.specs/.execution/66d1c847c06644d9b09995334710b3ec/receipt.json` | `.specs/.execution/ca301ef49128447aaea9f4232e78da31/receipt.json` |
 
 ## 2026-10-17 — Finalization of referenced registries (spec-fix)
 
@@ -205,3 +206,11 @@ The read-only HandoffBox012 preparation binds its four approved Markdown contrac
 | 2026-10-17 | Read [batch packing](../../../validator/semantic/review_batches.py): only the fallback considers at most 22 deterministic balanced layouts (2–12 partitions in each direction), with independent opposite-side packing per group. Retain the baseline unless a candidate uses fewer calls; break candidate ties by actual serialized prompt characters. | Read [balanced fallback regressions](../../../tests/test_review_balanced_fallback.py): pair/section/obligation coverage, deterministic output, unchanged explicit legacy layout/authenticity, no-gain retention and indivisible-budget rejection. |
 
 The frozen HandoffBox012 preparation (49 sources, 627 sections, AC-006) drops from 24 to 10 lots, preserves all 35,230 source/Plan pairs and bounds every actual prompt below 200,000 characters (maximum 199,719). Legacy input layout, source hashes, scope, model and policy remain governed; no consumer review or execution is inferred. Full-Plan reservation and the explicit historical packing path are unchanged.
+
+## 2026-10-17 — Manual history boundaries during finalization (spec-fix)
+
+| Date | Scoped correction | Regression |
+|---|---|---|
+| 2026-10-17 | Read [registry projection](../../../validator/execution_registry.py): remove a marked generated summary and its following blank line, preserving the preceding separator and all manual headings/bodies. | Read [boundary regressions](../../../tests/test_execution_registry_boundaries.py): exact Markdown preservation, real capture/finalize/receipt verification, generated-only stability and normative-edit detection. |
+
+The real012 changelog projection is invariant across removal/insertion of the generated8658a343 entry. Reconstructing the historical pre-finalize bytes with the old projector reproduces the b06 capture hash exactly; the corrected projector naturally has a different hash because it restores previously lost separators. Projection/scope policy versions and immutable captures stay unchanged. Runtime adoption and fresh consumer certification remain separate.
