@@ -70,9 +70,7 @@ def _isolated_environment(base: Path) -> dict[str, str]:
 
 def _working_tree_hashes(root: Path) -> dict[str, str]:
     """Full content hash of a fixture tree, git internals excluded."""
-    return {
-        path: value for path, value in tree_hashes(root).items() if not path.startswith(".git/")
-    }
+    return tree_hashes(root, excluded_prefixes=(".git/",))
 
 
 def _reference_lines(path: Path) -> list[str]:

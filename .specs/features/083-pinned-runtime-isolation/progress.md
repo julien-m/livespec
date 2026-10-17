@@ -27,6 +27,10 @@
 
 Implementation corrections (both audit passes) are done; execution re-certified by `/spec-test` on 2026-10-12 (18/18 AC, see [checks/2026-10-12-test.md](checks/2026-10-12-test.md)).
 
+## 2026-10-17 — CI test harness maintenance
+
+Read [the maintenance scope and proof](implementation.md#2026-10-17--migration-test-harness-maintenance) and [regressions](../../../tests/test_runtime_worktree_hashes.py). The Git-churn case observed RED then GREEN; 137 runtime/specify tests passed, with lint, format, types, conventions and independent native review PASS. Product runtime behavior and the existing migration assertions are unchanged; this checkpoint does not recertify all Feature 083 acceptance.
+
 ## Pipeline closure
 
 `/spec-feature --auto` supervisor goal `8a7aa28f` complete 55/55, archived with outcome success (`.specs/.runs/spec-feature-2026-10-12T04-01-14.707032-8a7aa28f-policy2.json`, gitignored). `/goal` is not invocable by sub-agents: the lead-authorized fallback, the CLI contract `livespec goal render/prove/status/archive`, was the completion proof for the supervisor and every phase child (specify `91ae1b55`, plan `6fe93f7d`, analyze `abbe831c`, preflight `72fdf6c3`, implement `df4ee1ef`, test `553c9ac8`).

@@ -54,6 +54,7 @@ EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
         "execute",
         "test-report",
         "test-suite",
+        "specify-review",
         "surfaces",
         "quality-only",
         "tree-only",

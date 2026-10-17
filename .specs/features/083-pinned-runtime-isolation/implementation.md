@@ -3,7 +3,7 @@ created: 2026-10-11
 feature: 083-pinned-runtime-isolation
 title: 'Implementation Map: Pinned Runtime Isolation'
 type: implementation
-updated: 2026-10-15
+updated: 2026-10-17
 ---
 
 # Implementation — Pinned Runtime Isolation
@@ -52,6 +52,16 @@ updated: 2026-10-15
 | AC-018 | `tests/test_runtime_docs.py` (isolated HOME/TMPDIR/git config, written-path containment, fixture-tree hashes), `tests/runtime_support.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
 
 Shared fixtures: `tests/runtime_support.py` (temporary git sources with a real-code copy, consumer fixtures, independent digest, write-bit restoration, tree hashes).
+
+## 2026-10-17 — Migration test harness maintenance
+
+Read [tree hashing](../../../tests/runtime_support.py), [the migration comparison](../../../tests/test_runtime_docs.py) and [the deterministic regressions](../../../tests/test_runtime_worktree_hashes.py). The worktree-only caller now excludes root Git internals before reading them, preventing a Git object disappearing during maintenance from breaking the comparison. Generic immutable-tree hashing keeps its full default scope; protected sources, `.github`, nested Git paths and symlinks remain compared, and source read errors still propagate. Runtime behavior, specifications and migration assertions are unchanged. This is test maintenance, not renewed whole-feature acceptance certification.
+
+| Scope | Current maintenance paths | Last Verified |
+|---|---|---|
+| AC-018 harness only | Read [helper](../../../tests/runtime_support.py), [migration test](../../../tests/test_runtime_docs.py) and [regressions](../../../tests/test_runtime_worktree_hashes.py). | 2026-10-17 |
+
+The deterministic regression observed RED (1 failed, 2 passed) then GREEN (3 passed); all runtime tests plus the 14 specify regressions passed (137 cases). Ruff, format, Pyright, mypy and independent native review passed. Final full-suite validation runs through PR #52 CI.
 
 ## Files Created/Modified
 
