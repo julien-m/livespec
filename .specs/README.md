@@ -135,6 +135,7 @@
 | 094 | Verified Review Continuity | In Progress | 2026-10-14 | 2026-10-14 | [spec](features/094-verified-review-continuity/spec.md), [plan](features/094-verified-review-continuity/plan.md), [implementation](features/094-verified-review-continuity/implementation.md) |
 | 095 | Test Time Budgets | Implemented | 2026-10-16 | 2026-10-16 | [spec](features/095-test-time-budgets/spec.md) |
 | 096 | Node Vitest Execution Observations | Implemented | 2026-10-16 | 2026-10-17 | [spec](features/096-node-vitest-execution/spec.md) |
+| 097 | Root Feature Delivery Review | Implemented | 2026-10-17 | 2026-10-17 | [spec](features/097-root-feature-delivery-review/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -159,16 +160,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-17 | Feature | [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture |
+| 2026-10-17 | Feature | 097: preserve exact Git index bytes while reviewing complete root bootstrap scope; current six-AC certification and independent full reviews pass. |
+| 2026-10-17 | Feature | [Feature 097] Test BLOCKED: 15 passed, 1 failed; Git index integrity assertion |
+| 2026-10-17 | Feature | [Feature 097] Test: 100% AC covered (6/6), 0 tests generated |
+| 2026-10-17 | Feature | 097 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state |
+| 2026-10-17 | Feature | Plan097: two bounded steps and new independent review; owner-bound acceptance remains pending |
+| 2026-10-17 | Spec | Spec identity097: root bootstrap review contract, renumbered from the historical root096 allocation; new independent review ready |
+| 2026-10-17 | Feature | Feature096 bugfix: reject late Chai matcher and prototype registration |
 | 2026-10-17 | Feature | Feature096 CI fixture fix: actual Typer Result annotation and exact outer deadline; normal AC004-filtered proof18 tests, previous110/six-AC proof historical |
 | 2026-10-17 | Bugfix | Feature096 Fix: bounded consumer timeouts and same-deadline CLI final verification; normal spec-fix after scoped fallback,110 current tests and six ACs certified |
-| 2026-10-17 | Feature | Feature 096: correct final delivery evidence links |
-| 2026-10-17 | Feature | Node/Vitest execution observations validated with six acceptance criteria and independent test review |
-| 2026-10-17 | Feature | Test:100% AC covered (6/6),0 tests generated,98/98 passed; final frozen report bound to current execution receipt |
-| 2026-10-17 | Feature | [Feature 096] ## [Feature]: Genuine Node22 and Vitest execution observations implemented |
-| 2026-10-16 | Bugfix | [Feature 096] Bugfix: select canonical goal tasks and repair deterministic CI fixture expectations |
-| 2026-10-16 | Feature | Technical plan: five bounded steps, two diagrams and explicit runtime evidence gates |
-| 2026-10-16 | Spec | Spec created: Node Vitest Execution Observations - 3 stories, 6 AC, 6 FR |
-| 2026-10-17 | Bugfix | [Feature 081] Bugfix: honor spec-specify review opt-out in goals |
 <!-- readme:activity:end -->
 
 ---
@@ -363,3 +364,17 @@
 <!-- finalize:spec-fix:2026-10-17:24d6777c -->
 
 <!-- finalize:spec-fix:2026-10-17:340e3e18 -->
+
+<!-- finalize:spec-specify:2026-10-17:ef92291b -->
+
+<!-- finalize:spec-plan:2026-10-17:3820eacd -->
+
+<!-- finalize:spec-implement:2026-10-17:b4afe262 -->
+
+<!-- finalize:spec-test:2026-10-17:18760dd5 -->
+
+<!-- finalize:spec-test:2026-10-17:e503d74b -->
+
+<!-- finalize:spec-implement:2026-10-17:1bab7ffb -->
+
+<!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
