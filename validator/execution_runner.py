@@ -14,6 +14,7 @@ from .execution_cargo_command import is_cargo, parse_cargo_test
 from .execution_cargo_toolchain import CargoRunnerUnavailable, cargo_provenance, runner_paths
 from .execution_deadline import current_deadline
 from .execution_scope import digest
+from .execution_vitest import is_vitest, prepare_vitest
 
 __all__ = ["CargoRunnerUnavailable", "prepare_runner", "runner_provenance"]
 
@@ -72,6 +73,8 @@ def prepare_runner(
     scope = current_deadline()
     if scope is not None and env is not None:
         env["LIVESPEC_TEST_BUDGET"] = json.dumps(scope.policy.frozen(scope.argv, scope.seconds))
+    if is_vitest(argv):
+        return _prepare_vitest_observation(argv, adapter, report, root, env)
     if is_cargo(argv):
         prepared = _prepare_cargo(argv, adapter, root or Path.cwd(), dict(env or os.environ))
         if scope is not None:
@@ -112,6 +115,24 @@ def prepare_runner(
         "-o",
         "enable_assertion_pass_hook=true",
     ], provenance
+
+
+def _prepare_vitest_observation(
+    argv: list[str],
+    adapter: str,
+    report: Path,
+    root: Path | None,
+    env: dict[str, str] | None,
+) -> tuple[list[str], dict[str, str]]:
+    """Prepare Vitest while retaining honest whole-command enforcement evidence."""
+    prepared = prepare_vitest(
+        argv, adapter, report, root or Path.cwd(), env if env is not None else dict(os.environ)
+    )
+    scope = current_deadline()
+    if scope is not None:
+        # Vitest bounds each body/hook separately, not the whole test lifecycle.
+        scope.granularity = "command-only"
+    return prepared
 
 
 # @spec FR-001: Route cargo test through the trusted Cargo runner

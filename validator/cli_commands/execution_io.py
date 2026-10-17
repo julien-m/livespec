@@ -7,17 +7,24 @@ import os
 import shlex
 import tempfile
 from pathlib import Path
+from typing import Literal
 
 import typer
 
-from validator.execution_capture import capture_execution
-from validator.execution_evidence import EvidenceVerification, verify_execution_receipt
+from validator.execution_capture import CaptureResult, capture_execution
+from validator.execution_deadline import BudgetExpired, command_scope
+from validator.execution_evidence import (
+    EvidenceVerification,
+    verify_execution_observation,
+    verify_execution_receipt,
+)
 from validator.execution_mapping import (
     AcceptanceMapping,
     ingest_mapping_review,
     prepare_mapping_review,
 )
 from validator.execution_mapping_anchors import derived_mapping
+from validator.execution_verification import complete_verification, provisional_verification
 from validator.semantic.review_contract import REVIEW_SCHEMA
 
 from .review_io import NativeReviewInput
@@ -33,8 +40,17 @@ def execution_io(
     ingest: Path | None,
     adapter: str,
     derive: bool = False,
+    observation: Literal["passed", "red"] | None = None,
 ) -> None:
     """Expose mapping derivation, reviewer preparation/ingestion and certified capture."""
+    # @spec FR-001: Explicit observations without AC mapping
+    # — .specs/features/096-node-vitest-execution/spec.md#fr-001
+    # @spec FR-005: Preserve strict acceptance beside observation
+    # — .specs/features/096-node-vitest-execution/spec.md#fr-005
+    if observation is not None:
+        _observe(
+            root, feature, command, mapping_path, prepare, ingest, adapter, derive, observation
+        )
     if not feature or mapping_path is None:
         raise ValueError("execution_feature_and_acceptance_mapping_required")
     if derive and (root / mapping_path).is_symlink():
@@ -66,6 +82,38 @@ def execution_io(
         typer.echo(json.dumps({"receipt_path": str(receipt_path), **receipt.model_dump()}))
         raise typer.Exit(0 if receipt.complete and receipt.ready else 1)
     _capture(root, feature, command, mapping_path, adapter)
+
+
+def _observe(
+    root: Path,
+    feature: str | None,
+    command: str | None,
+    mapping_path: Path | None,
+    prepare: bool,
+    ingest: Path | None,
+    adapter: str,
+    derive: bool,
+    observation: Literal["passed", "red"],
+) -> None:
+    """Validate observation purpose before any mapping read and capture without certification."""
+    from .operation_options import check_execution_options
+
+    check_execution_options(
+        feature=feature,
+        command=command,
+        mapping=mapping_path,
+        prepare=prepare,
+        ingest=ingest,
+        adapter=adapter,
+        mutation=False,
+        no_coverage=False,
+        debug=False,
+        derive=derive,
+        observation=observation,
+    )
+    if feature:
+        # Observation must bypass mapping reads and independent acceptance review entirely.
+        _capture(root, feature, command, None, adapter, observation)
 
 
 def _derive(root: Path, feature: str, mapping_path: Path) -> None:
@@ -106,24 +154,61 @@ def _publish(path: Path, text: str) -> None:
 
 
 def _capture(
-    root: Path, feature: str, command: str | None, mapping_path: Path, adapter: str
+    root: Path,
+    feature: str,
+    command: str | None,
+    mapping_path: Path | None,
+    adapter: str,
+    observation: Literal["passed", "red"] | None = None,
 ) -> None:
     if not command:
         raise ValueError("execution_command_required")
-    capture = capture_execution(
-        shlex.split(command),
-        project_root=root,
-        feature=feature,
-        adapter=adapter,
-        env=dict(os.environ),
-        acceptance_mapping=mapping_path.relative_to(root).as_posix(),
-    )
-    result = (
-        verify_execution_receipt(Path(capture.receipt_path), root, feature)
-        if capture.receipt_path
-        else EvidenceVerification(
-            valid=False, certified_acs=[], gaps=capture.gaps or ["No fresh execution receipt"]
+    argv = shlex.split(command)
+    capture: CaptureResult | None = None
+    with command_scope(root, argv) as scope:
+        try:
+            capture = capture_execution(
+                argv,
+                project_root=root,
+                feature=feature,
+                adapter=adapter,
+                env=dict(os.environ),
+                acceptance_mapping=mapping_path.relative_to(root).as_posix()
+                if mapping_path
+                else None,
+                verification_pending=True,
+            )
+            if scope.timed_out or capture.exit_code == 124:
+                raise BudgetExpired("Execution exceeded the original command deadline")
+            result = _verify_capture(capture, root, feature, observation)
+            if scope.timed_out:
+                raise BudgetExpired("Final verification exceeded the original command deadline")
+            payload = json.dumps(
+                {"execution_receipt_path": capture.receipt_path, **result.model_dump()}
+            )
+            if result.valid:
+                complete_verification(Path(capture.receipt_path), root)
+            status = 0 if result.valid else capture.exit_code or 1
+        except BudgetExpired as exc:
+            result = EvidenceVerification(valid=False, certified_acs=[], gaps=[f"TIMEOUT: {exc}"])
+            receipt_path = capture.receipt_path if capture else None
+            payload = json.dumps({"execution_receipt_path": receipt_path, **result.model_dump()})
+            status = 124
+    typer.echo(payload)
+    raise typer.Exit(status)
+
+
+def _verify_capture(
+    capture: CaptureResult,
+    root: Path,
+    feature: str,
+    observation: Literal["passed", "red"] | None,
+) -> EvidenceVerification:
+    """Keep provisional access internal to the live CLI; public reads require completion."""
+    receipt = Path(capture.receipt_path)
+    with provisional_verification(receipt, root):
+        return (
+            verify_execution_observation(receipt, root, feature, observation)
+            if observation is not None
+            else verify_execution_receipt(receipt, root, feature)
         )
-    )
-    typer.echo(json.dumps({"execution_receipt_path": capture.receipt_path, **result.model_dump()}))
-    raise typer.Exit(0 if result.valid else capture.exit_code or 1)

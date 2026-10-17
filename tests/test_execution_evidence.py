@@ -254,6 +254,7 @@ def test_expected_failure_xfail_is_not_an_observed_red_test(project: Path) -> No
     assert result.executed_tests[0].status == "skipped"
 
 
+@pytest.mark.acceptance
 def test_real_red_receipt_stays_observation_at_goal_and_archive_boundaries(project: Path) -> None:
     from validator.evidence_policy import EVIDENCE_POLICY_VERSION, typed_evidence_missing
     from validator.execution_evidence import verify_execution_observation

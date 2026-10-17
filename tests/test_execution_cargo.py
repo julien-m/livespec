@@ -34,6 +34,7 @@ def _capture_json(receipt: Path) -> dict[str, Any]:
     return json.loads((receipt.parent / "capture.json").read_text())
 
 
+@pytest.mark.integration
 def test_mapped_integration_assertion_is_certified(crate: Path) -> None:
     write_mapping(crate)
     receipt = capture(crate, INTEGRATION)

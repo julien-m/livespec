@@ -8,7 +8,7 @@ last_reviewed: 2026-10-16
 
 ## 1. Purpose
 
-Auto-implement a feature from its plan, write tests, run the visual gate for UI features, and map FR/AC to @spec anchors.
+Auto-implement a feature from its plan, write tests, run the visual gate for UI features, and map FR/AC to @spec anchors. Generic plan-step execution requires an explicit passed observation; feature AC acceptance keeps its complete mapped proof.
 
 ## 2. Preconditions
 

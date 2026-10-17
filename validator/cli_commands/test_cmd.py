@@ -12,7 +12,8 @@ Run driver tests or prepare, ingest and certify mapped execution evidence.
         mutation: Run the driver's mutation capability after coverage.
         no_coverage: Skip driver coverage, retaining journey checks and optional mutation.
         execution_command: Shell-tokenized test argv captured by the runner, without a shell.
-        acceptance_mapping: Project-confined mapping required by execution/review modes.
+        execution_observation: Requested passed/red observation without AC certification.
+        acceptance_mapping: Project-confined mapping required by acceptance/review modes.
         prepare_mapping_review: Emit context/schema JSON; exclusive with ingestion and execution.
         derive_mapping: Write the anchor-derived mapping to acceptance_mapping; exit 1 on
             orphan ACs, unknown anchors or unresolved anchor targets (feature 087).
@@ -20,8 +21,9 @@ Run driver tests or prepare, ingest and certify mapped execution evidence.
         report_adapter: Execution result format (default junit); unsupported proof cannot certify.
         debug: Print driver-mode exception tracebacks; not accepted in native modes.
 
-    Native modes require exactly one operation, feature and mapping; driver modifiers are
-    rejected. Non-default report_adapter is accepted only for execution.
+    Native modes require exactly one operation and feature; acceptance/review require mapping.
+    Observation requires execution without mapping; driver modifiers are rejected.
+    Non-default report_adapter is accepted only for execution.
 
     Returns:
         No value: emits driver summaries or prepared-review, review-receipt or capture JSON.
@@ -51,7 +53,7 @@ Run driver tests or prepare, ingest and certify mapped execution evidence.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 import typer
 
@@ -94,6 +96,12 @@ def test_command(
     execution_command: str | None = typer.Option(
         None, "--execution-command", help="Capture a resolved test command"
     ),
+    execution_observation: Annotated[
+        Literal["passed", "red"] | None,
+        typer.Option(
+            "--execution-observation", help="Verify passed/red execution without certifying ACs"
+        ),
+    ] = None,
     acceptance_mapping: Annotated[
         Path | None,
         typer.Option("--acceptance-mapping", help="Generated reviewed acceptance mapping"),
@@ -126,6 +134,7 @@ def test_command(
         ingest_mapping_review,
         report_adapter,
         debug,
+        execution_observation,
     )
 
 
@@ -140,6 +149,7 @@ def _dispatch_test(
     ingest_mapping_review: Path | None,
     report_adapter: str,
     debug: bool,
+    execution_observation: Literal["passed", "red"] | None = None,
 ) -> None:
     """Validate mode exclusivity and dispatch to native capture or bounded driver execution."""
     from .operation_options import check_execution_options
@@ -156,6 +166,7 @@ def _dispatch_test(
             no_coverage=no_coverage,
             debug=debug,
             derive=derive_mapping,
+            observation=execution_observation,
         )
     except ValueError as exc:
         typer.echo(f"Error: {exc}", err=True)
@@ -169,6 +180,7 @@ def _dispatch_test(
             ingest_mapping_review,
             report_adapter,
             derive_mapping,
+            execution_observation,
         )
 
     run_with_debug(
@@ -269,6 +281,7 @@ def _run_execution_io(
     ingest_mapping_review: Path | None,
     report_adapter: str,
     derive_mapping: bool = False,
+    execution_observation: Literal["passed", "red"] | None = None,
 ) -> None:
     from .execution_io import execution_io
 
@@ -282,6 +295,7 @@ def _run_execution_io(
             ingest=ingest_mapping_review,
             adapter=report_adapter,
             derive=derive_mapping,
+            observation=execution_observation,
         )
     except (OSError, ValueError) as exc:
         typer.echo(f"BLOCKED: {exc}", err=True)
