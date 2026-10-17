@@ -1060,9 +1060,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_preparation_hash_expiry_never_reaches_test_body",
       "expected": "Preparation expiry reaches genuine installed-module hashing.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 63,
-      "end_line": 63,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 67,
+      "end_line": 67,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "The recorded64-character identity proves the real module hash completed before the controlled wall-clock delay hit the shared cap; helper checks exit124 and both nonqualifying purposes."
     },
     {
@@ -1070,9 +1070,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_preparation_hash_expiry_never_reaches_test_body",
       "expected": "Preparation expiry prevents the selected test body from executing.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 64,
-      "end_line": 64,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 68,
+      "end_line": 68,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "The real two-second preparation cap interrupts hashing before any body marker; the same test also checks genuine timeout status and passed/red refusal."
     },
     {
@@ -1080,9 +1080,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_runtime_expiry_terminates_owned_descendant_and_heartbeat",
       "expected": "The runtime deadline case reaches the actual Vitest body.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 102,
-      "end_line": 102,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 106,
+      "end_line": 106,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "The body writes its marker and starts the child before blocking, separating this real runtime expiry from preparation expiry."
     },
     {
@@ -1090,9 +1090,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_runtime_expiry_terminates_owned_descendant_and_heartbeat",
       "expected": "Runtime expiry terminates the actual owned child process.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 111,
-      "end_line": 111,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 115,
+      "end_line": 115,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "After the bounded hanging body, the recorded descendant PID must disappear within the cleanup bound; helper checks timeout124 and both observation refusals."
     },
     {
@@ -1100,9 +1100,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_runtime_expiry_terminates_owned_descendant_and_heartbeat",
       "expected": "Runtime cleanup stops descendant heartbeat updates.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 113,
-      "end_line": 113,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 117,
+      "end_line": 117,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "A real child heartbeat is sampled after expiry and must remain unchanged after a delay, proving cleanup beyond a nominal timeout result."
     },
     {
@@ -1440,9 +1440,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_consumer_timeouts_cannot_disable_owned_limits[test-0-120]",
       "expected": "Configured test timeout 0 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Configured test timeout 0 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1450,9 +1450,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_consumer_timeouts_cannot_disable_owned_limits[hook-0-120]",
       "expected": "Configured hook timeout 0 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Configured hook timeout 0 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1460,9 +1460,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_consumer_timeouts_cannot_disable_owned_limits[test--1-120]",
       "expected": "Configured test timeout -1 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Configured test timeout -1 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1470,9 +1470,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_consumer_timeouts_cannot_disable_owned_limits[hook-NaN-120]",
       "expected": "Configured hook timeout NaN retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Configured hook timeout NaN retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1480,9 +1480,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_consumer_timeouts_cannot_disable_owned_limits[test-Infinity-120]",
       "expected": "Configured test timeout Infinity retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Configured test timeout Infinity retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1490,9 +1490,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_consumer_timeouts_cannot_disable_owned_limits[test-30-30]",
       "expected": "Configured test timeout 30 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 30 or actionable invalid-option diagnostic.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Configured test timeout 30 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 30 or actionable invalid-option diagnostic. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1500,9 +1500,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_consumer_timeouts_cannot_disable_owned_limits[hook-300-120]",
       "expected": "Configured hook timeout 300 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Configured hook timeout 300 retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds 120 or actionable invalid-option diagnostic. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1510,9 +1510,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_consumer_timeouts_cannot_disable_owned_limits[test-'invalid'-None]",
       "expected": "Configured test timeout 'invalid' retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds None or actionable invalid-option diagnostic.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 162,
-      "end_line": 162,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Configured test timeout 'invalid' retains the owned bounded limit and cannot qualify a passed observation; expected timeout milliseconds None or actionable invalid-option diagnostic. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1520,9 +1520,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout[within-deadline]",
       "expected": "Public CLI final verification mode within-deadline preserves the original deadline and immutable capture reference; fresh public receipt validity equals the actual success/completion outcome.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 222,
-      "end_line": 222,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 232,
+      "end_line": 232,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Public CLI final verification mode within-deadline preserves the original deadline and immutable capture reference; fresh public receipt validity equals the actual success/completion outcome. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1530,9 +1530,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout[expired-verification]",
       "expected": "Public CLI final verification mode expired-verification preserves the original deadline and immutable capture reference; fresh public receipt validity equals the actual success/completion outcome.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 222,
-      "end_line": 222,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 232,
+      "end_line": 232,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Public CLI final verification mode expired-verification preserves the original deadline and immutable capture reference; fresh public receipt validity equals the actual success/completion outcome. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1540,9 +1540,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout[completion-write-error]",
       "expected": "Public CLI final verification mode completion-write-error preserves the original deadline and immutable capture reference; fresh public receipt validity equals the actual success/completion outcome.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 222,
-      "end_line": 222,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 232,
+      "end_line": 232,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Public CLI final verification mode completion-write-error preserves the original deadline and immutable capture reference; fresh public receipt validity equals the actual success/completion outcome. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     },
     {
@@ -1550,9 +1550,9 @@
       "test_id": "tests.test_execution_vitest_budgets::test_cli_final_verification_keeps_original_deadline_and_invalidates_timeout[completion-late]",
       "expected": "Public CLI final verification mode completion-late preserves the original deadline and immutable capture reference; fresh public receipt validity equals the actual success/completion outcome.",
       "assertion_path": "tests/test_execution_vitest_budgets.py",
-      "start_line": 222,
-      "end_line": 222,
-      "source_sha256": "9abacf6be0ef0ae05460f135575a3888b439ad4e55e048031b59401121bc054b",
+      "start_line": 232,
+      "end_line": 232,
+      "source_sha256": "92cee10ec534f994c1d58615c76f7a5cfec27c537bfe32038cce575c0326a221",
       "justification": "Public CLI final verification mode completion-late preserves the original deadline and immutable capture reference; fresh public receipt validity equals the actual success/completion outcome. Exact canonical pytest/JUnit parameter identity binds the direct verdict assertion in the actual integration test; existing helper checks validate elapsed time, CLI exit, publication failure cleanup and unchanged reference bytes where applicable."
     }
   ],

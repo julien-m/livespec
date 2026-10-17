@@ -7,6 +7,13 @@
 
 ---
 
+## 2026-10-17 — Feature096 bugfix: reject late Chai matcher and prototype registration
+
+- Official seven-case RED/GREEN and37 adjacent checks pass; scoped regression proof only.
+
+## 2026-10-17 — Feature096 CI fixture fix: actual Typer Result annotation and exact outer deadline; normal AC004-filtered proof18 tests, previous110/six-AC proof historical
+<!-- finalize:spec-fix:2026-10-17:340e3e18 -->
+
 ## 2026-10-17 — Feature096 Fix: bounded consumer timeouts and same-deadline CLI final verification; normal spec-fix after scoped fallback,110 current tests and six ACs certified
 <!-- finalize:spec-fix:2026-10-17:24d6777c -->
 

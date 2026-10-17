@@ -158,3 +158,37 @@ Inspect [the independent gap report](checks/2026-10-17.md): six FRs align static
 - The scoped lane exceeded its300-line limit, so the final workflow is normal spec-fix after official fallback readiness. Inspect [the frozen independent report](checks/2026-10-17.md) and [the current110-test capture](.reviews/timeout-finalize-fix/final-capture.json): all110 pass and all six ACs are certified. Fresh consumer observations cover46dashboard and55slides tests. All historical failed/preliminary receipts remain preserved.
 
 <!-- finalize:spec-fix:2026-10-17:24d6777c -->
+
+## 2026-10-17 — [Bugfix]: CI fixtures: correct result type and preserve the measured deadline
+
+- Import the actual Typer Result class used by CliRunner. Full mypy now checks all797 source files successfully; no ignore or cast was added.
+- Record the real outer command deadline at capture_execution entry and require exactly that end during final provenance verification. CLI parsing time no longer enters a guessed tolerance. Assertions, four-second simulated budgets,4.3-second controlled delays and production limits remain unchanged.
+- This normal spec-fix is filtered to AC-004. Inspect [the current18-test capture](.reviews/type-import-fix/capture.json):18 tests pass and only AC-004 is certified. The previous110-test/six-AC archive remains historical before this test-source correction. Inspect [the frozen grouped gap report](checks/2026-10-17.md). No claim is made for the separate late-custom-matcher finding.
+
+<!-- finalize:spec-fix:2026-10-17:340e3e18 -->
+
+## 2026-10-17 — [Bugfix]: Reject late Chai matcher registration and prototype mutation after observer bootstrap
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .github/workflows/ci.yml, tests/test_execution_vitest_extensions.py, validator/vitest/matcher-observer.ts
+- **AC impacted:** AC-002
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[chainable], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[getter], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[method], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[parent], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[plugin-setup], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[plugin-test], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[replace-built-in]
+- **RED receipt:** `.specs/.execution/4e64d2dbb4fd44ecbf03f38e321fe43d/receipt.json`
+- **GREEN receipt:** `.specs/.execution/ec4b03a2c9824b2a930ef252401d0383/receipt.json`
+<!-- bugfix:ec4b03a2c9824b2a930ef252401d0383 -->
+
+## 2026-10-17 — [Bugfix]: Reject late Chai matcher registration with complete FR-002 source anchor
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .github/workflows/ci.yml, tests/test_execution_vitest_extensions.py, validator/vitest/matcher-observer.ts
+- **AC impacted:** AC-002
+- **Author:** livespec bugfix record
+- **Base revision:** d83fad41006955d6fbbd89effbcf5d88c9d02b3c
+- **Regression tests:** tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[chainable], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[getter], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[method], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[parent], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[plugin-setup], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[plugin-test], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[replace-built-in]
+- **RED receipt:** `.specs/.execution/4e64d2dbb4fd44ecbf03f38e321fe43d/receipt.json`
+- **GREEN receipt:** `.specs/.execution/237a4d011b7d4506aa7fdf940486488d/receipt.json`
+<!-- bugfix:237a4d011b7d4506aa7fdf940486488d -->
