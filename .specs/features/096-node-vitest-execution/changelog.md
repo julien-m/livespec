@@ -179,3 +179,16 @@ Inspect [the independent gap report](checks/2026-10-17.md): six FRs align static
 - **RED receipt:** `.specs/.execution/4e64d2dbb4fd44ecbf03f38e321fe43d/receipt.json`
 - **GREEN receipt:** `.specs/.execution/ec4b03a2c9824b2a930ef252401d0383/receipt.json`
 <!-- bugfix:ec4b03a2c9824b2a930ef252401d0383 -->
+
+## 2026-10-17 — [Bugfix]: Reject late Chai matcher registration with complete FR-002 source anchor
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .github/workflows/ci.yml, tests/test_execution_vitest_extensions.py, validator/vitest/matcher-observer.ts
+- **AC impacted:** AC-002
+- **Author:** livespec bugfix record
+- **Base revision:** d83fad41006955d6fbbd89effbcf5d88c9d02b3c
+- **Regression tests:** tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[chainable], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[getter], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[method], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[parent], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[plugin-setup], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[plugin-test], tests/test_execution_vitest_extensions.py::test_late_custom_matcher_cannot_hide_behind_supported_dispatch[replace-built-in]
+- **RED receipt:** `.specs/.execution/4e64d2dbb4fd44ecbf03f38e321fe43d/receipt.json`
+- **GREEN receipt:** `.specs/.execution/237a4d011b7d4506aa7fdf940486488d/receipt.json`
+<!-- bugfix:237a4d011b7d4506aa7fdf940486488d -->

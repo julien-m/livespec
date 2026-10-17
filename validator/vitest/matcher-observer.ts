@@ -143,7 +143,7 @@ const observe = (
 };
 
 /** Install once per worker before importing consumer setup and tests. */
-// @spec FR-002: keep the installed matcher boundary stable after Vitest bootstrap.
+// @spec FR-002: seal installed matchers — .specs/features/096-node-vitest-execution/spec.md#fr-002
 const sealMatcherSurface = (): void => {
 	const prototype = chai.Assertion.prototype;
 	const registry: unknown = Reflect.get(prototype, "__methods");
