@@ -77,3 +77,13 @@
 - **Author:** Codex independent Test phase
 
 <!-- finalize:spec-test:2026-10-17:8377a967 -->
+
+## 2026-10-17 — [Feature]: Node/Vitest delivery integration validated
+
+- Integrated main #52 with both changelog histories and the strict root Git-internals hashing fix. No Vitest asset or consumer source changed.
+- Actual integration capture:98/98 passed,6/6 AC certified, valid=true in226.776s under300s; previous Implement and Test artifacts remain historical.
+- Targeted integration checks:3 worktree regressions and21 migration/specify-review tests pass; Ruff and repo/feature conventions pass.
+- Inspect [the exact integration execution reference](summary.json), [the immutable execution receipt](../../../../.execution/82d9844e6e834858aeb7a2b4a6d3f199/receipt.json) and [the frozen independent Test report](../../checks/2026-10-17-test.md).
+- Independent full-scope review and audit:53 files each, PASS; advisory conventions warnings remain existing follow-up debt. Official delivery review verification passes.
+
+<!-- finalize:spec-feature:2026-10-17:35d03aca -->
