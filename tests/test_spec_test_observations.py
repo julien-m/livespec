@@ -54,11 +54,10 @@ def test_explicit_absence_and_resolved_commands_have_distinct_applicability(tmp_
     assert (absent, declared) == ([False, False], [True, True])
 
 
-@pytest.mark.acceptance
-def test_canonical_test_goal_proves_real_observation_without_certifying_review_acs(
+def _prepare_review_only_observation(
     vitest_project: VitestProject, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Current and historical canonical tasks retain their distinct proof purposes."""
+) -> tuple[Path, Path]:
+    """Prepare six review ACs and capture their independent genuine runtime observation."""
     project = vitest_project.root
     directory = project / ".specs/features" / FEATURE
     (directory / "spec.md").write_text(
@@ -76,6 +75,11 @@ def test_canonical_test_goal_proves_real_observation_without_certifying_review_a
     receipt = vitest_project.capture()
     observed = verify_execution_observation(receipt, project, FEATURE, "passed")
     assert observed.valid and observed.certified_acs == [], observed.gaps
+    return project, receipt
+
+
+def _prepare_historical_skill(project: Path) -> Path:
+    """Preserve the old immutable generic-task purpose in a separate producer copy."""
     producer = project.parent / "historical-producer"
     shutil.copytree(
         ROOT / ".agent-sync/skills/spec-test", producer / ".agent-sync/skills/spec-test"
@@ -83,6 +87,17 @@ def test_canonical_test_goal_proves_real_observation_without_certifying_review_a
     shutil.copytree(ROOT / "system", producer / "system")
     old_skill = producer / ".agent-sync/skills/spec-test/SKILL.md"
     old_skill.write_text(old_skill.read_text().replace(" outcome:passed", ""))
+    return old_skill
+
+
+@pytest.mark.acceptance
+def test_canonical_test_goal_proves_real_observation_without_certifying_review_acs(
+    vitest_project: VitestProject, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Current and historical canonical tasks retain their distinct proof purposes."""
+    project, receipt = _prepare_review_only_observation(vitest_project, monkeypatch)
+    old_skill = _prepare_historical_skill(project)
+    producer = old_skill.parents[3]
     history = old_skill.read_bytes()
     for livespec_root, historical in ((producer, True), (ROOT, False)):
         goal = compile_command_goal(

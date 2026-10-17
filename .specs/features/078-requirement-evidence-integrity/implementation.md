@@ -11,6 +11,7 @@ Read the [contract](spec.md), [approved plan](plan.md), [progress](progress.md) 
 
 | Requirement | Acceptance scope | Implementation | Regression coverage |
 |---|---|---|---|
+| FR-009 (2026-10-17) | AC-007, AC-015 | Read [canonical Test tasks](../../../.agent-sync/skills/spec-test/SKILL.md#phase-4--execute-test-suite), [Test expectations](../../../.agent-sync/skills/spec-test/expectations.md#3-observable-signals) and [command applicability](../../../validator/evidence_applicability.py) (`@spec FR-009`). | Read [the real observation regression](../../../tests/test_spec_test_observations.py); this maps the bounded fix, not full feature acceptance. |
 | FR-009, FR-016 | AC-007, AC-015 | Verified 2026-10-16: read [typed policy](../../../validator/evidence_policy.py) and [acceptance conjunction](../../../validator/acceptance_evidence.py). | Read [documentary-only boundary tests](../../../tests/test_documentary_only_acceptance.py). |
 | FR-001 | AC-001, AC-002 | Read [qualified inventory](../../../validator/semantic/review_context.py). | Read [context tests](../../../tests/test_review_context.py). |
 | FR-002 | AC-002 | Read [complete batches](../../../validator/semantic/review_batches.py), [synthesis](../../../validator/semantic/review_synthesis.py) and [lossless synthesis transport](../../../validator/semantic/review_synthesis_transport.py). | Read [paired-plan/blocker tests](../../../tests/test_review_batching.py) and [transport/budget tests](../../../tests/test_review_synthesis_transport.py). |

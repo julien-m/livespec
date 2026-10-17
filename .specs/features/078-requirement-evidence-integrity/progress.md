@@ -77,3 +77,12 @@ RED a5afa5c4 and GREEN 01917bd3 prove real mapped assertions in Git-ignored cach
 - Final regression bytes reproduce both defects in runner-owned RED `1f051d7a14a14812974a52a41c8f9f93`; pre-edit gate READY.
 - Necessary selection: 53 passed, zero skipped with real Node 22/Vitest 2.1.9; Ruff/format and full Pyright pass. Native high review found no blockers. GREEN and closing receipts follow through the bugfix trace.
 - Full feature acceptance/status and consumer lifecycle remain unchanged.
+
+## 2026-10-17 — Final PR51 integration preparation
+
+- Integrated PR51 head `36ed979502ce7627752263daef5dad7efeeab037`, preserving its producer corrections and the four unchanged 078 contract/test sources.
+- Current dated Requirement Mapping links the actual fix sources and test so the Bugfix Receipts table no longer masks conventions scope. No parser or normative requirement changed.
+- Current compatibility observation and conventions are independently reverified after this checkpoint. Historical receipts remain historical; delivered main and the separate 078 PR remain pending.
+
+- Necessary current selection: 53 passed, zero skipped through a runner-owned passed-observation receipt; no AC certified. Conventions PASS on all four mapped files; Ruff/format and full Pyright PASS.
+- Test-only helper extraction preserves every assertion while meeting the 60-line error threshold. Conventions retain nonblocking function-length warnings (57-line scenario and existing 41-line resolver); no waiver or parser change. Historical RED/GREEN is not current proof after these test bytes changed; final closure awaits delivered main.
