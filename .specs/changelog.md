@@ -1041,3 +1041,7 @@ Read the [078 correction](features/078-requirement-evidence-integrity/implementa
 ## 2026-10-17 — [Bugfix]: Manual changelog separators survive finalization
 
 Read the [078 correction](features/078-requirement-evidence-integrity/implementation.md): projecting generated history preserves adjacent manual headings, bodies and separators, keeping execution evidence stable across ordinary finalization. A true manual edit remains governed; policy versions and historical captures stay unchanged.
+
+## 2026-10-17 — [Feature 078] Bugfix: distinguish explicitly absent E2E commands
+
+- Read [the correction and regression receipts](features/078-requirement-evidence-integrity/implementation.md#2026-10-17--explicit-absent-e2e-commands-spec-fix): an explicit absent command cell no longer creates a separate execution obligation; real commands, ambiguity and visual requirements remain governed.

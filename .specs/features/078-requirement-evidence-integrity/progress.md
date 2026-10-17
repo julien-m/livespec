@@ -85,3 +85,9 @@ Capture22c6c801 certifies AC007/AC015 with zero gaps and 3875 passing tests. The
 - RED proves heading fusion and stale execution after insertion before a manual dated entry. GREEN and six scoped tests pass (4.08 seconds); lint, format, Pyright and feature/repo conventions pass.
 - Closing bugfix gate ELIGIBLE (63 counted lines, two files). Read the [implementation and runner-owned receipts](implementation.md#bugfix-receipts).
 - Pure read-only real012 projection: historical pre-finalize hash e217590c… reproduced with the old projector; corrected before/after hash7943e122… identical; real manual edits still change it. No consumer files, captures, goals or policy versions changed.
+
+## 2026-10-17 — Confined E2E absence correction
+
+- RED reproduced the explicit `Non exécutés` table being treated as a command; GREEN and thirteen scoped tests pass in 1.00 seconds. Concrete E2E commands, unresolved declarations, prerequisites and visual overrides stay required.
+- Closing bugfix gate ELIGIBLE (111 counted lines, two files); scoped Ruff/format/Pyright and feature/repo conventions pass. Read the [implementation and runner-owned receipts](implementation.md#bugfix-receipts).
+- Pure compilation of the unchanged real012 Plan excludes only task032 from the required inventory; seven other task identities and semantic fields, normalized flags and other goal payload fields remain identical. Ordinals are renumbered by the existing filter. No consumer goal, Plan or evidence is changed.

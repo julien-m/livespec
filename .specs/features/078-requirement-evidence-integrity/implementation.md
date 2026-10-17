@@ -182,6 +182,7 @@ FR-004 / AC-004: [normative identity](../../../validator/normative_identity.py) 
 | 2026-10-17 | implementation | `tests/test_acceptance_direct_inputs.py::test_direct_markdown_cli_preserves_roles_bytes_and_freshness` | `.specs/.execution/4298be9d7688405896ffcf814709f379/receipt.json` | `.specs/.execution/1ba4db750185419cbced4a099c475cdc/receipt.json` |
 | 2026-10-17 | implementation | `tests/test_review_balanced_fallback.py::test_balanced_fallback_reduces_calls_with_complete_exact_coverage` | `.specs/.execution/a619a75310c84c1aa4a3c77d639b40b3/receipt.json` | `.specs/.execution/8a2ab913493c43ab851d28763e7ee38c/receipt.json` |
 | 2026-10-17 | implementation | `tests/test_execution_registry_boundaries.py::test_actual_finalize_before_manual_entry_preserves_execution_receipt`, `tests/test_execution_registry_boundaries.py::test_generated_entry_preserves_manual_heading_body_and_separator` | `.specs/.execution/66d1c847c06644d9b09995334710b3ec/receipt.json` | `.specs/.execution/ca301ef49128447aaea9f4232e78da31/receipt.json` |
+| 2026-10-17 | implementation | `tests/test_e2e_command_applicability.py::test_absent_e2e_command_becomes_documentary_with_bound_plan_provenance`, `tests/test_e2e_command_applicability.py::test_real_e2e_and_ambiguous_or_missing_declarations_stay_required` | `.specs/.execution/31c0df499a554e21b543e35db3957de8/receipt.json` | `.specs/.execution/2ddb5942af364e6880ff96666ac4803e/receipt.json` |
 
 ## 2026-10-17 — Finalization of referenced registries (spec-fix)
 
@@ -214,3 +215,11 @@ The frozen HandoffBox012 preparation (49 sources, 627 sections, AC-006) drops fr
 | 2026-10-17 | Read [registry projection](../../../validator/execution_registry.py): remove a marked generated summary and its following blank line, preserving the preceding separator and all manual headings/bodies. | Read [boundary regressions](../../../tests/test_execution_registry_boundaries.py): exact Markdown preservation, real capture/finalize/receipt verification, generated-only stability and normative-edit detection. |
 
 The real012 changelog projection is invariant across removal/insertion of the generated8658a343 entry. Reconstructing the historical pre-finalize bytes with the old projector reproduces the b06 capture hash exactly; the corrected projector naturally has a different hash because it restores previously lost separators. Projection/scope policy versions and immutable captures stay unchanged. Runtime adoption and fresh consumer certification remain separate.
+
+## 2026-10-17 — Explicit absent E2E commands (spec-fix)
+
+| Date | Scoped correction | Regression |
+|---|---|---|
+| 2026-10-17 | Read [command applicability](../../../validator/evidence_applicability.py): an E2E table command cell explicitly declaring `Non exécutés` is absent; concrete commands, ambiguous declarations, missing prerequisites and visual overrides remain required. | Read [E2E declaration regressions](../../../tests/test_e2e_command_applicability.py): exact Plan provenance, evidence policy, real commands, fail-closed prerequisites and visual override. |
+
+The unchanged real012 Plan resolves E2E to `explicit_no_command`. Pure goal compilation excludes only task032 through the existing required-task filter; seven other tasks retain their semantic fields and normal ordinal renumbering. No consumer goal is saved or changed.

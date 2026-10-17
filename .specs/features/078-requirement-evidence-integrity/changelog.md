@@ -308,3 +308,16 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/66d1c847c06644d9b09995334710b3ec/receipt.json`
 - **GREEN receipt:** `.specs/.execution/ca301ef49128447aaea9f4232e78da31/receipt.json`
 <!-- bugfix:ca301ef49128447aaea9f4232e78da31 -->
+
+## 2026-10-17 — [Bugfix]: Distinguish explicit absent E2E table commands from real or unresolved execution declarations
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_e2e_command_applicability.py, validator/evidence_applicability.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_e2e_command_applicability.py::test_absent_e2e_command_becomes_documentary_with_bound_plan_provenance, tests/test_e2e_command_applicability.py::test_real_e2e_and_ambiguous_or_missing_declarations_stay_required
+- **RED receipt:** `.specs/.execution/31c0df499a554e21b543e35db3957de8/receipt.json`
+- **GREEN receipt:** `.specs/.execution/2ddb5942af364e6880ff96666ac4803e/receipt.json`
+<!-- bugfix:2ddb5942af364e6880ff96666ac4803e -->
