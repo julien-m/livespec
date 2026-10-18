@@ -1,4 +1,4 @@
-"""Commit only CLI captures whose full verification finished inside the original deadline."""
+"""Commit captures only after their API or CLI boundary finishes inside the original deadline."""
 
 from __future__ import annotations
 

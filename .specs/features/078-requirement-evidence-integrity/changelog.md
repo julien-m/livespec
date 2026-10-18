@@ -345,3 +345,7 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 ## 2026-10-18 — [Bugfix]: Qualify the exact eighth no-UI absence marker without opening suffix grammar. Current receipt `78e6012da9d84084b58256d28318313d` records 4 passing cases and 24 reviewed bindings for AC-007/009/010 only. Read [the execution checkpoint](progress.md#exact-no-ui-absence-verification--2026-10-18), [the mapped absence tests](../../../tests/test_suite_absence_declarations.py) and [the existing requirement mapping](implementation.md#requirement-mapping--2026-10-18). The exact additional marker is N/A — no UI; prior receipts and controls retain their historical identities and outcomes.
 
 <!-- finalize:spec-fix:2026-10-18:ec8178d9 -->
+
+## 2026-10-18 — [Bugfix]: Preserve fenced resolved-command invocations without dropping unknown drivers. Current receipt `0bf8bb9645c3449aaa070a2274cc4e9c` records two targeted tests, eight reviewed bindings and AC-007/010 only. Read [the current checkpoint](progress.md#fenced-command-execution-verification--2026-10-18) and [the real canonical regressions](../../../tests/test_suite_absence_declarations.py). Earlier source-bound proofs remain historical.
+
+<!-- finalize:spec-fix:2026-10-18:957ca33d -->

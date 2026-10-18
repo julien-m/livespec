@@ -222,3 +222,7 @@ Inspect [the independent gap report](checks/2026-10-17.md): six FRs align static
 ## 2026-10-17 — [Bugfix]: CI timeout-test correction: 10 genuine checks pass and AC-004 is certified through 30 independently reviewed bindings. Read [the execution receipt](../../.execution/cd926fb097c44fe282ed333ca49b8f56/receipt.json) and [the correction scope](implementation.md#ci-timeout-test-correction--2026-10-17). The 1.5-second timeout and both refusal checks remain unchanged; the public no-fresh-receipt outcome no longer fails the helper assumption. No production or normative change; historical six-AC certificates remain bound to their original trees.
 
 <!-- finalize:spec-fix:2026-10-17:f981b487 -->
+
+## 2026-10-18 — [Bugfix]: API completion fixture compatibility: four selected functions execute five genuine Node22/Vitest cases PASS, zero skips. Preserve actual completion budget while rebinding intentionally corrupted fixture hashes; historical-root representation explicitly disables pending completion. Read [the maintenance scope](implementation.md#api-completion-fixture-compatibility--2026-10-18). No production, normative or acceptance-certification change.
+
+<!-- finalize:spec-fix:2026-10-18:877b2a24 -->

@@ -234,3 +234,7 @@ Ambiguous trailing-parenthesis forms still meet the existing working-directory a
 | FR-009, FR-011; AC-007/009/010 | Read [the dedicated absence declarations](../../../tests/test_suite_absence_declarations.py), using the shared owned project/goal helpers in [command discovery](../../../tests/test_suite_command_discovery.py), and inspect [the production predicate](../../../validator/evidence_applicability.py). | Read [AC-007](spec.md#ac-007), [AC-009](spec.md#ac-009) and [AC-010](spec.md#ac-010). |
 
 The three absence tests moved without assertion changes to keep both test modules within the 500-line convention. Their new module identities require fresh mapping and execution; the first 43-case receipt remains historical for its exact pre-split bytes.
+
+### Fenced resolved commands
+
+Read [the fenced corpus and real-goal regressions](../../../tests/test_suite_absence_declarations.py) before changing fenced command discovery. Untyped and language-labelled fenced blocks inside the selected Resolved Test Commands section preserve each nonempty, non-comment invocation. Without an explicit action label these commands belong to unit and DoD; command arguments never infer integration/E2E. Only direct `ruff check`/`ruff format`, `pyright`, `mypy`, or an `&&` chain containing only those quality commands are excluded. Unknown, wrapped, mixed or ambiguous commands remain required opaque declarations or explicit unresolved bindings. Closing a fence resumes named-table parsing.

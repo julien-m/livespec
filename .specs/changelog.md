@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-10-18 — [Feature096] API completion fixture maintenance: five real Vitest regression cases PASS; no new AC claim.
+<!-- finalize:spec-fix:2026-10-18:877b2a24 -->
+
+## 2026-10-18 — [Feature095] Expired captured execution cannot return success; preserve124 diagnostics. Real publication and no-fresh-receipt regressions: two tests, eight bindings, AC001/003 only.
+<!-- finalize:spec-fix:2026-10-18:6dd8b550 -->
+
+## 2026-10-18 — [Feature095] Expired captured execution cannot return success; preserve124 diagnostics. Real publication and no-fresh-receipt regressions: two tests, five bindings, AC001/003 only.
+<!-- finalize:spec-fix:2026-10-18:54e97348 -->
+
+## 2026-10-18 — [Feature078] Preserve fenced resolved commands: exactargv/unit+DoD, positive quality exclusions and explicit unsupported drivers; two targeted tests, eight bindings, AC007/010 only.
+<!-- finalize:spec-fix:2026-10-18:957ca33d -->
+
 ## 2026-10-18 — [Feature 078] Exact eighth no-UI absence marker verified: 4 checks, 24 reviewed bindings and AC-007/009/010 only; opaque or unresolved command-bearing suffixes never disappear. Read [the current execution checkpoint](features/078-requirement-evidence-integrity/progress.md#exact-no-ui-absence-verification--2026-10-18).
 <!-- finalize:spec-fix:2026-10-18:ec8178d9 -->
 

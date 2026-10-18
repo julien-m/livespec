@@ -78,3 +78,11 @@
 - **AC impacted:** AC-001, AC-003 and AC-004.
 - **Validation:** Three necessary regressions pass in 0.69s and seven affected neighbors pass in 5.94s. Locked Ruff/format/mypy/Pyright and conventions pass; current acceptance and independent delivery review are refreshed before commit.
 - **Author:** Codex
+
+## 2026-10-18 — [Bugfix]: Refuse successful capture returns after an expired managed deadline, preserving existing124 diagnostics. Actual receipt `6123a3e50a004a2ebb4969a4fb5961b0` records two targeted tests and five reviewed bindings for AC-001/003 only. Read [the current checkpoint](progress.md#timeout-return-verification--2026-10-18) and [the real publication regressions](../../../tests/test_execution_test_budgets.py). Earlier receipts and the rejected precheck remain historical.
+
+<!-- finalize:spec-fix:2026-10-18:54e97348 -->
+
+## 2026-10-18 — [Bugfix]: Keep every API receipt provisional until existing atomic in-deadline completion, preserving CLI deferral and124 diagnostics. Actual receipt `7159ad511f904dc5b3b2cb0bed87e2ef` records two targeted tests and eight reviewed bindings for AC-001/003 only. Read [the current checkpoint](progress.md#atomic-api-completion-verification--2026-10-18) and [the real publication regressions](../../../tests/test_execution_test_budgets.py). Earlier receipts and the rejected precheck remain historical.
+
+<!-- finalize:spec-fix:2026-10-18:6dd8b550 -->

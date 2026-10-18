@@ -33,6 +33,7 @@ from .execution_scope import (
     read_regular,
     source_manifest,
 )
+from .execution_verification import complete_verification
 from .execution_working_directory import capture_execution_cwd, resolve_runner_cwd
 from .goal_archive_file import release_archive_lock
 
@@ -103,7 +104,7 @@ def capture_execution(
 
     with command_scope(project_root, argv, timeout) as scope:
         try:
-            return _capture_execution(
+            result = _capture_execution(
                 argv,
                 project_root=project_root,
                 feature=feature,
@@ -112,9 +113,16 @@ def capture_execution(
                 timeout=timeout,
                 acceptance_mapping=acceptance_mapping,
                 required_report_path=required_report_path,
-                verification_pending=verification_pending,
+                verification_pending=True,
                 execution_cwd=execution_cwd,
             )
+            # @spec FR-001, FR-003: Expiry never returns successful execution.
+            # — .specs/features/095-test-time-budgets/spec.md#fr-001
+            if (scope.timed_out or scope.remaining() <= 0) and result.exit_code != 124:
+                raise BudgetExpired("Managed execution deadline expired before returning capture")
+            if not verification_pending and result.receipt_path and result.exit_code != 124:
+                complete_verification(Path(result.receipt_path), project_root.resolve(strict=True))
+            return result
         except BudgetExpired as exc:
             scope.timed_out = True
             try:
@@ -189,7 +197,7 @@ def _capture_execution(
         stdout_sha256=digest(stdout.encode()),
         stderr_sha256=digest(stderr.encode()),
         acceptance_mapping=acceptance_mapping,
-        verification_pending=verification_pending,
+        verification_pending=verification_pending and code != 124,
         gaps=gaps,
     )
     return _finish_capture(directory, capture, stdout, stderr)

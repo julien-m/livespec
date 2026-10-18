@@ -162,3 +162,10 @@ Consumer zero, negative and nonfinite numeric test/hook timeouts use the positiv
 CI on `3cc9ac50da18e968a0b3b1d595523e9f36007f72` exposed the legitimate no-fresh-receipt timeout result. The test previously required publication through a convenience helper. Runtime behavior and normative requirements are unchanged. The local pre-edit attempt passed through the other legitimate branch; the official bugfix gate printed FALLBACK rather than qualifying a fabricated RED. The normal correction targets AC-004. Earlier 40-test/six-AC and 31-test/four-AC certificates remain bound to their original source trees.
 
 - Current AC-004 scope: 10 passing real cases and 30 independently reviewed bindings; inspect [the execution receipt](../../.execution/cd926fb097c44fe282ed333ca49b8f56/receipt.json). It includes separate preparation-expiry and owned-descendant/heartbeat cleanup witnesses. Other acceptance criteria are not recertified by this correction.
+
+
+## API completion fixture compatibility — 2026-10-18
+
+- Fixture maintenance only: no production or normative change, no new acceptance certification. Four selected test functions execute five cases, all PASS with real Node 22/Vitest and zero skips.
+- Read [the fixture](../../../tests/execution_vitest_fixture.py), [legacy-root regression](../../../tests/test_execution_working_directory.py) and [origin regression](../../../tests/test_execution_vitest_integrity.py). Semantic inventory/origin corruption updates only the capture hash in the actual completion marker while retaining its real deadline budget; historical schema explicitly has verification_pending=false.
+- Prior production-095 capture7159 and other certificates remain historical under their original test trees. Standalone regression output is external, not an AC receipt.

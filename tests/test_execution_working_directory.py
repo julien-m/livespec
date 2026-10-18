@@ -123,6 +123,7 @@ def test_historical_root_capture_retains_root_meaning(vitest_project: VitestProj
     receipt = vitest_project.capture()
     capture = json.loads((receipt.parent / "capture.json").read_text())
     assert capture["execution_cwd"] == "."
+    capture["verification_pending"] = False
     capture.pop("execution_cwd")
     capture.pop("execution_cwd_identity")
     for key in ("execution_cwd", "cwd_device", "cwd_inode"):

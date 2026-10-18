@@ -186,3 +186,96 @@ def test_corpus_no_ui_absence_is_exact_and_never_hides_command_suffixes(tmp_path
             assert ["opaque", ".", *shlex.split(declaration)] in binding["commands"]
         assert resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
         assert resolve_applicability(tmp_path, FEATURE, "e2e-command")["applicable"]
+
+
+def test_fenced_corpus_commands_preserve_selection_and_exclude_only_direct_quality() -> None:
+    """Untyped031 and bash081 bind every actual test invocation without argv suite inference."""
+    root = Path(__file__).resolve().parents[1]
+    for feature, count in [("031-ui-runner-android", 3), ("081-lightweight-outcome-goals", 2)]:
+        binding = suite_binding(root, feature, "all")
+        # @spec AC-007: Approved fenced test invocations remain exact required selections.
+        # — .specs/features/078-requirement-evidence-integrity/spec.md#ac-007
+        assert len(binding["commands"]) == count
+        assert all(command[0] in {"pytest", "opaque"} for command in binding["commands"])
+        text = (root / ".specs/features" / feature / "plan.md").read_text()
+        original = [
+            shlex.split(line)
+            for line in (section(text, "Resolved Test Commands") or "").splitlines()
+            if line.startswith(("python -m pytest", "pytest "))
+        ]
+        for frozen, argv in zip(binding["commands"], original, strict=True):
+            retained = argv
+            if frozen[0] == "pytest":
+                retained = argv[3:] if argv[1:3] == ["-m", "pytest"] else argv[1:]
+            assert frozen[2:] == retained
+        assert any(
+            "tests/integration/" in command
+            or "tests/integration/test_surfaces_maestro.py" in command
+            for command in binding["commands"]
+        )
+    rows = _command_rows(
+        "~~~bash\n# setup note\nruff check . && ruff format --check .\n"
+        "custom-driver --ignore=tests/integration\n~~~\n| Integration | N/A |\n"
+    )
+    assert rows == [
+        ("Static quality", "ruff check . && ruff format --check ."),
+        ("Declared command", "custom-driver --ignore=tests/integration"),
+        ("Integration", "N/A"),
+    ]
+    for command in [
+        "ruff check . && custom-driver",
+        "env CI=1 mypy .",
+        "ruff check .; ./unknown",
+        "ruff check . | unknown",
+        "mypy . & unknown",
+    ]:
+        assert _command_rows("```\n" + command + "\n```")[0] == ("Declared command", command)
+
+
+@pytest.mark.integration
+def test_real_fenced_goal_proves_unit_and_all_but_never_unknown_invocations(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Real pytest proves the complete fenced selection, never an unknown driver."""
+    for unknown in [False, True]:
+        root = tmp_path / str(unknown)
+        unit = [sys.executable, "-m", "pytest", "tests/test_one.py", "-q"]
+        feature = _project(root, [])
+        (feature / "plan.md").write_text(
+            "## Resolved Test Commands\n\n```bash\n"
+            + shlex.join(unit)
+            + "\nruff check . && ruff format --check .\nmypy .\n"
+            + ("custom-driver --ignore=tests/integration\n" if unknown else "")
+            + "```\n"
+        )
+        contract, state = _goal(root, monkeypatch)
+        result = capture_execution(
+            unit,
+            project_root=root,
+            feature=FEATURE,
+            adapter="junit",
+            env=dict(os.environ),
+            timeout=5,
+        )
+        receipt = Path(result.receipt_path)
+        assert verify_execution_observation(receipt, root, FEATURE, "passed").valid
+        for task in contract["tasks"]:
+            binding = task.get("expected_evidence", {}).get("suite_binding", {})
+            if binding.get("suite") not in {"unit", "all"}:
+                continue
+            proof = prove_goal_task(
+                contract,
+                state,
+                task["id"],
+                {"execution_receipt_path": str(receipt)},
+                project_root=root,
+            )
+            # @spec AC-007: Canonical unit and aggregate require every actual fenced invocation.
+            # — .specs/features/078-requirement-evidence-integrity/spec.md#ac-007
+            assert proof["accepted"] is (not unknown)
+            if unknown:
+                # @spec AC-010: Unknown fenced drivers stay required and unsupported, never absent.
+                # — .specs/features/078-requirement-evidence-integrity/spec.md#ac-010
+                assert (
+                    "suite_assertion_adapter_unsupported:custom-driver" in proof["missing_evidence"]
+                )

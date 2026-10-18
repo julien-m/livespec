@@ -148,3 +148,8 @@ Resume at Step 5 final validation. No native goal created (parent instruction); 
 - Full mypy and Pyright, changed-file Ruff and formatting pass. The independent current AC-004 mapping and bounded execution remain separate from historical full-feature certificates.
 
 - Current scoped execution: read [the genuine AC-004 receipt](../../.execution/cd926fb097c44fe282ed333ca49b8f56/receipt.json): 10 passed, zero skipped, 30 independently reviewed bindings, AC-004 certified, no gaps. This local run observed the published-timeout branch; the no-receipt branch is supported by the public API and the original CI failure, not claimed as locally observed.
+
+
+## API completion fixture compatibility — 2026-10-18
+
+Four selectors/five genuine Vitest cases PASS, zero skips; test-harness maintenance only. Production and normative definitions unchanged; no new acceptance claim.

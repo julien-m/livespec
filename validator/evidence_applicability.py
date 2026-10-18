@@ -63,17 +63,45 @@ def _resolved_commands(root: Path, feature: str) -> tuple[Path, str, str] | None
     return None
 
 
+def _fenced_action(command: str) -> str:
+    """Exclude only positive direct quality commands; every unknown invocation stays required."""
+    try:
+        if any(char in command for char in ";|<>$`#") or re.search(r"(?<!&)&(?!&)", command):
+            return "Declared command"
+        parts = [shlex.split(part) for part in command.split("&&")]
+        if all(
+            part
+            and (
+                part[0] in {"pyright", "mypy"}
+                or part[:2] in [["ruff", "check"], ["ruff", "format"]]
+            )
+            for part in parts
+        ):
+            return "Static quality"
+    except ValueError:
+        pass
+    return "Declared command"
+
+
 def _command_rows(commands: str) -> list[tuple[str, str]]:
-    """Read action/command cells; command arguments never declare a suite."""
+    """Read named table cells and fenced invocations without inferring suites from argv."""
     rows = []
-    fenced = False
+    fence = ""
     action_column, command_column = 0, 1
     for line in commands.splitlines():
-        if line.lstrip().startswith(("```", "~~~")):
-            fenced = not fenced
-        if fenced:
+        stripped = line.strip()
+        if fence and re.fullmatch(re.escape(fence[0]) + "{" + str(len(fence)) + ",}", stripped):
+            fence = ""
             continue
-        cells = re.split(r"(?<!\\)\|", line.strip().strip("|"))
+        opening = re.fullmatch(r"(`{3,}|~{3,})(?:[A-Za-z0-9_+-]+)?", stripped)
+        if not fence and opening:
+            fence = opening[1]
+            continue
+        if fence:
+            if stripped and not stripped.startswith("#"):
+                rows.append((_fenced_action(stripped), stripped))
+            continue
+        cells = re.split(r"(?<!\\)\|", stripped.strip("|"))
         cells = [cell.strip().strip("`").replace("\\|", "|") for cell in cells]
         if len(cells) < 2:
             continue
