@@ -7,6 +7,15 @@
 
 ---
 
+## 2026-10-18 — [Feature 078] Closed positive absence verified on split test modules: 43 checks, 159 reviewed bindings and AC-007/009/010 only; opaque or unresolved command-bearing suffixes never disappear. Read [the current execution checkpoint](features/078-requirement-evidence-integrity/progress.md#post-split-execution-verification--2026-10-18).
+<!-- finalize:spec-fix:2026-10-18:2c98861b -->
+
+## 2026-10-18 — [Feature 078] Closed positive absence grammar: 43 checks and 159 reviewed bindings certify AC-007/009/010 only; arbitrary command suffixes remain required, opaque or unresolved and noncertifying. Read [the correction scope](features/078-requirement-evidence-integrity/implementation.md#approved-command-table-compatibility-follow-up--2026-10-17).
+<!-- finalize:spec-fix:2026-10-18:9197b952 -->
+
+## 2026-10-18 — [Feature 078] Approved command-table compatibility: 41 checks and 149 reviewed bindings certify AC-007/009/010 only; named columns, strategy fallback, qualified absence and lifecycle-stable command identity. Read [the correction scope](features/078-requirement-evidence-integrity/implementation.md#approved-command-table-compatibility-follow-up--2026-10-17).
+<!-- finalize:spec-fix:2026-10-18:a036f062 -->
+
 ## 2026-10-17 — [Feature 078] Cloud command-discovery correction: 28 checks pass; AC-007/009/010 certified. Action purposes bind every test command; opaque identity grants no unsupported assertion adapter. Read [the current correction scope](features/078-requirement-evidence-integrity/implementation.md#cloud-command-discovery-correction--2026-10-17).
 <!-- finalize:spec-fix:2026-10-17:96cf0f5a -->
 

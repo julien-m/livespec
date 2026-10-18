@@ -129,3 +129,23 @@ RED a5afa5c4 and GREEN 01917bd3 prove real mapped assertions in Git-ignored cach
 - Current full mypy, Pyright, changed-file Ruff and format checks pass. Independent mapping review and final targeted execution remain pending at this checkpoint; no new acceptance PASS is claimed here.
 
 - Current mapped execution: read [the fresh three-AC receipt](../../.execution/1ea13b21907b47e3848486ee536c55ed/receipt.json): 28 passes, no skips, 95 independently reviewed bindings, AC-007/009/010 certified and no gaps. All 15 new regressions pass with the exact final test bytes used by RED `7361c392`; the mapped GREEN selection adds 13 existing witnesses and therefore is not a same-command bugfix-lane pair. No ELIGIBLE claim is made.
+
+## Approved command-table compatibility verification — 2026-10-18
+
+Current runner-owned receipt `bfe7d73a0af04c61a5a2d6d93c5c2627` qualifies 41 passed cases, 149 reviewed assertion bindings and only AC-007/009/010. It covers named/reordered/annotated columns, explicit qualified absence, action-only suite classification, strategy fallback/precedence, immutable original command/cwd and lifecycle-only plan identity. Unsupported opaque execution never qualifies. The earlier v7 40-case receipt and 28-case receipt remain historical for their actual bytes. The other 13 criteria are not recertified. Official goal/archive closure follows this current execution checkpoint.
+
+## Audit v5 absence-grammar correction prepared — 2026-10-18
+
+AUDIT-V5-001 identified command-bearing qualified absence text hidden by the finite runner blacklist. The correction accepts only exact absence tokens and the single approved bootstrap-fixture sentence. A consolidated suffix/opaque-command matrix and a genuine-unit-versus-E2E/aggregate refusal case are prepared but not executed. The earlier 41-case/149-binding receipt remains historical for its actual bytes; its first goal closed and its second archive stopped at the explicit closure deadline. No current execution or closure PASS is claimed for these new source bytes.
+
+## Closed positive absence verification — 2026-10-18
+
+Current runner-owned receipt `c9ffa8c5642748b99a8741f452e8088a` qualifies 43 passed cases, 159 reviewed assertion bindings and only AC-007/009/010. It covers the closed seven-form positive absence grammar, the 96-combination single-case matrix, unresolved ambiguous cwd annotations, real unit-versus-E2E/aggregate/archive refusal, named columns, strategy fallback, original command/cwd and lifecycle identity. Unsupported opaque execution never qualifies. The earlier 41-case receipt and its partially closed controls, plus the 40-case and 28-case receipts, remain historical for their actual bytes. The other 13 criteria are not recertified. Official goal/archive closure follows this current execution checkpoint.
+
+### Final test-file convention repair — 2026-10-18
+
+The first positive-absence capture passed 43 cases / 159 reviewed bindings, but the real conventions gate rejected the 584-line command-discovery module. The three absence cases moved to a dedicated module without changing assertions; both resulting files are under 500 lines. That receipt is historical after the move. Fresh semantic mapping, statics and conventions must pass before the second and final authorized capture; no current post-split execution PASS is claimed here.
+
+## Post-split execution verification — 2026-10-18
+
+Current runner-owned receipt `fcba6c6f2d734184a7816f1d0560e9d7` qualifies 43 passing cases, 159 current reviewed bindings and only AC-007/009/010 on the conventions-compliant split modules. The 96-combination matrix remains one test, and the moved functions retain identical ASTs with updated module identities. The 36-file snapshot is unchanged before/after execution, including the untracked dedicated test module. Ruff, format, full mypy (806 files), Pyright and the actual pre-capture conventions gate passed. The earlier 43-case receipt and its file-size conventions failure remain historical. The other 13 criteria are not recertified. Current official proof/control/archive outputs are retained separately by the CLI workflow; this checkpoint records execution scope without claiming historical whole-feature certification.

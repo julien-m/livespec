@@ -329,3 +329,15 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 ## 2026-10-17 — [Bugfix]: Cloud command-discovery correction: 28 genuine checks pass, 95 bindings certify AC-007/009/010. Read [the execution receipt](../../.execution/1ea13b21907b47e3848486ee536c55ed/receipt.json) and [the current correction scope](implementation.md#cloud-command-discovery-correction--2026-10-17). Explicit Action suites precede non-test vocabulary; installation/build/quality precede broad test-purpose aliases; ambiguous actions remain required. Unknown commands preserve exact opaque cwd/argv identity without a new assertion adapter, while real custom execution remains noncertifying. Historical certificates and the other thirteen criteria are not upgraded.
 
 <!-- finalize:spec-fix:2026-10-17:96cf0f5a -->
+
+## 2026-10-18 — [Bugfix]: Correct approved command-table discovery and source identity. Current runner-owned receipt `bfe7d73a0af04c61a5a2d6d93c5c2627` qualifies 41 passing cases and 149 reviewed bindings for AC-007/009/010 only. Read [the current discovery scope](implementation.md#approved-command-table-compatibility-follow-up--2026-10-17) and [the verification checkpoint](progress.md#approved-command-table-compatibility-verification--2026-10-18). Retain prior campaign receipts for their executed bytes; no historical whole-feature recertification.
+
+<!-- finalize:spec-fix:2026-10-18:a036f062 -->
+
+## 2026-10-18 — [Bugfix]: Correct AUDIT-V5-001 with a closed positive absence grammar and genuine unit-versus-E2E/aggregate refusal. Current runner-owned receipt `c9ffa8c5642748b99a8741f452e8088a` qualifies 43 passing cases and 159 reviewed bindings for AC-007/009/010 only. Read [the current discovery scope](implementation.md#approved-command-table-compatibility-follow-up--2026-10-17) and [the verification checkpoint](progress.md#closed-positive-absence-verification--2026-10-18). Retain prior campaign receipts for their executed bytes; no historical whole-feature recertification.
+
+<!-- finalize:spec-fix:2026-10-18:9197b952 -->
+
+## 2026-10-18 — [Bugfix]: Qualify the closed positive absence grammar on the conventions-compliant split test modules. Current receipt `fcba6c6f2d734184a7816f1d0560e9d7` records 43 passing cases and 159 reviewed bindings for AC-007/009/010 only. Read [the execution checkpoint](progress.md#post-split-execution-verification--2026-10-18), [the mapped absence tests](../../../tests/test_suite_absence_declarations.py) and [the existing requirement mapping](implementation.md#requirement-mapping--2026-10-18). The moved assertions are unchanged; prior receipts and controls retain their historical identities and outcomes.
+
+<!-- finalize:spec-fix:2026-10-18:2c98861b -->

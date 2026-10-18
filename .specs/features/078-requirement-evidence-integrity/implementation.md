@@ -216,3 +216,21 @@ Opaque identity is planning metadata, not a new Playwright, Bun, uv or npx asser
 This normal correction targets AC-007, AC-009 and AC-010 only. AC-015 and the other historical acceptance criteria are not recertified. Earlier closed controls and source-bound archives remain unchanged.
 
 - Current scoped proof: read [the runner-owned execution receipt](../../.execution/1ea13b21907b47e3848486ee536c55ed/receipt.json), with 28 passing cases, zero skips and 95 independently reviewed assertion bindings for AC-007/009/010. The actual custom driver executes without qualifying; genuine unit proof cannot cover its opaque identity or the complete aggregate. This does not recertify the other thirteen criteria or every unchanged historical clause.
+
+### Approved command-table compatibility follow-up — 2026-10-17
+
+Read [the command-discovery assertions](../../../tests/test_suite_command_discovery.py) and [the existing FR-009 contract](spec.md#fr-009). Resolve named Action/Purpose and Command columns in either order. After explicit non-test and absent rows, other declared purposes remain required unit commands; only explicit action labels declare integration/E2E. Full suite, Targeted, Witness corpus and arbitrary purposes preserve exact command/cwd identity. Unsupported opaque drivers retain their explicit proof gap; no adapter or wrapper support is inferred. The prior 28-test proof remains historical for its executed bytes.
+
+The same discovery helper selects an existing plan section before the approved testing-strategy fallback. Bind the selected source path/hash and the feature plan hash; a changed strategy or newly explicit plan invalidates prior commands. An explicit plan N/A never falls through to strategy; missing declarations remain required discovery gaps. Read [the actual fallback/precedence assertions](../../../tests/test_suite_command_discovery.py) before reusing a receipt.
+
+Absence uses a closed, case-insensitive positive vocabulary: exact `N/A`, `Not applicable`, `Not run`, `None`, `—`, `-`, plus the single approved corpus sentence `Not applicable to bootstrap fixtures`. Outer whitespace is ignored. No other suffix is inferred as prose: colon, parentheses, because, other to/for qualifiers, paths, runners and wrappers remain required opaque declarations. Applicability and binding share this grammar; opaque identity never grants assertion certification. Read [the consolidated qualifier matrix and real-unit refusal](../../../tests/test_suite_absence_declarations.py) before changing accepted forms.
+
+Ambiguous trailing-parenthesis forms still meet the existing working-directory annotation grammar. They remain required and unresolved when that directory is invalid; no exact-argv identity or passing proof is claimed for such a binding. Read [the matrix branches and real E2E/aggregate refusal](../../../tests/test_suite_absence_declarations.py) to distinguish opaque identity from conservative unresolved discovery.
+
+### Requirement Mapping — 2026-10-18
+
+| Requirements | Current source/test | Existing acceptance anchors |
+|---|---|---|
+| FR-009, FR-011; AC-007/009/010 | Read [the dedicated absence declarations](../../../tests/test_suite_absence_declarations.py), using the shared owned project/goal helpers in [command discovery](../../../tests/test_suite_command_discovery.py), and inspect [the production predicate](../../../validator/evidence_applicability.py). | Read [AC-007](spec.md#ac-007), [AC-009](spec.md#ac-009) and [AC-010](spec.md#ac-010). |
+
+The three absence tests moved without assertion changes to keep both test modules within the 500-line convention. Their new module identities require fresh mapping and execution; the first 43-case receipt remains historical for its exact pre-split bytes.

@@ -9,6 +9,8 @@ import shlex
 from pathlib import Path
 from typing import Any
 
+from .normative_identity import normative_hash
+
 
 def section(text: str, title: str) -> str | None:
     """Read one exact level-two heading outside fenced examples."""
@@ -30,13 +32,41 @@ def section(text: str, title: str) -> str | None:
 
 # @spec FR-009: Explicit execution applicability
 # — .specs/features/078-requirement-evidence-integrity/spec.md#fr-009
-_ABSENT = {"n/a", "not applicable", "not run", "none", "—", "-"}
+_ABSENT = {
+    "n/a",
+    "not applicable",
+    "not run",
+    "none",
+    "—",
+    "-",
+    "not applicable to bootstrap fixtures",
+}
+
+
+def _is_absent(command: str) -> bool:
+    """Accept only closed positive forms; every other qualifier stays required."""
+    return command.casefold().strip() in _ABSENT
+
+
+def _resolved_commands(root: Path, feature: str) -> tuple[Path, str, str] | None:
+    """Prefer an explicit plan section, otherwise use the approved testing strategy."""
+    for path in [
+        root / ".specs/features" / feature / "plan.md",
+        root / ".specs/testing/strategy.md",
+    ]:
+        if path.is_file():
+            text = path.read_text(encoding="utf-8")
+            commands = section(text, "Resolved Test Commands")
+            if commands is not None:
+                return path, text, commands
+    return None
 
 
 def _command_rows(commands: str) -> list[tuple[str, str]]:
     """Read action/command cells; command arguments never declare a suite."""
     rows = []
     fenced = False
+    action_column, command_column = 0, 1
     for line in commands.splitlines():
         if line.lstrip().startswith(("```", "~~~")):
             fenced = not fenced
@@ -44,37 +74,48 @@ def _command_rows(commands: str) -> list[tuple[str, str]]:
             continue
         cells = re.split(r"(?<!\\)\|", line.strip().strip("|"))
         cells = [cell.strip().strip("`").replace("\\|", "|") for cell in cells]
-        if len(cells) < 2 or cells[0].casefold() == "action":
+        if len(cells) < 2:
             continue
-        if re.fullmatch(r":?-{3,}:?", cells[0]):
+        names = [re.sub(r"\s+\([^()]*\)$", "", cell.casefold()) for cell in cells]
+        purpose = [i for i, name in enumerate(names) if name in {"action", "purpose"}]
+        if "command" in names and len(purpose) == 1:
+            action_column, command_column = purpose[0], names.index("command")
             continue
-        rows.append((cells[0], cells[1]))
+        if all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells):
+            continue
+        if max(action_column, command_column) >= len(cells):
+            rows.append(("Unresolved command table row", line.strip()))
+            continue
+        rows.append((cells[action_column], cells[command_column]))
     return rows
 
 
-def _action_suites(action: str) -> set[str] | None:
-    """Classify declared purposes; unknown execution actions stay unresolved."""
+def _action_suites(action: str) -> set[str]:
+    """Classify explicit suites; every remaining test purpose stays required as unit."""
     text = " ".join(action.casefold().split())
+    if re.match(r"^(?:install|build|bootstrap)\b", text) and not re.search(
+        r"\b(?:tests?|suites?)\b", text
+    ):
+        return set()
     explicit = {name for name in ("unit", "integration", "e2e") if re.search(rf"\b{name}\b", text)}
     if explicit:
         return explicit
     non_test = (
         r"\b(?:lint|format(?:ting)?|types?|type[- ]?check(?:s|ing)?|"
-        r"static (?:analysis|checks?)|install(?:ation)?|build|bootstrap|"
-        r"(?:package|code) generation|conventions?)\b"
+        r"quality|static(?: (?:analysis|checks?))?|install(?:ation)?|build|bootstrap|"
+        r"(?:package|code) generation|conventions?|structural (?:validation|spec check)|"
+        r"(?:ts|typescript) checks?|doc(?:umentation)? grep|(?:command|docs?) file modified|"
+        r"zero \w+ changes|untouched gate)\b"
     )
     if re.search(non_test, text) or text in {"spec", "spec validation"}:
         return set()
-    if re.search(r"^focused\b|\b(?:tests?|regressions?|compatibility)\b", text):
-        return {"unit"}
-    return None
+    return {"unit"}
 
 
 def _declares_command(commands: str, token: str) -> bool:
     """Require an action declaration, retaining unresolved commands conservatively."""
     return any(
-        command.casefold() not in _ABSENT
-        and ((labels := _action_suites(action)) is None or token in labels)
+        not _is_absent(command) and token in _action_suites(action)
         for action, command in _command_rows(commands)
     )
 
@@ -175,25 +216,34 @@ def suite_binding(root: Path | None, feature: str | None, suite: str) -> dict[st
     try:
         if root is None or not feature or suite not in {"unit", "integration", "e2e", "all"}:
             raise ValueError("suite_context_unresolved")
-        plan = (root / ".specs/features" / feature / "plan.md").read_text()
+        plan_path = root / ".specs/features" / feature / "plan.md"
+        plan = plan_path.read_text() if plan_path.is_file() else ""
+        resolved = _resolved_commands(root, feature)
+        if resolved is None:
+            raise ValueError("suite_commands_missing")
+        source, source_text, declared = resolved
         commands = []
-        for action, command in _command_rows(section(plan, "Resolved Test Commands") or ""):
-            if command.casefold() in _ABSENT:
+        for action, command in _command_rows(declared):
+            if _is_absent(command):
                 continue
             labels = _action_suites(action)
-            if labels is None:
-                raise ValueError(f"suite_action_unresolved:{action}")
             if not labels or (suite != "all" and suite not in labels):
                 continue
             match = re.search(r"\s+\(([^()]+)\)$", command)
             cwd = root if not match or match[1] == "root" else root / match[1]
-            text = command[: match.start()] if match else command
-            commands.append(_command_key(root, shlex.split(text.strip("`")), cwd))
+            command_text = command[: match.start()] if match else command
+            commands.append(_command_key(root, shlex.split(command_text.strip("`")), cwd))
         if not commands:
             raise ValueError("suite_commands_missing")
         return {
             "suite": suite,
-            "plan_sha256": hashlib.sha256(plan.encode()).hexdigest(),
+            "plan_sha256": normative_hash(plan, lifecycle_document=True),
+            "commands_source": source.relative_to(root).as_posix(),
+            "commands_source_sha256": (
+                normative_hash(source_text, lifecycle_document=True)
+                if source == plan_path
+                else hashlib.sha256(source_text.encode()).hexdigest()
+            ),
             "commands": commands,
         }
     except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:
@@ -271,17 +321,17 @@ def resolve_applicability(
                 "applicable": True,
                 "reason": "visual_execution_required",
             }
-    name = "spec.md" if predicate == "behavioral-ac" else "plan.md"
-    path = root / ".specs/features" / feature / name
-    if not path.is_file():
-        return {"predicate": predicate, "applicable": True, "reason": "prerequisite_missing"}
-    text = path.read_text(encoding="utf-8")
+    path = root / ".specs/features" / feature / "spec.md"
     if predicate == "behavioral-ac":
+        if not path.is_file():
+            return {"predicate": predicate, "applicable": True, "reason": "prerequisite_missing"}
+        text = path.read_text(encoding="utf-8")
         applicable = section(text, "Behavioral AC") is not None
     else:
-        commands = section(text, "Resolved Test Commands")
-        if commands is None:
+        resolved = _resolved_commands(root, feature)
+        if resolved is None:
             return {"predicate": predicate, "applicable": True, "reason": "test_discovery_required"}
+        path, text, commands = resolved
         token = "integration" if predicate == "integration-command" else "e2e"
         # This is an explicit declaration predicate, not task-purpose inference.
         applicable = _declares_command(commands, token)

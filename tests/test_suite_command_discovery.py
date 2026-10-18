@@ -12,7 +12,12 @@ from typing import Any
 import pytest
 
 from validator.acceptance_evidence import archived_policy2_evidence_errors
-from validator.evidence_applicability import _command_key, resolve_applicability, suite_binding
+from validator.evidence_applicability import (
+    _command_key,
+    resolve_applicability,
+    suite_binding,
+    suite_evidence_missing,
+)
 from validator.execution_capture import capture_execution
 from validator.execution_evidence import verify_execution_observation
 from validator.goal_contracts import (
@@ -57,6 +62,12 @@ def _project(root: Path, rows: list[tuple[str, str]]) -> Path:
         "Neighbor regressions",
         "Run tests",
         "Behavior tests",
+        "Full suite",
+        "Full relevant suite",
+        "Full no-LLM suite",
+        "Targeted (this feature)",
+        "Witness corpus",
+        "Feature",
     ],
 )
 def test_test_purpose_actions_freeze_original_unit_selection(tmp_path: Path, action: str) -> None:
@@ -72,7 +83,7 @@ def test_test_purpose_actions_freeze_original_unit_selection(tmp_path: Path, act
     assert not resolve_applicability(tmp_path, FEATURE, "e2e-command")["applicable"]
 
 
-def test_quality_actions_precede_purpose_aliases_and_ambiguous_actions_stay_required(
+def test_quality_actions_are_excluded_and_other_actions_remain_bound(
     tmp_path: Path,
 ) -> None:
     """Neither quality checks nor command arguments silently declare a test suite."""
@@ -84,15 +95,26 @@ def test_quality_actions_precede_purpose_aliases_and_ambiguous_actions_stay_requ
             ("Focused lint regression", "ruff check ."),
             ("Formatting regression", "ruff format --check ."),
             ("Types", "mypy ."),
+            ("Full quality gate", "ruff check ."),
+            ("Static", "pyright"),
+            ("Structural validation", "livespec validate ."),
+            ("Structural spec check", "livespec validate plan.md"),
+            ("TS checks", "tsc --noEmit"),
+            ("Doc grep", "grep version README.md"),
+            ("Zero Python changes", "git diff -- validator/"),
+            ("Command file modified", "git diff -- command.md"),
+            ("Docs file modified", "git diff -- doc.md"),
+            ("F041-F044 untouched gate", "git diff --stat main"),
             ("Integration / E2E", "Not applicable"),
         ],
     )
     assert len(suite_binding(tmp_path, FEATURE, "all").get("commands", [])) == 1
     plan = feature / "plan.md"
     plan.write_text(plan.read_text() + "| Validation | custom-driver run |\n")
-    assert "error" in suite_binding(tmp_path, FEATURE, "all")
-    assert resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
-    assert resolve_applicability(tmp_path, FEATURE, "e2e-command")["applicable"]
+    binding = suite_binding(tmp_path, FEATURE, "all")
+    assert binding["commands"][-1] == ["opaque", ".", "custom-driver", "run"]
+    assert not resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
+    assert not resolve_applicability(tmp_path, FEATURE, "e2e-command")["applicable"]
 
 
 def test_opaque_identity_preserves_exact_argv_and_cwd_without_relaxing_known_errors(
@@ -301,3 +323,125 @@ def test_explicit_suite_labels_override_non_test_vocabulary(
     argv = [sys.executable, "-m", "pytest", "tests/test_one.py"]
     _project(tmp_path, [(action, shlex.join(argv))])
     assert suite_binding(tmp_path, FEATURE, suite).get("commands") == [["pytest", ".", *argv[3:]]]
+
+
+@pytest.mark.parametrize(
+    "header,row",
+    [
+        ("Command | Purpose", "`{command}` | Full suite regression"),
+        ("Tool | Command | Action", "pytest | `{command}` | Targeted (this feature)"),
+        ("Purpose | Tool | Command (working directory)", "Unit tests | pytest | `{command}`"),
+    ],
+    ids=["command-first", "command-middle", "purpose-first"],
+)
+def test_resolved_headers_bind_the_named_columns_only(
+    tmp_path: Path, header: str, row: str
+) -> None:
+    """Approved command-first and reordered tables retain purpose-only suite inference."""
+    argv = [sys.executable, "-m", "pytest", "tests/test_one.py", "--ignore=tests/integration/e2e"]
+    feature = _project(tmp_path, [])
+    cells = len(header.split("|"))
+    (feature / "plan.md").write_text(
+        "## Resolved Test Commands\n\n| "
+        + header
+        + " |\n|"
+        + "---|" * cells
+        + "\n| "
+        + row.format(command=shlex.join(argv))
+        + " |\n"
+    )
+    # @spec AC-007: Resolve declared purpose and command by approved table headers.
+    # — .specs/features/078-requirement-evidence-integrity/spec.md#ac-007
+    assert suite_binding(tmp_path, FEATURE, "unit")["commands"] == [["pytest", ".", *argv[3:]]]
+    assert not resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
+    assert not resolve_applicability(tmp_path, FEATURE, "e2e-command")["applicable"]
+
+
+def test_integration_install_action_is_preparation_without_hiding_explicit_tests(
+    tmp_path: Path,
+) -> None:
+    """Installation qualifiers describe dependencies, while explicit test labels remain required."""
+    argv = [sys.executable, "-m", "pytest", "tests/test_one.py"]
+    _project(
+        tmp_path, [("Install (integration)", "uv sync"), ("Unit build tests", shlex.join(argv))]
+    )
+    assert suite_binding(tmp_path, FEATURE, "all")["commands"] == [["pytest", ".", *argv[3:]]]
+    assert not resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
+
+
+@pytest.mark.integration
+def test_strategy_fallback_proves_real_unit_and_rejects_source_or_plan_drift(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The approved fallback is bound to actual source bytes and yields to an explicit plan."""
+    unit = [sys.executable, "-m", "pytest", "tests/test_one.py", "-q"]
+    feature = _project(tmp_path, [("Witness corpus", shlex.join(unit))])
+    strategy = tmp_path / ".specs/testing/strategy.md"
+    strategy.parent.mkdir()
+    original = (feature / "plan.md").read_text()
+    strategy.write_text(original)
+    plan = feature / "plan.md"
+    plan.write_text("# Plan without a command section\n")
+    contract, state = _goal(tmp_path, monkeypatch)
+    task = next(
+        t
+        for t in contract["tasks"]
+        if t.get("expected_evidence", {}).get("suite_binding", {}).get("suite") == "unit"
+    )
+    binding = task["expected_evidence"]["suite_binding"]
+    result = capture_execution(
+        unit,
+        project_root=tmp_path,
+        feature=FEATURE,
+        adapter="junit",
+        env=dict(os.environ),
+        timeout=5,
+    )
+    receipt = Path(result.receipt_path)
+    # @spec AC-007: The approved strategy fallback proves its frozen real invocation.
+    # — .specs/features/078-requirement-evidence-integrity/spec.md#ac-007
+    assert binding["commands_source"] == ".specs/testing/strategy.md"
+    assert binding["commands"] == [["pytest", ".", *unit[3:]]]
+    assert not resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
+    assert prove_goal_task(
+        contract, state, task["id"], {"execution_receipt_path": str(receipt)}, project_root=tmp_path
+    )["accepted"]
+    strategy.write_text(original + "\nChanged strategy.\n")
+    # @spec AC-009: Strategy drift or a newly explicit plan invalidates the old binding.
+    # — .specs/features/078-requirement-evidence-integrity/spec.md#ac-009
+    assert suite_evidence_missing(binding, receipt, tmp_path, FEATURE, {}) == [
+        "suite_commands_changed_recompile_required"
+    ]
+    strategy.write_text(original)
+    plan.write_text(
+        "## Resolved Test Commands\n\n| Action | Command |\n|---|---|\n"
+        "| Unit | Not applicable |\n| Integration / E2E | Not applicable |\n"
+    )
+    assert suite_binding(tmp_path, FEATURE, "unit")["error"] == "suite_commands_missing"
+    assert not resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
+    assert suite_evidence_missing(binding, receipt, tmp_path, FEATURE, {}) == [
+        "suite_commands_changed_recompile_required"
+    ]
+    plan.write_text("# No commands\n")
+    strategy.write_text("# No commands\n")
+    assert suite_binding(tmp_path, FEATURE, "unit")["error"] == "suite_commands_missing"
+    assert resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
+
+
+def test_plan_binding_survives_lifecycle_finalization_but_rejects_command_changes(
+    tmp_path: Path,
+) -> None:
+    """Only recognized plan Status/Updated metadata may change after a frozen command."""
+    argv = [sys.executable, "-m", "pytest", "tests/test_one.py"]
+    feature = _project(tmp_path, [("Full suite", shlex.join(argv))])
+    plan = feature / "plan.md"
+    plan.write_text("---\nstatus: Planned\nupdated: 2026-10-16\n---\n" + plan.read_text())
+    before = suite_binding(tmp_path, FEATURE, "unit")
+    plan.write_text(
+        plan.read_text().replace("Planned", "Implemented").replace("2026-10-16", "2026-10-17")
+    )
+    # @spec AC-009: Lifecycle-only finalization preserves frozen plan execution identity.
+    # — .specs/features/078-requirement-evidence-integrity/spec.md#ac-009
+    assert suite_binding(tmp_path, FEATURE, "unit") == before
+    plan.write_text(plan.read_text().replace("tests/test_one.py", "tests/test_one.py -q"))
+    assert suite_binding(tmp_path, FEATURE, "unit") != before
