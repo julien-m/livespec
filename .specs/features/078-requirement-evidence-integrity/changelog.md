@@ -341,3 +341,7 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 ## 2026-10-18 — [Bugfix]: Qualify the closed positive absence grammar on the conventions-compliant split test modules. Current receipt `fcba6c6f2d734184a7816f1d0560e9d7` records 43 passing cases and 159 reviewed bindings for AC-007/009/010 only. Read [the execution checkpoint](progress.md#post-split-execution-verification--2026-10-18), [the mapped absence tests](../../../tests/test_suite_absence_declarations.py) and [the existing requirement mapping](implementation.md#requirement-mapping--2026-10-18). The moved assertions are unchanged; prior receipts and controls retain their historical identities and outcomes.
 
 <!-- finalize:spec-fix:2026-10-18:2c98861b -->
+
+## 2026-10-18 — [Bugfix]: Qualify the exact eighth no-UI absence marker without opening suffix grammar. Current receipt `78e6012da9d84084b58256d28318313d` records 4 passing cases and 24 reviewed bindings for AC-007/009/010 only. Read [the execution checkpoint](progress.md#exact-no-ui-absence-verification--2026-10-18), [the mapped absence tests](../../../tests/test_suite_absence_declarations.py) and [the existing requirement mapping](implementation.md#requirement-mapping--2026-10-18). The exact additional marker is N/A — no UI; prior receipts and controls retain their historical identities and outcomes.
+
+<!-- finalize:spec-fix:2026-10-18:ec8178d9 -->

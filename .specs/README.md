@@ -160,6 +160,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-18 | Feature | [Feature 078] Exact eighth no-UI absence marker verified: 4 checks, 24 reviewed bindings and AC-007/009/010 only; opaque or unresolved command-bearing suffixes never disappear. Read [the current execution checkpoint](features/078-requirement-evidence-integrity/progress.md#exact-no-ui-absence-verification--2026-10-18). |
 | 2026-10-18 | Feature | [Feature 078] Closed positive absence verified on split test modules: 43 checks, 159 reviewed bindings and AC-007/009/010 only; opaque or unresolved command-bearing suffixes never disappear. Read [the current execution checkpoint](features/078-requirement-evidence-integrity/progress.md#post-split-execution-verification--2026-10-18). |
 | 2026-10-18 | Feature | [Feature 078] Closed positive absence grammar: 43 checks and 159 reviewed bindings certify AC-007/009/010 only; arbitrary command suffixes remain required, opaque or unresolved and noncertifying. Read [the correction scope](features/078-requirement-evidence-integrity/implementation.md#approved-command-table-compatibility-follow-up--2026-10-17). |
 | 2026-10-18 | Feature | [Feature 078] Approved command-table compatibility: 41 checks and 149 reviewed bindings certify AC-007/009/010 only; named columns, strategy fallback, qualified absence and lifecycle-stable command identity. Read [the correction scope](features/078-requirement-evidence-integrity/implementation.md#approved-command-table-compatibility-follow-up--2026-10-17). |
@@ -169,7 +170,6 @@
 | 2026-10-17 | Feature | [Feature 096] Confined direct Vitest invocation cwd preserves governing-root authority and historical root defaults. Read [the independent check](features/096-node-vitest-execution/checks/2026-10-17.md) and [implementation ownership](features/096-node-vitest-execution/implementation.md). The source-owned 40-test checkpoint passed six ACs; current source closure is independently recorded by CLI goals and archives. Producer consumer-copy observations remain distinct from consumer042 delivery. |
 | 2026-10-17 | Feature | [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture |
 | 2026-10-17 | Feature | 097: preserve exact Git index bytes while reviewing complete root bootstrap scope; current six-AC certification and independent full reviews pass. |
-| 2026-10-17 | Feature | [Feature 097] Test BLOCKED: 15 passed, 1 failed; Git index integrity assertion |
 <!-- readme:activity:end -->
 
 ---
@@ -392,3 +392,5 @@
 <!-- finalize:spec-fix:2026-10-18:9197b952 -->
 
 <!-- finalize:spec-fix:2026-10-18:2c98861b -->
+
+<!-- finalize:spec-fix:2026-10-18:ec8178d9 -->

@@ -34,6 +34,7 @@ def section(text: str, title: str) -> str | None:
 # — .specs/features/078-requirement-evidence-integrity/spec.md#fr-009
 _ABSENT = {
     "n/a",
+    "n/a — no ui",
     "not applicable",
     "not run",
     "none",

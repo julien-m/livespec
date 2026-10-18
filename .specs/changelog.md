@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-10-18 — [Feature 078] Exact eighth no-UI absence marker verified: 4 checks, 24 reviewed bindings and AC-007/009/010 only; opaque or unresolved command-bearing suffixes never disappear. Read [the current execution checkpoint](features/078-requirement-evidence-integrity/progress.md#exact-no-ui-absence-verification--2026-10-18).
+<!-- finalize:spec-fix:2026-10-18:ec8178d9 -->
+
 ## 2026-10-18 — [Feature 078] Closed positive absence verified on split test modules: 43 checks, 159 reviewed bindings and AC-007/009/010 only; opaque or unresolved command-bearing suffixes never disappear. Read [the current execution checkpoint](features/078-requirement-evidence-integrity/progress.md#post-split-execution-verification--2026-10-18).
 <!-- finalize:spec-fix:2026-10-18:2c98861b -->
 

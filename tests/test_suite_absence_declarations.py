@@ -11,7 +11,9 @@ import pytest
 
 from tests.test_suite_command_discovery import FEATURE, _archive_errors, _goal, _project
 from validator.evidence_applicability import (
+    _command_rows,
     resolve_applicability,
+    section,
     suite_binding,
     suite_evidence_missing,
 )
@@ -34,7 +36,7 @@ def test_qualified_absence_prose_never_hides_embedded_commands(tmp_path: Path) -
     )
     plan = feature / "plan.md"
     original = plan.read_text()
-    accepted = ["N/A", "Not applicable", "Not run", "None", "\u2014", "-", absence]
+    accepted = ["N/A", "Not applicable", "Not run", "None", "\u2014", "-", absence, "N/A — no UI"]
     for marker in accepted:
         plan.write_text(original.replace(absence, marker))
         # @spec AC-007: Only closed positive absence forms remove declared commands.
@@ -155,3 +157,32 @@ def test_qualified_commands_cannot_be_proved_by_a_real_unit_receipt(
     assert "suite_assertion_adapter_unsupported" in " ".join(
         _archive_errors(contract, tasks["e2e"], tmp_path, receipt)
     )
+
+
+def test_corpus_no_ui_absence_is_exact_and_never_hides_command_suffixes(tmp_path: Path) -> None:
+    """Both approved plans use the eighth exact marker; all appended execution stays required."""
+    root = Path(__file__).resolve().parents[1]
+    plans = ["039.1-goal-archive-run-artifacts", "060-journey-fixture-bootstrap-contract"]
+    for name in plans:
+        text = (root / ".specs/features" / name / "plan.md").read_text()
+        rows = _command_rows(section(text, "Resolved Test Commands") or "")
+        # @spec AC-007: Real approved plan rows use the exact supported absence marker.
+        # — .specs/features/078-requirement-evidence-integrity/spec.md#ac-007
+        assert ("Visual tests", "N/A — no UI") in rows
+    unit = [sys.executable, "-m", "pytest", "tests/test_one.py"]
+    feature = _project(tmp_path, [("Unit tests", shlex.join(unit)), ("Integration / E2E", "TOKEN")])
+    plan = feature / "plan.md"
+    original = plan.read_text()
+    plan.write_text(original.replace("TOKEN", "N/A — no UI"))
+    assert suite_binding(tmp_path, FEATURE, "all")["commands"] == [["pytest", ".", *unit[3:]]]
+    assert not resolve_applicability(tmp_path, FEATURE, "e2e-command")["applicable"]
+    for suffix in [" pnpm test", ": yarn test", " because ./e2e.sh", " (./e2e.sh)", " && pytest x"]:
+        declaration = "N/A — no UI" + suffix
+        plan.write_text(original.replace("TOKEN", declaration))
+        binding = suite_binding(tmp_path, FEATURE, "all")
+        if suffix.startswith(" ("):
+            assert binding.get("error") and "commands" not in binding
+        else:
+            assert ["opaque", ".", *shlex.split(declaration)] in binding["commands"]
+        assert resolve_applicability(tmp_path, FEATURE, "integration-command")["applicable"]
+        assert resolve_applicability(tmp_path, FEATURE, "e2e-command")["applicable"]
