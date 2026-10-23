@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-10-23 — [Feature095] Handle unavailable API capture completion as nonqualifying evidence; retain no-follow confinement and timeout124.
+
 ## 2026-10-18 — [Feature096] API completion fixture maintenance: five real Vitest regression cases PASS; no new AC claim.
 <!-- finalize:spec-fix:2026-10-18:877b2a24 -->
 

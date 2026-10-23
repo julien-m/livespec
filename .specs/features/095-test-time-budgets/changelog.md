@@ -86,3 +86,12 @@
 ## 2026-10-18 — [Bugfix]: Keep every API receipt provisional until existing atomic in-deadline completion, preserving CLI deferral and124 diagnostics. Actual receipt `7159ad511f904dc5b3b2cb0bed87e2ef` records two targeted tests and eight reviewed bindings for AC-001/003 only. Read [the current checkpoint](progress.md#atomic-api-completion-verification--2026-10-18) and [the real publication regressions](../../../tests/test_execution_test_budgets.py). Earlier receipts and the rejected precheck remain historical.
 
 <!-- finalize:spec-fix:2026-10-18:6dd8b550 -->
+
+## 2026-10-23 — [Bugfix]: Return nonqualifying captures when API completion is unavailable
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `validator/execution_capture.py`, `tests/test_execution_scope.py`
+- **AC impacted:** AC-001/003; preserve ordinary outcomes and timeout124 while refusing incomplete evidence.
+- **Details:** Handle completion storage/identity failures without weakening descriptor no-follow checks. Preserve assertions against external writes and verify both storage-parent replacements plus completion-error/expiry cases.
+- **Author:** Codex

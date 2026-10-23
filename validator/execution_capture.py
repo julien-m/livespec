@@ -121,7 +121,7 @@ def capture_execution(
             if (scope.timed_out or scope.remaining() <= 0) and result.exit_code != 124:
                 raise BudgetExpired("Managed execution deadline expired before returning capture")
             if not verification_pending and result.receipt_path and result.exit_code != 124:
-                complete_verification(Path(result.receipt_path), project_root.resolve(strict=True))
+                _complete_api_verification(result, project_root)
             return result
         except BudgetExpired as exc:
             scope.timed_out = True
@@ -145,6 +145,16 @@ def capture_execution(
                     budget=scope.evidence(),
                     gaps=["Command budget exhausted; no fresh execution receipt"],
                 )
+
+
+def _complete_api_verification(result: CaptureResult, project_root: Path) -> None:
+    """Keep failed completion nonqualifying without masking managed deadline expiry."""
+    try:
+        complete_verification(Path(result.receipt_path), project_root.resolve(strict=True))
+    except BudgetExpired:
+        raise
+    except (OSError, ValueError) as exc:
+        result.gaps.append(f"Final verification unavailable: {exc}")
 
 
 def _capture_execution(
