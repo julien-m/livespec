@@ -26,7 +26,7 @@ from validator.drivers.runner import run_capability
 from validator.drivers.schemas import DriverCapability, DriverManifest
 from validator.execution_capture import CaptureResult, capture_execution
 from validator.execution_deadline import command_scope
-from validator.execution_evidence import verify_execution_receipt
+from validator.execution_evidence import verify_execution_observation, verify_execution_receipt
 from validator.execution_test_budget import resolve_test_budget
 from validator.test_budgets import BudgetPolicy
 
@@ -245,3 +245,42 @@ def _verify_missing_capture_consumers(
     )
     assert observed.exit_code == 124, observed.output
     assert json.loads(observed.output)["observed"] is False
+
+
+def test_publication_timeout_flag_cannot_return_success(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Real pytest passes normally, but no receipt from an expired publication may qualify."""
+    source = "def test_case():\n    assert 2 + 2 == 4\n"
+    normal = tmp_path / "normal"
+    normal.mkdir()
+    successful = _run(normal, source)
+    # @spec AC-001: Ordinary API capture remains a genuine passing observation.
+    # — .specs/features/095-test-time-budgets/spec.md#ac-001
+    assert successful.exit_code == 0
+    assert verify_execution_observation(
+        Path(successful.receipt_path), normal, "001-case", "passed"
+    ).valid
+    owner = capture_execution.__globals__
+    publish = owner["_publish"]
+
+    def expired_publication(*args: object) -> None:
+        scope = owner["current_deadline"]()
+        scope.timed_out = True
+        publish(*args)
+
+    monkeypatch.setitem(owner, "_publish", expired_publication)
+    expired = tmp_path / "expired"
+    expired.mkdir()
+    result = _run(expired, source)
+    # @spec AC-001: Expired managed execution cannot return successful exit zero.
+    # — .specs/features/095-test-time-budgets/spec.md#ac-001
+    assert result.exit_code == 124
+    assert result.budget and result.budget["timed_out"] is True
+    assert result.receipt_path and Path(result.receipt_path).is_file()
+    receipts = list((expired / ".specs/.execution").glob("*/receipt.json"))
+    assert len(receipts) >= 2
+    for receipt in receipts:
+        # @spec AC-003: Every receipt of the expired invocation refuses passing observation.
+        # — .specs/features/095-test-time-budgets/spec.md#ac-003
+        assert not verify_execution_observation(receipt, expired, "001-case", "passed").valid

@@ -1,5 +1,12 @@
 # Changelog - 096-node-vitest-execution
 
+## 2026-10-17 — [CI correction]: Accept bounded timeout results without a fresh receipt
+
+- **Spec modified:** No. Runtime and 1.5-second timeout unchanged.
+- **Test modified:** Read [the genuine runtime deadline test](../../../tests/test_execution_vitest.py); assert exit 124 and the timed-out budget directly, accepting either an explicitly absent receipt or a published nonqualifying receipt. Published receipts still fail both red and passed observation verification.
+- **Scope:** Normal AC-004 correction after an honest bugfix FALLBACK. The original failing CI log and the locally passing pre-edit observation are retained. Current targeted execution and closure are recorded separately; historical full-feature certificates are not upgraded.
+
+
 ## 2026-10-16 — [Bugfix]: Prove direct async consumption without detached-chain false positives
 
 - **Type:** Bugfix
@@ -192,3 +199,30 @@ Inspect [the independent gap report](checks/2026-10-17.md): six FRs align static
 - **RED receipt:** `.specs/.execution/4e64d2dbb4fd44ecbf03f38e321fe43d/receipt.json`
 - **GREEN receipt:** `.specs/.execution/237a4d011b7d4506aa7fdf940486488d/receipt.json`
 <!-- bugfix:237a4d011b7d4506aa7fdf940486488d -->
+
+## 2026-10-17 — Confined invocation cwd revision
+
+- Revised FR-003/004 and AC-003/004 through the official open/review/close protocol. Added optional confined cwd to direct Vitest capture and CLI, preserving root authority and historical root interpretation. Current implementation validation remains in progress.
+
+## 2026-10-17 — [Check]: Independent confined-cwd revision audit
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **AC impacted:** AC-001 through AC-006; current execution checkpoint, final freshness pending
+- Inspect [the frozen full check report](checks/2026-10-17.md): six FRs and six ACs align with actual code and the observed 40-pass, zero-skip, 108-binding checkpoint. Both unchanged consumer observations account separately for 46 and 55 tests.
+- Effective process cwd, package root and governing authority remain distinct; cwd identity, root-default history and proof/archive verification are explicit. Earlier certificates retain their historical interpretation.
+- The persisted conventions receipt collided with 078; a fresh sequential 096 gate and final cross-owner source freeze/capture remain required. Child goal `508ef695` is not yet closed; no final delivery certification is claimed.
+- **Author:** Codex independent spec-check reviewer (`gpt-6.1-sol`, high)
+
+## 2026-10-17 — [Bugfix]: Confined direct Vitest invocation cwd preserves governing-root authority and historical root defaults. Read [the independent check](checks/2026-10-17.md) and [implementation ownership](implementation.md). The source-owned 40-test checkpoint passed six ACs; current source closure is independently recorded by CLI goals and archives. Producer consumer-copy observations remain distinct from consumer042 delivery.
+
+<!-- finalize:spec-fix:2026-10-17:c1b7f27f -->
+
+## 2026-10-17 — [Bugfix]: CI timeout-test correction: 10 genuine checks pass and AC-004 is certified through 30 independently reviewed bindings. Read [the execution receipt](../../.execution/cd926fb097c44fe282ed333ca49b8f56/receipt.json) and [the correction scope](implementation.md#ci-timeout-test-correction--2026-10-17). The 1.5-second timeout and both refusal checks remain unchanged; the public no-fresh-receipt outcome no longer fails the helper assumption. No production or normative change; historical six-AC certificates remain bound to their original trees.
+
+<!-- finalize:spec-fix:2026-10-17:f981b487 -->
+
+## 2026-10-18 — [Bugfix]: API completion fixture compatibility: four selected functions execute five genuine Node22/Vitest cases PASS, zero skips. Preserve actual completion budget while rebinding intentionally corrupted fixture hashes; historical-root representation explicitly disables pending completion. Read [the maintenance scope](implementation.md#api-completion-fixture-compatibility--2026-10-18). No production, normative or acceptance-certification change.
+
+<!-- finalize:spec-fix:2026-10-18:877b2a24 -->

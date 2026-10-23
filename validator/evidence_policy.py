@@ -85,6 +85,13 @@ def apply_evidence_policy(
         )
         kind = "documentary" if specialized else declared.get(description, "unclassified")
         attributes = metadata.get(description, {})
+        if "suite" in attributes and (
+            kind != "execution"
+            or attributes.get("outcome") != "passed"
+            or "ac-scope" in attributes
+            or "ac-binding" in attributes
+        ):
+            raise ValueError("suite_requires_unscoped_passing_execution_observation")
         if "applicable" in attributes:
             from .evidence_applicability import resolve_applicability
 
@@ -99,6 +106,12 @@ def apply_evidence_policy(
         if "outcome" in attributes:
             task["evidence_expected_outcome"] = attributes["outcome"]
         _bind_acceptance_kind(task, attributes)
+        if "suite" in attributes:
+            from .evidence_applicability import suite_binding
+
+            task.setdefault("expected_evidence", {})["suite_binding"] = suite_binding(
+                project_root, feature, attributes["suite"]
+            )
         if kind in ("execution", "review"):
             task["required_evidence"] = [
                 item
@@ -122,7 +135,14 @@ def _declared_evidence(skill_path: Path) -> tuple[dict[str, str], dict[str, dict
             text = re.sub(r"^\[[^]]*\]\s*", "", text)
             declared[strip_evidence_marker(text)] = marker.group(1)
             attributes = dict(pair.split(":", 1) for pair in marker.group(2).split())
-            if set(attributes) - {"ac-scope", "applicable", "outcome", "review-kind", "ac-binding"}:
+            if set(attributes) - {
+                "ac-scope",
+                "applicable",
+                "outcome",
+                "review-kind",
+                "ac-binding",
+                "suite",
+            }:
                 raise ValueError("unknown_evidence_metadata")
             metadata[strip_evidence_marker(text)] = attributes
     return declared, metadata
@@ -235,6 +255,11 @@ def _execution_missing(
 
     if selection_missing := _fix_selection_missing(task, project_root, feature):
         return selection_missing
+    binding = task.get("expected_evidence", {}).get("suite_binding")
+    if binding is not None:
+        from .evidence_applicability import suite_evidence_missing
+
+        return suite_evidence_missing(binding, receipt, project_root, feature, evidence)
     expected_outcome = task.get("evidence_expected_outcome")
     if (
         policy == "2"

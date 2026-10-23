@@ -1,3 +1,8 @@
+---
+title: Test Time Budgets implementation
+feature: 095-test-time-budgets
+---
+
 # Implementation — Test Time Budgets
 
 Local implementation and targeted checks are recorded below. All implementation steps and current acceptance/conventions checks pass. The independent delivery review is recorded and verified PASS; feature finalization is verified PASS. No consumer pin was changed.
@@ -55,3 +60,15 @@ Local implementation and targeted checks are recorded below. All implementation 
 - Current acceptance capture was refreshed once after the four legacy-test compatibility changes entered the source manifest; no production behavior changed. Inspect [the current report](.reviews/test-report.md): valid=true, five AC, 15 assertions, gaps=[]. Existing legacy selection was reported by the supervisor as 51 PASS in 0.81s; this phase ran no other suite.
 
 - Current capture follows the three production-review corrections and the supervisor-refreshed five-binding acceptance mapping: valid=true, 5/5 AC, 15 assertions, gaps=[]. Inspect [the current report](.reviews/test-report.md). The intervening mapping-staleness attempt remains unsuccessful historical evidence; no assertion or requirement was weakened.
+
+## Timeout return guard — 2026-10-18
+
+Read [the managed capture boundary](../../../validator/execution_capture.py) (`@spec FR-001`, `FR-003`) and [the real publication and missing-receipt regressions](../../../tests/test_execution_test_budgets.py). A consumed deadline signal must not leave a successful return: expired non-124 results enter the existing bounded timeout path, while existing124 diagnostics remain unchanged. This scoped correction addresses AC-001/003; earlier whole-feature acceptance remains historical for its original source bytes. The missing implementation frontmatter is repaired so the current structural gate can run. Current proof outcomes are published by the runner and official closure, not inferred from this mapping.
+
+## Atomic API completion — 2026-10-18
+
+Read [the capture boundary](../../../validator/execution_capture.py), [the existing atomic completion protocol](../../../validator/execution_verification.py) and [the all-receipt publication regression](../../../tests/test_execution_test_budgets.py). New ordinary API captures remain provisional until the existing in-deadline atomic completion accepts them; CLI callers still defer completion to their semantic verification. Timeout124 captures remain readable and nonqualifying. The current regression uses a genuine one-assertion pytest pass, an ordinary successful control in a separate project, and every receipt produced by expired publication. No receipt from that expired project may prove a passed observation. Earlier timeout-return-only proofs remain historical; current runner and closure artifacts supply the actual outcomes.
+
+## Unavailable API completion — 2026-10-23
+
+Read [the API completion boundary](../../../validator/execution_capture.py) and [the confined-publication regressions](../../../tests/test_execution_scope.py). A final completion storage or identity error returns the original process outcome with an explicit gap; the capture remains provisional and cannot qualify. Managed `BudgetExpired` still reaches the existing timeout path and returns124. Descriptor-relative `O_NOFOLLOW` publication and external-write assertions remain unchanged; regressions cover replacement of both `.execution` and `.specs`, unavailable completion storage, identity rejection and completion expiry. This is a scoped correction; historical whole-feature acceptance is not recertified.

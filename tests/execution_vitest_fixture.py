@@ -59,6 +59,13 @@ class VitestProject:
         path.chmod(0o600)
         path.write_bytes(payload)
 
+    def rebind_completion(self, receipt: Path, capture_sha256: str) -> None:
+        """Retain real completion budget while bypassing hashes for semantic refusal tests."""
+        name = "verification-accepted.json"
+        completion = json.loads((receipt.parent / name).read_text())
+        completion["capture_sha256"] = capture_sha256
+        self.replace_artifact(receipt, name, json.dumps(completion).encode())
+
     def replace_inventory(self, receipt: Path, payload: bytes) -> None:
         """Rebind corrupt inventory hashes to exercise semantic checks beyond tamper detection."""
         self.replace_artifact(receipt, "inventory", payload)
@@ -69,6 +76,7 @@ class VitestProject:
         reference = json.loads(receipt.read_text())
         reference["capture_sha256"] = digest(capture_path.read_bytes())
         self.replace_artifact(receipt, receipt.name, json.dumps(reference).encode())
+        self.rebind_completion(receipt, reference["capture_sha256"])
 
 
 def _runtime() -> Path:

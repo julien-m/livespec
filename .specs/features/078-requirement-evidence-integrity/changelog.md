@@ -269,3 +269,83 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/a5afa5c4870749d0bfcf0b35f80bc286/receipt.json`
 - **GREEN receipt:** `.specs/.execution/01917bd3a4b445ceac4993164733cdbe/receipt.json`
 <!-- bugfix:01917bd3a4b445ceac4993164733cdbe -->
+
+## 2026-10-17 — [Bugfix]: Separate generic Test observations from acceptance and ignore explicit absent suite commands
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-test/SKILL.md, .agent-sync/skills/spec-test/expectations.md, tests/test_spec_test_observations.py, validator/evidence_applicability.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_spec_test_observations.py::test_canonical_test_goal_proves_real_observation_without_certifying_review_acs, tests/test_spec_test_observations.py::test_explicit_absence_and_resolved_commands_have_distinct_applicability
+- **RED receipt:** `.specs/.execution/1f051d7a14a14812974a52a41c8f9f93/receipt.json`
+- **GREEN receipt:** `.specs/.execution/ec3f3e562184495fbfd7862261d79d83/receipt.json`
+<!-- bugfix:ec3f3e562184495fbfd7862261d79d83 -->
+
+## 2026-10-17 — [Bugfix]: Separate generic Test observations and explicit absent commands while preserving acceptance
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-test/SKILL.md, .agent-sync/skills/spec-test/expectations.md, tests/test_spec_test_observations.py, validator/evidence_applicability.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** eedd866ab2b2faff31ab5e216a71e9c72d01f799
+- **Regression tests:** tests/test_spec_test_observations.py::test_canonical_test_goal_proves_real_observation_without_certifying_review_acs, tests/test_spec_test_observations.py::test_explicit_absence_and_resolved_commands_have_distinct_applicability
+- **RED receipt:** `.specs/.execution/453c6a2bc1354d1eaf4f244639e7943d/receipt.json`
+- **GREEN receipt:** `.specs/.execution/91c842aea1e34caa815c911e359e812e/receipt.json`
+<!-- bugfix:91c842aea1e34caa815c911e359e812e -->
+
+## 2026-10-17 — [Bugfix]: Bind Test suite observations to every resolved command and match applicability by action cell
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-test/SKILL.md, .agent-sync/skills/spec-test/expectations.md, tests/test_spec_test_observations.py, validator/evidence_applicability.py, validator/evidence_policy.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** 3559326f811dfa8d315082405e13065b69b920f8
+- **Regression tests:** tests/test_spec_test_observations.py::test_explicit_absence_and_resolved_commands_have_distinct_applicability, tests/test_spec_test_observations.py::test_suite_observations_reject_wrong_selection_and_require_complete_aggregate
+- **RED receipt:** `.specs/.execution/59f06396b43048b68f0c9baf2c5a0171/receipt.json`
+- **GREEN receipt:** `.specs/.execution/7c63ea90132a45a09b0cbd79e7093122/receipt.json`
+<!-- bugfix:7c63ea90132a45a09b0cbd79e7093122 -->
+
+## 2026-10-17 — [Bugfix]: Bind every resolved suite invocation and aggregate required observations; classify applicability by action
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-test/SKILL.md, .agent-sync/skills/spec-test/expectations.md, tests/test_spec_test_observations.py, validator/evidence_applicability.py, validator/evidence_policy.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** 3559326f811dfa8d315082405e13065b69b920f8
+- **Regression tests:** tests/test_spec_test_observations.py::test_explicit_absence_and_resolved_commands_have_distinct_applicability, tests/test_spec_test_observations.py::test_suite_observations_reject_wrong_selection_and_require_complete_aggregate
+- **RED receipt:** `.specs/.execution/59f06396b43048b68f0c9baf2c5a0171/receipt.json`
+- **GREEN receipt:** `.specs/.execution/b4206a7d50f944b1820c971a22cba070/receipt.json`
+<!-- bugfix:b4206a7d50f944b1820c971a22cba070 -->
+
+## 2026-10-17 — [Bugfix]: Bind generic suite observations to every resolved original command, actual cwd and supported literal alias; reject mixed suite/final-acceptance metadata and command-cell applicability false positives. Read [implementation evidence](implementation.md) and [the repair checkpoint](progress.md). Genuine five-test RED/GREEN preserves independent final acceptance and legacy semantics. Normal filtered FR-009/FR-011 evidence follows the printed FALLBACK; this does not certify all historical sixteen ACs.
+
+<!-- finalize:spec-fix:2026-10-17:caf10d18 -->
+
+## 2026-10-17 — [Bugfix]: Cloud command-discovery correction: 28 genuine checks pass, 95 bindings certify AC-007/009/010. Read [the execution receipt](../../.execution/1ea13b21907b47e3848486ee536c55ed/receipt.json) and [the current correction scope](implementation.md#cloud-command-discovery-correction--2026-10-17). Explicit Action suites precede non-test vocabulary; installation/build/quality precede broad test-purpose aliases; ambiguous actions remain required. Unknown commands preserve exact opaque cwd/argv identity without a new assertion adapter, while real custom execution remains noncertifying. Historical certificates and the other thirteen criteria are not upgraded.
+
+<!-- finalize:spec-fix:2026-10-17:96cf0f5a -->
+
+## 2026-10-18 — [Bugfix]: Correct approved command-table discovery and source identity. Current runner-owned receipt `bfe7d73a0af04c61a5a2d6d93c5c2627` qualifies 41 passing cases and 149 reviewed bindings for AC-007/009/010 only. Read [the current discovery scope](implementation.md#approved-command-table-compatibility-follow-up--2026-10-17) and [the verification checkpoint](progress.md#approved-command-table-compatibility-verification--2026-10-18). Retain prior campaign receipts for their executed bytes; no historical whole-feature recertification.
+
+<!-- finalize:spec-fix:2026-10-18:a036f062 -->
+
+## 2026-10-18 — [Bugfix]: Correct AUDIT-V5-001 with a closed positive absence grammar and genuine unit-versus-E2E/aggregate refusal. Current runner-owned receipt `c9ffa8c5642748b99a8741f452e8088a` qualifies 43 passing cases and 159 reviewed bindings for AC-007/009/010 only. Read [the current discovery scope](implementation.md#approved-command-table-compatibility-follow-up--2026-10-17) and [the verification checkpoint](progress.md#closed-positive-absence-verification--2026-10-18). Retain prior campaign receipts for their executed bytes; no historical whole-feature recertification.
+
+<!-- finalize:spec-fix:2026-10-18:9197b952 -->
+
+## 2026-10-18 — [Bugfix]: Qualify the closed positive absence grammar on the conventions-compliant split test modules. Current receipt `fcba6c6f2d734184a7816f1d0560e9d7` records 43 passing cases and 159 reviewed bindings for AC-007/009/010 only. Read [the execution checkpoint](progress.md#post-split-execution-verification--2026-10-18), [the mapped absence tests](../../../tests/test_suite_absence_declarations.py) and [the existing requirement mapping](implementation.md#requirement-mapping--2026-10-18). The moved assertions are unchanged; prior receipts and controls retain their historical identities and outcomes.
+
+<!-- finalize:spec-fix:2026-10-18:2c98861b -->
+
+## 2026-10-18 — [Bugfix]: Qualify the exact eighth no-UI absence marker without opening suffix grammar. Current receipt `78e6012da9d84084b58256d28318313d` records 4 passing cases and 24 reviewed bindings for AC-007/009/010 only. Read [the execution checkpoint](progress.md#exact-no-ui-absence-verification--2026-10-18), [the mapped absence tests](../../../tests/test_suite_absence_declarations.py) and [the existing requirement mapping](implementation.md#requirement-mapping--2026-10-18). The exact additional marker is N/A — no UI; prior receipts and controls retain their historical identities and outcomes.
+
+<!-- finalize:spec-fix:2026-10-18:ec8178d9 -->
+
+## 2026-10-18 — [Bugfix]: Preserve fenced resolved-command invocations without dropping unknown drivers. Current receipt `0bf8bb9645c3449aaa070a2274cc4e9c` records two targeted tests, eight reviewed bindings and AC-007/010 only. Read [the current checkpoint](progress.md#fenced-command-execution-verification--2026-10-18) and [the real canonical regressions](../../../tests/test_suite_absence_declarations.py). Earlier source-bound proofs remain historical.
+
+<!-- finalize:spec-fix:2026-10-18:957ca33d -->

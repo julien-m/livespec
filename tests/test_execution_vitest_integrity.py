@@ -44,6 +44,7 @@ def _rebind_trace(project: VitestProject, receipt: Path, payload: bytes) -> None
     reference = json.loads(receipt.read_text())
     reference["capture_sha256"] = digest(capture_path.read_bytes())
     project.replace_artifact(receipt, receipt.name, json.dumps(reference).encode())
+    project.rebind_completion(receipt, reference["capture_sha256"])
 
 
 @pytest.mark.parametrize("kind", ["native-python", "script-wrapper"])

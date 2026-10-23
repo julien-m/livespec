@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shlex
 import sys
 from pathlib import Path
@@ -11,6 +12,7 @@ import pytest
 
 from tests.execution_evidence_support import FEATURE, run
 from tests.execution_evidence_support import project as project
+from validator.execution_deadline import BudgetExpired
 from validator.execution_evidence import verify_execution_receipt
 from validator.execution_mapping import ingest_mapping_review, prepare_mapping_review
 
@@ -136,8 +138,9 @@ def test_explicit_normative_reference_overrides_generated_exclusion(project: Pat
     assert source_manifest(project, FEATURE) != before
 
 
+@pytest.mark.parametrize("parent", [".execution", ".specs"])
 def test_publication_parent_swap_cannot_redirect_writes(
-    project: Path, monkeypatch: pytest.MonkeyPatch
+    project: Path, monkeypatch: pytest.MonkeyPatch, parent: str
 ) -> None:
     import validator.execution_capture as capture
 
@@ -151,14 +154,52 @@ def test_publication_parent_swap_cannot_redirect_writes(
         original(descriptor, name, data)
         if not moved:
             moved = True
-            storage = project / ".specs/.execution"
-            storage.rename(project / ".specs/execution-old")
+            storage = (
+                project / ".specs/.execution" if parent == ".execution" else project / ".specs"
+            )
+            storage.rename(project / "storage-old")
             storage.symlink_to(outside, target_is_directory=True)
 
     monkeypatch.setattr(capture, "_write_new", replace_parent)
     path = run(project)
     assert not verify_execution_receipt(path, project, FEATURE).valid
     assert not list(outside.iterdir())
+
+
+@pytest.mark.parametrize(
+    "error",
+    [OSError("completion storage unavailable"), ValueError("replaced"), BudgetExpired("late")],
+)
+def test_failed_api_completion_returns_nonqualifying_capture(
+    project: Path, monkeypatch: pytest.MonkeyPatch, error: Exception
+) -> None:
+    import validator.execution_capture as capture
+
+    def fail_completion(receipt: Path, root: Path) -> None:
+        raise error
+
+    monkeypatch.setattr(capture, "complete_verification", fail_completion)
+    result = capture.capture_execution(
+        [sys.executable, "-m", "pytest", "test_app.py", "-q"],
+        project_root=project,
+        feature=FEATURE,
+        adapter="junit",
+        env={**os.environ, "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"},
+        acceptance_mapping="mapping.json",
+    )
+    expired = isinstance(error, BudgetExpired)
+    assert result.exit_code == (124 if expired else 0)
+    assert result.receipt_path
+    if expired:
+        assert result.budget and result.budget["timed_out"] is True
+    else:
+        assert result.gaps == [f"Final verification unavailable: {error}"]
+    receipt = Path(result.receipt_path)
+    assert not (receipt.parent / "verification-accepted.json").exists()
+    verified = verify_execution_receipt(receipt, project, FEATURE)
+    assert not verified.valid and not verified.certified_acs
+    for published in project.glob(".specs/.execution/*/receipt.json"):
+        assert not verify_execution_receipt(published, project, FEATURE).valid
 
 
 def test_generated_registry_and_selected_progress_do_not_invalidate(project: Path) -> None:

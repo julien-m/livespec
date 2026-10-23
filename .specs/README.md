@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-10-17
+> Last updated: 2026-10-18
 
 
 ---
@@ -115,7 +115,7 @@
 | 075 | Design Direction Carry | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/075-design-direction-carry/spec.md), [plan](features/075-design-direction-carry/plan.md), [implementation](features/075-design-direction-carry/implementation.md) |
 | 076 | Spec Init Goal Bootstrap | Implemented | 2026-09-04 | 2026-09-08 | Read [spec](features/076-spec-init-goal-bootstrap/spec.md), [plan](features/076-spec-init-goal-bootstrap/plan.md), and [implementation](features/076-spec-init-goal-bootstrap/implementation.md) |
 | 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-10-12 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
-| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-10-12 | [spec](features/078-requirement-evidence-integrity/spec.md) |
+| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-10-18 | [spec](features/078-requirement-evidence-integrity/spec.md) |
 | 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-10-13 | [spec](features/079-validator-ci-prerequisites/spec.md) |
 | 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-12 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
 | 081 | Lightweight Outcome-Based Goals | Implemented | 2026-10-10 | 2026-10-10 | Read [spec](features/081-lightweight-outcome-goals/spec.md) |
@@ -133,8 +133,8 @@
 | 092 | Existing Repository Onboarding | Draft | 2026-10-13 | 2026-10-13 | [spec](features/092-init-onboarding/spec.md), [plan](features/092-init-onboarding/plan.md) |
 | 093 | Configured Review Identity | In Progress | 2026-10-13 | 2026-10-15 | [spec](features/093-configured-review-identity/spec.md), [plan](features/093-configured-review-identity/plan.md), [implementation](features/093-configured-review-identity/implementation.md) |
 | 094 | Verified Review Continuity | In Progress | 2026-10-14 | 2026-10-14 | [spec](features/094-verified-review-continuity/spec.md), [plan](features/094-verified-review-continuity/plan.md), [implementation](features/094-verified-review-continuity/implementation.md) |
-| 095 | Test Time Budgets | Implemented | 2026-10-16 | 2026-10-16 | [spec](features/095-test-time-budgets/spec.md) |
-| 096 | Node Vitest Execution Observations | Implemented | 2026-10-16 | 2026-10-17 | [spec](features/096-node-vitest-execution/spec.md) |
+| 095 | Test Time Budgets | Implemented | 2026-10-16 | 2026-10-18 | [spec](features/095-test-time-budgets/spec.md) |
+| 096 | Node Vitest Execution Observations | Implemented | 2026-10-16 | 2026-10-18 | [spec](features/096-node-vitest-execution/spec.md) |
 | 097 | Root Feature Delivery Review | Implemented | 2026-10-17 | 2026-10-17 | [spec](features/097-root-feature-delivery-review/spec.md) |
 <!-- readme:features:end -->
 
@@ -160,16 +160,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-10-17 | Feature | [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture |
-| 2026-10-17 | Feature | 097: preserve exact Git index bytes while reviewing complete root bootstrap scope; current six-AC certification and independent full reviews pass. |
-| 2026-10-17 | Feature | [Feature 097] Test BLOCKED: 15 passed, 1 failed; Git index integrity assertion |
-| 2026-10-17 | Feature | [Feature 097] Test: 100% AC covered (6/6), 0 tests generated |
-| 2026-10-17 | Feature | 097 Root Feature Delivery Review — complete bootstrap scope, exact root SHA and unchanged Git state |
-| 2026-10-17 | Feature | Plan097: two bounded steps and new independent review; owner-bound acceptance remains pending |
-| 2026-10-17 | Spec | Spec identity097: root bootstrap review contract, renumbered from the historical root096 allocation; new independent review ready |
-| 2026-10-17 | Feature | Feature096 bugfix: reject late Chai matcher and prototype registration |
-| 2026-10-17 | Feature | Feature096 CI fixture fix: actual Typer Result annotation and exact outer deadline; normal AC004-filtered proof18 tests, previous110/six-AC proof historical |
-| 2026-10-17 | Bugfix | Feature096 Fix: bounded consumer timeouts and same-deadline CLI final verification; normal spec-fix after scoped fallback,110 current tests and six ACs certified |
+| 2026-10-18 | Feature | [Feature096] API completion fixture maintenance: five real Vitest regression cases PASS; no new AC claim. |
+| 2026-10-18 | Feature | [Feature095] Expired captured execution cannot return success; preserve124 diagnostics. Real publication and no-fresh-receipt regressions: two tests, eight bindings, AC001/003 only. |
+| 2026-10-18 | Feature | [Feature095] Expired captured execution cannot return success; preserve124 diagnostics. Real publication and no-fresh-receipt regressions: two tests, five bindings, AC001/003 only. |
+| 2026-10-18 | Feature | [Feature078] Preserve fenced resolved commands: exactargv/unit+DoD, positive quality exclusions and explicit unsupported drivers; two targeted tests, eight bindings, AC007/010 only. |
+| 2026-10-18 | Feature | [Feature 078] Exact eighth no-UI absence marker verified: 4 checks, 24 reviewed bindings and AC-007/009/010 only; opaque or unresolved command-bearing suffixes never disappear. Read [the current execution checkpoint](features/078-requirement-evidence-integrity/progress.md#exact-no-ui-absence-verification--2026-10-18). |
+| 2026-10-18 | Feature | [Feature 078] Closed positive absence verified on split test modules: 43 checks, 159 reviewed bindings and AC-007/009/010 only; opaque or unresolved command-bearing suffixes never disappear. Read [the current execution checkpoint](features/078-requirement-evidence-integrity/progress.md#post-split-execution-verification--2026-10-18). |
+| 2026-10-18 | Feature | [Feature 078] Closed positive absence grammar: 43 checks and 159 reviewed bindings certify AC-007/009/010 only; arbitrary command suffixes remain required, opaque or unresolved and noncertifying. Read [the correction scope](features/078-requirement-evidence-integrity/implementation.md#approved-command-table-compatibility-follow-up--2026-10-17). |
+| 2026-10-18 | Feature | [Feature 078] Approved command-table compatibility: 41 checks and 149 reviewed bindings certify AC-007/009/010 only; named columns, strategy fallback, qualified absence and lifecycle-stable command identity. Read [the correction scope](features/078-requirement-evidence-integrity/implementation.md#approved-command-table-compatibility-follow-up--2026-10-17). |
+| 2026-10-17 | Feature | [Feature 078] Cloud command-discovery correction: 28 checks pass; AC-007/009/010 certified. Action purposes bind every test command; opaque identity grants no unsupported assertion adapter. Read [the current correction scope](features/078-requirement-evidence-integrity/implementation.md#cloud-command-discovery-correction--2026-10-17). |
+| 2026-10-17 | Feature | [Feature 096] CI timeout-test correction: 10 checks pass, AC-004 certified; preserve the 1.5-second cap and published/no-fresh-receipt outcomes. Read [the correction scope](features/096-node-vitest-execution/implementation.md#ci-timeout-test-correction--2026-10-17). |
 <!-- readme:activity:end -->
 
 ---
@@ -378,3 +378,27 @@
 <!-- finalize:spec-implement:2026-10-17:1bab7ffb -->
 
 <!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
+
+<!-- finalize:spec-fix:2026-10-17:c1b7f27f -->
+
+<!-- finalize:spec-fix:2026-10-17:caf10d18 -->
+
+<!-- finalize:spec-fix:2026-10-17:f981b487 -->
+
+<!-- finalize:spec-fix:2026-10-17:96cf0f5a -->
+
+<!-- finalize:spec-fix:2026-10-18:a036f062 -->
+
+<!-- finalize:spec-fix:2026-10-18:9197b952 -->
+
+<!-- finalize:spec-fix:2026-10-18:2c98861b -->
+
+<!-- finalize:spec-fix:2026-10-18:ec8178d9 -->
+
+<!-- finalize:spec-fix:2026-10-18:957ca33d -->
+
+<!-- finalize:spec-fix:2026-10-18:54e97348 -->
+
+<!-- finalize:spec-fix:2026-10-18:6dd8b550 -->
+
+<!-- finalize:spec-fix:2026-10-18:877b2a24 -->

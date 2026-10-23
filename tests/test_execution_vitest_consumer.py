@@ -7,6 +7,7 @@ import json
 import os
 import subprocess
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -31,6 +32,28 @@ def _original_unchanged(inputs_path: Path) -> bool:
         timeout=5,
     ).stdout
     return unchanged and status == before["original_git_status"]
+
+
+def _copy_matches_requested(inputs_path: Path, captures: list[dict[str, Any]]) -> bool:
+    """Bind both executed packages and original argv/cwd to the frozen producer inputs."""
+    before = json.loads(inputs_path.read_text())
+    root = Path(before["copy"])
+    if len(captures) != 2:
+        return False
+    for package, capture in zip(("dashboard", "slides"), captures, strict=True):
+        if (
+            capture["project_root"] != str(root)
+            or capture.get("execution_cwd") != package
+            or capture.get("budget", {}).get("scope") != before["requested_commands"][package]
+        ):
+            return False
+        for name, expected in before["inputs"].items():
+            if name.startswith(package + "/") and (
+                hashlib.sha256((root / name).read_bytes()).hexdigest() != expected
+                or capture["before"].get(name) != expected
+            ):
+                return False
+    return True
 
 
 @pytest.mark.acceptance
@@ -66,5 +89,6 @@ def test_both_real_consumer_observations_remain_fresh_and_complete() -> None:
         )
         and len({capture["invocation"] for capture in captures}) == 2
         and all(capture["before"] == capture["after"] for capture in captures)
+        and _copy_matches_requested(Path(evidence["inputs_before"]), captures)
         and _original_unchanged(Path(evidence["inputs_before"]))
     ), [result.gaps for result in results]

@@ -123,6 +123,7 @@ def check_execution_options(
     debug: bool,
     derive: bool = False,
     observation: str | None = None,
+    execution_cwd: Path | None = None,
 ) -> bool:
     """Validate native test selection before resolving project inputs.
 
@@ -145,6 +146,8 @@ def check_execution_options(
     Side effects:
         None; supplied values and referenced files remain untouched.
     """
+    if execution_cwd is not None and command is None:
+        raise ValueError("--execution-cwd requires --execution-command")
     if observation is not None:
         _check_observation_options(feature, command, mapping, prepare, ingest, derive, observation)
     active = sum((command is not None, prepare, ingest is not None, derive))

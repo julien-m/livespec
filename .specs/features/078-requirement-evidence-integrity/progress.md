@@ -71,3 +71,89 @@ Capture22c6c801 certifies AC007/AC015 with zero gaps and 3875 passing tests. The
 ## 2026-10-16 — Governed cache capture bugfix
 
 RED a5afa5c4 and GREEN 01917bd3 prove real mapped assertions in Git-ignored caches and reject later mapping/review tampering. Closing bugfix gate ELIGIBLE; 29 adjacent tests pass. Existing feature acceptance/status remains unchanged.
+
+## 2026-10-17 — Test observations and explicit absent commands
+
+- Final regression bytes reproduce both defects in runner-owned RED `1f051d7a14a14812974a52a41c8f9f93`; pre-edit gate READY.
+- Necessary selection: 53 passed, zero skipped with real Node 22/Vitest 2.1.9; Ruff/format and full Pyright pass. Native high review found no blockers. GREEN and closing receipts follow through the bugfix trace.
+- Full feature acceptance/status and consumer lifecycle remain unchanged.
+
+## 2026-10-17 — Final PR51 integration preparation
+
+- Integrated PR51 head `36ed979502ce7627752263daef5dad7efeeab037`, preserving its producer corrections and the four unchanged 078 contract/test sources.
+- Current dated Requirement Mapping links the actual fix sources and test so the Bugfix Receipts table no longer masks conventions scope. No parser or normative requirement changed.
+- Current compatibility observation and conventions are independently reverified after this checkpoint. Historical receipts remain historical; delivered main and the separate 078 PR remain pending.
+
+- Necessary current selection: 53 passed, zero skipped through a runner-owned passed-observation receipt; no AC certified. Conventions PASS on all four mapped files; Ruff/format and full Pyright PASS.
+- Test-only helper extraction preserves every assertion while meeting the 60-line error threshold. Conventions retain nonblocking function-length warnings (57-line scenario and existing 41-line resolver); no waiver or parser change. Historical RED/GREEN is not current proof after these test bytes changed; final closure awaits delivered main.
+
+## 2026-10-17 — Delivered main final closure
+
+- Integrated delivered main `eedd866ab2b2faff31ab5e216a71e9c72d01f799`; its tree matches the independently reviewed PR51 base exactly.
+- Final current regression bytes reproduce both defects against an exact baseline of the three 078 production files only: RED `453c6a2bc1354d1eaf4f244639e7943d`, pre-edit gate READY. Tests and all PR51 sources remain unchanged between RED and the restored correction.
+- Existing 53-test compatibility observation remains current after main integration; full `mypy .` reports no issues in 799 files, full Ruff/format and Pyright pass. Fresh GREEN, closing trace, conventions and goal/archive checks follow. Old receipts and goals are preserved as history.
+
+- Current GREEN `91c842aea1e34caa815c911e359e812e` passes the exact RED command with unchanged regression bytes; closing bugfix gate ELIGIBLE and trace recorded. Real four-file conventions scope PASS. Fresh goal state is isolated under a process-only TMPDIR; old control pairs remain untouched. Archive and final independent metadata review precede publication.
+
+- Fresh goal complete 4/4; inspect [the current successful archive](../../.runs/spec-fix-2026-10-17T13-25-21.082948-0a082a99-policy2.json). Receipt rechecks and `verify-output spec-fix` pass. The independent final review refresh covers changed metadata and delivered-base context; unchanged source/test hashes retain their reviewed content identity. No full feature acceptance is claimed.
+
+## 2026-10-17 — PR54 command-scope review corrections
+
+- P1 freezes each explicit suite command/selection, plan bytes and local package/config identities. Genuine extra receipts aggregate multiple unit commands and every required suite for DoD; npm aliases read actual scripts without execution. Unmarked historical contracts retain their meaning.
+- P2 matches suite names only in Action cells, so unit exclusion paths cannot activate integration/E2E. Read [the regression](../../../tests/test_spec_test_observations.py) and [binding](../../../validator/evidence_applicability.py).
+- Current regression bytes reproduce both findings against committed pre-fix `3559326f811dfa8d315082405e13065b69b920f8`: RED `59f06396b43048b68f0c9baf2c5a0171`, pre-edit gate READY. One fixture-token cleanup required a fresh RED; prior captures remain historical. Scope and the original cumulative 300-second ceiling are unchanged.
+
+- Adversarial reviewers found and corrected npm forwarded-argument loss, lifecycle/chain expansion ambiguity and missing Cargo normalization before final freeze. Exact literal aliases only; Cargo retains all parsed argv. Plan bindings cover all runners, while additional package/script/config compile-time binding is Vitest-specific; every receipt still requires current source/config verification.
+- Final current GREEN `b4206a7d50f944b1820c971a22cba070` matches RED59f06396 test bytes/command; prior GREEN7c63 remains historical after the skill-scope clarification. Necessary selection 54 passed with real observations, no skips; full qualities and five-file conventions pass. Main53 integration and PR54 merge remain pending the coordinated order.
+
+## 2026-10-17 — Review repair cwd checkpoint (not closed)
+
+- Codex P1/P2 review repair now binds original command selections and actual capture cwd; separate dashboard/slides packages and wrong-root receipt refusal replace the earlier same-package-only regression.
+- Native mapping preparation identified missing negative bindings and a weak consumer-copy conjunction; current096 mapping108/40 was corrected and independently reviewed. Product preflight copies passed46/55 unchanged tests, without consumer042 closure or runtime pin changes.
+- Current078 correction naturally exceeds the bugfix lane300-line cap; preserve all changes and use the actual gate/FALLBACK authority. Do not reinterpret prior PASS archives as proof of this repair.
+- Final RED/GREEN, current final reviews/qualities, owner gates and archive remain pending integration of stablePR53; no publication or completion claim at this checkpoint.
+
+## Current command-scope repair evidence
+
+- Main53 `b20ff49d8645e8281e17cd20259019fc4bccff92` is normally merged; its tree matches the integrated reviewed base. Current regression pair RED `d90a624ad7fc4857a5ac8d08e4b7433b` and GREEN `41521b0767034ce18fb84cce829f6d5f` uses identical five-test bytes and command: five passed, no skips. Earlier invalid or failed attempts retain their original receipts.
+- Typed suite declarations require original execution + passed outcome and prohibit acceptance-scope/binding combinations before applicability may deactivate a suite. Npm literals require the real local Vitest shim/entry; direct argv preserves executable identity and every selection token. Only independently verified native Node22 observations gain the declared alias transport.
+- The actual closing lane is FALLBACK because revised096 and delivered097 normative content differs from base3559326; current full078 SPEC/PLAN readiness is READY with actual200000-character plan review budget. Normal filtered FR-009 and FR-011 repair proofs cover AC007/009/010/015; the other twelve ACs are unexamined by this repair, not newly certified. Current mapping review and goal archives determine proof readiness.
+
+
+### 2026-10-17 — Cloud command-discovery follow-up (separate correction)
+
+- The earlier closed repair and its archives remain historical. This follow-up starts from published `3cc9ac50` while preserving the separately closed CI096 timeout-test correction. It has its own 300-second validation ceiling; no earlier counter is reset.
+- Current full spec/plan implement readiness is READY. The independent precheck confirms two gaps: Action-purpose omission and conflating unknown command identity with unsupported certification.
+- Final new regression bytes reproduce 12 failures and three passes against the original published applicability source; the production baseline was restored in `finally`. The first RED remains retained under its original test hash. Read [the immutable new regression source](../../../tests/test_suite_command_discovery.py).
+- Read [the bounded implementation change](../../../validator/evidence_applicability.py): shared explicit-purpose classification and opaque original identity preserve strict observed-proof checks and clear unsupported-adapter diagnostics.
+- Current full mypy, Pyright, changed-file Ruff and format checks pass. Independent mapping review and final targeted execution remain pending at this checkpoint; no new acceptance PASS is claimed here.
+
+- Current mapped execution: read [the fresh three-AC receipt](../../.execution/1ea13b21907b47e3848486ee536c55ed/receipt.json): 28 passes, no skips, 95 independently reviewed bindings, AC-007/009/010 certified and no gaps. All 15 new regressions pass with the exact final test bytes used by RED `7361c392`; the mapped GREEN selection adds 13 existing witnesses and therefore is not a same-command bugfix-lane pair. No ELIGIBLE claim is made.
+
+## Approved command-table compatibility verification — 2026-10-18
+
+Current runner-owned receipt `bfe7d73a0af04c61a5a2d6d93c5c2627` qualifies 41 passed cases, 149 reviewed assertion bindings and only AC-007/009/010. It covers named/reordered/annotated columns, explicit qualified absence, action-only suite classification, strategy fallback/precedence, immutable original command/cwd and lifecycle-only plan identity. Unsupported opaque execution never qualifies. The earlier v7 40-case receipt and 28-case receipt remain historical for their actual bytes. The other 13 criteria are not recertified. Official goal/archive closure follows this current execution checkpoint.
+
+## Audit v5 absence-grammar correction prepared — 2026-10-18
+
+AUDIT-V5-001 identified command-bearing qualified absence text hidden by the finite runner blacklist. The correction accepts only exact absence tokens and the single approved bootstrap-fixture sentence. A consolidated suffix/opaque-command matrix and a genuine-unit-versus-E2E/aggregate refusal case are prepared but not executed. The earlier 41-case/149-binding receipt remains historical for its actual bytes; its first goal closed and its second archive stopped at the explicit closure deadline. No current execution or closure PASS is claimed for these new source bytes.
+
+## Closed positive absence verification — 2026-10-18
+
+Current runner-owned receipt `c9ffa8c5642748b99a8741f452e8088a` qualifies 43 passed cases, 159 reviewed assertion bindings and only AC-007/009/010. It covers the closed seven-form positive absence grammar, the 96-combination single-case matrix, unresolved ambiguous cwd annotations, real unit-versus-E2E/aggregate/archive refusal, named columns, strategy fallback, original command/cwd and lifecycle identity. Unsupported opaque execution never qualifies. The earlier 41-case receipt and its partially closed controls, plus the 40-case and 28-case receipts, remain historical for their actual bytes. The other 13 criteria are not recertified. Official goal/archive closure follows this current execution checkpoint.
+
+### Final test-file convention repair — 2026-10-18
+
+The first positive-absence capture passed 43 cases / 159 reviewed bindings, but the real conventions gate rejected the 584-line command-discovery module. The three absence cases moved to a dedicated module without changing assertions; both resulting files are under 500 lines. That receipt is historical after the move. Fresh semantic mapping, statics and conventions must pass before the second and final authorized capture; no current post-split execution PASS is claimed here.
+
+## Post-split execution verification — 2026-10-18
+
+Current runner-owned receipt `fcba6c6f2d734184a7816f1d0560e9d7` qualifies 43 passing cases, 159 current reviewed bindings and only AC-007/009/010 on the conventions-compliant split modules. The 96-combination matrix remains one test, and the moved functions retain identical ASTs with updated module identities. The 36-file snapshot is unchanged before/after execution, including the untracked dedicated test module. Ruff, format, full mypy (806 files), Pyright and the actual pre-capture conventions gate passed. The earlier 43-case receipt and its file-size conventions failure remain historical. The other 13 criteria are not recertified. Current official proof/control/archive outputs are retained separately by the CLI workflow; this checkpoint records execution scope without claiming historical whole-feature certification.
+
+## Exact no-UI absence verification — 2026-10-18
+
+Current runner-owned receipt `78e6012da9d84084b58256d28318313d` qualifies 4 passing cases, 24 current reviewed bindings and only AC-007/009/010 for the exact eighth absence marker used by plans039.1 and060. The unchanged 96-combination matrix remains one test. Command-bearing suffixes on the eighth marker remain required opaque or unresolved. The 36-file snapshot is unchanged before/after execution, including the untracked dedicated test module. Ruff, format, full mypy (806 files), Pyright and the actual pre-capture conventions gate passed. The earlier 43-case receipt and its file-size conventions failure remain historical. The other 13 criteria are not recertified. Current official proof/control/archive outputs are retained separately by the CLI workflow; this checkpoint records execution scope without claiming historical whole-feature certification.
+
+## Fenced command execution verification — 2026-10-18
+
+Current receipt `0bf8bb9645c3449aaa070a2274cc4e9c` qualifies two targeted tests and eight reviewed bindings for AC-007/010. The actual fenced command sections of plans031/081 bind their exact selections, direct quality-only commands are excluded, canonical unit/all tasks accept a genuine matching pytest observation and refuse an unknown invocation. Command arguments never infer suite labels. Full mypy806, Pyright, Ruff/format and conventions passed before capture. Earlier four-case and43-case source-bound receipts remain historical after this parser correction. The other14 acceptance criteria are not recertified. Official current goal/archive proofs are retained separately.

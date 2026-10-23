@@ -33,6 +33,8 @@ from .execution_scope import (
     read_regular,
     source_manifest,
 )
+from .execution_verification import complete_verification
+from .execution_working_directory import capture_execution_cwd, resolve_runner_cwd
 from .goal_archive_file import release_archive_lock
 
 
@@ -46,6 +48,8 @@ class ExecutionCapture(BaseModel):
     invocation: str
     directory_identity: tuple[int, int]
     project_root: str
+    execution_cwd: str | None = None
+    execution_cwd_identity: tuple[int, int] | None = None
     feature: str
     argv: list[str]
     runner_provenance: dict[str, str]
@@ -93,13 +97,14 @@ def capture_execution(
     acceptance_mapping: str | None = None,
     required_report_path: str | None = None,
     verification_pending: bool = False,
+    execution_cwd: Path | None = None,
 ) -> CaptureResult:
     """Include runner preparation and evidence capture in the managed deadline."""
     from .execution_timeout_capture import timeout_capture
 
     with command_scope(project_root, argv, timeout) as scope:
         try:
-            return _capture_execution(
+            result = _capture_execution(
                 argv,
                 project_root=project_root,
                 feature=feature,
@@ -108,23 +113,48 @@ def capture_execution(
                 timeout=timeout,
                 acceptance_mapping=acceptance_mapping,
                 required_report_path=required_report_path,
-                verification_pending=verification_pending,
+                verification_pending=True,
+                execution_cwd=execution_cwd,
             )
+            # @spec FR-001, FR-003: Expiry never returns successful execution.
+            # — .specs/features/095-test-time-budgets/spec.md#fr-001
+            if (scope.timed_out or scope.remaining() <= 0) and result.exit_code != 124:
+                raise BudgetExpired("Managed execution deadline expired before returning capture")
+            if not verification_pending and result.receipt_path and result.exit_code != 124:
+                _complete_api_verification(result, project_root)
+            return result
         except BudgetExpired as exc:
             scope.timed_out = True
             try:
                 arm_finalization(scope)
-                return timeout_capture(argv, project_root, feature, adapter, scope.evidence())
-            except BudgetExpired:
+                return timeout_capture(
+                    argv,
+                    project_root,
+                    feature,
+                    adapter,
+                    scope.evidence(),
+                    execution_cwd=execution_cwd,
+                )
+            except (BudgetExpired, OSError, ValueError) as finalization_error:
                 disarm_deadline_alarm()
                 return CaptureResult(
                     exit_code=124,
                     stdout="",
-                    stderr=f"TIMEOUT: {exc}; no fresh receipt finalized within command budget",
+                    stderr=f"TIMEOUT: {exc}; no fresh receipt: {finalization_error}",
                     receipt_path="",
                     budget=scope.evidence(),
                     gaps=["Command budget exhausted; no fresh execution receipt"],
                 )
+
+
+def _complete_api_verification(result: CaptureResult, project_root: Path) -> None:
+    """Keep failed completion nonqualifying without masking managed deadline expiry."""
+    try:
+        complete_verification(Path(result.receipt_path), project_root.resolve(strict=True))
+    except BudgetExpired:
+        raise
+    except (OSError, ValueError) as exc:
+        result.gaps.append(f"Final verification unavailable: {exc}")
 
 
 def _capture_execution(
@@ -138,36 +168,30 @@ def _capture_execution(
     acceptance_mapping: str | None = None,
     required_report_path: str | None = None,
     verification_pending: bool = False,
+    execution_cwd: Path | None = None,
 ) -> CaptureResult:
     """Execute once with fresh report env; retain honest gaps on insufficient proof."""
     root = project_root.resolve(strict=True)
+    cwd = resolve_runner_cwd(root, execution_cwd, argv)
+    cwd_stat = cwd.stat()
     directory, directory_identity = _run_directory(root)
     report = directory / "runner-report"
     gaps: list[str] = []
-    try:
-        argv, provenance = prepare_runner(argv, adapter, report, root=root, env=env)
-    except CargoRunnerUnavailable as exc:
-        provenance = {}
-        gaps.append(f"Unsupported runner: {exc}")
-    if not provenance and not gaps:
-        gaps.append("Unsupported runner: structured reports alone cannot certify execution")
+    argv, provenance = _prepare_capture_runner(argv, adapter, report, root, env, cwd, gaps)
     raw_before, before = _manifests(root, feature, gaps, acceptance_mapping)
     started = time.time_ns()
     code, stdout, stderr = _invoke(
-        argv, root, directory, feature, env, timeout, required_report_path, gaps
+        argv, root, directory, feature, env, timeout, required_report_path, gaps, cwd
     )
-    finished, scope = time.time_ns(), current_deadline()
-    if scope is not None and scope.timed_out:
-        raw_after: dict[str, str] = {}
-        after: dict[str, str] = {}
-        gaps.append("Post-execution source snapshot omitted after timeout")
-    else:
-        raw_after, after = _manifests(root, feature, gaps, acceptance_mapping)
+    finished = time.time_ns()
+    raw_after, after = _post_execution_manifests(root, feature, gaps, acceptance_mapping)
     capture = ExecutionCapture(
         acceptance_evidence_policy="2",
         invocation=directory.name,
         directory_identity=directory_identity,
         project_root=str(root),
+        execution_cwd=cwd.relative_to(root).as_posix(),
+        execution_cwd_identity=(cwd_stat.st_dev, cwd_stat.st_ino),
         feature=feature,
         argv=argv,
         runner_provenance=provenance,
@@ -183,10 +207,43 @@ def _capture_execution(
         stdout_sha256=digest(stdout.encode()),
         stderr_sha256=digest(stderr.encode()),
         acceptance_mapping=acceptance_mapping,
-        verification_pending=verification_pending,
+        verification_pending=verification_pending and code != 124,
         gaps=gaps,
     )
     return _finish_capture(directory, capture, stdout, stderr)
+
+
+def _prepare_capture_runner(
+    argv: list[str],
+    adapter: str,
+    report: Path,
+    root: Path,
+    env: dict[str, str],
+    cwd: Path,
+    gaps: list[str],
+) -> tuple[list[str], dict[str, str]]:
+    """Keep unsupported transports diagnostic without changing actual command execution."""
+    try:
+        prepared, provenance = prepare_runner(
+            argv, adapter, report, root=root, env=env, execution_cwd=cwd
+        )
+    except CargoRunnerUnavailable as exc:
+        gaps.append(f"Unsupported runner: {exc}")
+        return argv, {}
+    if not provenance:
+        gaps.append("Unsupported runner: structured reports alone cannot certify execution")
+    return prepared, provenance
+
+
+def _post_execution_manifests(
+    root: Path, feature: str, gaps: list[str], mapping: str | None
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Keep timeout finalization bounded instead of starting another source snapshot."""
+    scope = current_deadline()
+    if scope is not None and scope.timed_out:
+        gaps.append("Post-execution source snapshot omitted after timeout")
+        return {}, {}
+    return _manifests(root, feature, gaps, mapping)
 
 
 def _finish_capture(
@@ -194,6 +251,10 @@ def _finish_capture(
 ) -> CaptureResult:
     """Publish captured facts and return the same process outcome to the driver."""
     scope = current_deadline()
+    try:
+        capture_execution_cwd(capture)
+    except (OSError, ValueError) as exc:
+        capture.gaps.append(f"Execution cwd unavailable after invocation: {exc}")
     if capture.runner_provenance.get("runner") == "vitest" and not (scope and scope.timed_out):
         from .execution_vitest_provenance import current_vitest_provenance
 
@@ -228,6 +289,7 @@ def _invoke(
     timeout: float | None,
     required_report_path: str | None,
     gaps: list[str],
+    execution_cwd: Path | None = None,
 ) -> tuple[int, str, str]:
     """Invoke the prepared runner and retain its exact process outcome."""
     proc_env = {
@@ -240,7 +302,7 @@ def _invoke(
         "LIVESPEC_EXECUTION_FEATURE": feature,
     }
     del timeout
-    code, stdout, stderr = run_owned(argv, root, proc_env)
+    code, stdout, stderr = run_owned(argv, execution_cwd or root, proc_env)
     if required_report_path and not (root / required_report_path).is_file():
         code = code or 1
         stderr += f"\nMissing coverage report at {root / required_report_path}"

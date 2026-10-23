@@ -8,20 +8,21 @@ updated: 2026-10-17
 
 # Implementation — Node Vitest Execution Observations
 
-All six execution ACs are certified by the fresh runner-owned98-test capture. Current143 bindings, independent mapping/full-scope reviews, nine-asset installed API and unchanged46/55 consumer observations pass. Inspect [the final capture](.reviews/implementation-evidence/corrected-98-capture.json) and [the progress checkpoint](progress.md). Earlier failed and stale runs remain historical; no consumer lifecycle or global runtime was changed.
+The original six-AC delivery remains historical. The confined-cwd revision is under current verification; its spec and plan reviews were refreshed and the official revision closed. Current capture, consumer, acceptance and delivery evidence will be recorded below before claiming revised completion. Inspect [the checkpoint](progress.md); all earlier artifacts are preserved.
 
 ## Requirement Mapping
 
 Inspect the linked source files and their requirement anchors.
 
-| Requirement | Source | Anchor | Current status |
-|---|---|---|---|
-| [FR-001](spec.md#fr-001) | [CLI observation](../../../validator/cli_commands/execution_io.py), [Vitest preparation](../../../validator/execution_vitest.py) | `@spec FR-001` | Implemented; real passed/red and option tests pass |
-| [FR-002](spec.md#fr-002) | [matcher observer](../../../validator/vitest/matcher-observer.ts), [selected results](../../../validator/execution_vitest_results.py) | `@spec FR-002` | Implemented; four review findings corrected, 14 boundary cases pass |
-| [FR-003](spec.md#fr-003) | [runtime provenance](../../../validator/execution_vitest_provenance.py), [governed configuration](../../../validator/vitest/config.ts) | `@spec FR-003` | Implemented; runtime/config/setup and artifact refusal tests pass |
-| [FR-004](spec.md#fr-004) | [bounded preparation](../../../validator/execution_vitest.py) | `@spec FR-004` | Implemented; native body/hook caps plus shared command cap; enforcement reports command-only |
-| [FR-005](spec.md#fr-005) | [observation branch](../../../validator/cli_commands/execution_io.py), [generic goal marker](../../../.agent-sync/skills/spec-implement/SKILL.md) | `@spec FR-005` | Implemented; acceptance unchanged; generic passed proof and current goal archive verified |
-| [FR-006](spec.md#fr-006) | [two-run verification](../../../tests/test_execution_vitest_consumer.py) | `@spec FR-006` | Fresh final 46/55 observations pass; original input identity check passes |
+| Date | Requirement | Source | Anchor | Current status |
+|---|---|---|---|---|
+| 2026-10-17 | [FR-003](spec.md#fr-003), [FR-004](spec.md#fr-004) | [execution_capture.py](../../../validator/execution_capture.py), [execution_runner.py](../../../validator/execution_runner.py), [execution_vitest.py](../../../validator/execution_vitest.py), [execution_vitest_provenance.py](../../../validator/execution_vitest_provenance.py), [execution_evidence.py](../../../validator/execution_evidence.py), [execution_working_directory.py](../../../validator/execution_working_directory.py), [execution_timeout_capture.py](../../../validator/execution_timeout_capture.py), [test_cmd.py](../../../validator/cli_commands/test_cmd.py), [operation_options.py](../../../validator/cli_commands/operation_options.py), [execution_io.py](../../../validator/cli_commands/execution_io.py), [test_execution_working_directory.py](../../../tests/test_execution_working_directory.py), [test_execution_vitest_consumer.py](../../../tests/test_execution_vitest_consumer.py) | `@spec FR-003`, `@spec FR-004`, `@spec AC-003` | Confined single-invocation cwd; current verification in progress |
+| Historical | [FR-001](spec.md#fr-001) | [CLI observation](../../../validator/cli_commands/execution_io.py), [Vitest preparation](../../../validator/execution_vitest.py) | `@spec FR-001` | Implemented; real passed/red and option tests pass |
+| Historical | [FR-002](spec.md#fr-002) | [matcher observer](../../../validator/vitest/matcher-observer.ts), [selected results](../../../validator/execution_vitest_results.py) | `@spec FR-002` | Implemented; four review findings corrected, 14 boundary cases pass |
+| Historical | [FR-003](spec.md#fr-003) | [runtime provenance](../../../validator/execution_vitest_provenance.py), [governed configuration](../../../validator/vitest/config.ts) | `@spec FR-003` | Implemented; runtime/config/setup and artifact refusal tests pass |
+| Historical | [FR-004](spec.md#fr-004) | [bounded preparation](../../../validator/execution_vitest.py) | `@spec FR-004` | Implemented; native body/hook caps plus shared command cap; enforcement reports command-only |
+| Historical | [FR-005](spec.md#fr-005) | [observation branch](../../../validator/cli_commands/execution_io.py), [generic goal marker](../../../.agent-sync/skills/spec-implement/SKILL.md) | `@spec FR-005` | Implemented; acceptance unchanged; generic passed proof and current goal archive verified |
+| Historical | [FR-006](spec.md#fr-006) | [two-run verification](../../../tests/test_execution_vitest_consumer.py) | `@spec FR-006` | Fresh final 46/55 observations pass; original input identity check passes |
 
 ## Acceptance Criteria Mapping
 
@@ -128,3 +129,43 @@ Consumer zero, negative and nonfinite numeric test/hook timeouts use the positiv
 | 2026-10-17 | Inspect [execution_capture.py](../../../validator/execution_capture.py) |
 | 2026-10-17 | Inspect [execution_evidence.py](../../../validator/execution_evidence.py) |
 | 2026-10-17 | Inspect [execution_verification.py](../../../validator/execution_verification.py) |
+
+## Confined Invocation Working Directory Revision
+
+- FR-003/004 keep the governing project, feature and storage root fixed while one direct Vitest invocation uses an explicit existing directory confined beneath that root. CLI and API omit cwd by default; historical captures still mean root. Archive reads recheck the same directory identity and runtime provenance.
+- Read [the current independent check](checks/2026-10-17.md) and [the real cwd regressions](../../../tests/test_execution_working_directory.py). The source-owned 40-test/108-binding checkpoint passed all six ACs; later source closure belongs to the current CLI goal archive, never to an older certificate. Producer copies observed 46/55 unchanged consumer tests and do not close consumer042.
+
+| Date | Requirement | Owned source |
+|---|---|---|
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_working_directory.py](../../../validator/execution_working_directory.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_capture.py](../../../validator/execution_capture.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_evidence.py](../../../validator/execution_evidence.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_runner.py](../../../validator/execution_runner.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_timeout_capture.py](../../../validator/execution_timeout_capture.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_vitest.py](../../../validator/execution_vitest.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_vitest_provenance.py](../../../validator/execution_vitest_provenance.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [execution_io.py](../../../validator/cli_commands/execution_io.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [operation_options.py](../../../validator/cli_commands/operation_options.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [test_cmd.py](../../../validator/cli_commands/test_cmd.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [test_execution_working_directory.py](../../../tests/test_execution_working_directory.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [test_execution_vitest_consumer.py](../../../tests/test_execution_vitest_consumer.py) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [ci.yml](../../../.github/workflows/ci.yml) |
+| 2026-10-17 | FR-003, FR-004 / AC-003, AC-004, AC-006 | Read [README.md](../../../README.md) |
+
+
+## CI timeout-test correction — 2026-10-17
+
+| Date | Requirement | Owned test and anchor | Scope |
+|---|---|---|---|
+| 2026-10-17 | [FR-004](spec.md#fr-004), [AC-004](spec.md#ac-004) | Read [the runtime deadline test](../../../tests/test_execution_vitest.py), `@spec AC-004` | Assert the public timeout result before branching on receipt publication; retain the 1.5-second limit and both observation refusals for published receipts. |
+
+CI on `3cc9ac50da18e968a0b3b1d595523e9f36007f72` exposed the legitimate no-fresh-receipt timeout result. The test previously required publication through a convenience helper. Runtime behavior and normative requirements are unchanged. The local pre-edit attempt passed through the other legitimate branch; the official bugfix gate printed FALLBACK rather than qualifying a fabricated RED. The normal correction targets AC-004. Earlier 40-test/six-AC and 31-test/four-AC certificates remain bound to their original source trees.
+
+- Current AC-004 scope: 10 passing real cases and 30 independently reviewed bindings; inspect [the execution receipt](../../.execution/cd926fb097c44fe282ed333ca49b8f56/receipt.json). It includes separate preparation-expiry and owned-descendant/heartbeat cleanup witnesses. Other acceptance criteria are not recertified by this correction.
+
+
+## API completion fixture compatibility — 2026-10-18
+
+- Fixture maintenance only: no production or normative change, no new acceptance certification. Four selected test functions execute five cases, all PASS with real Node 22/Vitest and zero skips.
+- Read [the fixture](../../../tests/execution_vitest_fixture.py), [legacy-root regression](../../../tests/test_execution_working_directory.py) and [origin regression](../../../tests/test_execution_vitest_integrity.py). Semantic inventory/origin corruption updates only the capture hash in the actual completion marker while retaining its real deadline budget; historical schema explicitly has verification_pending=false.
+- Prior production-095 capture7159 and other certificates remain historical under their original test trees. Standalone regression output is external, not an AC receipt.
