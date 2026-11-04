@@ -64,3 +64,13 @@ No final feature certification or implemented lifecycle promotion is claimed.
 | RED | Done | `tests/test_generation_ci_selection.py` | targeted pytest | 5 failed / 6 passed | 2026-10-13 |
 | Fix | Done | `.github/workflows/ci.yml` | targeted pytest | 15 passed | 2026-10-13 |
 | Capture | Done | `acceptance-mapping.json` | `livespec test` receipt `bf31deb16fdf4dde80242aeb31dd93ea` | AC-002 certified | 2026-10-13 |
+
+## 2026-11-04 — spec-fix: corpus pin and runner image (FR-005, FR-003)
+
+| Step | Status | Files | Verification | Result | Date |
+|---|---|---|---|---|---|
+| Refine | Done | `spec.md`, `plan.md` | independent spec/plan reviews complete+ready (claude-opus-5-5, round 1) | READY | 2026-11-04 |
+| RED | Done | `tests/test_generation_ci_selection.py` | targeted pytest against the shipped workflow | 4 failed / 10 passed | 2026-11-04 |
+| Fix | Done | `.github/workflows/ci.yml` | targeted pytest | 18 passed (selection + events) | 2026-11-04 |
+| Capture | Done | `acceptance-mapping.json` | mapping review ready; `livespec test` receipt `704bda7a4a474b7eb074269b14aa39f4` | AC-002 certified | 2026-11-04 |
+| Suite | Done | — | full unit suite, CI parity (Penflow dd356b9, corpus fb126cd) | 4392 passed / 122 skipped | 2026-11-04 |

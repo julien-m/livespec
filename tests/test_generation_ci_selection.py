@@ -5,6 +5,7 @@
 # @spec AC-002: Public immutable Penflow pin without credential
 # ../.specs/features/079-validator-ci-prerequisites/spec.md#ac-002
 
+import hashlib
 import os
 import shlex
 import subprocess
@@ -34,6 +35,11 @@ PENFLOW_PATH = ".ci-deps/penflow"
 # Commit-map equivalent of retired private revision dcbfea6 after the public republication.
 PENFLOW_COMMIT = "dd356b95f8543d025b85632ce3998eed88fef07c"
 PENFLOW_JOBS = ("unit-tests", "integration-3a")
+# First ai-ressources revision whose documents match the shipped AST catalog source hashes.
+CORPUS_COMMIT = "fb126cd52560e7908243e85cae1543700ef7a9a3"
+CATALOG_DIR = REPO / "validator/conventions_ast/rule_catalog"
+# ubuntu-latest moved to 26.04, where the pinned Playwright cannot install Chromium.
+RUNNER_IMAGE = "ubuntu-24.04"
 
 
 def _job(name: str) -> JsonFixture:
@@ -61,7 +67,7 @@ def test_ast_corpus_checkout_pins_private_source_and_exact_sparse_files() -> Non
     assert step["uses"] == "actions/checkout@v4"
     assert step["with"] == {
         "repository": "julien-m/ai-ressources",
-        "ref": "11976242fc5b9ae5f3a574e19339b78ebd18a0c4",
+        "ref": CORPUS_COMMIT,
         "ssh-key": "${{ secrets.AIRESOURCES_READONLY_DEPLOY_KEY }}",
         "persist-credentials": "false",
         "path": CORPUS_PATH,
@@ -201,3 +207,35 @@ def test_real_penflow_cli_is_installed_before_every_pytest_consumer(job_name: st
     consumers = [i for i, step in enumerate(steps) if step.get("run", "").startswith("pytest ")]
     assert consumers
     assert cleanup < min(consumers)
+
+
+@pytest.mark.parametrize("job_name", PENFLOW_JOBS)
+def test_required_jobs_run_on_a_runner_image_supported_by_playwright(job_name: str) -> None:
+    assert _job(job_name)["runs-on"] == RUNNER_IMAGE
+
+
+def _catalog_pins() -> set[tuple[str, str]]:
+    """Collect every (source document, source hash) pair declared by the shipped catalogs."""
+    pins: set[tuple[str, str]] = set()
+    for path in sorted(CATALOG_DIR.glob("*.yaml")):
+        for rule in yaml.safe_load(path.read_text())["rules"]:
+            pins.add((rule["source_path"].removeprefix("ai-ressources/"), rule["source_hash"]))
+    return pins
+
+
+def test_corpus_pin_matches_every_shipped_catalog_source_hash() -> None:
+    """The workflow ref and the catalog hashes must change together (079 FR-005)."""
+    ref = _named_step("Checkout pinned normative corpus")["with"]["ref"]
+    clone = os.environ.get("AIRESOURCES", "")
+    probe = ["git", "-C", clone, "cat-file", "-e", f"{ref}^{{commit}}"]
+    # Read-only git query of the configured corpus clone; skip when it lacks the pinned commit.
+    if not clone or subprocess.run(probe, capture_output=True, check=False).returncode:
+        pytest.skip("pinned corpus commit unavailable in $AIRESOURCES")
+    pins = _catalog_pins()
+    assert pins
+    for source, expected in sorted(pins):
+        # Read-only git query: the exact blob at the pinned revision.
+        blob = subprocess.run(
+            ["git", "-C", clone, "show", f"{ref}:{source}"], capture_output=True, check=True
+        ).stdout
+        assert f"sha256:{hashlib.sha256(blob).hexdigest()}" == expected, source

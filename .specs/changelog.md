@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-11-04 — [Feature 079] Fix: 2/2 gaps closed — corpus pin follows the AST catalog hashes; required jobs on ubuntu-24.04
+
 ## 2026-11-04 — [Feature 078] Bugfix: fall back to paired Plan packing when full-Plan reservation exceeds the batch limit
 
 - A Plan that nearly fills the budget no longer makes a reviewable context incomplete; receipts from the full-Plan layout stay valid.

@@ -182,3 +182,22 @@ The event-policy test asserted the same facts three times regardless of its para
 - **Author:** spec-fix (claude-opus-5-5)
 
 <!-- finalize:spec-fix:2026-10-13:5a48c61f -->
+
+## 2026-11-04 — Spec Update: corpus pin follows the AST catalog hashes
+
+- **Type:** Spec Update
+- **Spec modified:** Yes (FR-005 revision, two Edge Cases); plan Steps 3 and 5 synchronized
+- **Code modified:** None
+- **AC impacted:** None renumbered
+- **Reason:** ai-ressources fb126cd changed rust.md, javascript.md and swift-kotlin.md; the catalogs were re-pinned in b08bd9cb, so revision 11976242 no longer matches them (PR #55 review P1). Ubuntu 26.04 behind `ubuntu-latest` cannot install the pinned Playwright Chromium.
+- **Author:** spec-refine (claude-opus-5-5)
+
+## 2026-11-04 — [Fix]: 2 gaps closed (2 functional, 0 visual) — corpus pin and runner image
+
+- **Type:** Bug Fix
+- **Spec modified:** No (refined earlier today by spec-refine)
+- **Code modified:** `.github/workflows/ci.yml`, `tests/test_generation_ci_selection.py`, `acceptance-mapping.json`
+- **Gaps closed:** FR-005 corpus pin, FR-003 runner image; policy tests RED (4 failed) before the workflow change, GREEN after
+- **Evidence:** progression implement READY; independent mapping review ready; receipt `704bda7a4a474b7eb074269b14aa39f4` certifies AC-002; unit suite 4392 passed / 122 skipped in CI parity; conventions PASS at feature scope
+- **Remaining:** AC-005 (same-SHA CI stability on the new SHA); AC-006 corpus-count drift, out of scope
+- **Author:** spec-fix (claude-opus-5-5)
