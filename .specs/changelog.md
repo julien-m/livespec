@@ -7,11 +7,17 @@
 
 ---
 
+## 2026-11-04 — [Feature 079] Check: 73% verified (4/5 FR, 4/6 AC)
+
+- Post-fix check on 6cce2aea: corpus pin matches catalog hashes, same-SHA CI stable; AC-002 receipt stale, AC-006 corpus-count drift.
+
 ## 2026-11-04 — [Feature 010] Bugfix: run the Visual Tests matrix on ubuntu-24.04
 
 - ubuntu-latest moved to 26.04, where the pinned Playwright cannot install browsers; regression test RED/GREEN, gate ELIGIBLE.
 
 ## 2026-11-04 — [Feature 079] Fix: 2/2 gaps closed — corpus pin follows the AST catalog hashes; required jobs on ubuntu-24.04
+
+- ai-ressources fb126cd matches every catalog source hash; AC-002 receipt `125eac2c…` at 6cce2aea; AC-005 stable on 6cce2aea.
 
 ## 2026-11-04 — [Feature 078] Bugfix: fall back to paired Plan packing when full-Plan reservation exceeds the batch limit
 

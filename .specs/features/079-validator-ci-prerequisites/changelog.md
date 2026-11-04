@@ -201,3 +201,21 @@ The event-policy test asserted the same facts three times regardless of its para
 - **Evidence:** progression implement READY; independent mapping review ready; receipt `704bda7a4a474b7eb074269b14aa39f4` certifies AC-002; unit suite 4392 passed / 122 skipped in CI parity; conventions PASS at feature scope
 - **Remaining:** AC-005 (same-SHA CI stability on the new SHA); AC-006 corpus-count drift, out of scope
 - **Author:** spec-fix (claude-opus-5-5)
+
+## 2026-11-04 — [Check]: Spec-code alignment verified (post-fix, corpus pin and runner image)
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **Coverage:** 8/11 verified (73%), 2 partial (FR-005, AC-002), 1 drifted (AC-006), 0 missing, 0 pending
+- **Findings:** Corpus pin fb126cd matches all shipped catalog source hashes (11976242 and fb126cd~1 do not); both required jobs pass on ubuntu-24.04; AC-005 observed on 6cce2aea (10/10 checks success at 06:19:18Z and 06:21:23Z). AC-002 receipt 704bda7a is stale at HEAD (inputs changed after capture); 7 corpus documents shipped versus 3 specified; ai-ressources is now public.
+- **Report:** `checks/2026-11-04.md`
+- **Author:** spec-check (claude-opus-5-5)
+
+## 2026-11-04 — [Fix]: AC-002 receipt recaptured after post-fix check
+
+- **Type:** Bug Fix (evidence only)
+- **Spec modified:** No
+- **Code modified:** None
+- **Evidence:** receipt `125eac2ca39d4501bf4589d174f01aae` certifies AC-002 at 6cce2aea; it replaces `704bda7a…`, which the independent post-fix check found stale after the later commits
+- **Author:** spec-fix (claude-opus-5-5)

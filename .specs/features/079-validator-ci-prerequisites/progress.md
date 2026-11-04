@@ -74,3 +74,4 @@ No final feature certification or implemented lifecycle promotion is claimed.
 | Fix | Done | `.github/workflows/ci.yml` | targeted pytest | 18 passed (selection + events) | 2026-11-04 |
 | Capture | Done | `acceptance-mapping.json` | mapping review ready; `livespec test` receipt `704bda7a4a474b7eb074269b14aa39f4` | AC-002 certified | 2026-11-04 |
 | Suite | Done | — | full unit suite, CI parity (Penflow dd356b9, corpus fb126cd) | 4392 passed / 122 skipped | 2026-11-04 |
+| Recapture | Done | — | `livespec test` at 6cce2aea after post-fix spec-check found `704bda7a` stale | AC-002 certified, receipt `125eac2ca39d4501bf4589d174f01aae` | 2026-11-04 |

@@ -195,6 +195,6 @@ AC-005 resets with this new SHA and stays pending; AC-006 corpus-count drift (7 
 |---|---|---|
 | FR-005 | Read [CI](../../../.github/workflows/ci.yml) and [workflow policy tests](../../../tests/test_generation_ci_selection.py) | Pin and catalog hashes consistent locally; remote CI pending |
 | FR-003 | Read [CI](../../../.github/workflows/ci.yml) | Runner image pinned; remote CI pending |
-| AC-002 | Native receipt `704bda7a4a474b7eb074269b14aa39f4` | ✅ certified (AC-002 only) |
+| AC-002 | Native receipt `125eac2ca39d4501bf4589d174f01aae` (recaptured at 6cce2aea; `704bda7a…` went stale with later commits) | ✅ certified (AC-002 only) |
 
 AC-005 resets with the new SHA. The AC-006 corpus-count drift (7 shipped documents versus 3 specified) stays outside this fix: the mapping reviewer confirmed it and AC-006 is not certified here.
