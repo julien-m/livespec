@@ -109,3 +109,41 @@ def test_authentic_historical_layout_stays_valid_but_modified_spans_are_rejected
     batch = reviewed.batches[0].model_copy(update={"section_ids": ()})
     forged = reviewed.model_copy(update={"batches": (batch, *reviewed.batches[1:])})
     assert not _authentic(forged, reviewed.context_hash)
+
+
+def _near_full_plan_sources() -> tuple[dict[str, str], dict[str, str]]:
+    sources = {"spec": "# Contract\nFR-001: Persist the uploaded object.\n"}
+    sources["plan"] = "".join(
+        f"## Step {index}\n" + "Persist and verify the committed upload. " * 10 + "\n"
+        for index in range(10)
+    )
+    sources.update({f"ref-{i}": f"# Ref {i}\n" + "Reference detail. " * 8 for i in range(100)})
+    return sources, {name: "reference" for name in sources if name.startswith("ref-")}
+
+
+# @spec FR-002: Coherent bounded batches retain complete normative context
+#   — .specs/features/078-requirement-evidence-integrity/spec.md#fr-002
+def test_full_plan_reservation_never_loses_a_bounded_paired_layout() -> None:
+    from validator.semantic.review_batches import MAX_REVIEW_BATCHES, build_batches
+
+    sources, roles = _near_full_plan_sources()
+    fallbacks = 0
+    for budget in range(6000, 9001, 250):
+        current = prepare_review_context(
+            "uploads", sources, source_roles=roles, model="reviewer", max_chars=budget
+        )
+        paired, _ = build_batches(
+            current.kind,
+            list(current.sections),
+            current.requirements,
+            budget,
+            legacy_plan_packing=True,
+        )
+        if not paired:
+            continue
+        _assert_coverage(current)
+        assert len(current.batches) <= MAX_REVIEW_BATCHES
+        plan_ids = {s.section_id for s in current.sections if s.role == "plan"}
+        if not all(plan_ids <= set(batch.section_ids) for batch in current.batches):
+            fallbacks += 1
+    assert fallbacks, "no budget exercised the paired fallback"

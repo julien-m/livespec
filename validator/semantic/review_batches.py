@@ -84,20 +84,27 @@ def build_batches(
     shared = [s for s in sections if s.role in ("constitution", "stack", "project")]
     plans = [s for s in sections if s.role == "plan"]
     specs = [s for s in sections if s not in shared and s not in plans]
-    if fits(sections):
-        groups = [sections]
-    elif (
+    whole = fits(sections)
+    reserved: list[list[ReviewSection]] = []
+    if (
         kind == "plan"
         and plans
         and specs
         and not legacy_plan_packing
+        and not whole
         and all(fits([*shared, spec, *plans]) for spec in specs)
     ):
         # Reserve the complete Plan before packing sources; reserving one Plan
         # section first can multiply every source group by avoidable Plan fragments.
         spec_groups = _pack(specs, lambda group: fits([*shared, *group, *plans]))
-        groups = [[*shared, *group, *plans] for group in spec_groups]
+        reserved = [[*shared, *group, *plans] for group in spec_groups]
+    if whole:
+        groups = [sections]
+    elif reserved and len(reserved) <= MAX_REVIEW_BATCHES:
+        groups = reserved
     elif kind == "plan" and plans and specs:
+        # A Plan that nearly fills the budget can leave room for too few sources;
+        # paired packing then stays the bounded fallback.
         # All pairs must fit individually; no requirement is reviewed without its plan evidence.
         if any(not fits([*shared, spec, plan]) for spec in specs for plan in plans):
             return (), ["indivisible_paired_context_over_budget"]

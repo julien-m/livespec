@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-17
+> Last updated: 2026-11-04
 
 ---
+
+## 2026-11-04 — [Feature 078] Bugfix: fall back to paired Plan packing when full-Plan reservation exceeds the batch limit
+
+- A Plan that nearly fills the budget no longer makes a reviewable context incomplete; receipts from the full-Plan layout stay valid.
 
 ## 2026-10-17 — [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture
 <!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
