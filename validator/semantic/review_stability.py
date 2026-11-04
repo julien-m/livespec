@@ -215,19 +215,37 @@ def _authentic(reviewed: PreparedReview, context_hash: str) -> bool:
     The source texts are rebuilt from the stored sections, checked against the stored
     source hashes and prepared again, so an edited section, hash or role is refused.
     """
-    from validator.semantic.review_context import content_hash
+    from validator.semantic import review_context as context
 
     texts = dict.fromkeys(reviewed.source_hashes, "")
     for section in reviewed.sections:
         if section.source not in texts:
             return False
         texts[section.source] += section.text
-    if any(content_hash(texts[name]) != hashed for name, hashed in reviewed.source_hashes.items()):
+    if any(
+        context.content_hash(texts[name]) != hashed
+        for name, hashed in reviewed.source_hashes.items()
+    ):
         return False
     rebuilt = prepare_like(reviewed, texts, reviewed.dependencies)
     snapshot = reviewed_snapshot(rebuilt)
     if not reviewed.source_roles:
         snapshot = snapshot.model_copy(update={"source_roles": {}})
+    if snapshot != reviewed:
+        # Historical receipts may use the previous deterministic Plan packing.
+        # Rebuild that exact layout, never accept arbitrary edited batch metadata;
+        # all other snapshot fields and the raw results still have to verify.
+        _, batches, _ = context._scoped_batches(  # pyright: ignore[reportPrivateUsage]
+            reviewed.kind,
+            list(rebuilt.sections),
+            rebuilt.requirements,
+            reviewed.requirement_scope,
+            reviewed.max_chars,
+            legacy_plan_packing=True,
+        )
+        snapshot = snapshot.model_copy(
+            update={"batches": tuple(batch.model_copy(update={"prompt": ""}) for batch in batches)}
+        )
     return rebuilt.context_hash == context_hash and snapshot == reviewed
 
 

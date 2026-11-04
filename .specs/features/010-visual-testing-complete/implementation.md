@@ -180,3 +180,9 @@ title: 'Implementation Map — Feature 010: Visual Testing Complete'
 | FR-023 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-023) | ✅ Implemented | 2026-06-08 |
 | FR-024 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-024) | ✅ Implemented | 2026-06-08 |
 | FR-025 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-025) | ✅ Implemented | 2026-06-08 |
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-11-04 | implementation | `tests/test_visual_tests_workflow.py::test_visual_matrix_runs_on_a_runner_image_supported_by_playwright` | `.specs/.execution/bc02e4498e4f4055a1fdc0490a1c60de/receipt.json` | `.specs/.execution/062cda4e03f14812aa6f893fab8ddecc/receipt.json` |

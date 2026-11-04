@@ -3,7 +3,7 @@ title: Validator CI Prerequisites
 status: Approved
 priority: P1
 created: 2026-09-07
-updated: 2026-10-13
+updated: 2026-11-04
 visual: false
 ---
 
@@ -73,7 +73,7 @@ flowchart TD
 - **FR-002:** Provision an actual compatible Penflow CLI from the public julien-m/penflow repository at the immutable verified commit dd356b95f8543d025b85632ce3998eed88fef07c, without any Penflow credential or private-access gate; never substitute a stub, a mutable branch or tag reference, or a vendored copy. Maps to AC-002.
 - **FR-003:** Run the existing unit and integration suites with required Node/Chromium dependencies and isolated test temporary directories; retain all tests and repair remaining causal failures. Maps to AC-003.
 - **FR-004:** Preserve the exact 94 percent branch-coverage threshold and add behavioral regression tests for uncovered baseline-link validation paths. Maps to AC-004.
-- **FR-005:** Keep GitHub validation deterministic: remove automatic real-model generation, provider installation and model-credential requirements while retaining local opt-in generation tools. Privately provision the three normative corpus documents at immutable revision11976242fc5b9ae5f3a574e19339b78ebd18a0c4, preserve source-hash validation and full AST tests, and record success only for the unchanged reviewed SHA after120seconds of stable successful checks. Maps to AC-005 and AC-006.
+- **FR-005:** Keep GitHub validation deterministic: remove automatic real-model generation, provider installation and model-credential requirements while retaining local opt-in generation tools. Privately provision the three normative corpus documents at immutable revision fb126cd52560e7908243e85cae1543700ef7a9a3, whose documents match the shipped AST catalog source hashes, preserve source-hash validation and full AST tests, and record success only for the unchanged reviewed SHA after120seconds of stable successful checks. Maps to AC-005 and AC-006.
 
 ## Acceptance Criteria
 
@@ -110,6 +110,8 @@ Given the committed GitHub workflow, when its deterministic policy and dependenc
 - Private normative-corpus access may be unavailable; no fallback can claim the missing proof. GitHub validation requires no model or Penflow credential.
 - An upstream history rewrite can remove a pinned commit; repin only to a verified content-equivalent commit SHA, never to a branch or tag.
 - A changed SHA invalidates previous CI stability observations.
+- A normative corpus update changes the AST catalog source hashes; repin the corpus revision and the catalog hashes together, never one without the other.
+- A moving runner label can switch to an image where the pinned Playwright cannot install Chromium; pin a supported runner image instead.
 
 ## Success Criteria
 

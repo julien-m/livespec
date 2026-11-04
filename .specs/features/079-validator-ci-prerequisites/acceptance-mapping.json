@@ -40,9 +40,9 @@
       "test_id": "tests.test_generation_ci_selection::test_penflow_checkout_pins_public_commit_without_credential[unit-tests]",
       "expected": "unit-tests checkout pins the full public commit with no credential",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 175,
-      "end_line": 180,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 181,
+      "end_line": 186,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "The single Penflow checkout step's with-mapping equals exactly repository julien-m/penflow, ref dd356b95..., persist-credentials false and path, so no ssh-key or token is present."
     },
     {
@@ -50,9 +50,9 @@
       "test_id": "tests.test_generation_ci_selection::test_penflow_checkout_pins_public_commit_without_credential[integration-3a]",
       "expected": "integration-3a checkout pins the full public commit with no credential",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 175,
-      "end_line": 180,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 181,
+      "end_line": 186,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "Same exact with-mapping assertion for the integration-3a job."
     },
     {
@@ -60,9 +60,9 @@
       "test_id": "tests.test_generation_ci_selection::test_workflow_requests_no_penflow_credential_or_capability_gate",
       "expected": "workflow requests no Penflow credential",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 185,
-      "end_line": 185,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 191,
+      "end_line": 191,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "The shipped workflow text contains no PENFLOW_READONLY_DEPLOY_KEY secret reference."
     },
     {
@@ -70,9 +70,9 @@
       "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[unit-tests]",
       "expected": "real pinned CLI is installed before unit pytest consumers",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 203,
-      "end_line": 203,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 209,
+      "end_line": 209,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "The Penflow checkout cleanup, which follows checkout and install, precedes every pytest step, so tests run against the installed real CLI."
     },
     {
@@ -80,9 +80,9 @@
       "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[integration-3a]",
       "expected": "real pinned CLI is installed before integration pytest consumers",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 203,
-      "end_line": 203,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 209,
+      "end_line": 209,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "Same ordering assertion for the integration-3a job."
     },
     {
@@ -90,9 +90,9 @@
       "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[unit-tests]",
       "expected": "real CLI is installed from the pinned checkout path",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 198,
-      "end_line": 198,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 204,
+      "end_line": 204,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "The install step runs uv pip install on exactly the pinned .ci-deps/penflow checkout, not a stub or index package."
     },
     {
@@ -100,9 +100,9 @@
       "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[unit-tests]",
       "expected": "unit-tests checkout precedes install, which precedes cleanup",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 199,
-      "end_line": 199,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 205,
+      "end_line": 205,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "Checkout, install and cleanup appear in that order in the unit-tests job."
     },
     {
@@ -110,9 +110,9 @@
       "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[integration-3a]",
       "expected": "integration-3a checkout precedes install, which precedes cleanup",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 199,
-      "end_line": 199,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 205,
+      "end_line": 205,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "Same ordering assertion for the integration-3a job."
     },
     {
@@ -120,9 +120,9 @@
       "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[integration-3a]",
       "expected": "real CLI is installed from the pinned checkout path in integration-3a",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 198,
-      "end_line": 198,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 204,
+      "end_line": 204,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "Same exact install command assertion for the integration-3a job."
     },
     {
@@ -130,9 +130,9 @@
       "test_id": "tests.test_generation_ci_selection::test_workflow_requests_no_penflow_credential_or_capability_gate",
       "expected": "no job keeps a Penflow capability gate",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 189,
-      "end_line": 189,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 195,
+      "end_line": 195,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "Neither Penflow job contains the former Require read-only Penflow capability step."
     },
     {
@@ -140,9 +140,9 @@
       "test_id": "tests.test_generation_ci_selection::test_workflow_requests_no_penflow_credential_or_capability_gate",
       "expected": "workflow references no Penflow key variable",
       "assertion_path": "tests/test_generation_ci_selection.py",
-      "start_line": 186,
-      "end_line": 186,
-      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "start_line": 192,
+      "end_line": 192,
+      "source_sha256": "20a541df74d22cc2340b6b6f0cf964e92bba8a3a3352a6a0e259b21bad7486a9",
       "justification": "The shipped workflow text contains no PENFLOW_KEY environment reference."
     }
   ]

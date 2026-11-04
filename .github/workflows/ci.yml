@@ -14,7 +14,8 @@ env:
 jobs:
   unit-tests:
     name: "Unit Tests (Layers 1-4)"
-    runs-on: ubuntu-latest
+    # ubuntu-latest moved to 26.04, where the pinned Playwright cannot install Chromium.
+    runs-on: ubuntu-24.04
     env:
       AIRESOURCES: ${{ github.workspace }}/.ci-deps/ai-ressources
     steps:
@@ -83,7 +84,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: julien-m/ai-ressources
-          ref: 11976242fc5b9ae5f3a574e19339b78ebd18a0c4
+          # First revision whose documents match the shipped AST catalog source hashes.
+          ref: fb126cd52560e7908243e85cae1543700ef7a9a3
           ssh-key: ${{ secrets.AIRESOURCES_READONLY_DEPLOY_KEY }}
           persist-credentials: false
           path: .ci-deps/ai-ressources
@@ -195,7 +197,8 @@ jobs:
 
   integration-3a:
     name: "Integration 3A — Static invariants (no LLM)"
-    runs-on: ubuntu-latest
+    # ubuntu-latest moved to 26.04, where the pinned Playwright cannot install Chromium.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

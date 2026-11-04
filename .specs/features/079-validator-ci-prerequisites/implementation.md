@@ -182,3 +182,19 @@ Penflow was republished as a public MIT repository with a rewritten history, so 
 | AC-002 | Read [Penflow authority](../../../tests/test_penflow_contract_validation.py) and [workflow policy](../../../tests/test_generation_ci_selection.py) | ✅ Native receipt `bf31deb16fdf4dde80242aeb31dd93ea`: 16 passed, valid, certifies AC-002 only |
 
 AC-005 resets with this new SHA and stays pending; AC-006 corpus-count drift (7 documents shipped versus 3 specified) is reported in [the 2026-10-13 gap report](checks/2026-10-13.md) and is outside this fix.
+
+## 2026-11-04 — Corpus pin follows the catalog hashes; supported runner image (spec-fix, FR-005 / FR-003)
+
+| File | Change |
+|---|---|
+| `.github/workflows/ci.yml` | `unit-tests` corpus checkout pins ai-ressources `fb126cd52560e7908243e85cae1543700ef7a9a3`, the first revision matching the shipped AST catalog source hashes; `unit-tests` and `integration-3a` run on `ubuntu-24.04` because `ubuntu-latest` (26.04) cannot install the pinned Playwright Chromium |
+| `tests/test_generation_ci_selection.py` | Asserts the corpus pin, the runner image of both jobs, and that every catalog `source_hash` equals the blob at the pinned ref in `$AIRESOURCES` (skips when that commit is absent) |
+| `acceptance-mapping.json` | AC-002 binding spans and source hashes refreshed after the test edit; mapping review ready |
+
+| Requirement | Evidence | Status |
+|---|---|---|
+| FR-005 | Read [CI](../../../.github/workflows/ci.yml) and [workflow policy tests](../../../tests/test_generation_ci_selection.py) | Pin and catalog hashes consistent locally; remote CI pending |
+| FR-003 | Read [CI](../../../.github/workflows/ci.yml) | Runner image pinned; remote CI pending |
+| AC-002 | Native receipt `125eac2ca39d4501bf4589d174f01aae` (recaptured at 6cce2aea; `704bda7a…` went stale with later commits) | ✅ certified (AC-002 only) |
+
+AC-005 resets with the new SHA. The AC-006 corpus-count drift (7 shipped documents versus 3 specified) stays outside this fix: the mapping reviewer confirmed it and AC-006 is not certified here.

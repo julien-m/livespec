@@ -3,12 +3,32 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-17
+> Last updated: 2026-11-04
 
 ---
 
+## 2026-11-04 — [Feature 079] Check: 73% verified (4/5 FR, 4/6 AC)
+
+- Post-fix check on 6cce2aea: corpus pin matches catalog hashes, same-SHA CI stable; AC-002 receipt stale, AC-006 corpus-count drift.
+
+## 2026-11-04 — [Feature 010] Bugfix: run the Visual Tests matrix on ubuntu-24.04
+
+- ubuntu-latest moved to 26.04, where the pinned Playwright cannot install browsers; regression test RED/GREEN, gate ELIGIBLE.
+
+## 2026-11-04 — [Feature 079] Fix: 2/2 gaps closed — corpus pin follows the AST catalog hashes; required jobs on ubuntu-24.04
+
+- ai-ressources fb126cd matches every catalog source hash; AC-002 receipt `125eac2c…` at 6cce2aea; AC-005 stable on 6cce2aea.
+
+## 2026-11-04 — [Feature 078] Bugfix: fall back to paired Plan packing when full-Plan reservation exceeds the batch limit
+
+- A Plan that nearly fills the budget no longer makes a reviewable context incomplete; receipts from the full-Plan layout stay valid.
+
 ## 2026-10-17 — [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture
 <!-- finalize:spec-test:2026-10-17:79fb2bb1 -->
+
+## 2026-10-16 — [Feature 078] Bugfix: reserve the full Plan before packing review sources
+
+- Avoid unnecessary Cartesian review expansion and preserve exact historical receipt layouts. Read [the validation record](features/078-requirement-evidence-integrity/checks/2026-10-16-plan-packing.md).
 
 ## 2026-10-17 — 097: preserve exact Git index bytes while reviewing complete root bootstrap scope; current six-AC certification and independent full reviews pass.
 <!-- finalize:spec-implement:2026-10-17:1bab7ffb -->

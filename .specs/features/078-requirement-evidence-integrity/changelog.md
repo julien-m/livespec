@@ -269,3 +269,28 @@ The Handy report said `finalize apply --status Planned` made the spec and plan r
 - **RED receipt:** `.specs/.execution/a5afa5c4870749d0bfcf0b35f80bc286/receipt.json`
 - **GREEN receipt:** `.specs/.execution/01917bd3a4b445ceac4993164733cdbe/receipt.json`
 <!-- bugfix:01917bd3a4b445ceac4993164733cdbe -->
+## 2026-10-16 — [Bugfix]: Reserve the complete Plan before packing review sources and retain exact historical layouts for existing receipts
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/fixtures/review-plan-packing-legacy.json, tests/test_review_plan_packing.py, validator/semantic/review_batches.py, validator/semantic/review_context.py, validator/semantic/review_stability.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_review_plan_packing.py::test_complete_plan_reservation_prevents_cartesian_review_explosion
+- **RED receipt:** `.specs/.execution/e2d13ae570de416fbc8c6ba40e8e685b/receipt.json`
+- **GREEN receipt:** `.specs/.execution/9f1fbbf9ed264615bf0efd56923a5aba/receipt.json`
+<!-- bugfix:9f1fbbf9ed264615bf0efd56923a5aba -->
+
+## 2026-11-04 — [Bugfix]: Fall back to paired Plan packing when full-Plan reservation exceeds the batch limit
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_review_plan_packing.py, validator/semantic/review_batches.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** 0b0603f0ff9ec767792cddbff2d432d2d22fe7f3
+- **Regression tests:** tests/test_review_plan_packing.py::test_full_plan_reservation_never_loses_a_bounded_paired_layout
+- **RED receipt:** `.specs/.execution/b9991941c92c4678b67b979c1bebede4/receipt.json`
+- **GREEN receipt:** `.specs/.execution/fe400f7e86e04012a0dde3fd2bca6353/receipt.json`
+<!-- bugfix:fe400f7e86e04012a0dde3fd2bca6353 -->

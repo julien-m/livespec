@@ -121,3 +121,27 @@ def test_load_ast_catalog_rejects_missing_traceability_source(tmp_path: Path) ->
 
     with pytest.raises(AstCatalogError, match="source_path missing"):
         load_ast_catalog(catalog_path, project_root=tmp_path)
+
+
+_SHIPPED_CATALOGS = sorted(
+    (Path(__file__).resolve().parents[1] / "validator" / "conventions_ast" / "rule_catalog").glob(
+        "*_high.yaml"
+    )
+)
+
+
+@pytest.mark.parametrize("catalog", _SHIPPED_CATALOGS, ids=lambda path: path.name)
+def test_shipped_catalog_matches_local_ai_resources(catalog: Path, tmp_path: Path) -> None:
+    """Shipped hashes must match the ai-ressources clone the projects resolve.
+
+    A stale hash blocks every project's `conventions verify`, so the drift is caught here
+    when a clone is available (via ``AIRESOURCES``) instead of in a consumer project.
+    """
+    from validator.ai_resources import AiResourcesResolutionError, resolve_ai_resources_root
+
+    try:
+        resolve_ai_resources_root(None)
+    except AiResourcesResolutionError:
+        pytest.skip("AIRESOURCES is not set; the shipped catalog cannot be checked here")
+    project_root = Path(__file__).resolve().parents[1]
+    assert load_ast_catalog(catalog, project_root=project_root).rules
