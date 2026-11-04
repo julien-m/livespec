@@ -118,3 +118,16 @@
 - **Code modified:** none
 - **AC impacted:** AC-001 through AC-030 (all 30 ACs defined)
 - **Author:** spec.specify agent
+
+## 2026-11-04 — [Bugfix]: Run the Visual Tests matrix on ubuntu-24.04, where the pinned Playwright installs browsers
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .github/workflows/visual-tests.yml, tests/test_visual_tests_workflow.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_visual_tests_workflow.py::test_visual_matrix_runs_on_a_runner_image_supported_by_playwright
+- **RED receipt:** `.specs/.execution/bc02e4498e4f4055a1fdc0490a1c60de/receipt.json`
+- **GREEN receipt:** `.specs/.execution/062cda4e03f14812aa6f893fab8ddecc/receipt.json`
+<!-- bugfix:062cda4e03f14812aa6f893fab8ddecc -->

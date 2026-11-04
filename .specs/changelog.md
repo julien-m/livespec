@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-11-04 — [Feature 010] Bugfix: run the Visual Tests matrix on ubuntu-24.04
+
+- ubuntu-latest moved to 26.04, where the pinned Playwright cannot install browsers; regression test RED/GREEN, gate ELIGIBLE.
+
 ## 2026-11-04 — [Feature 079] Fix: 2/2 gaps closed — corpus pin follows the AST catalog hashes; required jobs on ubuntu-24.04
 
 ## 2026-11-04 — [Feature 078] Bugfix: fall back to paired Plan packing when full-Plan reservation exceeds the batch limit
