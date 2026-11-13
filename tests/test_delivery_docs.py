@@ -1,3 +1,4 @@
+# Feature122: historical certification assertions target the preserved diagnostic sources.
 """Skills, hook and protocol follow the lane and review once (feature 086 AC-008)."""
 
 from __future__ import annotations
@@ -34,7 +35,7 @@ def test_protocol_forbids_audit_skill_and_codex() -> None:
 
 
 def test_implement_skill_runs_checks_per_step_and_one_review() -> None:
-    skill = _read(".agent-sync/skills/spec-implement/SKILL.md")
+    skill = _read(".agent-sync/skills/spec-implement/certification.md")
     assert "STEP 0.95 — Delivery lane" in skill
     assert "Phase 6.8 — Delivery review (once per feature)" in skill
     assert "Spin up a **Spec Reviewer** subagent" not in skill
@@ -44,16 +45,16 @@ def test_implement_skill_runs_checks_per_step_and_one_review() -> None:
 
 
 def test_supervisor_dispatches_no_reviewer_per_step() -> None:
-    prompt = _read(".agent-sync/agents/livespec-supervisor/prompt.md")
+    prompt = _read(".agent-sync/agents/livespec-supervisor/certification.md")
     assert "Spin up a **Spec Reviewer** subagent" not in prompt
     assert "Dispatch no Spec Reviewer, Code Quality Reviewer or audit for a step" in prompt
     assert "delivery-review.md" in prompt
 
 
 def test_feature_and_ship_skills_reuse_the_single_review() -> None:
-    feature = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    feature = _read(".agent-sync/skills/spec-feature/certification.md")
     assert "livespec delivery review verify --feature NNN-feature-name" in feature
-    ship = _read(".agent-sync/skills/spec-ship/SKILL.md")
+    ship = _read(".agent-sync/skills/spec-ship/certification.md")
     assert "audit failed after 3 attempts" not in ship
     assert "round_cap_reached" in ship
 

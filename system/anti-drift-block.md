@@ -8,6 +8,11 @@
 
 # Anti-Drift Block
 
+## Default delivery policy
+
+Read [review led delivery](review-led-delivery.md) for standard feature work. It takes precedence over the certification, nested-goal, receipt, phase-stop and automatic review requirements below. Those sections describe explicitly requested historical diagnostics; they are not prerequisites of normal delivery. Checks keep their actual outcomes and the independent final review judges delivery.
+
+
 > Reusable hardened-step template for all LiveSpec `.agent-sync` skills and agents.
 > Injected via `<!-- @import system/anti-drift-block.md -->` directive at the top of each target.
 >

@@ -196,6 +196,11 @@ def _check_command_file(command: CommandInfo) -> AuditCheck:
     if not command.command_path.is_file():
         return AuditCheck("command_file", "FAIL", "command Markdown is missing")
     text = command.command_path.read_text(encoding="utf-8")
+    if "system/review-led-delivery.md" in text:
+        policy = command.command_path.parent / "../../../system/review-led-delivery.md"
+        if policy.is_file():
+            return AuditCheck("command_file", "PASS", "command Markdown and delivery policy exist")
+        return AuditCheck("command_file", "FAIL", "delivery policy is missing")
     if "system/anti-drift-block.md" not in text:
         return AuditCheck("command_file", "FAIL", "anti-drift import missing")
     return AuditCheck("command_file", "PASS", "command Markdown and anti-drift import exist")

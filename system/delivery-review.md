@@ -4,6 +4,11 @@
 
 # Delivery Review — once per feature, on the complete diff
 
+## Default delivery policy
+
+Read [review led delivery](review-led-delivery.md) for standard feature work. It takes precedence over the certification, nested-goal, receipt, phase-stop and automatic review requirements below. Those sections describe explicitly requested historical diagnostics; they are not prerequisites of normal delivery. Checks keep their actual outcomes and the independent final review judges delivery.
+
+
 Implementation steps run only targeted tests, lint, format and the conventions gate. Spec compliance, code quality and audit are reviewed **once**, at the end of the feature, on the complete diff. The lane decides how many independent reviewers run; the CLI decides the lane (`livespec delivery lane --feature <slug>`, with `--model <m>` unless `review_model` of `.specs/semantic/config.yaml` names the reviewer; with neither it exits 2 with `review_model_required`), never the agent. The lane reads the Quality Engineering section of the current spec and of the spec the review judged, and keeps every reason from both: editing the QE section after the review never lowers the lane. The reviewer's `qe_assessment` raises the criticality to High or contests an author High; it never contests the blast radius.
 
 | Lane | When (CLI-verified) | End-of-feature reviewers |

@@ -5,6 +5,11 @@
 
 # LiveSpec System — Universal Spec Rules
 
+## Default delivery policy
+
+Read [review led delivery](review-led-delivery.md) for standard feature work. In a project copy of this file, read `.specs/.livespec-path` and resolve the policy as `<recorded-runtime>/system/review-led-delivery.md`; the link is relative to the runtime system directory, not the project copy. It takes precedence over the certification, nested-goal, receipt, phase-stop and automatic review requirements below. Those sections describe explicitly requested historical diagnostics; they are not prerequisites of normal delivery. Checks keep their actual outcomes and the independent final review judges delivery.
+
+
 > **EVERY AI TOOL READS THIS FILE FIRST.**
 > This file defines how the spec system works in this project. Follow these rules for every task.
 

@@ -1,13 +1,15 @@
+# Feature122: historical certification assertions target the preserved diagnostic sources.
 """AC-15 — economy mode must NOT inject sub-phase integrations.
 
-The `--economy` mode in `.agent-sync/skills/spec-feature/SKILL.md` runs specify/plan/implement
+The `--economy` mode in `.agent-sync/skills/spec-feature/certification.md`
+runs specify/plan/implement
 inline in the main context (no subagent spawn). Because the
 anti-drift runtime directive resolves under the outer command name
 (`feature`), sub-phase integrations (e.g. `commands: [specify, plan]`)
 CANNOT be injected in this mode by construction.
 
 This contract is enforced by ensuring the `--economy` paragraphs in
-`.agent-sync/skills/spec-feature/SKILL.md`:
+`.agent-sync/skills/spec-feature/certification.md`:
 
 1. do NOT contain `livespec hooks resolve --event before --command specify`
 2. do NOT contain `livespec hooks resolve --event before --command plan`
@@ -22,7 +24,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-FEATURE_MD = Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-feature" / "SKILL.md"
+FEATURE_MD = (
+    Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-feature" / "certification.md"
+)
 
 
 def _economy_blockquote_sections() -> list[str]:
@@ -55,12 +59,12 @@ def _economy_blockquote_sections() -> list[str]:
 def test_economy_paragraphs_never_inject_sub_phase_hooks_or_headers() -> None:
     paragraphs = _economy_blockquote_sections()
     # Guard against a vacuous pass: the negative checks below need real economy blocks.
-    assert paragraphs, "no economy mode blockquote found in spec-feature SKILL.md"
+    assert paragraphs, "no economy mode blockquote found in spec-feature certification.md"
     for paragraph in paragraphs:
         for sub_phase in ("specify", "plan", "implement", "test"):
             assert f"livespec hooks resolve --event before --command {sub_phase}" not in paragraph
         # Economy mode may reference canonical command source files such as
-        # `.agent-sync/skills/spec-specify/SKILL.md`; it must not inject a standalone slash
+        # `.agent-sync/skills/spec-specify/certification.md`; it must not inject a standalone slash
         # command header because no subagent prompt is spawned.
         lines = [line.strip() for line in paragraph.splitlines()]
         for header in ("/spec-specify", "/spec-plan", "/spec-implement"):

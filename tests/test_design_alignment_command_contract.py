@@ -1,3 +1,4 @@
+# Feature122: historical certification assertions target the preserved diagnostic sources.
 # LiveSpec traceability anchors
 # @spec(AC-001)
 # @spec(AC-002)
@@ -35,7 +36,7 @@ def test_global_workflow_docs_exist_and_capture_cloudskill_rules() -> None:
 
 
 def test_spec_test_documents_design_alignment_before_baseline_capture() -> None:
-    body = _read(".agent-sync/skills/spec-test/SKILL.md")
+    body = _read(".agent-sync/skills/spec-test/certification.md")
 
     assert "### 4.5.0 — Design Alignment Gate" in body
     assert "system/testing/design-alignment.md" in body

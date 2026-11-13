@@ -43,76 +43,29 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
+Read [the migration plan](docs/review-led-migration.md) before adopting this policy in an existing project.
+
 ## How It Works
 
 ```mermaid
 flowchart LR
-    P["/spec-propose\nDiscover what\nto build"] --> S["/spec-specify\nWrite the spec\n(stories, AC, FR)"]
-    S --> PL["/spec-plan\nTechnical plan\n(diagrams, steps)"]
-    PL --> I["/spec-implement\nCode, test,\nmap to spec"]
-    I --> J["/spec-journey\nCross-feature\nregression flows"]
-    J --> T["/spec-test\nAudit + Penflow\n+ visual gates"]
-    T --> C["/spec-check\nVerify spec\nvs code"]
-    C --> F["/spec-fix\nFix gaps\n(functional + visual)"]
-    F --> E["/spec-explain\nLiving\ndocumentation"]
-
-    style P fill:#e8f4f8,stroke:#2196F3
-    style S fill:#e8f4f8,stroke:#2196F3
-    style PL fill:#e8f4f8,stroke:#2196F3
-    style I fill:#e8f4f8,stroke:#2196F3
-    style J fill:#e8f4f8,stroke:#2196F3
-    style T fill:#e8f4f8,stroke:#2196F3
-    style C fill:#e8f4f8,stroke:#2196F3
-    style F fill:#e8f4f8,stroke:#2196F3
-    style E fill:#e8f4f8,stroke:#2196F3
+    S[Spec and plan] --> I[Implement and run useful checks]
+    I --> R[Independent final review]
+    R --> C[Correct material findings]
+    C --> D[Deliver and report]
 ```
 
-Each command works standalone, or chain them all with `/spec-feature` for an end-to-end pipeline with validation gates.
+`/spec-feature` and `$spec-feature` use this short workflow by default, including autonomous and resumed work. Direct implement, fix, test and ship commands use the same policy. An existing plan review remains useful context; another plan review runs only when requested.
 
-### Contract and execution evidence
+Tests, builds, lint and type checks retain their actual results. A failed script, warning, missing baseline or unavailable certification is reported to the final reviewer rather than automatically blocking the feature. The reviewer distinguishes material product defects from administrative failures, irrelevant checks and inherited debt. Essential unverified behavior stays unverified; no failure is relabeled PASS.
 
-Reviews use complete, bounded source context and feature-qualified requirement IDs. Analyze reports structural reference coverage separately from grounded semantic conclusions: citing an ID cannot prove that a plan implements its meaning. Missing context, contradictions, stale reviews and unresolved critical clarifications block progression. An unchanged valid review is reused; the five-question presentation limit never discards outstanding questions.
+A fresh native reviewer examines the complete change, relevant existing code, file placement, conventions, expected behavior and actual check results. The implementer corrects material findings and reruns affected checks without restarting the entire pipeline. Delivery requires that review; minor observations and unrelated failing checks remain visible follow-ups.
 
-Autonomous runs (`/spec-ship`, `--auto` pipelines, `/spec-implement`) carry an outcome goal: one executable stop condition that `livespec goal prove` verifies itself, a short list of receipt-backed proofs, and the skill inventory as an indicative checklist. Native goal tools (Codex `create_goal`, Claude Code `/goal`) are optional mirrors; drifted contracts recompile with their valid evidence, and three rejections of one proof hand control back with a report. Short interactive commands run without a goal. Current goals distinguish documentary, review and execution evidence. Execution certification requires a runner-owned receipt with current source/test/configuration identity, actual test results and independently reviewed acceptance mappings. A success sentence, exit code zero, or global coverage percentage is insufficient. Custom drivers remain runnable and report any certification gap. Existing visual, conventions, finalization, bootstrap and Penflow checks still apply; historical archives retain their original policy rather than becoming new proof.
+Read [the default delivery policy](system/review-led-delivery.md) for the complete workflow. Former skill bodies are retained as `certification.md` beside each compact skill for explicit historical diagnostics. `livespec goal`, `validate`, `conventions`, Penflow and other diagnostic CLI commands keep their real exit codes and historical semantics; they are no longer automatic prerequisites of skill delivery. Existing histories are preserved, and active missions are not silently migrated.
 
-The generation evaluation corpus contains isolated Python CLI, TypeScript API and UI/Penflow witnesses. Independent frozen oracles check actual behavior and reject faulty mutants. Reports distinguish first-attempt success, repaired success, expected blocking, failure, invalid runs and unavailable runtimes. GitHub checks are deterministic and require no model provider or model credential. Real-model samples and full-corpus evaluations remain explicit local opt-in operations; their reports distinguish actual completed coverage and unknown costs. A passing finite corpus does not establish universal correctness or untested runtime parity.
+## Conventions
 
-The `spec-feature` coordinator binds final acceptance to the complete current independently reviewed specification, including criteria created after its goal was compiled. Proof, archive and archive-read all require that review plus execution and any documentary acceptance evidence. Existing frozen contracts keep their original interpretation.
-
-Read the [shared review protocol](system/review-protocol.md) and [execution rules](system/testing/execution-rules.md) for the internal adapters used by existing commands. Generated review caches and receipts require no additional user-maintained document.
-
----
-
-## Conventions Enforcement
-
-LiveSpec enforces project conventions through three engines:
-
-- **Engine A — deterministic subprocess:** lint, format, typecheck, and built-in repo checks from `.specs/conventions-gates.yaml`.
-- **Engine B — visual receipt:** Penflow/design/visual evidence receipts for UI workflows.
-- **Engine C — Layer 4 LLM review:** semantic conventions from the compiled rulebook when deterministic checks are not enough.
-
-Primary CLI commands:
-
-```bash
-livespec conventions gates init --force
-livespec conventions compile --force
-livespec conventions scaffold --apply
-livespec conventions verify --report
-livespec conventions supervisor-gate --base-ref <ref> --head-ref <ref>
-```
-
-Feature-scoped verification resolves mapped source, configuration (`.yaml`, `.yml`, `.json`, `.toml`) and Markdown files from `implementation.md`. CI-only features therefore receive the same conventions receipt; declared linters still enforce their diagnostics, while source AST checks keep their supported language set. Internal `.specs/` artifacts and paths outside the project cannot establish implementation scope.
-
-`livespec conventions verify --json` also emits `source_manifest`, an
-AI-res/ARS corpus inventory with source counts, explicit exclusions, and a
-language/domain matrix.
-Root `SECURITY.md` and `THIRD_PARTY_NOTICES.md` notices are explicitly excluded
-with reasons; nested files with those names and unknown sources remain subject
-to classification and completeness checks.
-
-For debt remediation, run `/spec-fix --conventions`. See [`system/conventions-enforcement.md`](system/conventions-enforcement.md) for the full architecture, human operations, anti-bypass locks, and CLI reference.
-
----
+Load and apply the project's conventions to the changed code. Useful deterministic checks inform the final review. An optional explicit `livespec conventions verify --report` provides a diagnostic report; its certificate is not a mandatory delivery gate. The final reviewer checks architecture, file placement, maintainability and concrete security risks.
 
 ## The 23 Commands
 

@@ -1,3 +1,5 @@
+# @spec FR-002: Archived diagnostic inventory
+# — .specs/features/122-review-led-delivery/spec.md#fr-002
 """Goal payload responsibilities behind the public contract facade."""
 
 from __future__ import annotations
@@ -29,7 +31,9 @@ def _goal_payload(
     feature: str | None,
     flags: str | list[str] | tuple[str, ...] | None,
 ) -> dict[str, Any]:
-    skill_path = livespec_root / ".agent-sync" / "skills" / command / "SKILL.md"
+    skill_dir = livespec_root / ".agent-sync" / "skills" / command
+    certification = skill_dir / "certification.md"
+    skill_path = certification if certification.is_file() else skill_dir / "SKILL.md"
     normalized_flags = _contracts.normalize_goal_flags(flags)
     runtime, execution_tasks, definition_of_done = _contracts._goal_runtime(
         command, project_root, feature, skill_path, normalized_flags

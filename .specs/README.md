@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-10-17
+> Last updated: 2026-11-13
 
 
 ---
@@ -136,6 +136,7 @@
 | 095 | Test Time Budgets | Implemented | 2026-10-16 | 2026-10-16 | [spec](features/095-test-time-budgets/spec.md) |
 | 096 | Node Vitest Execution Observations | Implemented | 2026-10-16 | 2026-10-17 | [spec](features/096-node-vitest-execution/spec.md) |
 | 097 | Root Feature Delivery Review | Implemented | 2026-10-17 | 2026-10-17 | [spec](features/097-root-feature-delivery-review/spec.md) |
+| 122 | Review Led Delivery | In Progress | 2026-11-13 | 2026-11-13 | [spec](features/122-review-led-delivery/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -158,6 +159,8 @@
 > Latest entries from [changelog.md](changelog.md).
 
 <!-- readme:activity:start -->
+
+Review Led Delivery122 is in progress; read [its checkpoints](features/122-review-led-delivery/progress.md).
 | Date | Type | Description |
 |---|---|---|
 | 2026-10-17 | Feature | [Feature 097] Test: 6/6 AC certified, 18 current checks PASS; independent verification reused current capture |

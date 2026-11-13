@@ -1,3 +1,4 @@
+# Feature122: historical certification assertions target the preserved diagnostic sources.
 """The bugfix lane is documented in spec-fix, expectations, spec-system, README (084 AC-014)."""
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ def _read(relative: str) -> str:
 
 
 def test_skill_documents_mode_conditions_gate_fallback_and_record() -> None:
-    text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    text = (SKILL / "certification.md").read_text(encoding="utf-8")
     for expected in (
         "### `--bugfix` Mode",
         "| `--bugfix` |",
@@ -55,7 +56,7 @@ def test_both_spec_system_copies_describe_the_lane_once(relative: str) -> None:
 def test_every_cited_bugfix_command_exists() -> None:
     commands: dict[str, object] = getattr(typer.main.get_command(app), "commands", {})
     subcommands: dict[str, object] = getattr(commands["bugfix"], "commands", {})
-    cited = set(re.findall(r"livespec bugfix ([a-z]+)", (SKILL / "SKILL.md").read_text()))
+    cited = set(re.findall(r"livespec bugfix ([a-z]+)", (SKILL / "certification.md").read_text()))
     assert cited == {"capture", "gate", "record"}
     assert cited <= set(subcommands)
 
