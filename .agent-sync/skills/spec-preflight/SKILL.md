@@ -2,6 +2,8 @@
 name: spec-preflight
 description: "Inspect only the prerequisites needed for the next useful work."
 ---
+<!-- @spec FR-001: Review led delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
+
 
 # spec-preflight
 

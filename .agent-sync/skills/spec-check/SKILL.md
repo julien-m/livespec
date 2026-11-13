@@ -2,6 +2,8 @@
 name: spec-check
 description: "Review alignment between the requested feature and its actual implementation."
 ---
+<!-- @spec FR-001: Review led delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
+
 
 # spec-check
 

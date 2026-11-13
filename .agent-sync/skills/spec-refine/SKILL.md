@@ -2,6 +2,8 @@
 name: spec-refine
 description: "Update an existing specification or plan without a certification restart."
 ---
+<!-- @spec FR-001: Review led delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
+
 
 # spec-refine
 

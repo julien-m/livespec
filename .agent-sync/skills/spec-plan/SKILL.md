@@ -2,6 +2,8 @@
 name: spec-plan
 description: "Prepare a short implementation plan for the requested change."
 ---
+<!-- @spec FR-001: Review led delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
+
 
 # spec-plan
 

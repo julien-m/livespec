@@ -1,3 +1,4 @@
+<!-- @spec FR-001: Review led delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
 # livespec-supervisor
 
 Read [review led delivery](../../../system/review-led-delivery.md) from this prompt's real source directory. It is the default role policy. If a provider-native projection copied this prompt, resolve the LiveSpec root from the project's `.specs/.livespec-path`, then read `system/review-led-delivery.md` there.

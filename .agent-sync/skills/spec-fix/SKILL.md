@@ -2,6 +2,8 @@
 name: spec-fix
 description: "Fix a reported product gap without restarting feature certification."
 ---
+<!-- @spec FR-001: Review led delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
+
 
 # spec-fix
 

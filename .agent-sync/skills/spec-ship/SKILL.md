@@ -2,6 +2,8 @@
 name: spec-ship
 description: "Deliver the selected features using the short review led workflow."
 ---
+<!-- @spec FR-001: Review led delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
+
 
 # spec-ship
 

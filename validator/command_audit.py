@@ -1,3 +1,5 @@
+# @spec FR-003: Audit current delivery policy
+# — .specs/features/122-review-led-delivery/spec.md#fr-003
 # LiveSpec traceability anchors
 # @spec(FR-002)
 # @spec(FR-005)
