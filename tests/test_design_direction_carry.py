@@ -39,7 +39,10 @@ def test_spec_specify_populates_design_direction_with_precedence() -> None:
 
 
 def test_spec_init_wizard_and_import_carry_direction() -> None:
-    text = _text(".agent-sync/skills/spec-init/SKILL.md")
+    skill = REPO_ROOT / ".agent-sync/skills/spec-init/SKILL.md"
+    wrapper = skill.read_text(encoding="utf-8")
+    reference = wrapper.split("[installation details](", 1)[1].split(")", 1)[0]
+    text = wrapper + (skill.parent / reference).read_text(encoding="utf-8")
     assert "default-direction" in text
     assert "Design direction extraction" in text
     assert "## Design direction" in text

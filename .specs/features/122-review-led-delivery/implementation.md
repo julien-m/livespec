@@ -22,7 +22,7 @@
 
 ## Files Created/Modified
 
-Ten compact skills, four role prompts,14 original public archives, routing, system introductions, README, migration plan, goal compiler, regression tests and this feature's documents. No private historical specification or unrelated private commit is published.
+Twelve compact skills, four role prompts,16 original public archives, routing, system introductions, README, migration plan, goal compiler, regression tests and this feature's documents. No private historical specification or unrelated private commit is published.
 
 ## Verification
 
@@ -48,3 +48,7 @@ Ruff check/format pass on changed Python files. Public-port independent review: 
 Read [FR-001 and FR-003 policy](../../../system/review-led-delivery.md), [FR-002 selector](../../../validator/goal_payload.py), [FR-004 migration](../../../docs/review-led-migration.md), and [diagnostic regression tests](../../../tests/test_review_led_delivery_diagnostics.py). Their @spec comments identify the corresponding FR anchor. Read the [progress checkpoints](progress.md) for delivery observations.
 
 The default [Git hook](../../../validator/hooks/pre-commit-hook) is advisory; its [original certification template](../../../validator/hooks/pre-commit-certification-hook) remains unchanged. Read the [hook regression](../../../tests/test_review_led_hook.py) for proof that a commit no longer starts an automatic certification command.
+
+## Bootstrap follow-up
+
+Read [initialization](../../../.agent-sync/skills/spec-init/SKILL.md) and [migration](../../../.agent-sync/skills/spec-migrate/SKILL.md), with their linked operational references. Their original public bodies remain byte-for-byte diagnostic archives. Only this bootstrap delta is retained from the canceled old objective; no new mission states, unlimited-restart dependency or supervisor application is included. Existing Atlas pins and services are unchanged.

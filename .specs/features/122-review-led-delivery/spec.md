@@ -78,7 +78,7 @@ The documented migration preserves consumer-specific fixes, accepted decisions, 
 ## Functional Requirements
 
 ### FR-001
-Replace ten default skills and four native role prompts with the shared review-led workflow. Covers AC-001, AC-003 and AC-005.
+Replace twelve default skills and four native role prompts with the shared review-led workflow. Covers AC-001, AC-003 and AC-005.
 
 ### FR-002
 Preserve original command/role bodies as explicit certification diagnostics and select the archived command inventory in goal compilation. Covers AC-004.
@@ -90,6 +90,8 @@ Update routing, system entry points and documentation so script results inform r
 Document and verify safe migration without consumer downgrade or retrospective certification. Covers AC-005 and AC-006.
 
 ## Key Entities
+
+Initialization and migration preserve read-only previews, backed-up recovery, ordered migrations, runtime pins and historical records without creating certification prerequisites. Optional continuity is reported honestly and never required for independent feature delivery.
 
 Existing filesystem specs, skills, role prompts and diagnostic records only; no new database or persisted state schema.
 

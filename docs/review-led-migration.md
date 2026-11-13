@@ -31,3 +31,7 @@ Standard skills now use implementation, useful checks and one independent final 
 ## Rollback
 
 Select the saved previous runtime through the supported runtime command and restore only the saved provider links or prompts changed by adoption. Keep newer product changes and both histories. Report which policy now applies; do not mix old machine certification with review-led completion.
+
+## Bootstrap follow-up
+
+Initialization and format migration now use the same review-led policy; read [initialization](../.agent-sync/skills/spec-init/SKILL.md) and [migration](../.agent-sync/skills/spec-migrate/SKILL.md) for the operational safeguards. Adopt these instruction changes through the selected runtime at a safe checkpoint. This change adds no format migration, continuity service or application installation. Preserve an active consumer pin and its private fixes; public format21 is not a replacement for an existing private format23 runtime.

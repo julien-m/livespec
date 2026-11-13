@@ -242,14 +242,14 @@ Initialize LiveSpec through an interactive brainstorm or an observed from-code p
 /spec-init --auto                # Use defaults, skip questions
 /spec-init --stack web-realtime  # Skip interview, use preset
 /spec-init --from-code           # Reverse-engineer existing codebase into specs
-/spec-init --from-code --auto    # Observed bootstrap with full verification/hooks/goal closure
+/spec-init --from-code --auto    # Observed bootstrap with useful checks and final review
 /spec-init --from-code --auto --force --dir "/path with spaces" # Backed-up recovery
 /spec-init --from-code --deep    # Interactive extended scan; rejected in autonomous mode
 ```
 
 Key flags: `--auto`, `--stack [preset]`, `--from-code`, `--deep`, `--force`, `--dir [path]`, `--dry-run`
 
-Explicit autonomous force recovery backs up prior specs, conventions and integration documents before overwriting owned bootstrap files, preserving custom history and source bytes. Mutable agents use local copies. `--dry-run` previews without project writes; the backend's `--verify-only` rechecks current profile/content identity without mutation. Autonomous `--deep` and conflicting presets fail before writes. Installer, sync, probes and hook subprocesses share one finite budget; backend exit zero still requires integration proof, after-init hooks, current verification and the authentic goal archive. Tooling READY does not certify application runtime. Conventions are rendered from the ai-ressources clone located as described in [ai-ressources location (`AIRESOURCES`)](#ai-ressources-location-airesources).
+Explicit autonomous force recovery backs up prior specs, conventions and integration documents before overwriting owned bootstrap files, preserving custom history and source bytes. Mutable agents use local copies. `--dry-run` previews without project writes; the backend's `--verify-only` rechecks current profile/content identity without mutation. Autonomous `--deep` and conflicting presets fail before writes. Installer, sync, probes and hook subprocesses share one finite budget; backend exit zero alone does not establish that installation is complete: inspect actual integrations and current verification, then include the real outcomes in the shared final review. No goal archive or semantic receipt is required. Tooling READY does not certify application runtime. Conventions are rendered from the ai-ressources clone located as described in [ai-ressources location (`AIRESOURCES`)](#ai-ressources-location-airesources).
 
 ### `/spec-propose`
 
