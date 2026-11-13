@@ -17,8 +17,9 @@ Standard skills now use implementation, useful checks and one independent final 
 2. Upgrade the project pin through the supported runtime selection command. Re-read the actual selected runtime and resolved skill files; updating the global default does not update existing pins.
 3. Resolve shared instructions from the runtime's `system/review-led-delivery.md`. Project copies read `.specs/.livespec-path`; skill symlinks resolve from their real source directory.
 4. Preserve customized agent settings. Use a fresh generic native reviewer if an old mutable agent prompt still injects certification gates; do not overwrite customization silently.
-5. Preserve old mission and goal history. Record explicitly that remaining work follows review-led delivery; do not fabricate archive/proof success for the former contract. Do not let an obsolete goal stop independent product work.
-6. Reload the coordinator and worker instructions at the checkpoint. Resume from the actual implemented feature, accepted decisions and remaining product findings, without restarting completed work.
+5. Inspect existing Git hooks. The supported installer replaces an exact original LiveSpec hook with the advisory template. For a composite/custom hook it preserves the original content and appends the advisory reminder; inspect and migrate only the old LiveSpec-owned block manually, preserving other tools and their checks. The original certification hook remains an explicit diagnostic template. Do not bypass an unrelated custom hook.
+6. Preserve old mission and goal history. Record explicitly that remaining work follows review-led delivery; do not fabricate archive/proof success for the former contract. Do not let an obsolete goal stop independent product work.
+7. Reload the coordinator and worker instructions at the checkpoint. Resume from the actual implemented feature, accepted decisions and remaining product findings, without restarting completed work.
 
 ## Verify the migration
 

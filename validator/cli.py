@@ -1029,8 +1029,24 @@ def install_hook(
 
     hook_dst = hooks_dir / "pre-commit"
 
-    if hook_dst.exists():
-        typer.echo(f"Warning: {hook_dst} already exists. Appending LiveSpec hook.", err=True)
+    # @spec FR-003: Migrate the exact generated hook without deleting custom checks
+    # — .specs/features/122-review-led-delivery/spec.md#fr-003
+    historical_hook = hook_src.with_name("pre-commit-certification-hook")
+    if (
+        hook_dst.is_file()
+        and not hook_dst.is_symlink()
+        and historical_hook.is_file()
+        and hook_dst.read_bytes() == historical_hook.read_bytes()
+    ):
+        shutil.copy2(hook_src, hook_dst)
+        hook_dst.chmod(0o755)
+        typer.echo("Replaced the original LiveSpec certification hook with the advisory hook.")
+    elif hook_dst.exists():
+        typer.echo(
+            f"Warning: {hook_dst} already exists. Appending LiveSpec hook; "
+            "existing custom checks remain unchanged and require separate inspection.",
+            err=True,
+        )
         with open(hook_dst, "a") as f:
             f.write("\n\n# --- LiveSpec validation hook ---\n")
             f.write(hook_src.read_text())

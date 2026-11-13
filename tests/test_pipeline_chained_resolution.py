@@ -1,3 +1,4 @@
+# Feature122: retained certification contracts use their archived workflow sources.
 """Static markdown verification for D-a subagent-header propagation.
 
 The supervisor skills for feature and ship must prepend a synthetic
@@ -16,8 +17,8 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).parent.parent
-FEATURE_MD = REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "SKILL.md"
-SHIP_MD = REPO_ROOT / ".agent-sync" / "skills" / "spec-ship" / "SKILL.md"
+FEATURE_MD = REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "certification.md"
+SHIP_MD = REPO_ROOT / ".agent-sync" / "skills" / "spec-ship" / "certification.md"
 
 
 def _read(p: Path) -> str:

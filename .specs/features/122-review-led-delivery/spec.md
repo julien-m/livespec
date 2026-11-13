@@ -97,6 +97,25 @@ Existing filesystem specs, skills, role prompts and diagnostic records only; no 
 
 Unavailable native reviewer remains an unavailable review; missing essential product observations remain unknown. Existing read-only requests and external refusals remain binding. Existing active missions require an explicit adoption checkpoint.
 
+## Quality Engineering
+
+- **Criticality:** High. This changes default delivery authority and must not hide product defects or essential missing observations.
+- **Blast radius:** Shared. Standard skills, native roles, diagnostics and generated Git hooks are affected; persisted historical verdicts remain intact.
+- **Primary risk:** Contract. **Confidence:** Medium until public CI and the installed LiveSpec/Penflow pair are validated.
+- **qe_dimensions_considered:** functional correctness, diagnostic compatibility, source/record integrity, installer packaging, custom hook preservation and safe consumer adoption. Product UI and capacity benchmarks are outside this change.
+- **qe_gates_required:** One independent native final review. Script outcomes are review inputs, not automatic feature gates; material defects and missing essential observations remain explicit.
+- **qe_expected_evidence:** archived-inventory regressions, generated hook behavior and ownership checks, genuine wheel installation, public CI results and observed consumer continuation.
+- **qe_gaps_or_missing_evidence:** final public CI, paired installation and Atlas adoption remain pending; do not infer delivery from source review alone.
+- **Non-functional expectations:** no added runtime dependency, no invented PASS, no consumer downgrade or history reset. Preserve custom hooks and existing data.
+- **qe_boundary_note:** tools report outcomes; the final reviewer judges delivery. No new certificate chain is introduced.
+
+## Clarifications
+
+- The user explicitly requires manual implementation outside LiveSpec execution while retaining its feature document structure.
+- The default has one final independent review; a separate plan review is only requested explicitly.
+- Administrative script failures do not automatically block; a material product defect or essential observation gap remains a concrete review finding.
+- Atlas reload waits for the corrected LiveSpec/Penflow pair to be validated together.
+
 ## Success Criteria
 
 - SC-001: A standard feature reaches independent final review despite an administrative script failure.

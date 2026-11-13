@@ -1,3 +1,4 @@
+# Feature122: retained certification contracts use their archived workflow sources.
 """Validation policy is reachable from the actual planning and execution workflows."""
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ def test_plan_and_execution_workflows_reach_the_same_budget_contract() -> None:
     policy = ROOT / "system/testing/execution-rules.md"
     scope = ROOT / "system/minimal-spec-scope.md"
     workflows = [
-        ROOT / f".agent-sync/skills/{name}/SKILL.md"
+        ROOT / f".agent-sync/skills/{name}/certification.md"
         for name in ("spec-plan", "spec-test", "spec-implement")
     ]
     assert all({policy, scope} <= _links(path) for path in workflows)

@@ -46,3 +46,5 @@ Ruff check/format pass on changed Python files. Public-port independent review: 
 - Role: read [livespec-verifier](../../../.agent-sync/agents/livespec-verifier/prompt.md) and its [retained diagnostic](../../../.agent-sync/agents/livespec-verifier/certification.md).
 
 Read [FR-001 and FR-003 policy](../../../system/review-led-delivery.md), [FR-002 selector](../../../validator/goal_payload.py), [FR-004 migration](../../../docs/review-led-migration.md), and [diagnostic regression tests](../../../tests/test_review_led_delivery_diagnostics.py). Their @spec comments identify the corresponding FR anchor. Read the [progress checkpoints](progress.md) for delivery observations.
+
+The default [Git hook](../../../validator/hooks/pre-commit-hook) is advisory; its [original certification template](../../../validator/hooks/pre-commit-certification-hook) remains unchanged. Read the [hook regression](../../../tests/test_review_led_hook.py) for proof that a commit no longer starts an automatic certification command.

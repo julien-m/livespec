@@ -67,6 +67,8 @@ Read [the default delivery policy](system/review-led-delivery.md) for the comple
 
 Explicit `livespec goal` diagnostics retain an outcome goal with an executable stop condition and their original receipt contracts. They inspect historical runs on request; standard review-led delivery does not create or prove these goals automatically.
 
+The generated LiveSpec Git hook is advisory and no longer launches strict certification or visual suites. Existing projects must migrate their LiveSpec-owned hook explicitly while preserving custom hooks.
+
 ## Conventions
 
 Load and apply the project's conventions to the changed code. Useful deterministic checks inform the final review. An optional explicit `livespec conventions verify --report` provides a diagnostic report; its certificate is not a mandatory delivery gate. The final reviewer checks architecture, file placement, maintainability and concrete security risks.
