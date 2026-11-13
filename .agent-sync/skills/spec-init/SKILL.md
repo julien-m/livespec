@@ -8,6 +8,8 @@ description: Initialize LiveSpec from a project interview or observed code, pres
 
 Read [review led delivery](../../../system/review-led-delivery.md) first, resolving this link from the skill's physical directory through any installed symlink. It governs direct, nested, autonomous and resumed initialization. No goal render/prove/archive, semantic receipt, separate plan review or certification inventory is a prerequisite.
 
+Read [the command catalogue](../../rules/livespec/commands.md) for the commands installed by initialization.
+
 ## Resolve scope before writes
 
 - Resolve the target from `--dir`/`-D` (otherwise cwd) and the executing LiveSpec root from the physical skill, recorded project path or source layout. Verify its VERSION and required installer/sync scripts; keep the selected runtime, not a mutable `current` alias.
