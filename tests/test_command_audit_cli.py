@@ -181,3 +181,30 @@ def test_command_audit_enforces_hyphenated_policy() -> None:
         entry["command_path"].endswith(f".agent-sync/skills/{entry['name']}/SKILL.md")
         for entry in payload["commands"]
     )
+
+
+@pytest.mark.parametrize(
+    ("linked", "catalogue_exists"), [(True, True), (False, True), (True, False)]
+)
+def test_init_routes_through_existing_command_catalogue(
+    tmp_path: Path, linked: bool, catalogue_exists: bool
+) -> None:
+    command = tmp_path / ".agent-sync/skills/spec-check/SKILL.md"
+    command.parent.mkdir(parents=True)
+    command.write_text("# Command: /spec-check\n")
+    init = tmp_path / ".agent-sync/skills/spec-init/SKILL.md"
+    init.parent.mkdir(parents=True)
+    catalogue = tmp_path / ".agent-sync/rules/livespec/commands.md"
+    if catalogue_exists:
+        catalogue.parent.mkdir(parents=True)
+        catalogue.write_text("### /spec-check\n")
+    init.write_text(
+        "Read [the command catalogue](../../rules/livespec/commands.md).\n"
+        if linked
+        else "# Initialization\n"
+    )
+    result = runner.invoke(app, ["command-audit", "--repo", str(tmp_path), "--json"])
+    commands = json.loads(result.output)["commands"]
+    checks = next(command["checks"] for command in commands if command["name"] == "spec-check")
+    routing = next(check for check in checks if check["name"] == "routing_docs")
+    assert routing["status"] == ("PASS" if linked and catalogue_exists else "FAIL")

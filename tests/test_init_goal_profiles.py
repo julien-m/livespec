@@ -84,7 +84,13 @@ def test_render_preserves_selected_target_and_force_without_rewriting_history(
 
 
 def test_autonomous_skill_normalizes_before_lock_and_requires_current_closure() -> None:
-    body = (ROOT / ".agent-sync/skills/spec-init/SKILL.md").read_text(encoding="utf-8")
+    skill = ROOT / ".agent-sync/skills/spec-init/SKILL.md"
+    wrapper = skill.read_text(encoding="utf-8")
+    historical = wrapper.split("[the former certification workflow](", 1)[1].split(")", 1)[0]
+    body = (skill.parent / historical).read_text(encoding="utf-8")
+    assert "explicitly requested historical diagnostic" in wrapper
+    assert "No goal render/prove/archive" in wrapper
+    assert "## STEP 0" not in wrapper
     lock = body.split("## STEP 0", 1)[1].split("# Command:", 1)[0]
     assert lock.index("--from-code --auto") < lock.index("livespec goal render spec-init")
     autonomous = body.split("### Non-Interactive Autonomous From-Code Mode", 1)[1]

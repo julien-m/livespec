@@ -266,11 +266,19 @@ def _check_docs_reference(repo_root: Path, command: CommandInfo) -> AuditCheck:
     existing = [path for path in doc_paths if path.is_file()]
     if not existing:
         return AuditCheck("routing_docs", "PASS", "routing docs absent in fixture")
-    missing = [
-        path.relative_to(repo_root).as_posix()
-        for path in existing
-        if command.name not in path.read_text(encoding="utf-8")
-    ]
+    missing: list[str] = []
+    init_skill = repo_root / ".agent-sync" / "skills" / "spec-init" / "SKILL.md"
+    catalogue_link = "[the command catalogue](../../rules/livespec/commands.md)"
+    for path in existing:
+        text = path.read_text(encoding="utf-8")
+        # Compact initialization delegates the command list to the same canonical
+        # catalogue agents read; a missing link/target still fails this audit.
+        if path == init_skill and catalogue_link in text:
+            catalogue = path.parent / "../../rules/livespec/commands.md"
+            if catalogue.is_file():
+                text += catalogue.read_text(encoding="utf-8")
+        if command.name not in text:
+            missing.append(path.relative_to(repo_root).as_posix())
     if missing:
         return AuditCheck("routing_docs", "FAIL", f"missing in {', '.join(missing)}")
     return AuditCheck("routing_docs", "PASS", "routing docs mention command")

@@ -1,7 +1,7 @@
 <!-- @spec FR-001, FR-003: Default delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
 # Review led delivery
 
-This is the default delivery policy for feature, specify, plan, implement, fix, test, check, refine, preflight and ship skills, including direct, nested, autonomous and resumed invocations. It replaces their former automatic certification workflow. Read the applicable project conventions and honor the user's scope and decisions.
+This is the default delivery policy for init, migrate, feature, specify, plan, implement, fix, test, check, refine, preflight and ship skills, including direct, nested, autonomous and resumed invocations. It replaces their former automatic certification workflow. Read the applicable project conventions and honor the user's scope and decisions.
 
 ```mermaid
 flowchart LR
@@ -43,3 +43,9 @@ Reuse an existing plan review as context. Do not create another automatic review
 - Update the feature's spec/implementation mappings, registry and changelog as ordinary project documents. Use confined edits that preserve unrelated content and concurrent work. Do not make a metadata write depend on a certification helper.
 - Mark the feature Implemented only when the independent review accepts the requested behavior with no unresolved material finding; disclose accepted limitations and nonblocking failures. This is review-led delivery, not a claim of legacy machine certification.
 - Report the result, review verdict, useful checks and remaining limits. Commit, publish, merge or deploy only within the user's existing authorization. An explicit no-write or preview request remains read-only.
+
+## Initialization and format migration
+
+- Bootstrap skills use this same policy. Their technical installer/migration procedures remain available without nested goals, semantic receipts or a separate plan review. Report useful checks to the shared final reviewer or parent.
+- Preserve explicit preview/read-only scope, force-recovery backups, effective runtime/pin identity, ordered migrations, inverse integrity and history. Failed essential setup, missing authority or an unsafe migration is a real problem; never claim initialization or migration succeeded when it did not.
+- Requested or configured continuity remains a functional need: when supported and authorized, initialize or attach the project-bound process through the current review-led interface, preserving runtime/project identity without nested goals or implicit global installation. Missing continuity does not block independent feature delivery and is not silently removed from the plan. If not requested, no host observation is needed; if unsupported, unauthorized or explicitly refused, retain the unmet need and report the affected unexecuted action `NOT_RUN`. Never retry a known refusal or broaden permissions automatically.

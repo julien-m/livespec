@@ -22,7 +22,18 @@ _INLINE = re.compile(r"`(livespec [^`]+)`")
 def _cited_invocations() -> list[tuple[str, str]]:
     cited: list[tuple[str, str]] = []
     for skill in sorted(SKILLS_DIR.glob("*/SKILL.md")):
-        for line in skill.read_text(encoding="utf-8").splitlines():
+        sources = [skill]
+        # Scan the operational reference agents actually follow as well as the
+        # short entry point; retained historical certification is not executable.
+        reference = {"spec-init": "installation.md", "spec-migrate": "migration.md"}.get(
+            skill.parent.name
+        )
+        if reference is not None:
+            assert f"({reference}" in skill.read_text(encoding="utf-8")
+            sources.append(skill.parent / reference)
+        for line in "\n".join(
+            source.read_text(encoding="utf-8") for source in sources
+        ).splitlines():
             cited.extend((skill.parent.name, m.group(1)) for m in _INLINE.finditer(line))
             if line.strip().startswith("livespec "):  # fenced command lines
                 cited.append((skill.parent.name, line.strip()))

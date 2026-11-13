@@ -26,6 +26,14 @@ def _read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
+def _bootstrap_text(command: str, label: str) -> str:
+    """Read the wrapper and the operational reference it actually directs agents to."""
+    skill = ROOT / ".agent-sync" / "skills" / command / "SKILL.md"
+    wrapper = skill.read_text(encoding="utf-8")
+    reference = wrapper.split(f"[{label}](", 1)[1].split(")", 1)[0].split("#", 1)[0]
+    return wrapper + (skill.parent / reference).read_text(encoding="utf-8")
+
+
 def test_system_penflow_contract_doc_exists() -> None:
     body = _read("system/testing/penflow-contract.md")
 
@@ -49,9 +57,9 @@ def test_system_penflow_contract_doc_exists() -> None:
 
 
 def test_spec_init_supports_brainstorm_and_from_scratch_penflow() -> None:
-    body = _read(".agent-sync/skills/spec-init/SKILL.md")
+    body = _bootstrap_text("spec-init", "installation details")
 
-    assert "Step 3.5.5 — Penflow Contract Workspace Bootstrap" in body
+    assert "Penflow workspace import" in body
     assert "Brainstorm `handoff/penflow/` or legacy `penflow/` directory" in body
     bootstrap_command = (
         "livespec penflow-contract bootstrap --project . --source "
@@ -62,10 +70,13 @@ def test_spec_init_supports_brainstorm_and_from_scratch_penflow() -> None:
     assert ".brainstorm/penflow/" not in body
     assert "continue from scratch" in body
     assert "state: absent" in body
+    assert "No additional literal confirmation is required" in body
+    assert "not a required certificate" in body
+    assert "preserve its refusal" in body
 
 
 def test_spec_init_documents_handoff_livespec_brainstorm_inputs() -> None:
-    body = _read(".agent-sync/skills/spec-init/SKILL.md")
+    body = _bootstrap_text("spec-init", "installation details")
     expectations = _read(".agent-sync/skills/spec-init/expectations.md")
 
     assert "handoff/livespec/project-profile.md" in body
@@ -87,33 +98,50 @@ def test_spec_refresh_from_brainstorm_resolves_handoff_lifecycle_first() -> None
 
 
 def test_spec_init_requires_post_sync_command_asset_verification() -> None:
-    body = _read(".agent-sync/skills/spec-init/SKILL.md")
+    body = _bootstrap_text("spec-init", "installation details")
 
     assert "Step 3.12 — Sync Agent Assets" in body
-    assert "BLOCKED at step 3.12" in body
-    assert "Post-sync verification" in body
+    assert "post-sync verification against the actual source inventory" in body
+    assert "never announce those assets installed" in body
     assert ".specs/.livespec-path" in body
     assert ".agent-sync.local/skills/spec-feature" in body
     assert ".claude/skills/spec-feature" in body
     assert ".agents/skills/spec-feature" in body
     assert ".codex/agents/livespec-verifier.toml" in body
     assert "Unknown command: /spec-feature" in body
+    assert "every source `spec-*` skill and `source-command-cli`" in body
+    assert "reject escaping writes" in body
 
 
 def test_spec_init_from_code_autonomous_prompt_is_bounded_noninteractive() -> None:
-    body = _read(".agent-sync/skills/spec-init/SKILL.md")
+    body = _bootstrap_text("spec-init", "installation details")
 
     assert "Non-Interactive Autonomous From-Code Mode" in body
-    assert "Proceed autonomously" in body
-    assert "Normalize autonomous intent to `--from-code --auto` at Step 0" in body
+    assert "Normalize aliases and autonomous intent to `--from-code --auto`" in body
+    assert "use supported manifests and real code only" in body
+    assert "Retain Unknown business fields" in body
+    assert "No inherited goal, semantic receipt, plan review or certification restart" in body
+    assert "--verify-only" in body
+    assert "300 seconds" in body
+    assert "same finite deadline" in body
+    assert "INIT_ARGS+=(--force)" in body
+    assert "INIT_ARGS+=(--dry-run)" in body
+    assert '"$TARGET_DIR"' in body
+    assert "rejects unsupported `--deep`, `--stack`" in body
+    assert "it neither launches a model nor executes Markdown hooks" in body
+    _assert_historical_init_closure()
+
+
+def _assert_historical_init_closure() -> None:
+    historical = _bootstrap_text("spec-init", "the former certification workflow")
+    assert "Proceed autonomously" in historical
+    assert "Normalize autonomous intent to `--from-code --auto` at Step 0" in historical
     assert (
         "interviews, inferred business defaults and stack confirmation belong to `init-interactive`"
-        in body
+        in historical
     )
-    assert "--verify-only" in body
-    assert "only this full goal closure completes `/spec-init`" in body
-    assert "300 seconds" in body
-    assert "Autonomous from-code: enabled" in body
+    assert "only this full goal closure completes `/spec-init`" in historical
+    assert "Autonomous from-code: enabled" in historical
 
 
 def test_spec_init_expectations_require_autonomous_from_code_completion() -> None:
@@ -260,11 +288,11 @@ def test_visual_feature_pipeline_requires_feature_local_design_proofs() -> None:
 
 
 def test_spec_migrate_documents_planner_and_penflow_backfill_metadata() -> None:
-    body = _read(".agent-sync/skills/spec-migrate/SKILL.md")
+    body = _bootstrap_text("spec-migrate", "the migration procedure")
     migration = _read("migrations/17/migrate.md")
 
-    assert "livespec migrate plan --project . --livespec <path> --json" in body
-    assert "execute only the migrations listed in `apply`" in body
+    assert "livespec migrate plan --project <project> --livespec <resolved-source> --json" in body
+    assert "Execute only planned migrations in order" in body
     assert "invalid_restore_points" in body
     assert "supersedes" in body
     assert "replaces_when_unapplied" in body

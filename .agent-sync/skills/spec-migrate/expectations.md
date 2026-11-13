@@ -1,10 +1,12 @@
 ---
 command: spec-migrate
 contract_version: "1.0"
-last_reviewed: 2026-10-10
+last_reviewed: 2026-11-13
 ---
 
 # Expectations — /spec-migrate
+
+Read [the retained diagnostic](certification.md) for this historical contract. Normal setup follows [the current entry point](SKILL.md) and its shared review policy.
 
 ## 1. Purpose
 
