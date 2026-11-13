@@ -1,3 +1,4 @@
+# Feature122: historical certification documentation remains under explicit diagnostics.
 """Feature 083 boundary and documentation tests (AC-012, AC-018, SC-001, SC-002, SC-004)."""
 
 from __future__ import annotations
@@ -32,10 +33,10 @@ BOUNDARY = WORKTREE / "system/tool-project-boundary.md"
 REFERENCING_FILES = (
     "system/spec-system.md",
     ".specs/spec-system.md",
-    ".agent-sync/skills/spec-feature/SKILL.md",
-    ".agent-sync/skills/spec-fix/SKILL.md",
-    ".agent-sync/skills/spec-implement/SKILL.md",
-    ".agent-sync/skills/spec-ship/SKILL.md",
+    ".agent-sync/skills/spec-feature/certification.md",
+    ".agent-sync/skills/spec-fix/certification.md",
+    ".agent-sync/skills/spec-implement/certification.md",
+    ".agent-sync/skills/spec-ship/certification.md",
 )
 LIFECYCLE_SKILLS = ("spec-feature", "spec-fix", "spec-implement", "spec-ship")
 # Markdown link whose target ends with tool-project-boundary.md, e.g. "](../system/x.md)".
@@ -135,8 +136,8 @@ def pinned_consumer(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[
 
 
 def _linked_reference_target(project: Path, skill: str) -> tuple[bool, Path | None]:
-    """Resolve a linked SKILL.md reference from the SKILL.md physical location."""
-    physical = (project / ".agent-sync.local/skills" / skill / "SKILL.md").resolve()
+    """Resolve a linked certification.md reference from the certification.md physical location."""
+    physical = (project / ".agent-sync.local/skills" / skill / "certification.md").resolve()
     lines = _reference_lines(physical)
     match = _LINK_RE.search(lines[0]) if lines else None
     target = (physical.parent / match.group(1)).resolve() if match else None

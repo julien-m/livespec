@@ -1,3 +1,4 @@
+# Feature122: historical certification documentation remains under explicit diagnostics.
 """Visual-only goals retain visual proof without inventing a functional suite result."""
 
 from pathlib import Path
@@ -39,7 +40,7 @@ def test_visual_prerequisite_distinguishes_failed_suite_from_unrequested_suite(
 
 def test_capture_prose_requires_only_an_applicable_functional_suite(tmp_path: Path) -> None:
     _goal(tmp_path, "spec-test", "--visual", True)
-    skill = (ROOT / ".agent-sync/skills/spec-test/SKILL.md").read_text()
+    skill = (ROOT / ".agent-sync/skills/spec-test/certification.md").read_text()
     prerequisite = skill.split("### 4.5.2 — Capture Baselines", 1)[1].split("**CRITICAL", 1)[0]
     assert "If `test-suite` is active" in prerequisite
     assert "non-zero exit code" in prerequisite

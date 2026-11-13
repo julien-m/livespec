@@ -1,3 +1,4 @@
+# Feature122: historical certification documentation remains under explicit diagnostics.
 """Test generation requires readiness, while inspection and existing-test modes do not."""
 
 from pathlib import Path
@@ -58,7 +59,7 @@ def test_generation_readiness_precedes_writes_only_in_writing_modes(
     ],
 )
 def test_all_generation_entrypoints_reference_the_same_readiness_gate(section: str) -> None:
-    skill = (REPO / ".agent-sync/skills/spec-test/SKILL.md").read_text()
+    skill = (REPO / ".agent-sync/skills/spec-test/certification.md").read_text()
     start = skill.index(section)
     boundary = skill.find("\n## ", start + len(section))
     text = skill[start : boundary if boundary >= 0 else len(skill)]
