@@ -1,3 +1,4 @@
+# Feature122: retained certification contracts use their archived workflow sources.
 """Preserved test cases and fixtures for test_run_artifact.py."""
 
 from __future__ import annotations
@@ -228,9 +229,9 @@ class TestTruthFixes:
         assert "039 FR-005" in text
 
     def test_spec_feature_skill_uses_goal_archive(self) -> None:
-        text = (REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "SKILL.md").read_text(
-            encoding="utf-8"
-        )
+        text = (
+            REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "certification.md"
+        ).read_text(encoding="utf-8")
         assert "livespec goal archive" in text
         assert "livespec run record" not in text
 

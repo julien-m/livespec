@@ -2,6 +2,11 @@
 
 # Tool/Project Boundary
 
+## Default delivery policy
+
+Read [review led delivery](review-led-delivery.md) for standard feature work. It takes precedence over the certification, nested-goal, receipt, phase-stop and automatic review requirements below. Those sections describe explicitly requested historical diagnostics; they are not prerequisites of normal delivery. Checks keep their actual outcomes and the independent final review judges delivery.
+
+
 > Applies to every session whose project is a LiveSpec consumer (any project other than the LiveSpec repository), in **every lock mode** of `.specs/livespec.lock` (pinned, dev or none). Dev mode only changes which runtime executes; it never relaxes these rules.
 
 A **LiveSpec root** is any directory holding `VERSION`, `validator/` and `.agent-sync/`: an installed runtime snapshot under `<home>/versions/<id>/` or a LiveSpec checkout. The root used by the project is recorded in `.specs/.livespec-path`.

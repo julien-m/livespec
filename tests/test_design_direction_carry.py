@@ -1,3 +1,4 @@
+# Feature122: historical certification assertions target the preserved diagnostic sources.
 # @spec(AC-001)
 # @spec(AC-002)
 # @spec(AC-003)
@@ -28,7 +29,7 @@ def test_spec_template_carries_optional_design_direction() -> None:
 
 
 def test_spec_specify_populates_design_direction_with_precedence() -> None:
-    text = _text(".agent-sync/skills/spec-specify/SKILL.md")
+    text = _text(".agent-sync/skills/spec-specify/certification.md")
     assert "Carry design direction" in text
     assert "penflow/design-read.json" in text
     assert ".specs/design/theme.md" in text
@@ -46,7 +47,7 @@ def test_spec_init_wizard_and_import_carry_direction() -> None:
 
 def test_design_direction_never_leaks_into_judgement_commands() -> None:
     for command in ("spec-check", "spec-test"):
-        text = _text(f".agent-sync/skills/{command}/SKILL.md")
+        text = _text(f".agent-sync/skills/{command}/certification.md")
         assert "Design direction" not in text
 
 

@@ -59,7 +59,9 @@ def _prepare_goal(project: Path, variant: str, *, historical: bool) -> GoalPair:
     canonical = ROOT / ".agent-sync/skills/spec-implement"
     skill = producer / ".agent-sync/skills/spec-implement"
     shutil.copytree(canonical, skill)
-    skill_path = skill / "SKILL.md"
+    # Historical/canonical witnesses must edit the source the diagnostic compiler reads.
+    source_name = "certification.md" if (skill / "certification.md").is_file() else "SKILL.md"
+    skill_path = skill / source_name
     if historical:
         skill_path.write_text(
             skill_path.read_text().replace(
@@ -70,7 +72,7 @@ def _prepare_goal(project: Path, variant: str, *, historical: bool) -> GoalPair:
             )
         )
     else:
-        assert skill_path.read_bytes() == (canonical / "SKILL.md").read_bytes()
+        assert skill_path.read_bytes() == (canonical / source_name).read_bytes()
     goal = compile_command_goal(
         "spec-implement",
         project_root=project,

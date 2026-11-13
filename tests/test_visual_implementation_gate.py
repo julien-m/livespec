@@ -1,3 +1,4 @@
+# Feature122: historical certification documentation remains under explicit diagnostics.
 # @spec(FR-006)
 
 # LiveSpec traceability anchors
@@ -55,7 +56,7 @@ def _png_chunk(kind: bytes, data: bytes) -> bytes:
 
 def test_implement_requires_visual_gate_before_final_status() -> None:
     """AC-001/AC-002: UI features run /spec-test --visual before finalization."""
-    body = _read(".agent-sync/skills/spec-implement/SKILL.md")
+    body = _read(".agent-sync/skills/spec-implement/certification.md")
 
     assert "Phase 6.5 — Mandatory Visual Gate" in body
     assert "/spec-test <feature> --auto --visual" in body
@@ -66,7 +67,7 @@ def test_implement_requires_visual_gate_before_final_status() -> None:
 
 def test_visual_tooling_failure_blocks_implementation() -> None:
     """AC-003: unavailable visual tooling cannot silently pass UI features."""
-    body = _read(".agent-sync/skills/spec-implement/SKILL.md")
+    body = _read(".agent-sync/skills/spec-implement/certification.md")
 
     assert "Visual tooling unavailable on a UI feature is BLOCKED" in body
     assert "do not continue without blocking" in body
@@ -79,7 +80,7 @@ def test_visual_tooling_failure_blocks_implementation() -> None:
 
 def test_no_visual_flag_caps_ui_feature_at_in_progress() -> None:
     """AC-004: --no-visual is allowed for partial work only."""
-    body = _read(".agent-sync/skills/spec-implement/SKILL.md")
+    body = _read(".agent-sync/skills/spec-implement/certification.md")
 
     assert "`--no-visual` on a visual feature" in body
     assert "must set Status to `In Progress`" in body
@@ -88,7 +89,7 @@ def test_no_visual_flag_caps_ui_feature_at_in_progress() -> None:
 
 def test_spec_test_exposes_structured_visual_gate_verdict() -> None:
     """AC-005: /spec-test provides a verdict consumable by /spec-implement."""
-    body = _read(".agent-sync/skills/spec-test/SKILL.md")
+    body = _read(".agent-sync/skills/spec-test/certification.md")
 
     assert "### Visual Gate Verdict" in body
     assert "PASS | FAIL | BLOCKED" in body
@@ -118,7 +119,7 @@ def test_visual_command_skills_require_oracle_receipts() -> None:
         "spec-implement",
         "spec-feature",
     ):
-        body = _read(f".agent-sync/skills/{skill}/SKILL.md")
+        body = _read(f".agent-sync/skills/{skill}/certification.md")
         assert "livespec visual-gate certify" in body
         assert "livespec visual-gate validate --feature" in body
         assert "visual_evidence_receipt_path" in body
@@ -138,7 +139,7 @@ def test_visual_workflows_publish_terminal_and_browser_proofs() -> None:
     )
 
     for skill in ("spec-feature", "spec-test", "spec-fix"):
-        body = _read(f".agent-sync/skills/{skill}/SKILL.md")
+        body = _read(f".agent-sync/skills/{skill}/certification.md")
         for marker in required_markers:
             assert marker in body
 

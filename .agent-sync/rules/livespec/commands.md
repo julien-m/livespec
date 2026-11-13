@@ -5,6 +5,10 @@
 
 > **Chargé à la demande par `livespec-routing.md`.** Ne pas charger ce fichier par défaut.
 
+## Default execution policy
+
+Standard delivery follows the selected compact skill and its shared review-led policy: implement, run useful checks, then one independent final review. Failed checks are reported for review, not automatic phase stops. No intermediate certification or separate automatic plan review is required. Retained examples of diagnostic commands below do not reinstate former gates.
+
 ## Table — Intention → Commande
 
 | Intention utilisateur | Commande à proposer |
@@ -64,7 +68,7 @@ Documentation vivante — comprend comment une feature marche, ou répond à une
 - `/spec-explain "what changed in the auth feature last month?"` — diff temporel
 
 ### /spec-feature
-Pipeline complet : specify → clarify → plan → review → analyze → implement → test → commit.
+Pipeline court : specify → plan → implement et contrôles utiles → revue finale indépendante → livraison autorisée.
 **Usage** :
 - `/spec-feature "User can filter search results by date range"` — pipeline interactif
 - `/spec-feature "Add CSV export" --auto` — pipeline auto, zéro pause

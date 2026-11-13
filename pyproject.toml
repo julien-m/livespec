@@ -59,10 +59,29 @@ markers = [
 ]
 
 [tool.setuptools.package-data]
-validator = ["vitest/*.ts"]
+validator = [
+    "vitest/*.ts",
+    "vitest_assertions/*.ts",
+    "playwright_assertions/*.mjs",
+    "conventions_ast/rule_catalog/*.yaml",
+    "conventions_ast/rule_catalog/*.csv",
+    "execution_cargo_rustc.sh",
+    "hooks/pre-commit-hook",
+    "hooks/pre-commit-certification-hook",
+]
+livespec = [
+    "drivers/*.yaml",
+    "drivers/templates/*.yaml",
+    "drivers/scripts/*.sh",
+    "ui-runners/*.yaml",
+    "ui-runners/maestro-template/*.md",
+    "ui-runners/maestro-template/flows/*.yaml",
+    "ui-runners/xcuitest-template/*.md",
+    "ui-runners/xcuitest-template/*.swift",
+]
 
 [tool.setuptools.packages.find]
-include = ["validator*"]
+include = ["validator*", "livespec*"]
 
 [tool.ruff]
 target-version = "py311"

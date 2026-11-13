@@ -1,0 +1,595 @@
+---
+name: spec-plan
+description: Migrated Claude command /spec-plan
+---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-002) -->
+<!-- @spec(FR-005) -->
+
+
+# /spec-plan
+
+---
+description: "Generate technical plan with sequence, state, and ER diagrams"
+argument-hint: "<feature-name>"
+---
+
+> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2), runtime goal contract for autonomous runs (§5).
+
+Read [necessary validation](../../../system/minimal-spec-scope.md#necessary-validation) and [validation budgets](../../../system/testing/execution-rules.md#validation-budgets) before planning, generating or executing tests. Add only distinct behavior/risk/regression proof; reuse adequate passing tests, avoid redundant matrices and stop after relevant checks pass. Preparation/generation/cleanup share the command budget; timeout means stop/diagnose, never identical relaunch or automatic limit inflation.
+
+## STEP 0 — Goal (autonomous runs)
+
+A goal is required only with `--auto` (for example as a child of `/spec-feature --auto`); interactive runs skip this step. **Read** [runtime goal contract](../../../system/anti-drift-block.md#runtime-goal-contract) for the full protocol.
+
+1. Resolve feature and flags read-only.
+   For review-bearing goals, **Read** [goal review identity](../../../system/review-protocol.md#goal-review-identity) and keep `--model=<actual-model>` in the flags of every child command.
+2. Run `livespec goal render spec-plan [--feature <feature-slug>] --flags "<active-flags>" --save` (add `--model=<actual-model>` for review-bearing goals), then read `stop_condition`, `tasks` and `checklist` from the printed contract file.
+3. Mirror the goal in the native goal tool when one exists (Codex `create_goal`/`update_goal`, Claude Code `/goal`); update an active goal when allowed, otherwise leave it untouched. Without a native tool, print a warning and continue with the CLI contract.
+4. Work toward the stop condition. Prove each required task with `livespec goal prove`; the goal checks `outcome.verified` itself. After three rejections of one task, hand back the `BLOCKED` report.
+5. Before `DONE`: `livespec goal archive`, prove `archive.run`, confirm `livespec goal status` is complete, then mark the native mirror complete.
+
+If `goal render` fails, report `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` with its stderr.
+
+## Requirement evidence integrity
+
+**Read** [complete review and progression](../../../system/review-protocol.md) before review or phase progression. Use actual prepared context and raw reviewer JSON; enforce the same source-backed Clarify/Analyze gates in direct and nested execution. Structural references, an empty findings summary, or `--no-review` cannot certify semantic readiness.
+
+## STEP 0.8 — Evidence-First Retry Contract
+
+Avant de relancer une commande, un poll, ou une interaction terminal (`write_stdin`, review LLM, validation structurelle, preuve goal), appliquer le contrat de [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) §3 : consigner `retry_hypothesis`, `retry_evidence`, puis `retry_result`. Relancer la même action sans preuve fraîche est interdit.
+
+# Command: /spec-plan
+
+> Generate a technical plan with sequence, state, and ER diagrams from a feature spec.
+
+---
+
+## Overview
+
+`/spec-plan [feature-name]`
+
+Reads the spec.md and generates a complete `plan.md` with:
+- Technical context (stack-aware)
+- Mermaid sequence, state, and ER diagrams
+- File-by-file implementation plan
+- Testing strategy
+
+```mermaid
+flowchart TD
+    START(["/spec-plan"]) --> RESOLVE["Resolve feature\nname"]
+    RESOLVE --> READ["Read spec.md +\nconstitution + stack\n+ testing strategy"]
+    READ --> DESIGN{"UI feature +\nmockups?"}
+    DESIGN -->|"yes"| SCREENS["Map screens →\ncomponent breakdown"]
+    DESIGN -->|"no"| EXTRACT
+    SCREENS --> EXTRACT["Extract FR, AC,\nentities, API needs"]
+    EXTRACT --> SIZE{"Scope\nS / M / L"}
+    SIZE --> CONST["Constitution\ncheck"]
+    CONST --> DIAGRAMS["Generate Mermaid\ndiagrams"]
+
+    subgraph DIAGRAMS_SUB ["Mermaid Diagrams"]
+        SEQ["sequenceDiagram\n(if API interactions)"]
+        STATE["stateDiagram-v2\n(if stateful entities)"]
+        ER["erDiagram\n(if new DB tables)"]
+    end
+
+    DIAGRAMS --> DIAGRAMS_SUB
+    DIAGRAMS_SUB --> PLAN["File-by-file\nimplementation plan\n(by layer)"]
+    PLAN --> TESTS["Test resolution\n+ testing strategy"]
+    TESTS --> CONTRACTS{"API\ncontracts?"}
+    CONTRACTS -->|"yes"| OAS["Generate\nopenapi.yaml"]
+    CONTRACTS -->|"no"| SYNC
+    OAS --> SYNC["Update README\n+ changelog"]
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style DIAGRAMS fill:#fff3e0,stroke:#FF9800
+    style PLAN fill:#fff3e0,stroke:#FF9800
+    style SYNC fill:#e8f5e9,stroke:#4CAF50
+```
+
+---
+
+## Flags
+
+| Flag | Behavior |
+|---|---|
+| `--auto`, `-a` | Skip confirmation, generate plan silently |
+| `--no-contracts`, `-C` | Skip API contract generation |
+| `--no-review`, `-N` | Skip LLM plan review (review runs by default) |
+| `--all-reviewers`, `-R` | Use all configured reviewers (default: first only) |
+
+---
+
+> **Hooks & integrations — before starting:** Run `livespec hooks resolve --event before --command plan [--feature <slug>]` (the anti-drift directive in [`system/anti-drift-block.md`](../system/anti-drift-block.md) § 7 fires this automatically when this command is invoked directly as `/spec-plan`). The CLI resolves the full 4-level chain:
+> 0. `~/.config/livespec/*.md` — user-level integrations (see [`system/integrations.md`](../system/integrations.md))
+> 1. `~/.claude/livespec/hooks/before-plan.md` — global
+> 2. `.specs/hooks/before-plan.md` — project
+> 3. `.specs/hooks/before-plan.local.md` — personal (if `mode: override` → skips 1 and 2)
+>
+> Non-empty stdout is injected as additional context. When hook files, CLI, or integrations are absent: no injection occurs (this is NOT an error — per [`system/integrations.md`](../system/integrations.md) design contract, absence is intentional). When exit code is non-zero (which should not occur per system guarantees in [`system/integrations.md`](../system/integrations.md) L154-156): skip resolution and emit a diagnostic to stderr.
+>
+> **Hooks & integrations — after completing:** Same resolution with `--event after`.
+
+> **Native QE Analysis:** `livespec goal render spec-plan` embeds **Read** [`../../../system/qe-analysis.md`](../../../system/qe-analysis.md) and injects a `qe.analysis` proof task. The plan must translate spec risks into gates, test levels, proof artifacts, evidence gaps, and boundary notes for review/audit/tests. User hooks may extend this behavior only; they are not the primary QE source.
+
+## Surface-Aware Test Directory Resolution
+
+**When generating the Testing Strategy table:** If `.specs/surfaces.yaml` exists, use each surface's `testDir` for test file paths instead of generic `tests/e2e/`. Example paths in this command are illustrations — resolve actual paths from surfaces config.
+
+---
+
+## Steps
+
+### Step 1 — Resolve Feature
+
+1. If feature name provided: find `.specs/features/NNN-feature-name/`
+2. If no feature name: use current git branch (parse NNN from branch name)
+3. If still no match: scan `.specs/features/*/spec.md` for the first feature with status `Draft` that has no `plan.md` (lifecycle: Draft → Planned → Approved → Implemented). If found, display:
+   ```
+   Next to plan: **NNN-feature-name** (Draft)
+   → Proceed? (yes / no / list all)
+   ```
+   - **yes** → use this feature
+   - **no** → abort
+   - **list all** → display all plannable features (Draft, no plan.md), let user pick
+4. Verify `spec.md` exists — if not, prompt user to run `/spec-specify` first
+
+### Step 2 — Read Context Files
+
+Read ALL of these before generating anything:
+
+```
+.specs/features/NNN-feature-name/spec.md   ← WHAT to build
+.specs/constitution.md                      ← Architectural constraints
+.specs/stacks/_default.md                   ← Tech stack choices
+.specs/testing/strategy.md                  ← How to test
+.specs/project.md                           ← Project context (users, scale)
+```
+
+### Step 2.5 — Design Reference (UI features only)
+
+If the feature's `spec.md` contains a `## Screens` section:
+
+1. Read the screen references and their linked PNG files from `.specs/design/screens/`
+2. Check if `.specs/design/theme.css` exists — if yes, read it and `.specs/design/theme.md`
+3. Generate a `## Design Reference` section in the plan, mapping each screen to its component breakdown:
+
+   ```markdown
+   ## Design Reference
+
+   | Screen | Component Breakdown | Reference |
+   |--------|-------------------|-----------|
+   | [screen-name] | [Components identified from mockup] | [screen-name.png](../../design/screens/screen-name.png) |
+   ```
+
+4. If theme.css exists, add a `## Theme` subsection:
+
+   ```markdown
+   ### Theme
+
+   - **Source:** [from theme.md]
+   - **Install:** `bunx shadcn@latest add <url>` *(if available)*
+   - **CSS:** [theme.css](../../design/theme.css)
+
+   All UI implementation steps must use CSS variables from `theme.css` (e.g., `var(--primary)`, `var(--background)`). Do not hardcode colors or spacing when a matching theme token exists.
+   ```
+
+5. Use the mockups to inform the implementation plan — component hierarchy, layout structure, responsive breakpoints
+
+If no `## Screens` section exists → skip this step.
+
+### Step 2.6 — Penflow Code IR Input (UI features only)
+
+UI plans require the root Penflow contract before implementation. If root `penflow/` is absent for a UI feature, run the From-Scratch Penflow Forward Contract before writing `plan.md`; do not fall back to `.brainstorm/`.
+
+```bash
+penflow validate-flow-specs penflow/flow-ui-contract --json
+penflow export-semantic-tree penflow/flow-ui-contract --out penflow/semantic-ui-tree.json --json
+penflow validate-semantic-tree penflow/semantic-ui-tree.json --json
+penflow draft-pen-from-tree penflow/semantic-ui-tree.json --out penflow/ui.pen --json
+penflow validate-pen penflow/ui.pen --json
+penflow export-expected penflow/ui.pen --out penflow/expected-ui-tree.json --json
+penflow code-ir --from-context penflow/ui.pen --semantic-tree penflow/semantic-ui-tree.json --flow-id <feature_slug> --flow-name "<feature_description>" --out penflow/code-ir.json --json
+livespec penflow-contract status --project . --target web-desktop --json
+```
+
+1. Run `livespec penflow-contract status --project . --target web-desktop --json` for web desktop features; otherwise run `livespec penflow-contract status --project . --json`.
+2. If status is `absent` for a UI feature, create missing `penflow/flow-ui-contract` flow/screen specs from the approved `spec.md`, then execute the From-Scratch Penflow Forward Contract.
+3. Read `penflow/semantic-ui-tree.json` and `penflow/code-ir.json`.
+4. Add a `## Penflow Contract Inputs` section to `plan.md` with links to `penflow/semantic-ui-tree.json`, `penflow/code-ir.json`, and the relevant `flow_id` / `screen_id`.
+5. Use `penflow/code-ir.json` as the primary UI implementation input. `.specs/design/screens/` remains visual evidence, not behavioral source of truth.
+6. If `penflow/code-ir.json` is missing for a UI feature, print `BLOCKED - penflow_forward_contract_failed` and stop instead of producing a plan with absent UI contract inputs.
+
+Before writing or revising plan content, run `livespec validate <feature-dir> --progression plan --model <resolved-model>`; resolve missing/stale review and critical clarification first.
+
+### Step 3 — Analyze Requirements
+
+From the spec, extract:
+- All Functional Requirements (FR-001, FR-002, ...)
+- All Acceptance Criteria (AC-001, AC-002, ...)
+- Key Entities (for ER diagram)
+- User Stories with API interactions (for sequence diagrams)
+- Entities with states/lifecycle (for state diagrams)
+- Infrastructure dependencies (databases, KV stores, object storage, queues, CDN, external APIs requiring credentials)
+  - If spec has an "Infrastructure Requirements" section, extract directly
+  - If spec mentions external resources in FR/stories but lacks the section, flag: `[INFRA DETECTED — consider adding Infrastructure Requirements section to spec]`
+
+### Step 3.5 — Scope Sizing (Avoid Over-Planning)
+
+Classify feature size before generating artifacts:
+
+- **S (small):** <= 3 FR, no new entity, single API route
+- **M (medium):** 4-8 FR, 1-2 entities, multiple interactions
+- **L (large):** > 8 FR, cross-domain dependencies, migration risk
+
+Apply output budget:
+
+- S: 1 sequence diagram max, no ER unless new entity exists
+- M: 1-2 sequence + state if lifecycle exists + ER if needed
+- L: full set + explicit risk section with phased delivery
+
+### Step 4 — Generate Technical Context
+
+Auto-fill from `.specs/stacks/_default.md`:
+
+```markdown
+| Aspect | Choice | Reason |
+|---|---|---|
+| Language | TypeScript | From project stack |
+| Framework | Next.js 14 | From stack preset |
+| Database | Supabase PostgreSQL | From stack preset |
+| Real-time | Supabase Realtime | Feature requires WebSocket |
+| Testing | Vitest + Playwright | From testing strategy |
+```
+
+### Step 5 — Constitution Check
+
+For each principle in `.specs/constitution.md`, verify the planned approach:
+- Simplicity: is this the simplest solution?
+- Separation: are UI, logic, and data properly separated?
+- Testing: are all business logic functions unit-testable?
+- Naming: do proposed file names follow conventions?
+- Infrastructure: every cloud resource referenced in code has a provisioning step (if applicable)
+
+Mark each gate as ✅ or add a note if deviation is needed.
+
+### Step 6 — Generate Mermaid Diagrams
+
+#### Decision: Which diagrams to generate?
+
+| Condition | Gherkin | Mermaid |
+|---|---|---|
+| Feature has API calls or service interactions | ✅ Gherkin interaction scenarios (MANDATORY) | ✅ Sequence diagram (MANDATORY) |
+| Feature has an entity with multiple states | ✅ Gherkin state transition scenarios (MANDATORY) | ✅ State diagram (MANDATORY) |
+| Feature introduces new database tables | — | ✅ ER diagram only (no behavioral flow) |
+| Feature is UI-only with no state or API | Already in spec (Gherkin scenarios) | Only flowchart in spec (already done) |
+
+#### Sequence Diagrams
+- Map out every API call in the feature
+- Show happy path first, then error paths with `alt` blocks
+- Include all participants: User, Client, API, Database, external services
+- Show real-time events separately if applicable
+
+#### State Diagrams
+- Identify all states an entity can be in
+- Map transitions between states (what triggers each transition?)
+- Add notes explaining business rules for key states
+- Use `stateDiagram-v2` syntax
+
+#### ER Diagrams
+- Include all new tables introduced by the feature
+- Include existing tables that are JOINed or referenced
+- Show primary keys (PK), foreign keys (FK), and important fields
+- Show relationships with cardinality (||, |{, etc.)
+
+### Step 7 — Generate File-by-File Implementation Plan
+
+For each FR, map to specific files:
+
+0. **Infrastructure layer** (if detected) — provisioning commands, binding configuration, verification. Generates an "Infrastructure Setup" section in the plan before Step 1.
+1. **Database layer** — migrations, schema changes
+2. **Data access layer** — query functions
+3. **Business logic layer** — services
+4. **API layer** — routes, handlers
+5. **UI layer** — components, pages, hooks
+6. **Test files** — unit, integration, E2E
+
+**FR sub-task format:** Each FR mentioned in a step's `**FR covered:**` line must include a sequential sub-task number and a short description of the work done in that step:
+
+```markdown
+**FR covered:** FR-001.1: Schema creation, FR-003.1: Read status mutations
+```
+
+- Sub-task numbers increment per FR across the entire plan (e.g., FR-001.1 in Step 1, FR-001.2 in Step 3, FR-001.3 in Step 5)
+- Description is mandatory and must be < 50 characters
+- This enables the FR Dependency Graph playground to assign each sub-task to its correct step
+
+For each file:
+- State whether it's new or modified
+- List the functions/components to create
+- Reference which FR it satisfies
+
+<!-- @spec FR-001: Minimal spec scope, FR-002: Evidence class per step — .specs/features/090-minimal-plan-scope/spec.md#fr-001 -->
+**Minimal spec scope:** **Read** [minimal spec scope](../../../system/minimal-spec-scope.md) before writing steps. Plan only mechanisms that trace to an FR, an AC or a constitution rule; drop caches, retry layers, telemetry or abstractions nobody asked for, or keep one only as a justified technical necessity that names the requirement it serves.
+
+**Evidence class:** Each step may add one line `**Evidence class:** local` (default, omit it) or `**Evidence class:** release` when its proof needs release signing, a device fleet or production. Release evidence is pending during implementation and required by `/spec-ship`; split a step whose proof is partly local. `livespec validate <plan.md>` rejects an unknown class.
+
+### Step 7.5 — Test Resolution
+
+Before generating the testing strategy, resolve the project's test infrastructure:
+
+1. **Read `.specs/testing/strategy.md`** — check if test commands are already resolved
+2. **If not resolved**, follow the discovery procedure in `system/testing/discovery.md`:
+   - Detect language/runtime
+   - Detect test runners, linters, type checkers, visual testing tools
+3. **Verify availability** of detected tools
+4. **Record** resolved commands in the plan:
+
+| Action | Command | Tool | Status |
+|---|---|---|---|
+| Unit tests | `[resolved]` | `[resolved]` | Verified / Not verified |
+| Integration tests | `[resolved]` | `[resolved]` | Verified / Not verified |
+| E2E tests | `[resolved]` | `[resolved]` | Verified / Not available |
+| Visual tests | `[resolved]` | `[resolved]` | Verified / Not available |
+| Type check | `[resolved]` | `[resolved]` | Verified / N/A |
+| Lint | `[resolved]` | `[resolved]` | Verified / Not verified |
+| Full suite (only if concrete risk justifies it) | `[resolved]` | `[resolved]` | Verified / Not verified |
+
+5. If a tool is missing → mark `[TOOL NEEDED: install command]` in the plan
+
+### Step 7.6 — Theme Installation Step (UI features with theme)
+
+If `.specs/design/theme.css` exists and the feature has UI components:
+
+1. Check `.specs/design/theme.md` for an install command
+2. If an install command exists (Mode A/C themes), add a **Step 0** to the implementation plan before any UI work:
+
+   ```markdown
+   **Step 0 — Install Theme** (if not already installed)
+   - Check if `theme.css` is already imported in the project's global CSS
+   - If not: run `[install command from theme.md]` (e.g., `bunx shadcn@latest add <url>`)
+   - If install command is unavailable (Mode B): copy `.specs/design/theme.css` to the project's CSS directory and import it in the global stylesheet
+   - Verify: theme CSS variables are accessible in the browser dev tools
+   ```
+
+3. If no install command (Mode B — generated theme), the step instructs to copy the CSS file manually
+4. This step runs only once per project — subsequent features skip it if theme is already installed. Add a guard: "Skip if theme variables are already present in the project's CSS output"
+
+### Step 8 — Generate Testing Strategy
+
+Using the commands resolved in Step 7.5, map each test type to specific files based on `.specs/testing/strategy.md`:
+
+```markdown
+| Test Type | What | File | Command | FR/AC |
+|---|---|---|---|---|
+| Unit | getUnreadNotifications() | src/data/notifications.test.ts | `[resolved unit command] -- src/data/notifications.test.ts` | FR-001 |
+| Integration | GET /api/notifications | tests/api/notifications.test.ts | `[resolved integration command] -- tests/api/notifications.test.ts` | AC-001 |
+| E2E | Full notification flow | tests/e2e/notifications.spec.ts | `[resolved E2E command]` | AC-001, AC-002 |
+| Visual | Notification panel states | tests/e2e/notifications.spec.ts | `[resolved visual command]` | SC-004 |
+```
+
+### Step 9 — Generate API Contracts (if applicable)
+
+If the feature introduces new API endpoints:
+1. Create `.specs/features/NNN-feature-name/contracts/` directory
+2. Generate `openapi.yaml` with endpoint specifications
+3. Include request/response schemas based on the ER diagram
+
+### Step 9.5 — Update README.md
+
+Update the feature row in `.specs/README.md`:
+- Set Status to `Planned`
+- Update the `Updated` date to today
+
+Find the row by matching the feature number (column 1) between `<!-- readme:features:start -->` and `<!-- readme:features:end -->`.
+Update the `Last updated` date in the header.
+
+If `.specs/README.md` does not exist, create it by scanning existing artifacts (see spec-system.md README.md Recovery).
+
+### Step 9.6 — Update Changelog
+
+Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
+
+```markdown
+## YYYY-MM-DD — [Plan]: Technical plan generated
+
+- **Type:** Feature
+- **Spec modified:** No
+- **Code modified:** None (plan.md created)
+- **AC impacted:** None (pre-implementation)
+- **Author:** [tool name]
+```
+
+Also add a summary entry to `.specs/changelog.md` (global):
+`[Feature NNN] Plan created: [Feature Name] — N implementation steps, N diagrams`
+
+### Bound Penflow source review for visual features
+
+- Before first review, the existing C20 producer automatically calls `penflow authority prepare <contract> --project . --json`, checks its PASS/operation envelope and persists the returned prepared C20 at the same canonical path. Explicit test_id values are preserved; missing IDs are generated deterministically by Penflow. Never regenerate identities after approval as a validation repair. `review-snapshot` runs the real read-only `validate-flow-contract --require-test-ids` guard before publishing active inputs; failure leaves the review incomplete.
+
+- Declare `penflow_verification_policy` metadata in each concrete active plan, with the actual producing mode (`livespec` or `brainstorm_handoff`), version 1 and generated_docs/native_geometry/homologous_references/native_export set from the procedures actually chosen. Preserve every active plan's required procedures and authenticated inheritance; do not copy policy from candidate C20 or infer N/A from absent files. `review-snapshot` automatically archives the full active-plan union and generates its policy source; partial declarations block. No extra user document or flag is required.
+
+- Apply this bound review to visual work and any feature with accepted Penflow approval history, including an explicit visual retirement. Before dispatching the actual plan reviewer, finalize the selected feature FR/AC and the cumulative active canonical `penflow/flow-ui-contract/contract.json` requirements bindings/outcome predicates, then run `livespec penflow-contract review-snapshot --feature <feature_slug> --json`. Pass the complete returned immutable snapshot, every governed source and plan, active mappings/predicates and prior delta to that same reviewer; no extra full review or MockupFactory pass is required.
+- Persist the actual raw reviewer JSON, then automatically run `livespec penflow-contract review-result --snapshot <snapshot-path> --output <actual-reviewer-output-path> --json`; forward its returned immutable result path. The assembler preserves complete actual fields and never manufactures missing verdicts/findings/input hashes. A plain PASS, finalized registry receipt, skipped review or source reread after dispatch does not establish approval. **Read** [review approval](../../../system/testing/penflow-contract.md) for the versioned contract.
+- Return the actual bound result path in `PHASE_RESULT.extra.review_result_path` for the supervisor; do not reconstruct a successful result from a summary or registry receipt.
+- Record successful visual Plan Review with `livespec pipeline update --feature <feature_slug> --phase plan-review --status done --review-result <review_result_path>`. The command verifies the snapshot/current semantic identities and review result under the project lock, archives the approval and source baseline, then records Done. Preserve its output; failures leave the phase incomplete.
+- After approval of active visual work, reuse current visual evidence to produce `penflow run --target penflow --profile design --project . --json`, then require `livespec penflow-contract status --project . --required-profile design --feature <feature_slug> --json` to return PASS and certified true before application code. Source or mapping changes require the same bound review with the prior receipt and precise delta. Nonvisual planning without accepted Penflow history keeps its existing review path. An approved retirement follows nonvisual preparation without requesting C51 certification for the retired caller and keeps the former contract archived; cleanup of active UI evidence is required at nonvisual closure, not before its review. Per-feature retired_features preserves other active approvals; C51 evaluates selection minus retired_features, never a report-selected subset. When all are retired the projection is empty and cannot certify C51.
+
+### Step 9.7 — LLM Plan Review (default, unless `--no-review`)
+
+Unless the `--no-review` flag is set:
+
+1. Read the generated `plan.md` content
+2. Load reviewer models from `.specs/semantic/config.yaml` → `review_reviewers` list
+3. If no reviewers configured, use the provider's default model
+4. Prepare complete plan review context and ingest actual raw reviewer JSON through the shared protocol. Native and provider transports use the same qualified inventory, exact citations and strict completeness checks; preserve the additional Penflow bound review when applicable.
+5. Display findings inline with severity markers:
+   ```
+   Plan Review (google/gemini-3.1-pro):
+     [ERROR] Coverage gap: AC-003 has no corresponding implementation step
+       → Add a step covering notification preferences (FR-005)
+     [WARNING] Ordering: Step 3 depends on Step 5's migration output
+       → Move database migration before business logic layer
+     Confidence: 4/5 | Findings: 2 | Complexity: 6 FR, 9 files, 5 AC, 3 diagrams
+   ```
+6. If `--all-reviewers` is set and multiple reviewers are configured, run each reviewer sequentially and display all findings
+7. If confidence is low (< threshold) and findings are empty, display warning:
+   ```
+   ⚠ Review suspiciously empty for a plan of this complexity. Consider using a different reviewer model.
+   ```
+
+**On findings — correction behavior:**
+
+- **`[ERROR]` / BLOCKING findings:** Regenerate `plan.md` with the findings injected as hard constraints (max 2 retries). On each retry, re-run the review. Only blockers trigger a retry: ingestion reports `round` and `round_cap_reached` (feature 088). If BLOCKING findings remain after 2 retries (`round_cap_reached: true`) → display all remaining findings and stop with:
+  ```
+  ⚠ Plan still has blocking issues after 2 correction attempts. Review manually then re-run /spec-plan.
+  ```
+- **`[WARNING]` / `[INFO]` findings only:** Display findings and proceed. These are informational — no regeneration triggered. Address the spec review `carry_over` items in the plan, and pass the plan review `carry_over` items to `/spec-implement`.
+- **PASS:** Require the validated receipt to be complete and ready. Missing or contradictory obligations, critically ambiguous obligations, unapproved business scope and stale inputs block even when a display summary is empty.
+
+### Step 9.8 — Structural Validation
+
+After generating `plan.md`, validate its structure:
+
+```bash
+livespec validate .specs/features/NNN-feature-name/plan.md --format compact
+```
+
+**Exit 0:** proceed to plan gate.
+
+**Exit non-zero:** inject verbatim errors:
+
+> "The plan.md you just generated failed structural validation. Regenerate plan.md fixing these issues:
+> `<livespec validate --format compact output verbatim>`"
+
+Regenerate `plan.md` (spec.md + constitution + stack + error constraints). **Maximum 2 retries.** On 3rd failure:
+```
+ABORT: "plan.md failed structural validation after 2 retries.
+        Last errors: <livespec validate output>"
+```
+
+### Step 10 — Present for Approval
+
+> ✅ **Plan generated:** `.specs/features/004-notifications/plan.md`
+>
+> **Summary:**
+> - 2 sequence diagrams (notification fetch, mark as read)
+> - 1 state diagram (notification lifecycle)
+> - 1 ER diagram (2 new tables: notifications, notification_preferences)
+> - 7 implementation steps across 9 files
+> - API contract: `contracts/openapi.yaml`
+>
+> **Constitution check:** All gates ✅
+>
+> Ready to implement? Run: `/spec-implement notifications`
+> Or review the plan first in `.specs/features/004-notifications/plan.md`
+
+---
+
+## Output
+
+```
+.specs/features/004-notifications/
+├── spec.md          ← Existing (read-only during plan)
+├── plan.md          ← Generated now
+└── contracts/
+    └── openapi.yaml ← Generated if API endpoints exist
+```
+
+---
+
+
+## Penflow C51 stage contract
+
+Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
+This command prepares inputs and reports inspection readiness. Do not require a runtime report or build manifest before the producing/test stages. A revalidation of an already Implemented UI feature through finalize verify must receive the existing independent runner manifest; absence blocks that certification only.
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal
+
+- [always] Render the goal via `livespec goal render spec-plan --save` when the run requires one <!-- evidence:documentary -->
+- [always] Mirror the goal in the native goal tool when available (optional; warn and continue otherwise) <!-- evidence:documentary -->
+
+### Phase 1 — Resolve Feature
+
+- [always] Resolve feature by name, git branch, or first Draft without plan.md <!-- evidence:documentary -->
+- [always] Verify spec.md exists for target feature <!-- evidence:documentary -->
+
+### Phase 2 — Read Context
+
+- [always] Read spec.md, constitution.md, stacks/_default.md, testing/strategy.md, project.md <!-- evidence:documentary -->
+- [visual] Read mockup PNGs from .specs/design/screens/ and generate Design Reference section <!-- evidence:documentary -->
+- [visual] Read theme.css and theme.md if they exist <!-- evidence:documentary -->
+- [penflow] Run Penflow forward contract if penflow/ is absent for UI feature <!-- evidence:documentary -->
+- [penflow] Read penflow/semantic-ui-tree.json and penflow/code-ir.json <!-- evidence:documentary -->
+
+### Phase 3 — Analyze Requirements
+
+- [always] Extract all FR, AC, key entities, API interactions, state entities, infra dependencies <!-- evidence:documentary -->
+- [always] Classify feature size (S/M/L) and apply output budget <!-- evidence:documentary -->
+
+### Phase 4 — Generate Technical Context
+
+- [always] Auto-fill stack table from stacks/_default.md <!-- evidence:documentary -->
+
+### Phase 5 — Constitution Check
+
+- [always] Verify planned approach against each constitution principle <!-- evidence:documentary -->
+
+### Phase 6 — Generate Diagrams
+
+- [always] Determine which diagram types apply (sequence, state, ER) <!-- evidence:documentary -->
+- [always] Generate Mermaid sequence diagram if feature has API interactions <!-- evidence:documentary -->
+- [always] Generate Mermaid state diagram if feature has stateful entities <!-- evidence:documentary -->
+- [always] Generate ER diagram if feature introduces new database tables <!-- evidence:documentary -->
+
+### Phase 7 — File-by-File Plan
+
+- [always] Map each FR to concrete files by layer (infra, db, data, logic, API, UI, tests) <!-- evidence:documentary -->
+- [always] Write FR sub-task numbers and descriptions for each step <!-- evidence:documentary -->
+- [always] Resolve test commands and record in Resolved Test Commands table <!-- evidence:documentary -->
+- [always] Translate native QE risks into gates, test levels, proof artifacts, and evidence gaps <!-- evidence:documentary -->
+- [visual] Add theme installation Step 0 to plan if theme.css exists <!-- evidence:documentary -->
+- [always] Map each test type to specific files and FR/AC <!-- evidence:documentary -->
+
+### Phase 8 — Contracts and Sync
+
+- [always] Generate openapi.yaml if feature introduces new API endpoints <!-- evidence:documentary -->
+- [always] Update .specs/README.md feature row Status to Planned <!-- evidence:documentary -->
+- [always] Add plan entry to feature changelog.md and global .specs/changelog.md <!-- evidence:documentary -->
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation <!-- evidence:documentary -->
+- [always] Apply the minimal spec scope rule and declare `**Evidence class:** release` only on steps whose proof needs signing, a device fleet or production <!-- evidence:documentary -->
+- [always] Run LLM plan review unless --no-review; retry on blocking findings <!-- evidence:review review-kind:plan -->
+- [always] Run `livespec validate` structural validation; retry on failure <!-- evidence:documentary -->
+
+### Phase 9 — Present for Approval
+
+- [always] Display plan summary with diagram count, step count, and next action <!-- evidence:documentary -->
+
+## Definition of Done (Command-Level)
+
+`/spec-plan` is complete only if all are true:
+
+- [ ] `plan.md` generated in target feature directory <!-- evidence:documentary -->
+- [ ] Every FR appears in implementation plan mapping <!-- evidence:documentary -->
+- [ ] Diagram set matches feature size — Gherkin scenarios paired with Mermaid diagrams (except ER) <!-- evidence:documentary -->
+- [ ] If spec has Infrastructure Requirements: plan includes Infrastructure Setup section with provisioning and verification for every listed resource <!-- evidence:documentary -->
+- [ ] Constitution check contains explicit pass/deviation notes <!-- evidence:documentary -->
+- [ ] Test commands are resolved (Resolved Test Commands table filled) <!-- evidence:documentary -->
+- [ ] Testing strategy maps AC/FR to concrete test files <!-- evidence:documentary -->
+- [ ] `.specs/README.md` feature row Status is `Planned` <!-- evidence:documentary -->
+- [ ] Feature `changelog.md` has a plan entry <!-- evidence:documentary -->
+- [ ] Global `.specs/changelog.md` has a summary entry <!-- evidence:documentary -->
+- [ ] Next action is proposed (`/spec-implement [feature]`) <!-- evidence:documentary -->
+
+If a requirement cannot be planned safely, mark it `[DECISION NEEDED]` with owner and unblock options.
+
+---
+
+*LiveSpec Command v1.0*

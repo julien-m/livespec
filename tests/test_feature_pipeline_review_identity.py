@@ -1,3 +1,4 @@
+# Feature122: verify retained historical certification contracts.
 """Documented pipeline transitions preserve the caller's current review identity."""
 
 import re
@@ -13,7 +14,7 @@ from tests.review_support import grounded_response, reviewed_project
 from validator.cli import app
 from validator.semantic.review_api import ingest_feature_review, prepare_feature_review
 
-SKILL = Path(__file__).parents[1] / ".agent-sync/skills/spec-feature/SKILL.md"
+SKILL = Path(__file__).parents[1] / ".agent-sync/skills/spec-feature/certification.md"
 
 
 def _documented_command(phase: str, model: str, budget: int | None) -> list[str]:

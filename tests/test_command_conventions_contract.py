@@ -23,7 +23,7 @@ _INVOCATION = re.compile(r"`(livespec conventions [^`]+)`")
 def _documented_invocations() -> list[tuple[str, str]]:
     return [
         (skill.parent.name, match.group(1))
-        for skill in sorted(SKILLS_DIR.glob("*/SKILL.md"))
+        for skill in sorted(SKILLS_DIR.glob("*/certification.md"))
         for match in _INVOCATION.finditer(skill.read_text(encoding="utf-8"))
     ]
 

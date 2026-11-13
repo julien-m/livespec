@@ -1,3 +1,4 @@
+# Feature122: historical certification assertions target the preserved diagnostic sources.
 # @spec(AC-006)
 # @spec(AC-007)
 # @spec(AC-008)
@@ -31,7 +32,7 @@ def test_expectations_require_conventions_receipt_verdict_rule() -> None:
 
 def test_final_command_skills_verify_conventions_before_phase_result() -> None:
     for command in ("spec-implement", "spec-test", "spec-fix"):
-        text = _text(f".agent-sync/skills/{command}/SKILL.md")
+        text = _text(f".agent-sync/skills/{command}/certification.md")
         assert "livespec conventions verify --json --feature <slug>" in text
         assert "receipt_path" in text
         assert "conventions_receipt_path" in text
@@ -41,7 +42,7 @@ def test_final_command_skills_verify_conventions_before_phase_result() -> None:
 
 
 def test_spec_fix_documents_conventions_burndown_mode() -> None:
-    text = _text(".agent-sync/skills/spec-fix/SKILL.md")
+    text = _text(".agent-sync/skills/spec-fix/certification.md")
 
     assert "--conventions" in text
     assert "debt.json" in text
@@ -52,8 +53,8 @@ def test_spec_fix_documents_conventions_burndown_mode() -> None:
 
 
 def test_agent_prompts_treat_conventions_gate_as_blocking() -> None:
-    verifier = _text(".agent-sync/agents/livespec-verifier/prompt.md")
-    supervisor = _text(".agent-sync/agents/livespec-supervisor/prompt.md")
+    verifier = _text(".agent-sync/agents/livespec-verifier/certification.md")
+    supervisor = _text(".agent-sync/agents/livespec-supervisor/certification.md")
 
     assert "conventions gate failure is BLOCKING when gates file exists" in verifier
     assert "conventions receipt PASS (repo scope) is a hard gate" in supervisor
@@ -80,7 +81,7 @@ def test_evidence_first_retry_contract_is_documented_for_goal_locked_commands() 
         "spec-plan",
         "spec-test",
     ):
-        text = _text(f".agent-sync/skills/{command}/SKILL.md")
+        text = _text(f".agent-sync/skills/{command}/certification.md")
         assert "Evidence-First Retry Contract" in text
         assert "retry_hypothesis" in text
         assert "retry_evidence" in text

@@ -162,7 +162,11 @@ def _step0(text: str) -> str:
 
 def _skill_violations(skill: Path) -> list[str]:
     name = skill.parent.name
-    text = skill.read_text(encoding="utf-8")
+    text = (
+        skill.with_name("certification.md")
+        if skill.with_name("certification.md").exists()
+        else skill
+    ).read_text(encoding="utf-8")
     forbidden = ("ABSOLU", "/goal clear", "/goal slash command unavailable", "active goal exists")
     problems = [f"{name}: {token}" for token in forbidden if token in text]
     step0 = _step0(text)
@@ -239,7 +243,16 @@ def test_runtime_goal_prompt_is_short_and_neutral() -> None:
     long_steps = [
         skill.parent.name
         for skill in SKILLS.glob("spec-*/SKILL.md")
-        if len(_step0(skill.read_text(encoding="utf-8")).splitlines()) > 20
+        if len(
+            _step0(
+                (
+                    skill.with_name("certification.md")
+                    if skill.with_name("certification.md").exists()
+                    else skill
+                ).read_text(encoding="utf-8")
+            ).splitlines()
+        )
+        > 20
     ]
     prompt_problems += [f"long STEP 0: {name}" for name in long_steps]
     docs = {
