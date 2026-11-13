@@ -63,6 +63,10 @@ A fresh native reviewer examines the complete change, relevant existing code, fi
 
 Read [the default delivery policy](system/review-led-delivery.md) for the complete workflow. Former skill bodies are retained as `certification.md` beside each compact skill for explicit historical diagnostics. `livespec goal`, `validate`, `conventions`, Penflow and other diagnostic CLI commands keep their real exit codes and historical semantics; they are no longer automatic prerequisites of skill delivery. Existing histories are preserved, and active missions are not silently migrated.
 
+## Historical goal diagnostics
+
+Explicit `livespec goal` diagnostics retain an outcome goal with an executable stop condition and their original receipt contracts. They inspect historical runs on request; standard review-led delivery does not create or prove these goals automatically.
+
 ## Conventions
 
 Load and apply the project's conventions to the changed code. Useful deterministic checks inform the final review. An optional explicit `livespec conventions verify --report` provides a diagnostic report; its certificate is not a mandatory delivery gate. The final reviewer checks architecture, file placement, maintainability and concrete security risks.

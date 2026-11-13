@@ -1,3 +1,4 @@
+# Feature122: verify retained historical certification contracts.
 """Generated-source syntax validation cannot execute test, import or startup hooks."""
 
 import json
@@ -15,7 +16,7 @@ from tests.goal_checklist_support import checklist_tasks
 from tests.test_command_preview_obligations import ROOT, _goal
 from validator.goal_contracts import render_goal_contract_file
 
-SKILL = ROOT / ".agent-sync/skills/spec-test/SKILL.md"
+SKILL = ROOT / ".agent-sync/skills/spec-test/certification.md"
 TYPESCRIPT_COMPILER = ROOT / "node_modules/typescript/lib/typescript.js"
 
 

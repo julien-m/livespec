@@ -1,3 +1,4 @@
+# Feature122: verify retained historical certification contracts.
 """Filtered repairs cannot substitute another accepted execution or mutate during previews."""
 
 import json
@@ -97,7 +98,7 @@ def test_documented_fix_runner_invocation_executes_real_tests(
     project: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(project)
-    text = (ROOT / ".agent-sync/skills/spec-fix/SKILL.md").read_text()
+    text = (ROOT / ".agent-sync/skills/spec-fix/certification.md").read_text()
     command = re.search(r"`(livespec test [^`]+)`", text)
     assert command is not None
     argv = command[1].replace("<feature>", FEATURE).replace("<mapping-path>", "mapping.json")

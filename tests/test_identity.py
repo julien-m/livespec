@@ -154,7 +154,7 @@ class TestSlugRegex:
     def test_spec_check_contract_uses_subfeature_regex(self) -> None:
         """Spec-check and activation docs use the canonical sub-feature regex."""
         repo_root = Path(__file__).resolve().parents[1]
-        spec_check = repo_root / ".agent-sync" / "skills" / "spec-check" / "SKILL.md"
+        spec_check = repo_root / ".agent-sync" / "skills" / "spec-check" / "certification.md"
         activation_contract = repo_root / "system" / "activation-contract.md"
 
         assert SLUG_REGEX.pattern in spec_check.read_text(encoding="utf-8")

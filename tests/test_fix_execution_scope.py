@@ -1,3 +1,4 @@
+# Feature122: verify retained historical certification contracts.
 """Fix commands require current readiness and prove only their actual execution scope."""
 
 from pathlib import Path
@@ -11,7 +12,7 @@ from validator.evidence_policy import typed_evidence_missing
 from validator.goal_contracts import compile_command_goal
 
 ROOT = Path(__file__).parents[1]
-SKILL = ROOT / ".agent-sync/skills/spec-fix/SKILL.md"
+SKILL = ROOT / ".agent-sync/skills/spec-fix/certification.md"
 
 
 # --ac/--fr/--visual/--functional share one filtered branch; --resume must stay feature-wide.

@@ -1,3 +1,4 @@
+# Feature122: verify retained historical certification contracts.
 # LiveSpec traceability anchors
 # @spec(AC-001)
 # @spec(AC-002)
@@ -128,10 +129,10 @@ def test_spec_init_expectations_require_autonomous_from_code_completion() -> Non
 
 
 def test_visual_feature_pipeline_requires_forward_penflow_generation() -> None:
-    feature = _read(".agent-sync/skills/spec-feature/SKILL.md")
-    specify = _read(".agent-sync/skills/spec-specify/SKILL.md")
-    plan = _read(".agent-sync/skills/spec-plan/SKILL.md")
-    implement = _read(".agent-sync/skills/spec-implement/SKILL.md")
+    feature = _read(".agent-sync/skills/spec-feature/certification.md")
+    specify = _read(".agent-sync/skills/spec-specify/certification.md")
+    plan = _read(".agent-sync/skills/spec-plan/certification.md")
+    implement = _read(".agent-sync/skills/spec-implement/certification.md")
 
     for body in (feature, specify, plan, implement):
         assert "From-Scratch Penflow Forward Contract" in body
@@ -157,7 +158,7 @@ def test_visual_feature_pipeline_requires_forward_penflow_generation() -> None:
 
 
 def test_spec_feature_blocks_specify_until_penflow_preparation_ready() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert "Phase 0.5 is a synchronous hard gate" in body
     assert (
@@ -175,7 +176,7 @@ def test_spec_feature_blocks_specify_until_penflow_preparation_ready() -> None:
 
 
 def test_spec_feature_initializes_pipeline_with_atomic_flags_and_description() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert (
         'livespec pipeline init --feature NNN-feature-name --description "<original feature '
@@ -186,7 +187,7 @@ def test_spec_feature_initializes_pipeline_with_atomic_flags_and_description() -
 
 
 def test_spec_feature_phase_35_requires_runtime_penflow_evidence_before_done() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert "Phase 3.5 Runtime Evidence Gate" in body
     assert (
@@ -208,7 +209,7 @@ def test_spec_feature_phase_35_requires_runtime_penflow_evidence_before_done() -
 
 
 def test_spec_test_documents_web_runtime_adapter_for_actual_ui_tree() -> None:
-    body = _read(".agent-sync/skills/spec-test/SKILL.md")
+    body = _read(".agent-sync/skills/spec-test/certification.md")
 
     assert "Web Runtime Adapter" in body
     assert "real browser at `1440x900`" in body
@@ -234,7 +235,7 @@ def test_spec_test_documents_web_runtime_adapter_for_actual_ui_tree() -> None:
 
 
 def test_visual_feature_pipeline_loads_design_conventions_before_ui_work() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert "Convention Gate" in body
     assert "livespec conventions refresh --repo . --full" in body
@@ -249,7 +250,7 @@ def test_visual_feature_pipeline_loads_design_conventions_before_ui_work() -> No
 
 
 def test_visual_feature_pipeline_requires_feature_local_design_proofs() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert ".specs/features/<feature_slug>/design/flow-ui-contract/" in body
     assert ".specs/features/<feature_slug>/design/ui.pen" not in body
@@ -273,7 +274,7 @@ def test_spec_migrate_documents_planner_and_penflow_backfill_metadata() -> None:
 
 
 def test_visual_feature_pipeline_promotes_penflow_to_global_design_registry() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
     expectations = _read(".agent-sync/skills/spec-feature/expectations.md")
 
     for text in (body, expectations):
@@ -291,7 +292,7 @@ def test_visual_feature_pipeline_promotes_penflow_to_global_design_registry() ->
 
 
 def test_spec_feature_requires_mockup_factory_before_code() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
     expectations = _read(".agent-sync/skills/spec-feature/expectations.md")
 
     for text in (body, expectations):
@@ -310,7 +311,7 @@ def test_spec_feature_requires_mockup_factory_before_code() -> None:
 
 
 def test_spec_test_requires_global_design_registry_for_penflow_visual_runs() -> None:
-    body = _read(".agent-sync/skills/spec-test/SKILL.md")
+    body = _read(".agent-sync/skills/spec-test/certification.md")
     expectations = _read(".agent-sync/skills/spec-test/expectations.md")
 
     for text in (body, expectations):
@@ -332,7 +333,7 @@ def test_spec_test_requires_global_design_registry_for_penflow_visual_runs() -> 
 
 
 def test_spec_test_requires_mockup_factory_proof_for_penflow_visual_runs() -> None:
-    body = _read(".agent-sync/skills/spec-test/SKILL.md")
+    body = _read(".agent-sync/skills/spec-test/certification.md")
     expectations = _read(".agent-sync/skills/spec-test/expectations.md")
 
     for text in (body, expectations):
@@ -347,7 +348,7 @@ def test_spec_test_requires_mockup_factory_proof_for_penflow_visual_runs() -> No
 
 
 def test_spec_feature_requires_binding_safe_penflow_screen_ids() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert "binding-safe snake_case screen IDs" in body
     assert "Do not use kebab-case screen IDs" in body
@@ -360,7 +361,7 @@ def test_spec_feature_requires_binding_safe_penflow_screen_ids() -> None:
 
 
 def test_spec_feature_requires_desktop_viewport_and_non_visual_modal_transitions() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert "`platform: web-desktop`" in body
     assert '`viewport: "1440x900"`' in body
@@ -370,7 +371,7 @@ def test_spec_feature_requires_desktop_viewport_and_non_visual_modal_transitions
 
 
 def test_spec_feature_blocks_instead_of_manual_penflow_fallback() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert "/Users/julienm/projects/penflow/.venv/bin/penflow" in body
     assert "penflow_cli_missing" in body
@@ -378,7 +379,7 @@ def test_spec_feature_blocks_instead_of_manual_penflow_fallback() -> None:
 
 
 def test_spec_feature_auto_mode_does_not_commit_without_explicit_authorization() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
     expectations = _read(".agent-sync/skills/spec-feature/expectations.md")
 
     assert (
@@ -405,7 +406,7 @@ def test_spec_feature_auto_mode_does_not_commit_without_explicit_authorization()
 
 
 def test_spec_feature_recovers_when_phase_agent_writes_artifact_without_result() -> None:
-    body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+    body = _read(".agent-sync/skills/spec-feature/certification.md")
 
     assert "Phase Agent Timeout and Artifact Recovery" in body
     assert "plan.md exists but no PHASE_RESULT" in body
@@ -419,11 +420,11 @@ def test_spec_feature_recovers_when_phase_agent_writes_artifact_without_result()
 
 
 def test_ui_commands_reference_penflow_contract_artifacts() -> None:
-    specify = _read(".agent-sync/skills/spec-specify/SKILL.md")
-    plan = _read(".agent-sync/skills/spec-plan/SKILL.md")
-    implement = _read(".agent-sync/skills/spec-implement/SKILL.md")
-    test = _read(".agent-sync/skills/spec-test/SKILL.md")
-    check = _read(".agent-sync/skills/spec-check/SKILL.md")
+    specify = _read(".agent-sync/skills/spec-specify/certification.md")
+    plan = _read(".agent-sync/skills/spec-plan/certification.md")
+    implement = _read(".agent-sync/skills/spec-implement/certification.md")
+    test = _read(".agent-sync/skills/spec-test/certification.md")
+    check = _read(".agent-sync/skills/spec-check/certification.md")
 
     assert "penflow/semantic-ui-tree.json" in specify
     assert "flow_id" in specify and "screen_id" in specify
@@ -451,7 +452,7 @@ def test_command_expectations_include_penflow_verdicts() -> None:
 
 
 def test_plan_binds_review_before_design_certification() -> None:
-    body = _read(".agent-sync/skills/spec-plan/SKILL.md")
+    body = _read(".agent-sync/skills/spec-plan/certification.md")
     gate = body[body.index("### Bound Penflow source review") : body.index("### Step 9.7")]
     assert gate.index("review-snapshot") < gate.index("--review-result")
     assert gate.index("--review-result") < gate.index("--profile design")

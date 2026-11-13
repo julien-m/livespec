@@ -1,3 +1,4 @@
+# Feature122: verify retained historical certification contracts.
 """Rendered visual fix contracts keep inspection separate from authorized mutation."""
 
 import json
@@ -67,7 +68,7 @@ def test_visual_mutation_obligations_only_apply_to_executable_repairs(
 
 
 def test_visual_fix_branch_documentation_covers_all_used_tags() -> None:
-    text = (ROOT / ".agent-sync/skills/spec-fix/SKILL.md").read_text()
+    text = (ROOT / ".agent-sync/skills/spec-fix/certification.md").read_text()
     inventory = text.split("## Execution Tasks", 1)[1].split("\n## ", 1)[0]
     legend = inventory.split("### Phase 0", 1)[0]
     # Every branch tag used by an inventory row must be explained in the legend above it.
