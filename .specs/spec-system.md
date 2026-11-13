@@ -1,3 +1,5 @@
+> For normal feature delivery, read [review led delivery](../system/review-led-delivery.md) first. Its useful-checks and one-native-final-review policy takes precedence over former certification prerequisites in this project copy. Historical diagnostics retain their actual results.
+
 <!-- LiveSpec traceability anchors -->
 <!-- @spec(FR-005) -->
 <!-- @spec(FR-009) -->
