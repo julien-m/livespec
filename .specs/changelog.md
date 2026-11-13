@@ -3,7 +3,7 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-11-04
+> Last updated: 2026-11-13
 
 ---
 
@@ -1129,4 +1129,4 @@ Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/
 
 ## 2026-11-13 — Feature122: Review Led Delivery
 
-- Implement the short delivery workflow and preserve historical diagnostics. Read [the feature](features/122-review-led-delivery/spec.md) and [migration plan](../docs/review-led-migration.md).
+- Publish the reviewed short delivery workflow, preserve historical diagnostics and verify the adapted installed pair in a consumer. Read [the feature](features/122-review-led-delivery/spec.md) and [migration plan](../docs/review-led-migration.md).

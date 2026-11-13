@@ -6,5 +6,5 @@
 | 2 | Goal diagnostic source selection | Complete | Two regression tests pass |
 | 3 | Policy, routing and documentation | Complete | Independent final review favorable |
 | 4 | Migration procedure | Complete | Independent review; preserve newer consumer fixes |
-| 5 | Main publication and installed verification | In Progress | Local tests and public integration in progress |
-| 6 | Atlas reload and actual continuation | Pending | Only after published/installed validation |
+| 5 | Main publication and installed verification | Complete | PR56 merged; all code CI green; adapted installed pair tested |
+| 6 | Atlas reload and actual continuation | Complete | Atlas reloaded, recorded explicit adoption and applied its next real product correction; A1 product checks remain separate |

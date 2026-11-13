@@ -7,18 +7,18 @@
 | FR-001 | `.agent-sync/skills/spec-*/SKILL.md`, `.agent-sync/agents/livespec-*/prompt.md`, `system/review-led-delivery.md` | FR-001 | Implemented, independently reviewed | 2026-11-13 |
 | FR-002 | `validator/goal_payload.py`, retained certification.md files | FR-002 | Two compatibility tests pass | 2026-11-13 |
 | FR-003 | `.agent-sync/rules/livespec/`, five system entry points, README | FR-003 | Independently reviewed | 2026-11-13 |
-| FR-004 | `docs/review-led-migration.md` | FR-004 | Plan reviewed; live migration pending | 2026-11-13 |
+| FR-004 | `docs/review-led-migration.md` | FR-004 | Plan reviewed; installed pair selected and reloaded in Atlas | 2026-11-13 |
 
 ## Acceptance Criteria Mapping
 
 | AC | Test File / Observation | Status |
 |---|---|---|
 | AC-001 | Short skill/policy inspection and final independent review | Reviewed |
-| AC-002 | Explicit failure and missing-observation rules in shared policy | Reviewed; real consumer run pending |
+| AC-002 | Explicit failure and missing-observation rules in shared policy | Installed Penflow check retains a real comparison FAIL and missing runtime observations |
 | AC-003 | Four native role prompt inspection and independent final review | Reviewed |
 | AC-004 | `tests/test_review_led_delivery_diagnostics.py` | 2 passed in0.30s |
-| AC-005 | Official isolated provider projection from local source | 24 entry points inspected; public installed run pending |
-| AC-006 | Migration plan | Reviewed; Atlas adoption pending |
+| AC-005 | Official isolated provider projection from local source | 24 isolated entry points inspected;20 live project skills and4global bootstrap links verified |
+| AC-006 | Migration plan | Atlas safe checkpoint, supported upgrade and policy reload observed |
 
 ## Files Created/Modified
 
@@ -26,7 +26,7 @@ Ten compact skills, four role prompts,14 original public archives, routing, syst
 
 ## Verification
 
-Ruff check/format pass on changed Python files. Public-port independent review: no material finding. Full local suite in progress; its actual result and later installed/Atlas observations will be recorded without relabeling failures.
+Ruff check/format pass on changed Python files. Public-port independent review: no material finding. Public PR56 merged to main after Unit, Integration3A, Vitest observer, five visual-target and CodeQL checks passed. The full local public attempt timed out and is not presented as green. Consumer adaptation retains its newer runtime/SDK fixes;27targeted LiveSpec checks and2013Penflow tests pass (2skipped). Installed pair: bound interpreter, no workspace writes, actual comparison FAIL retained. Atlas confirmed a safe checkpoint, selected the pair through the supported command, reloaded the new skills, retained mission history and resumed a real one-line font-source correction without the former certification chain. Product feature A1 remains open until its real rendered/native checks and review; this tool feature does not certify that product.
 
 ## Exact implementation inventory
 
