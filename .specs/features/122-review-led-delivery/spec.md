@@ -4,7 +4,7 @@ priority: P1
 feature: 122-review-led-delivery
 status: Implemented
 created: 2026-11-13
-updated: 2026-11-13
+updated: 2026-11-14
 ---
 
 # Feature Spec: Review Led Delivery
@@ -21,6 +21,8 @@ updated: 2026-11-13
 ## Scope
 
 The default skill workflow supersedes automatic certification prerequisites of earlier features for standard delivery only. Explicit historical CLI diagnostics retain their original results and contracts. Existing evidence is never rewritten. The identity122 continues the locally prepared feature; unpublished identifiers are not reallocated.
+
+The 2026-11-14 follow-up makes useful native delegation automatic within that same delivery policy, including independent tasks/features and shared-canvas work. It adds no scheduler runtime, command or persisted state.
 
 ## User Scenarios & Testing
 
@@ -45,6 +47,15 @@ Feature: Review led delivery
     When it adopts review led delivery at a safe checkpoint
     Then those fixes and historical records are preserved
     And the coordinator reloads the new instructions explicitly
+  Scenario: Ready independent work is dispatched automatically
+    Given a feature has independent tasks with stable inputs and permitted native delegation
+    When the coordinator starts or resumes the feature
+    Then it dispatches ready workers without another opt-in
+    And it coordinates shared edits and one final feature review
+  Scenario: Parallelism preserves scope
+    Given a plan-only request or an explicit single-agent restriction
+    When the coordinator considers delegation
+    Then its tasks preserve that restriction and do not start unauthorized implementation
 ```
 
 ```mermaid
@@ -75,16 +86,19 @@ Project skill projections and copied native roles resolve the shared policy corr
 ### AC-006
 The documented migration preserves consumer-specific fixes, accepted decisions, private data and historical verdicts, provides rollback and verifies the actual selected runtime.
 
+### AC-007
+Every feature automatically dispatches useful ready independent work within actual native capacity and authority. Briefs define ownership, inputs, conventions, tools and evidence; the coordinator integrates shared changes and one final review. Independent selected features in an authorized batch or program/goal/backlog may advance together, including in authorized worktrees based on actual accepted source rather than an obsolete Git HEAD. Shared pen.dev work stays in one product canvas with disjoint ownership. Indivisible tasks, missing delegation capabilities, read-only scopes, requested models/roles and actual refusals remain explicit without an agent-count gate.
+
 ## Functional Requirements
 
 ### FR-001
-Replace twelve default skills and four native role prompts with the shared review-led workflow. Covers AC-001, AC-003 and AC-005.
+Replace twelve default skills and four native role prompts with the shared review-led workflow, including automatic useful delegation for every feature. Covers AC-001, AC-003, AC-005 and AC-007.
 
 ### FR-002
 Preserve original command/role bodies as explicit certification diagnostics and select the archived command inventory in goal compilation. Covers AC-004.
 
 ### FR-003
-Update routing, system entry points and documentation so script results inform review instead of automatically blocking progression. Covers AC-001 and AC-002.
+Update routing, system entry points and documentation so script results inform review instead of automatically blocking progression, and ready independent work does not wait for a manual parallelism opt-in. Covers AC-001, AC-002 and AC-007.
 
 ### FR-004
 Document and verify safe migration without consumer downgrade or retrospective certification. Covers AC-005 and AC-006.

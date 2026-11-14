@@ -648,51 +648,30 @@ LiveSpec separates **format** from **automation**:
 
 ## Multi-Agent Mode (default)
 
-`/spec-implement` uses multi-agent orchestration by default — a supervisor acts as **Orchestrator/Translator**, building a Task Payload per step and delegating execution to the `superpowers:subagent-driven-development` skill:
+Every feature automatically uses available native subagents for ready independent tasks through [the shared delivery policy](system/review-led-delivery.md#automatic-useful-parallelism). The coordinator identifies dependencies and ownership, dispatches useful work without another opt-in, and integrates the results. Small indivisible work runs directly with a brief concrete reason; no agent-count target or new certification gate is imposed.
 
 ```mermaid
-flowchart TD
-    SUP["SUPERVISOR\n(Orchestrator / Translator)"]
-
-    SUP -->|"Task Payload\n(FR/AC, TDD, @spec rules)"| SPW
-    SUP -->|"Checkpoint\nafter each step"| DOC
-
-    subgraph SPW ["Superpowers: Subagent-Driven Dev"]
-        IMP["Implementer\n(TDD, @spec anchors)"]
-        SR["Spec Reviewer\n(FR/AC coverage)"]
-        QR["Quality Reviewer\n(tests + code quality)"]
-        IMP --> SR --> QR
-    end
-
-    subgraph DOC ["Documenter"]
-        PROG["progress.md"]
-        IMPL["implementation.md"]
-        CL["changelog.md"]
-    end
-
-    style SUP fill:#fff3e0,stroke:#FF9800
-    style IMP fill:#e8f4f8,stroke:#2196F3
-    style SR fill:#e8f4f8,stroke:#2196F3
-    style QR fill:#e8f4f8,stroke:#2196F3
-    style PROG fill:#f3e5f5,stroke:#9C27B0
-    style IMPL fill:#f3e5f5,stroke:#9C27B0
-    style CL fill:#f3e5f5,stroke:#9C27B0
+flowchart LR
+    COORD[Coordinator] --> BACK[Backend and API worker]
+    COORD --> UI[UI or canvas worker]
+    COORD --> CHECK[Independent checks worker]
+    BACK --> INT[Coordinated integration]
+    UI --> INT
+    CHECK --> INT
+    INT --> REVIEW[One final review per feature]
 ```
 
 ```bash
-# Multi-agent implementation (default)
+# Automatic useful parallelism (default)
 /spec-implement notifications
-
-# Single-agent mode (original APEX pipeline)
-/spec-implement notifications --mono
 
 # Resume an interrupted run
 /spec-implement notifications --resume
 ```
 
-**Per-step cycle:** Supervisor builds Task Payload (FR/AC context, TDD commands, `@spec` rules, Definition of Done) → dispatches to `superpowers:subagent-driven-development` → Documenter writes `progress.md` checkpoint. Superpowers handles the full TDD loop, spec compliance review, and code quality review with isolated subagents (no context pollution).
+Worker briefs include the repository, workflow, accepted contracts, applicable conventions, exact file or canvas-frame ownership, dependencies, models/roles, actual tool access and permissions, and expected results/evidence. Workers preserve each other's edits and return actual checks to the coordinator; they do not start per-task review chains. An explicit single-agent or read-only request remains binding.
 
-Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: 1` in settings.
+For batches, independent features and ready parts of dependent features can advance together; numbering alone does not impose serial execution. Separate worktrees isolate checkouts when useful and authorized, while the coordinator manages shared contracts, migrations and integration order. In pen.dev, agents may edit disjoint regions of the same canonical product canvas while coordinating shared components and variables. No Superpowers dependency or blanket experimental-team setting is required by this policy; use the host's exposed native delegation capabilities and report actual limitations.
 
 ---
 

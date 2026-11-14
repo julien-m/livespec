@@ -19,6 +19,7 @@
 | AC-004 | `tests/test_review_led_delivery_diagnostics.py` | 2 passed in0.30s |
 | AC-005 | Official isolated provider projection from local source | 24 isolated entry points inspected;20 live project skills and4global bootstrap links verified |
 | AC-006 | Migration plan | Atlas safe checkpoint, supported upgrade and policy reload observed |
+| AC-007 | Read [automatic useful parallelism](../../../system/review-led-delivery.md#automatic-useful-parallelism), [parallel delivery](../../../system/parallel-delivery.md) and [current README](../../../README.md#multi-agent-mode-default) | Shared policy dispatches native workers automatically; final correction review and consumer adoption owned by parent |
 
 ## Files Created/Modified
 
@@ -52,3 +53,7 @@ The default [Git hook](../../../validator/hooks/pre-commit-hook) is advisory; it
 ## Bootstrap follow-up
 
 Read [initialization](../../../.agent-sync/skills/spec-init/SKILL.md) and [migration](../../../.agent-sync/skills/spec-migrate/SKILL.md), with their linked operational references. Their original public bodies remain byte-for-byte diagnostic archives. Only this bootstrap delta is retained from the canceled old objective; no new mission states, unlimited-restart dependency or supervisor application is included. Existing Atlas pins and services are unchanged.
+
+## Automatic delegation follow-up
+
+The existing compact skills and native roles already require reading the shared policy from their physical source directory or selected runtime; the dispatch rule is defined there, so no generated skill/role edit or optional CLI flag is required. FR-001/FR-003 now cover ready task/feature scheduling, complete worker briefs, disjoint file/canvas ownership, coordinated integration, explicit scopes and graceful missing-capability handling. No Python scheduler or guarantee that a model obeys every instruction is claimed. Parent verifies actual Atlas use after explicit adoption.

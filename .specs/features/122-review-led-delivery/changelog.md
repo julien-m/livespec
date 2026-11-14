@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-14 — Feature: Automatic useful delegation
+
+- **Type:** Feature.
+- **Spec modified:** FR-001/FR-003 extended with AC-007; same existing feature identifier and manual tool-correction scope.
+- **Policy modified:** Read [automatic useful parallelism](../../../system/review-led-delivery.md#automatic-useful-parallelism) and [README](../../../README.md#multi-agent-mode-default): automatic native dispatch for ready tasks/features, complete ownership briefs, worktree integration and multiple agents in one canonical product canvas.
+- **Preserved:** one final review per feature, proportional checks, read-only/single-agent scope, model/role choices, authority/refusals, immutable diagnostic history and private consumer fixes. No runtime code or generated skill changed.
+- **Review/adoption:** parent coordinates independent correction review, publication and explicit consumer reload; this source change alone does not establish installed behavior.
+
 ## 2026-11-13 — Feature: Review Led Delivery
 
 - **Type:** Feature
