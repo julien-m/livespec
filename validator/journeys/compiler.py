@@ -110,6 +110,10 @@ def compile_journeys(
             continue
         if not source.is_executable:
             continue
+        # @spec FR-003: Preserve existing tests
+        # — .specs/features/123-existing-test-journeys/spec.md#fr-003
+        if source.existing_test is not None:
+            continue
         capability_issue = validate_runner_capability(
             source.runner,
             source.journey_id,

@@ -10,6 +10,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import TypeAlias
 
+from .schema import ExistingTestReference
+
 JsonScalar: TypeAlias = str | int | float | bool | None
 JsonValue: TypeAlias = JsonScalar | list["JsonValue"] | dict[str, "JsonValue"]
 
@@ -51,6 +53,7 @@ class JourneyFile:
     disabled: bool = False
     manual_reason: str | None = None
     source_hash: str = ""
+    existing_test: ExistingTestReference | None = None
 
     @property
     def is_manual(self) -> bool:

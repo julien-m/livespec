@@ -60,6 +60,7 @@ markers = [
 
 [tool.setuptools.package-data]
 validator = [
+    "journeys/*.mjs",
     "vitest/*.ts",
     "vitest_assertions/*.ts",
     "playwright_assertions/*.mjs",

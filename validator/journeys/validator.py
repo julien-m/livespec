@@ -20,6 +20,7 @@ from pathlib import Path
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
 from pydantic import ValidationError
 
+from .existing_tests import reference_files
 from .fixtures import (
     BootstrapAmbiguityError,
     FixtureContract,
@@ -90,6 +91,13 @@ def validate_journey_file(
     issues.extend(_validate_wait_and_manual(path, source))
     issues.extend(_validate_fixtures_contract(project_root, path, source))
     issues.extend(validate_history(project_root, source.id, source_hash))
+    if source.existing_test is not None:
+        try:
+            reference_files(project_root, source.existing_test)
+        except (OSError, ValueError) as error:
+            issues.append(
+                _issue("journey_existing_test_invalid", JourneySeverity.ERROR, str(error), path)
+            )
     if any(issue.severity == JourneySeverity.ERROR for issue in issues):
         return None, issues
     primary_feature = source.covers[0].feature
@@ -110,6 +118,7 @@ def validate_journey_file(
             disabled=source.status.value == "disabled" or _primary_policy(source) == "disabled",
             manual_reason=source.manual_reason,
             source_hash=source_hash,
+            existing_test=source.existing_test,
         ),
         issues,
     )

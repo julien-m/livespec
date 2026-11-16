@@ -28,11 +28,10 @@ from validator.journeys import compile_journeys, scan_journeys, validate_journey
 from validator.journeys.compiler import XCUITEST_TARGET_UNRESOLVED
 from validator.journeys.fixtures import scaffold_fixtures_contract
 from validator.journeys.impact import analyze_journey_impacts
-from validator.journeys.index import build_journey_index
 from validator.journeys.migration import migrate_v1_journeys
-from validator.journeys.models import JourneyIssue
+from validator.journeys.models import JourneyFile, JourneyIssue, JsonValue
 from validator.journeys.paths import fixtures_contract_path, relative_to_project
-from validator.journeys.runner import run_journeys
+from validator.journeys.runner import JourneyRunResult, run_journeys
 from validator.journeys.schema import RunStage
 from validator.journeys.visual_receipts import verify_visual_receipts
 
@@ -124,9 +123,10 @@ def run_command(
     impacted: bool = typer.Option(False, "--impacted", help="Run impacted journeys."),
     all_journeys: bool = typer.Option(False, "--all", help="Run all selected journeys."),
     stage: RunStageOption = RunStage.LOCAL,
+    dry_run: bool = typer.Option(False, "--dry-run", help="Plan selected runs without execution."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
-    """Run compiled journey artifacts without compiling."""
+    """Run existing tests or compiled journey artifacts without compiling."""
     _ = impacted, all_journeys
     project_root = require_specs_root()
     result = run_journeys(
@@ -134,6 +134,7 @@ def run_command(
         journey=journey,
         feature=feature,
         stage=stage,
+        execute=not dry_run,
     )
     if json_output:
         typer.echo(
@@ -142,6 +143,10 @@ def run_command(
                     "executed": result.executed,
                     "manual": result.manual,
                     "disabled": result.disabled,
+                    "reused": result.reused,
+                    "planned": result.planned,
+                    "planned_commands": result.planned_commands,
+                    "selection_status": result.selection_status,
                     "issues": [_issue_json(project_root, issue) for issue in result.issues],
                     # @spec FR-002: Journey run JSON exposes replay records
                     # — .specs/features/074-agent-device-proof-adapter/spec.md#fr-002
@@ -161,10 +166,12 @@ def run_command(
             )
         emit_summary(
             "journey run",
-            "OK" if result.error_count == 0 else "FAIL",
+            _run_verdict(result),
             executed=len(result.executed),
             manual=len(result.manual),
             disabled=len(result.disabled),
+            planned=len(result.planned),
+            reused=len(result.reused),
             errors=result.error_count,
         )
     raise typer.Exit(0 if result.error_count == 0 else 1)
@@ -180,7 +187,7 @@ def test_command(
     _emit_issues(project_root, result.issues)
     emit_summary(
         "journey test",
-        "OK" if result.error_count == 0 else "FAIL",
+        _run_verdict(result),
         executed=len(result.executed),
         manual=len(result.manual),
         disabled=len(result.disabled),
@@ -213,16 +220,36 @@ def list_command(
 ) -> None:
     """List valid v2 journeys."""
     project_root = require_specs_root()
-    index = build_journey_index(project_root)
-    journeys = [
-        {"id": journey.journey_id, "features": journey.covered_features}
-        for journey in index.journeys.values()
-    ]
+    result = validate_journeys(project_root)
+    journeys = [_catalogue_entry(project_root, journey) for journey in result.journeys]
     if json_output:
-        typer.echo(json.dumps({"journeys": journeys}))
+        typer.echo(
+            json.dumps(
+                {
+                    "journeys": journeys,
+                    "catalogue_status": (
+                        "invalid" if result.error_count else "available" if journeys else "empty"
+                    ),
+                    "issues": [_issue_json(project_root, issue) for issue in result.issues],
+                }
+            )
+        )
     else:
-        for item in journeys:
-            typer.echo(f"{item['id']} features={','.join(item['features'])}")
+        _emit_issues(project_root, result.issues)
+        for journey in result.journeys:
+            mode = "reference" if journey.existing_test is not None else "generated"
+            reference = f" test={journey.existing_test.path}" if journey.existing_test else ""
+            typer.echo(
+                f"{journey.journey_id} features={','.join(journey.covered_features)} "
+                f"runner={journey.runner} execution_mode={mode}{reference}"
+            )
+        if not journeys:
+            typer.echo(
+                "No valid journeys; see validation issues."
+                if result.error_count
+                else "Journey catalogue is empty."
+            )
+    raise typer.Exit(1 if result.error_count else 0)
 
 
 @journey_app.command(name="inspect")
@@ -230,19 +257,62 @@ def inspect_command(
     journey_id: str,
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
-    """Inspect one valid v2 journey."""
+    """Inspect one valid v2 journey and expose any source validation issues."""
     project_root = require_specs_root()
-    index = build_journey_index(project_root)
-    journey = index.journeys.get(journey_id)
+    result = validate_journeys(project_root)
+    journey = next((item for item in result.journeys if item.journey_id == journey_id), None)
+    issues = [issue for issue in result.issues if issue.path.parent.name == journey_id]
     if journey is None:
-        typer.echo(f"Journey not found: {journey_id}", err=True)
+        if json_output:
+            typer.echo(
+                json.dumps(
+                    {
+                        "id": journey_id,
+                        "found": False,
+                        "issues": [_issue_json(project_root, issue) for issue in issues],
+                    }
+                )
+            )
+        else:
+            _emit_issues(project_root, issues)
+            typer.echo(f"Journey not found: {journey_id}", err=True)
         raise typer.Exit(1)
-    data = {
+    data = _catalogue_entry(project_root, journey)
+    serialized_issues: list[JsonValue] = [_issue_json(project_root, issue) for issue in issues]
+    data["issues"] = serialized_issues
+    if json_output:
+        typer.echo(json.dumps(data))
+    else:
+        _emit_issues(project_root, issues)
+        typer.echo(
+            f"{journey.journey_id} {data['source']} runner={journey.runner} "
+            f"execution_mode={data['execution_mode']} existing_test={data['existing_test']}"
+        )
+
+
+def _catalogue_entry(project_root: Path, journey: JourneyFile) -> dict[str, JsonValue]:
+    """Serialize execution metadata without implying that a test has run."""
+    return {
         "id": journey.journey_id,
-        "features": journey.covered_features,
+        "features": list(journey.covered_features),
         "source": relative_to_project(project_root, journey.path),
+        "runner": journey.runner,
+        "execution_mode": "reference" if journey.existing_test is not None else "generated",
+        "existing_test": journey.existing_test.model_dump(mode="json")
+        if journey.existing_test is not None
+        else None,
     }
-    typer.echo(json.dumps(data) if json_output else f"{data['id']} {data['source']}")
+
+
+def _run_verdict(result: JourneyRunResult) -> str:
+    """Translate selection outcomes without calling an empty run successful."""
+    if result.error_count:
+        return "FAIL"
+    return {
+        "no_selection": "NO_SELECTION",
+        "planned": "PLANNED",
+        "not_executed": "NOT_EXECUTED",
+    }.get(result.selection_status, "OK")
 
 
 @journey_app.command(name="visual-verify")
@@ -355,7 +425,7 @@ def _emit_issues(project_root: Path, issues: list[JourneyIssue]) -> None:
         )
 
 
-def _issue_json(project_root: Path, issue: JourneyIssue) -> dict[str, str]:
+def _issue_json(project_root: Path, issue: JourneyIssue) -> dict[str, JsonValue]:
     """Serialize a journey issue for JSON CLI output."""
     return {
         "severity": issue.severity.value,

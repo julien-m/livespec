@@ -107,7 +107,8 @@ def test_run_journeys_executes_manifest_artifacts_without_compiling(tmp_path: Pa
     result = run_journeys(tmp_path, journey="onboarding-first-project", execute=False)
 
     assert result.error_count == 0, [issue.code for issue in result.issues]
-    assert result.executed == ["onboarding-first-project"]
+    assert result.executed == []
+    assert result.planned == ["onboarding-first-project"]
     assert artifact.stat().st_mtime_ns == before
 
 

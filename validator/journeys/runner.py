@@ -18,6 +18,7 @@ import os
 import shlex
 import subprocess
 import sys
+import tempfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Protocol, cast
@@ -25,11 +26,13 @@ from typing import Protocol, cast
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
 from pydantic import ValidationError
 
+from .existing_tests import reference_command, reference_result_error
 from .fixtures import BOOTSTRAP_FAILURE_PREFIX, fixtures_contract_hash
 from .manifest import COMPILER_VERSION, CompiledManifest, read_compiled_manifest
 from .models import JourneyIssue, JourneySeverity
 from .paths import iter_journey_source_paths, journey_runs_dir
 from .schema import JourneySourceV2, RunPolicyValue, RunStage
+from .validator import validate_journey_file
 
 # Native UI regressions can boot simulators/browsers; 10 minutes avoids short CI
 # flake while still bounding hung runners.
@@ -130,6 +133,22 @@ class JourneyRunResult:
     disabled: list[str] = field(default_factory=list)
     issues: list[JourneyIssue] = field(default_factory=list)
     runs: list[JourneyExecutionRecord] = field(default_factory=list)
+    planned: list[str] = field(default_factory=list)
+    reused: dict[str, str] = field(default_factory=dict)
+    planned_commands: dict[str, list[str]] = field(default_factory=dict)
+
+    @property
+    def selection_status(self) -> str:
+        """Distinguish an empty selection and a plan from a completed test execution."""
+        if self.error_count:
+            return "failed"
+        if self.planned:
+            return "planned"
+        if self.executed:
+            return "completed"
+        if self.manual or self.disabled:
+            return "not_executed"
+        return "no_selection"
 
     @property
     def error_count(self) -> int:
@@ -148,6 +167,7 @@ class JourneyExecutionRecord:
     destination: str | None
     udid: str | None
     platform: str | None
+    evidence_level: str | None = None
 
 
 def run_journeys(
@@ -166,9 +186,18 @@ def run_journeys(
     disabled: list[str] = []
     issues: list[JourneyIssue] = []
     records: list[JourneyExecutionRecord] = []
+    planned: list[str] = []
+    reused: dict[str, str] = {}
+    planned_commands: dict[str, list[str]] = {}
+    reference_results: dict[tuple[str, ...], tuple[str, JourneyIssue | None]] = {}
     for source_path in iter_journey_source_paths(project_root):
+        if journey is not None and source_path.parent.name != journey:
+            continue
         source, raw_text = _read_source(source_path)
         if source is None or raw_text is None:
+            issues.append(
+                _issue("journey_schema_invalid", "Cannot parse journey source", source_path)
+            )
             continue
         if journey is not None and source.id != journey:
             continue
@@ -192,6 +221,50 @@ def run_journeys(
                 )
             else:
                 manual.append(source.id)
+            continue
+        # @spec FR-002, FR-004: Direct reuse and deduplication
+        # — .specs/features/123-existing-test-journeys/spec.md#fr-002
+        if source.existing_test is not None:
+            _, reference_issues = validate_journey_file(project_root, source_path)
+            issues.extend(reference_issues)
+            if any(item.severity is JourneySeverity.ERROR for item in reference_issues):
+                continue
+            try:
+                command = reference_command(
+                    project_root, source.targets[0].runner.value, source.existing_test
+                )
+            except (OSError, ValueError) as error:
+                issues.append(_issue("journey_existing_test_invalid", str(error), source_path))
+                continue
+            key = tuple(command)
+            if not execute:
+                planned.append(source.id)
+                planned_commands[source.id] = command
+                continue
+            if key in reference_results:
+                first_id, run_issue = reference_results[key]
+                reused[source.id] = first_id
+            else:
+                reference_manifest = CompiledManifest(
+                    journey_id=source.id,
+                    source_path=str(source_path),
+                    source_hash="",
+                    compiler_version=COMPILER_VERSION,
+                    runner=source.targets[0].runner.value,
+                    native_output_paths=[source.existing_test.path],
+                )
+                run_issue = _run_manifest_artifacts(
+                    project_root,
+                    source,
+                    reference_manifest,
+                    resolved_executor,
+                    records,
+                )
+                reference_results[key] = (source.id, run_issue)
+            if run_issue is not None:
+                issues.append(run_issue)
+            else:
+                executed.append(source.id)
             continue
         manifest = read_compiled_manifest(project_root, source.id)
         current_hash = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()
@@ -243,13 +316,19 @@ def run_journeys(
             if run_issue is not None:
                 issues.append(run_issue)
                 continue
-        executed.append(source.id)
+        if execute:
+            executed.append(source.id)
+        else:
+            planned.append(source.id)
     return JourneyRunResult(
         executed=executed,
         manual=manual,
         disabled=disabled,
         issues=issues,
         runs=records,
+        planned=planned,
+        reused=reused,
+        planned_commands=planned_commands,
     )
 
 
@@ -261,6 +340,8 @@ def _run_manifest_artifacts(
     records: list[JourneyExecutionRecord],
 ) -> JourneyIssue | None:
     """Run compiled native artifacts listed in a fresh manifest."""
+    if source.existing_test is not None:
+        return _run_reference_artifact(project_root, source, executor, records)
     native_paths = manifest.native_output_paths
     if not native_paths:
         return _issue(
@@ -280,6 +361,10 @@ def _run_manifest_artifacts(
             invocation = _runner_command(project_root, source, manifest.runner, artifact, executor)
         except SimulatorDiscoveryError as error:
             return _issue(error.code, error.message, artifact)
+        except (OSError, ValueError) as error:
+            if source.existing_test is None:
+                raise
+            return _issue("journey_existing_test_invalid", str(error), artifact)
         if invocation is None:
             return _issue(
                 "journey_native_runner_unsupported",
@@ -288,7 +373,14 @@ def _run_manifest_artifacts(
             )
         # @spec FR-001: Record journey run metadata, FR-003: Write run receipt
         # — .specs/features/074-agent-device-proof-adapter/spec.md#fr-001
-        record = _execution_record(project_root, source.id, manifest.runner, artifact, invocation)
+        record = _execution_record(
+            project_root,
+            source.id,
+            manifest.runner,
+            artifact,
+            invocation,
+            source.existing_test.evidence_level if source.existing_test else None,
+        )
         records.append(record)
         _write_run_receipt(project_root, record)
         if manifest.runner == "xcuitest":
@@ -314,12 +406,56 @@ def _run_manifest_artifacts(
     return None
 
 
+def _run_reference_artifact(
+    project_root: Path,
+    source: JourneySourceV2,
+    executor: JourneyExecutor,
+    records: list[JourneyExecutionRecord],
+) -> JourneyIssue | None:
+    """Execute the original suite, observe runner results, and clean scratch output."""
+    reference = source.existing_test
+    assert reference is not None
+    artifact = project_root / reference.path
+    runner = source.targets[0].runner.value
+    try:
+        command = reference_command(project_root, runner, reference)
+    except (OSError, ValueError) as error:
+        return _issue("journey_existing_test_invalid", str(error), artifact)
+    with tempfile.TemporaryDirectory(prefix="livespec-journey-results-") as directory:
+        result_path = Path(directory) / "results.xml"
+        if runner == "pytest":
+            command.extend(["--junitxml", str(result_path)])
+        elif runner == "playwright":
+            command.append("--reporter=json")
+        record = _execution_record(
+            project_root,
+            source.id,
+            runner,
+            artifact,
+            _RunnerInvocation(command),
+            reference.evidence_level,
+        )
+        records.append(record)
+        _write_run_receipt(project_root, record)
+        return _run_command(
+            project_root,
+            source.id,
+            artifact,
+            command,
+            RUNNER_TIMEOUT_SECONDS,
+            executor,
+            reference_runner=runner,
+            result_path=result_path,
+        )
+
+
 def _execution_record(
     project_root: Path,
     journey_id: str,
     runner: str,
     artifact: Path,
     invocation: _RunnerInvocation,
+    evidence_level: str | None = None,
 ) -> JourneyExecutionRecord:
     """Build replay metadata from the resolved native runner invocation."""
     destination = _destination_value(invocation.argv)
@@ -331,6 +467,7 @@ def _execution_record(
         destination=destination,
         udid=_destination_udid(invocation.argv),
         platform=_destination_platform(destination),
+        evidence_level=evidence_level,
     )
 
 
@@ -357,6 +494,9 @@ def _run_command(
     argv: list[str],
     timeout_seconds: int,
     executor: JourneyExecutor,
+    *,
+    reference_runner: str | None = None,
+    result_path: Path | None = None,
 ) -> JourneyIssue | None:
     """Execute one native journey command and convert process failures to issues."""
     try:
@@ -400,6 +540,10 @@ def _run_command(
             output or f"Native runner exited with {completed.returncode}",
             artifact,
         )
+    if reference_runner is not None and result_path is not None:
+        result_error = reference_result_error(reference_runner, completed.stdout, result_path)
+        if result_error is not None:
+            return _issue(result_error[0], result_error[1], artifact)
     return None
 
 
@@ -466,6 +610,8 @@ def _runner_command(
 ) -> _RunnerInvocation | None:
     """Return the native command for one compiled journey artifact."""
     relative = artifact.relative_to(project_root).as_posix()
+    if source.existing_test is not None:
+        return _RunnerInvocation(reference_command(project_root, runner, source.existing_test))
     if runner == "playwright":
         return _RunnerInvocation(["npx", "playwright", "test", relative])
     if runner == "maestro":
