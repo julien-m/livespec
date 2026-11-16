@@ -35,3 +35,7 @@ No Atlas runtime/global skill changes. Reuse the original tests and fixtures; co
 - `python -m build` was unavailable (`No module named build`); supported `uv build --offline --wheel` succeeded. Wheel hash and installed CLI/reference smoke are preserved in [the installed proof](checks/installed-wheel.json).
 - An early test harness used pytest `-k original`, also matching the filename; it was corrected to the actual test selector `case_original`. This did not change product logic or suppress a failure.
 - Build output/scratch consumers are cleaned after verification; the wheel remains available for the owner. No source test was copied into a journey, no Atlas runtime changed and no provider writes occurred.
+
+## CI typing follow-up
+
+The first public CI run found two mypy errors not reported by Pyright: a reference manifest variable was later assigned an optional generated manifest, and the raw test-builder coverage value was typed as object. The reference variable is now distinct; the test builder normalizes through the existing Pydantic boundary. No assertion/behavior was weakened. Targeted mypy and 60 affected tests pass; the same reviewer accepted the correction.

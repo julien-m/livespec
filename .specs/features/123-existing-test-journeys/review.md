@@ -18,3 +18,7 @@ Final native response:
 > No further material findings. Built-wheel installation verification remains coordinator-owned; browser/device product behavior was outside these checks.
 
 After that response, the coordinator verified the built/installed wheel with its current Node asset and nine CLI/runner assertions. Read [the installed proof](checks/installed-wheel.json). The installation was isolated, not an Atlas runtime change.
+
+## Targeted typing correction
+
+The same reviewer accepted the CI correction: `reference_manifest` separates the types without changing execution; Pydantic normalization supplies the fixture's typed serialized dictionary without weakening assertions or selection. The coordinator observed 60 affected tests passing and targeted mypy clean.

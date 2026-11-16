@@ -245,7 +245,7 @@ def run_journeys(
                 first_id, run_issue = reference_results[key]
                 reused[source.id] = first_id
             else:
-                manifest = CompiledManifest(
+                reference_manifest = CompiledManifest(
                     journey_id=source.id,
                     source_path=str(source_path),
                     source_hash="",
@@ -256,7 +256,7 @@ def run_journeys(
                 run_issue = _run_manifest_artifacts(
                     project_root,
                     source,
-                    manifest,
+                    reference_manifest,
                     resolved_executor,
                     records,
                 )

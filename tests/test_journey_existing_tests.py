@@ -35,7 +35,7 @@ def _reference_project(root: Path, *, runner: str = "pytest", journey_id: str = 
         "def case_unselected():\n    raise AssertionError('must not run')\n"
     )
     (root / "suite.ini").write_text("[pytest]\npython_functions = case_*\n")
-    data = _valid_source()
+    data = JourneySourceV2.model_validate(_valid_source()).model_dump(mode="json")
     data.update(
         {
             "id": journey_id,
