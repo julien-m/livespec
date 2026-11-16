@@ -22,3 +22,7 @@ After that response, the coordinator verified the built/installed wheel with its
 ## Targeted typing correction
 
 The same reviewer accepted the CI correction: `reference_manifest` separates the types without changing execution; Pydantic normalization supplies the fixture's typed serialized dictionary without weakening assertions or selection. The coordinator observed 60 affected tests passing and targeted mypy clean.
+
+## Maintained Markdown definitions
+
+The same independent reviewer inspected the adoption correction to AC-002, including the local AST helper and both validation/doctor callers. It identified a lost second declaration when consecutive bold definitions share a Markdown paragraph. The implementer corrected the AST-break grouping and preserved wrapped descriptions and opaque nodes. Final response: “Correction acceptée”; 23 parser tests independently passed, with no further material finding. The scanner's pre-existing flattening of references from multiple features is an accepted out-of-scope follow-up; the current consumer's nine references each cover one feature. This remains definition validation, not execution of the consumer suites.

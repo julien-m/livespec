@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-11-16 — [Feature 123] Bugfix: discover Markdown requirement definitions
+
+- Journey validation and doctor now read actual criterion tables, anchors and headings while excluding references/examples, without rewriting consumer specifications.
+
 ## 2026-11-16 — [Feature 123] Existing test journeys
 
 - Added existing-suite references with runner configuration, exact file selection, native result observation, invocation-local reuse and explicit empty/planned outcomes. Read [the adoption guide](../system/testing/existing-test-journeys.md). Consumer runtime adoption remains separate.

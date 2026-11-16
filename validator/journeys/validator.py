@@ -14,7 +14,6 @@
 from __future__ import annotations
 
 import hashlib
-import re
 from pathlib import Path
 
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
@@ -33,6 +32,7 @@ from .fixtures import (
 from .history import validate_history
 from .models import JourneyFile, JourneyIssue, JourneySeverity, JsonValue, ValidationResult
 from .paths import fixtures_contract_path, iter_journey_source_paths
+from .requirements import defined_requirement_ids
 from .schema import (
     CoverageRefKind,
     JourneyAction,
@@ -40,9 +40,6 @@ from .schema import (
     JourneySourceV2,
     RunPolicyValue,
 )
-
-_AC_RE = re.compile(r"\*\*(AC-\d+):")
-_FR_RE = re.compile(r"\*\*(FR-\d+):")
 
 
 def validate_journeys(project_root: Path, feature: str | None = None) -> ValidationResult:
@@ -332,7 +329,10 @@ def _validate_bootstrap_resolution(
 def _known_refs(spec_path: Path, kind: CoverageRefKind) -> set[str]:
     """Return requirement IDs declared in a feature spec file."""
     text = spec_path.read_text(encoding="utf-8", errors="ignore")
-    return set(_AC_RE.findall(text) if kind is CoverageRefKind.AC else _FR_RE.findall(text))
+    prefix = "AC-" if kind is CoverageRefKind.AC else "FR-"
+    return {
+        identifier for identifier in defined_requirement_ids(text) if identifier.startswith(prefix)
+    }
 
 
 def _primary_policy(source: JourneySourceV2) -> str:

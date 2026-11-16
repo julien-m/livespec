@@ -94,7 +94,7 @@ flowchart LR
 A schema-v2 reference journey declares exactly one supported target and `existing_test.path`, optional `config`/`test_name`, and a nonblank declarative `evidence_level`; `steps` is omitted or empty; portable visual contracts and preconditions are not accepted in reference mode because the original suite owns assertions, fixtures and setup. Invalid, missing, absolute or escaping paths and incompatible runner/step combinations are rejected before execution.
 
 ### AC-002
-`list` and `inspect` expose the reference and existing covers links. `impact` includes changes to the referenced test or config plus existing feature impact behavior.
+`list` and `inspect` expose the reference and existing covers links. `impact` includes changes to the referenced test or config plus existing feature impact behavior. Covered IDs are resolved from actual Markdown requirement definitions: legacy bold/list declarations, criterion/requirement tables and headings, including inline HTML anchors. Prose references, mappings, links, code examples, comments and bare anchors do not create requirements.
 
 ### AC-003
 `run` invokes the original existing file directly without requiring compilation, preserving its runner configuration, assertions and fixtures. `compile` emits no reference test files and does not modify the original.

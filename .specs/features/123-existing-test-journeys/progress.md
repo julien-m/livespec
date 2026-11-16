@@ -39,3 +39,14 @@ No Atlas runtime/global skill changes. Reuse the original tests and fixtures; co
 ## CI typing follow-up
 
 The first public CI run found two mypy errors not reported by Pyright: a reference manifest variable was later assigned an optional generated manifest, and the raw test-builder coverage value was typed as object. The reference variable is now distinct; the test builder normalizes through the existing Pydantic boundary. No assertion/behavior was weakened. Targeted mypy and 60 affected tests pass; the same reviewer accepted the correction.
+
+## Markdown definition adoption correction
+
+- Atlas registration exposed 17 false missing-AC findings for 9 existing journeys. The old parser recognized only bold declarations.
+- Initial focused regression run: 11 failures / 7 passes. With supported definitions and reference exclusions, 20 cases pass.
+- Read-only validation of the real Atlas specs/YAML now returns 9 valid journeys, 17 linked criteria and zero errors; the 26 read source files retain their hashes. This observation is validation only, not test execution and not yet a selected private-runtime rollout.
+- The same independent reviewer is inspecting this correction. The selected Atlas runtime stays 23-0ffd until a new explicit checkpoint.
+
+### Definition correction accepted
+
+The same reviewer found and accepted a compatibility correction for consecutive bold declarations in one paragraph: AST line breaks now preserve every declaration and wrapped descriptions without exposing link/code contents. It independently verified 23 definition tests passing. A combined run of the existing journeys and new suites passes 216 tests; targeted mypy, Ruff and typing pass. The consumer read-only validation remains 9 valid journeys / 17 references / zero errors. Private-runtime adoption remains a separate checkpoint.
