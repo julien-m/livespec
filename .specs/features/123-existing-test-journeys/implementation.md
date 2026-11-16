@@ -5,7 +5,7 @@
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
 | FR-001 | `validator/journeys/schema.py`, `models.py`, `validator.py` | FR-001 execution modes | Implemented | 2026-11-16 |
-| FR-002 | `validator/cli_commands/journey_cmd.py`, `journeys/impact.py`, `scanner.py` | Existing reference catalogue/impact | Implemented | 2026-11-16 |
+| FR-002 | `validator/cli_commands/journey_cmd.py`, `journeys/impact.py`, `scanner.py`, `requirements.py` | Existing reference catalogue/impact | Implemented | 2026-11-16 |
 | FR-003 | `journeys/compiler.py`, `runner.py`, `existing_tests.py`, `vitest-reference.mjs`, `pyproject.toml` | FR-003 preserve existing tests; FR-002 exact suite execution | Implemented | 2026-11-16 |
 | FR-004 | `journeys/runner.py`, `cli_commands/journey_cmd.py` | FR-004 reuse and explicit outcomes | Implemented | 2026-11-16 |
 | FR-005 | Guide and README | Read [the adoption guide](../../../system/testing/existing-test-journeys.md) | Implemented | 2026-11-16 |
@@ -15,7 +15,7 @@
 | AC | Evidence | Status |
 |---|---|---|
 | AC-001 | `tests/test_journey_existing_tests.py`: mixed/unsafe references, missing and symlink files | Verified |
-| AC-002 | Catalogue/CLI/config-impact/deleted-file tests and installed-wheel CLI | Verified |
+| AC-002 | Catalogue/CLI/config-impact/deleted-file tests, definition-format tests and installed-wheel CLI | Verified |
 | AC-003 | Real original pytest fixture/config and Playwright/Vitest execution; unchanged bytes/no generated tests | Verified |
 | AC-004 | Exact sibling exclusion in real Node runners; all-skipped/invalid-report/retry checks; original suite assertions retained | Verified |
 | AC-005 | Real successful and failed duplicate references execute once, with reused mapping | Verified |

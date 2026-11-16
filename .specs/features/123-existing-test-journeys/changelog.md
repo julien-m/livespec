@@ -30,3 +30,7 @@
 ## 2026-11-16 — Feature accepted
 
 - Independent final review accepted all material corrections; 18 new tests, 175 existing journey checks and installed-wheel smoke passed. Read [verification](checks/verification.json) and [review](review.md). Atlas runtime adoption remains separately coordinated.
+
+## 2026-11-16 — Bugfix: recognize maintained requirement definitions
+
+- Journey coverage and doctor share AST-based definition discovery for existing Markdown tables, anchors and headings. Reference-only contexts remain excluded. No consumer specs or source tests are rewritten. Read [the definition regression tests](../../../tests/test_journey_requirement_definitions.py).

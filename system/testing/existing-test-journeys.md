@@ -29,7 +29,7 @@ existing_test:
 privacy: { llm_allowed: false, retention: none }
 ```
 
-Replace the illustrative IDs, paths and selector with existing consumer files and real requirement references. `path` is required; `config` and `test_name` are optional. Both file paths are project-relative, must resolve to real files inside the selected project and cannot escape via symlinks. `evidence_level` is a required nonblank declaration of what this suite can prove. The selector is native runner syntax, not a shell expression.
+Replace the illustrative IDs, paths and selector with existing consumer files and real requirement references. AC/FR links resolve actual Markdown definitions: legacy bold/list declarations, definition tables in acceptance/requirement sections and headings with a body, including empty inline HTML anchors. Mentions in prose, mappings, links, examples, quotes, code, comments and frontmatter do not declare requirements. `path` is required; `config` and `test_name` are optional. Both file paths are project-relative, must resolve to real files inside the selected project and cannot escape via symlinks. `evidence_level` is a required nonblank declaration of what this suite can prove. The selector is native runner syntax, not a shell expression.
 
 A file reference runs its selected native tests; omit `test_name` to run the file according to that runner's discovery rules. A reference has one target; separate journeys may reference the same suite with distinct coverage links.
 

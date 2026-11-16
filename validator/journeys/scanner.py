@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import hashlib
-import re
 from pathlib import Path
 
 import yaml
@@ -18,10 +17,8 @@ from .backlinks import verify_feature_backlinks
 from .manifest import COMPILER_VERSION, read_compiled_manifest
 from .models import JourneyFinding, JourneyReport, JourneySeverity
 from .paths import iter_journey_source_paths, iter_v1_journey_source_paths
+from .requirements import defined_requirement_ids
 from .validator import validate_journeys
-
-_AC_RE = re.compile(r"\*\*(AC-\d+):")
-_FR_RE = re.compile(r"\*\*(FR-\d+):")
 
 
 def scan_journeys(project_root: Path, feature: str | None = None) -> JourneyReport:
@@ -160,14 +157,13 @@ def _scan_requirement_drift(project_root: Path, journey: object) -> list[Journey
             )
         ]
     spec_text = spec_path.read_text(encoding="utf-8", errors="ignore")
-    known_ac = set(_AC_RE.findall(spec_text))
-    known_fr = set(_FR_RE.findall(spec_text))
+    known_refs = defined_requirement_ids(spec_text)
     findings: list[JourneyFinding] = []
     for requirement in typed.covers_ac:
-        if requirement not in known_ac:
+        if requirement not in known_refs:
             findings.append(_missing_requirement(typed.path, typed.feature, requirement))
     for requirement in typed.covers_fr:
-        if requirement not in known_fr:
+        if requirement not in known_refs:
             findings.append(_missing_requirement(typed.path, typed.feature, requirement))
     return findings
 

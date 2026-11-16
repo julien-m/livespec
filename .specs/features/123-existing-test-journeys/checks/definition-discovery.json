@@ -1,0 +1,25 @@
+{
+  "scope": "journey requirement definition discovery only",
+  "base": "a6f6dc8c3eeed0efef8fcbdaf3dd1398cde59528",
+  "new_definition_tests": 23,
+  "combined_journey_tests": 216,
+  "initial_regression": {
+    "passed": 7,
+    "failed": 11
+  },
+  "read_only_consumer_observation": {
+    "valid_journeys": 9,
+    "covered_refs": 17,
+    "errors": 0,
+    "source_files_hash_checked": 26,
+    "execution": "NOT_RUN"
+  },
+  "typing": "mypy targeted four files PASS; standard pre-commit pyright required",
+  "lint": "Ruff check/format PASS",
+  "review": "same independent native reviewer accepted compatibility correction, independently ran 23 tests",
+  "limitations": [
+    "No consumer source/spec/test rewrite",
+    "No new runtime selected without a separate product checkpoint",
+    "Pre-existing scanner cross-feature flattening is out of this correction"
+  ]
+}
