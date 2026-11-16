@@ -44,7 +44,10 @@ def analyze_journey_impacts(
     changed_files: list[Path],
 ) -> list[JourneyImpact]:
     """Analyze changed files against v2 journey targets and visual contracts."""
-    changed_text = "\n".join(_read_changed_file(path) for path in changed_files)
+    normalized_changes = {_project_path(project_root, path) for path in changed_files}
+    changed_text = "\n".join(
+        _read_changed_file(_project_path(project_root, path)) for path in changed_files
+    )
     selector_features = _selector_features(project_root, changed_files)
     impacts: dict[tuple[str, str], JourneyImpact] = {}
     for source_path in iter_journey_source_paths(project_root):
@@ -67,6 +70,26 @@ def analyze_journey_impacts(
                 recommended_command=f"$spec-journey edit {source.id}",
                 blocking=True,
             )
+        if source.existing_test is not None:
+            for signal_name, value in (
+                ("existing_test_path", source.existing_test.path),
+                ("existing_test_config", source.existing_test.config),
+            ):
+                if (
+                    value is None
+                    or _project_path(project_root, Path(value)) not in normalized_changes
+                ):
+                    continue
+                impacts[(source.id, signal_name)] = JourneyImpact(
+                    journey_id=source.id,
+                    reason=f"changed files include referenced journey {signal_name} {value!r}",
+                    source_signal=signal_name,
+                    confidence=100,
+                    affected_features=affected_features,
+                    required_classification="intentional_update",
+                    recommended_command=f"$spec-journey edit {source.id}",
+                    blocking=True,
+                )
         for signal_name, value in _target_signals(source):
             if value and value in changed_text:
                 key = (source.id, signal_name)
@@ -81,6 +104,11 @@ def analyze_journey_impacts(
                     blocking=True,
                 )
     return sorted(impacts.values(), key=lambda impact: (impact.journey_id, impact.source_signal))
+
+
+def _project_path(project_root: Path, path: Path) -> Path:
+    """Normalize project-relative and absolute paths without requiring existence."""
+    return (path if path.is_absolute() else project_root / path).resolve()
 
 
 def _selector_features(project_root: Path, changed_files: list[Path]) -> set[str]:

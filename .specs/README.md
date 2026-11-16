@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-11-13
+> Last updated: 2026-11-16
 
 
 ---
@@ -137,6 +137,7 @@
 | 096 | Node Vitest Execution Observations | Implemented | 2026-10-16 | 2026-10-17 | [spec](features/096-node-vitest-execution/spec.md) |
 | 097 | Root Feature Delivery Review | Implemented | 2026-10-17 | 2026-10-17 | [spec](features/097-root-feature-delivery-review/spec.md) |
 | 122 | Review Led Delivery | Implemented | 2026-11-13 | 2026-11-13 | [spec](features/122-review-led-delivery/spec.md) |
+| 123 | Existing Test Journeys | Implemented | 2026-11-16 | 2026-11-16 | [spec](features/123-existing-test-journeys/spec.md), [plan](features/123-existing-test-journeys/plan.md), [implementation](features/123-existing-test-journeys/implementation.md) |
 <!-- readme:features:end -->
 
 ---

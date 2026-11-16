@@ -4,6 +4,8 @@
 
 # Executable User Journeys v2
 
+Read [existing-test journeys](existing-test-journeys.md) when adopting an original suite instead of generating test code. That additive v2 mode preserves its fixtures/configuration and has explicit selection/results; the generated-mode rules below remain unchanged.
+
 Canonical journey sources live at `.specs/journeys/<journey-id>/journey.yaml`.
 
 ## Directory Contract

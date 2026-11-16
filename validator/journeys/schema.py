@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from pathlib import PurePosixPath
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
@@ -72,6 +73,7 @@ class JourneyRunner(StrEnum):
     MAESTRO = "maestro"
     PYTEST = "pytest"
     CARGO = "cargo"
+    VITEST = "vitest"
 
 
 class JourneyAction(StrEnum):
@@ -283,6 +285,41 @@ class PrivacyPolicy(JourneyBaseModel):
     local_only: bool = False
 
 
+class ExistingTestReference(JourneyBaseModel):
+    """Reference an owned test without duplicating its fixtures or assertions."""
+
+    path: str = Field(min_length=1)
+    config: str | None = Field(default=None, min_length=1)
+    test_name: str | None = Field(default=None, min_length=1)
+    evidence_level: str = Field(min_length=1)
+
+    @field_validator("path", "config")
+    @classmethod
+    def validate_relative_path(cls, value: str | None) -> str | None:
+        """Keep file arguments relative, literal and separate from runner options."""
+        if value is None:
+            return None
+        path = PurePosixPath(value)
+        if (
+            not value.strip()
+            or path.is_absolute()
+            or ".." in path.parts
+            or "\\" in value
+            or "\x00" in value
+            or any(part.startswith("-") for part in path.parts)
+        ):
+            raise ValueError("existing test paths must be project-relative file paths")
+        return value
+
+    @field_validator("test_name", "evidence_level")
+    @classmethod
+    def validate_nonblank_value(cls, value: str | None) -> str | None:
+        """Reject blank selectors and evidence labels rather than silently broadening a run."""
+        if value is not None and (not value.strip() or "\x00" in value):
+            raise ValueError("existing test selector and evidence level must be nonblank")
+        return value
+
+
 class JourneySourceV2(JourneyBaseModel):
     """Canonical User Journeys v2 YAML source document."""
 
@@ -295,11 +332,31 @@ class JourneySourceV2(JourneyBaseModel):
     run_policy: dict[RunStage, RunPolicyValue]
     targets: list[JourneyTarget] = Field(min_length=1)
     preconditions: Preconditions = Field(default_factory=Preconditions)
-    steps: list[JourneyStep] = Field(min_length=1)
+    steps: list[JourneyStep] = Field(default_factory=list)
+    existing_test: ExistingTestReference | None = None
     visual_checks: list[VisualCheck] = Field(default_factory=list)
     privacy: PrivacyPolicy = Field(default_factory=PrivacyPolicy)
     # @spec AC-015: Manual reason — .specs/features/056-executable-user-journeys/spec.md#ac-015
     manual_reason: str | None = None
+
+    # @spec FR-001: Exclusive execution modes
+    # — .specs/features/123-existing-test-journeys/spec.md#fr-001
+    @model_validator(mode="after")
+    def validate_execution_mode(self) -> JourneySourceV2:
+        """Select portable generation or a single existing suite, never both."""
+        if self.existing_test is None:
+            if not self.steps:
+                raise ValueError("generated journeys require at least one step")
+            return self
+        if len(self.targets) != 1 or self.targets[0].runner not in {
+            JourneyRunner.PLAYWRIGHT,
+            JourneyRunner.PYTEST,
+            JourneyRunner.VITEST,
+        }:
+            raise ValueError("existing tests require one playwright, pytest or vitest target")
+        if self.steps or self.visual_checks or self.preconditions != Preconditions():
+            raise ValueError("existing tests own their steps, visual checks and preconditions")
+        return self
 
     @property
     def is_manual(self) -> bool:
@@ -329,6 +386,7 @@ __all__ = [
     "BootstrapOverride",
     "CoverageRef",
     "CoverageRefKind",
+    "ExistingTestReference",
     "JourneyAction",
     "JourneyRunner",
     "JourneySourceV2",

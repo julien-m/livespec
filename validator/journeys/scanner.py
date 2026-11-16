@@ -12,6 +12,8 @@ import hashlib
 import re
 from pathlib import Path
 
+import yaml
+
 from .backlinks import verify_feature_backlinks
 from .manifest import COMPILER_VERSION, read_compiled_manifest
 from .models import JourneyFinding, JourneyReport, JourneySeverity
@@ -83,7 +85,7 @@ def scan_journeys(project_root: Path, feature: str | None = None) -> JourneyRepo
                     feature=journey.feature,
                 )
             )
-        if journey.is_executable:
+        if journey.is_executable and journey.existing_test is None:
             findings.extend(_scan_compiled_artifact(project_root, journey))
     return JourneyReport(journeys=validation.journeys, findings=findings)
 
@@ -100,6 +102,9 @@ def _scan_manifest_stale_for_all_sources(
     }
     findings: list[JourneyFinding] = []
     for path in iter_journey_source_paths(project_root):
+        # Referenced tests have no generated artifact; validation reports their errors.
+        if _is_existing_test_source(path):
+            continue
         journey_id = path.parent.name
         manifest = read_compiled_manifest(project_root, journey_id)
         if manifest is None or path in existing_stale_paths:
@@ -125,6 +130,15 @@ def _scan_manifest_stale_for_all_sources(
                 )
             )
     return findings
+
+
+def _is_existing_test_source(path: Path) -> bool:
+    """Identify references even when cross-file validation reports a missing test."""
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError):
+        return False
+    return isinstance(data, dict) and data.get("existing_test") is not None
 
 
 def _scan_requirement_drift(project_root: Path, journey: object) -> list[JourneyFinding]:

@@ -322,7 +322,7 @@ Create and govern cross-feature User Journeys v2. Journey sources live globally 
 /spec-journey bootstrap --from-existing    # Propose journeys for old projects/features
 /spec-journey edit onboarding-first-project # Governed edit with decision + changelog
 /spec-journey impact                       # Detect changed files touching old journeys
-/spec-journey run                          # Execute compiled native artifacts only
+/spec-journey run                          # Execute compiled artifacts or referenced existing tests
 /spec-journey list
 /spec-journey inspect onboarding-first-project
 /spec-journey visual                       # Agent evaluates LLM visual contracts, writes receipts
@@ -333,14 +333,16 @@ Low-level CLI:
 ```bash
 livespec journey validate [--journey ID] [--feature SLUG] [--json]
 livespec journey compile [--journey ID] [--feature SLUG] [--changed] [--force]
-livespec journey run [--journey ID] [--feature SLUG] [--impacted] [--all] [--json]
+livespec journey run [--journey ID] [--feature SLUG] [--impacted] [--all] [--dry-run] [--json]
 livespec journey impact --changed-file PATH [--feature SLUG] [--json]
 livespec journey migrate --from-v1 [--apply] [--json]
 livespec journey visual-verify [--journey ID] [--json]   # verify agent receipts (no model call)
 livespec journey list|inspect
 ```
 
-Rules: create/edit compiles once; `run` executes native artifacts without recompiling and fails on stale source or old compiler manifests. XCUITest compilation runs `xcodegen generate` when `project.yml`/`project.yaml` is present. Edits require classification (`regression`, `intentional_update`, `obsolete`, `selector_fix`, or `coverage_expansion`) plus decision, changelog, validation, and run evidence. Visual checks may be native deterministic checks or LLM screenshot checks: the agent evaluates each compiled contract and writes a strict JSON receipt that `livespec journey visual-verify` checks (schema, contract/capture hashes, privacy, verdict). **Read** [`system/testing/user-journeys.md`](system/testing/user-journeys.md).
+Read [existing-test journeys](system/testing/existing-test-journeys.md) to register an original Playwright, Vitest or pytest file with its configuration and native selector. References run directly without compilation or copied fixtures; `list`/`inspect` expose them and `impact` tracks their files/config. Empty selections report `no_selection`, dry runs report `planned`, and identical references share one invocation. Declared evidence levels do not imply native application proof.
+
+Generated-mode rules: create/edit compiles once; `run` executes native artifacts without recompiling and fails on stale source or old compiler manifests. XCUITest compilation runs `xcodegen generate` when `project.yml`/`project.yaml` is present. Edits require classification (`regression`, `intentional_update`, `obsolete`, `selector_fix`, or `coverage_expansion`) plus decision, changelog, validation, and run evidence. Visual checks may be native deterministic checks or LLM screenshot checks: the agent evaluates each compiled contract and writes a strict JSON receipt that `livespec journey visual-verify` checks (schema, contract/capture hashes, privacy, verdict). **Read** [`system/testing/user-journeys.md`](system/testing/user-journeys.md).
 
 ### `/spec-check`
 

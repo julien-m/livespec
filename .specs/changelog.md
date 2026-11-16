@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-11-13
+> Last updated: 2026-11-16
 
 ---
+
+## 2026-11-16 — [Feature 123] Existing test journeys
+
+- Added existing-suite references with runner configuration, exact file selection, native result observation, invocation-local reuse and explicit empty/planned outcomes. Read [the adoption guide](../system/testing/existing-test-journeys.md). Consumer runtime adoption remains separate.
 
 ## 2026-11-04 — [Feature 079] Check: 73% verified (4/5 FR, 4/6 AC)
 

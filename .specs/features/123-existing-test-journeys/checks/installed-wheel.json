@@ -1,0 +1,17 @@
+{
+  "installed_helper": "/private/tmp/livespec-existing-journey-wheel-20261116/installed/validator/journeys/existing_tests.py",
+  "cases": [
+    "installed catalogue",
+    "installed impact",
+    "dry-run no execution + argv",
+    "real Vitest original fixture once",
+    "neighbor not imported",
+    "consumer outputFile handled",
+    "original bytes preserved",
+    "no generated test",
+    "empty selection explicit"
+  ],
+  "node_adapter": "node /private/tmp/livespec-existing-journey-wheel-20261116/installed/validator/journeys/vitest-reference.mjs '{\"config\": \"owned.config.mjs\", \"path\": \"existing/suite.spec.mjs\", \"test_name\": null}'",
+  "test_sha256_before_after": "f41b3acac1f1731066582a84b23de2479eed1b77c46c4b491c9bf26b666d46d1",
+  "wheel_sha256": "43362d101571866ddff594d6cea3fceb8b422cdfd71f99e0ab762bbf7c1ae0aa"
+}
