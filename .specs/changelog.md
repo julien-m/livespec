@@ -1138,3 +1138,7 @@ Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/
 ## 2026-11-13 — Feature122: Review Led Delivery
 
 - Publish the reviewed short delivery workflow, preserve historical diagnostics and verify the adapted installed pair in a consumer. Read [the feature](features/122-review-led-delivery/spec.md) and [migration plan](../docs/review-led-migration.md).
+
+## 2026-11-17 — Bugfix: package launchers respect pinned runtimes
+
+- Read [feature 083 correction](features/083-pinned-runtime-isolation/changelog.md) for package-generated command dispatch and reinstall checks; no consumer migration required.

@@ -195,3 +195,10 @@
 - **Proof:** `test_install_refuses_a_commit_missing_evidence_its_policy_declares` and `test_lost_rename_race_refuses_an_incomplete_winner` fail on the previous code and pass after the fix; `pytest tests/test_runtime_*.py` 120 passed; ruff, mypy and pyright clean.
 - **Gaps closed:** FR-001, FR-003 (snapshot completeness)
 - **Author:** claude-code
+
+## 2026-11-17 — Bugfix: preserve runtime dispatch across package reinstall
+
+- **Spec modified:** No; restores FR-004 CLI runtime selection for package-generated commands.
+- **Code modified:** `pyproject.toml`, `validator/entrypoint.py`.
+- **Tests:** `tests/test_package_entrypoint.py`, existing runtime-shim regression suite; isolated package reinstall qualification.
+- **Behavior:** wheel and editable console scripts execute the installed shim; missing/unusable/recursive shims fail with recovery guidance instead of bypassing project pins.

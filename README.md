@@ -540,13 +540,23 @@ development checkout. Full reference: [`docs/cli-reference.md`](docs/cli-referen
 cd ~/projects/livespec && uv sync    # once: the checkout's venv holds LiveSpec's dependencies
 cd ~/projects/livespec && .venv/bin/python -m validator.cli runtime install --source ~/projects/livespec --ref <commit>
 # first snapshot via the checkout's own venv; later `livespec runtime install` runs through the shim
-export PATH="$HOME/.livespec/bin:$PATH"   # shim before /opt/homebrew/bin/livespec (editable install)
+export PATH="$HOME/.livespec/bin:$PATH"   # direct shim access (package launchers also dispatch here)
 livespec runtime pin                      # in the project: writes .specs/livespec.lock
 livespec runtime upgrade --to current     # later, voluntarily; run /spec-migrate if reported
 livespec runtime dev --project . --source .   # the LiveSpec repository itself
 livespec runtime status --json            # drift findings (also part of livespec doctor)
 livespec runtime defect --command '<cmd>' --error '<error>' --feature <slug> --phase <phase>
 ```
+
+Package installs (editable or wheel, including installations under a Homebrew Python
+prefix) generate `livespec` through `validator.entrypoint:main`. Reinstalling the
+package therefore preserves dispatch through `$LIVESPEC_HOME/bin/livespec`, or
+`~/.livespec/bin/livespec` by default, independent of PATH order. The dispatcher
+executes the shim with its own interpreter and standard streams; it never silently
+runs the editable checkout. A missing, non-executable or self-referencing shim exits
+3 with bootstrap guidance. Bootstrap and explicit maintenance remain available via
+`python -m validator.cli`; do not install the package into the runtime home's own
+`bin` directory, which belongs to the generated shim.
 
 Fresh machine (no `livespec` CLI yet): `cd <livespec repo> && uv sync && .venv/bin/python -m
 validator.cli runtime install --source <livespec repo> --ref <commit from lock>`,
@@ -680,6 +690,11 @@ For batches, independent features and ready parts of dependent features can adva
 ## Validator CLI
 
 LiveSpec includes a Python-based validator (`livespec validate`) for structural, coherence, and semantic validation of `.specs/` files.
+
+After installing the package, bootstrap the shim and pin the project as described in
+[pinned runtime setup](#pinned-runtime-for-consumer-projects) before using the short
+command below. For explicit checkout maintenance, use `python -m validator.cli`
+instead of `livespec`.
 
 ```bash
 # Install

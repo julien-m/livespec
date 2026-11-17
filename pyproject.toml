@@ -36,7 +36,7 @@ integration = [
 ]
 
 [project.scripts]
-livespec = "validator.cli:app"
+livespec = "validator.entrypoint:main"
 
 [build-system]
 requires = ["setuptools>=68.0"]
