@@ -170,3 +170,9 @@ FR-001 / FR-003: the code running `livespec runtime install` may predate the com
 - [snapshot.py](../../../validator/runtime/snapshot.py) checks the staging tree before sealing (a cited file absent from the commit is refused with `RuntimeSourceError`) and checks a reused snapshot (`RuntimeSnapshotError` listing the missing paths, with the commands to delete and rebuild it).
 - [test_runtime_snapshot_evidence.py](../../../tests/test_runtime_snapshot_evidence.py) simulates an older builder (empty running policy, then no target reading and no check) and covers the three cases; a guard checks that this repository's own policy and catalogs parse back exactly. [runtime_support.py](../../../tests/runtime_support.py) now copies that evidence into the real-code source, which the new check otherwise refuses.
 
+
+## Package launcher correction — 2026-11-17
+
+- FR-004 / CLI shim resolution: `pyproject.toml` now generates `validator.entrypoint:main`; `validator/entrypoint.py` delegates by exec to the installed shim rather than importing the checkout CLI. This preserves the runtime-owned interpreter and project pins after editable/wheel reinstallations, regardless of PATH order. Missing, unusable and recursive shims fail explicitly; bootstrap remains `python -m validator.cli`.
+- Regression coverage: read [package command tests](../../../../tests/test_package_entrypoint.py); the original entrypoint fails all four cases, the correction passes. Existing runtime-shim tests exercise unchanged selection behavior.
+- Installation proof: isolated wheel and editable installation/reinstallation checks use the actual package-generated entrypoint and the Atlas private runtime, without repinning or changing global current.

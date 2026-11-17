@@ -51,3 +51,13 @@ Read [the maintenance scope and proof](implementation.md#2026-10-17--migration-t
 | Spec and plan realignment | Done | `spec.md` (AC-016, Story 6 Gherkin and flowchart), `plan.md` (D-11, Steps 2 and 3), `docs/cli-reference.md` | spec and plan reviews at `--review-max-chars 120000` | complete and ready | 2026-10-15 |
 | Readiness gate | Done | `.reviews/{spec,plan}.json` (disposable caches) | `livespec validate --progression implement --model claude-opus-5-5 --review-max-chars 120000` | READY | 2026-10-15 |
 | Full suite and conventions | Done | — | `pytest tests/ --ignore=tests/integration` (4218 passed); `livespec conventions verify --feature 083-pinned-runtime-isolation` | Pass / PASS | 2026-10-15 |
+
+## 2026-11-17 — Package entrypoint repair
+
+- Identified global Python editable installation as the owner of the legacy Homebrew-prefix launcher; no Homebrew formula involved.
+- Added package-to-shim process delegation and four regression cases; 24 package/shim tests pass, targeted Ruff and Pyright pass.
+- Scope is one shared package dispatch boundary: implement serially, then one independent final review. No project migration or runtime upgrade.
+
+- Qualification passed: isolated wheel install/reinstall and editable install/reinstall, each checked in fresh zsh `-c` and `-lc`; all eight observations discover nine Atlas references and report the pinned runtime, binding bound, no drift/findings. Active installation not reinstalled.
+- Independent final review accepted the dispatcher; its minor fresh-machine bootstrap documentation observation is corrected.
+- Extended adjacent runtime regression suite: 127 passed in 66.38 s; command bounded at 180 s.
