@@ -39,3 +39,8 @@ Private/public histories differ. Publish only this feature and original public a
 | No new runtime/data behavior | No Python, dependency, schema, generated skill or historical diagnostic edit | Check changed-file scope and preserve existing consumer runtime lineage during the parent's explicit port |
 
 This extends feature122's existing delivery contract without allocating another feature identifier. Parent publication/adoption and review remain separate from this source correction; no live consumer is silently repinned here.
+
+## 2026-11-18 — Project conventions in review
+
+- FR-005 / AC-008: read [the shared convention review procedure](../../../system/review-led-delivery.md#conventions-in-plan-and-final-reviews). Use project-local selection and reference resolution for the planned decisions and the final diff. Record rule, evidence and conclusion in the existing report, including coverage limits.
+- Read [the plan entry point](../../../.agent-sync/skills/spec-plan/SKILL.md) for integration. Keep the existing review cadence and use static review and existing diagnostic compatibility checks as evidence. No runtime code, persisted schema or test gate changes.

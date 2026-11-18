@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-18 — Project conventions in review
+
+- FR-005 / AC-008: read [the review procedure](../../../system/review-led-delivery.md#conventions-in-plan-and-final-reviews) for project-local convention selection and rule-to-evidence reporting in both reviews. No new tests or certification gates.
+
 ## 2026-11-14 — Feature: Automatic useful delegation
 
 - **Type:** Feature.

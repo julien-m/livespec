@@ -71,7 +71,7 @@ The generated LiveSpec Git hook is advisory and no longer launches strict certif
 
 ## Conventions
 
-Load and apply the project's conventions to the changed code. Useful deterministic checks inform the final review. An optional explicit `livespec conventions verify --report` provides a diagnostic report; its certificate is not a mandatory delivery gate. The final reviewer checks architecture, file placement, maintainability and concrete security risks.
+Start reviews from the target project's `.conventions/`, when present, and follow its relevant references. Report the rules checked against the plan or delivered code, with locations and conclusions. Read [the shared convention review procedure](system/review-led-delivery.md#conventions-in-plan-and-final-reviews). Useful deterministic checks inform the final review. The optional `livespec conventions verify --report` remains an explicit diagnostic.
 
 ## The 23 Commands
 
