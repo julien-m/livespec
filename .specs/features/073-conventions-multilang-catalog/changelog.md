@@ -1,5 +1,15 @@
 # Changelog: Multilang Convention AST Catalog + Enforce-by-Default (073)
 
+## 2026-11-18 — [Fix]: Refresh AST catalog source provenance hashes
+
+- **Type:** Bugfix
+- **Spec modified:** No; FR-003/AC-005 rules, anchors, patterns and fixtures unchanged.
+- **Code modified:** `source_hash` only in [ast_high.yaml](../../../validator/conventions_ast/rule_catalog/ast_high.yaml), [rust_high.yaml](../../../validator/conventions_ast/rule_catalog/rust_high.yaml), [swift_high.yaml](../../../validator/conventions_ast/rule_catalog/swift_high.yaml) and [kotlin_high.yaml](../../../validator/conventions_ast/rule_catalog/kotlin_high.yaml).
+- **AC impacted:** AC-005; no full-feature certification claimed.
+- **Author:** spec-fix
+- **Result:** Hashes recomputed from installed AI-RESSOURCES `javascript.md`, `rust.md` and `swift-kotlin.md`; referenced sections still state each rule. Catalog load previously failed with `source_hash mismatch`; 110 targeted local tests pass after the edit. This is not a closure verdict, and consumer-environment validation is pending its own proof.
+- **Remaining:** `ars_executable_rules.csv` keeps its inventory-snapshot hashes, which are not compared with live sources at load.
+
 ## 2026-10-08 — [Fix]: Exclude only root governance notices
 
 - **Type:** Bugfix

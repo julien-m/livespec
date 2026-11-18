@@ -10,7 +10,7 @@ rules:
     enforcement: mode
     source_path: ai-ressources/code-conventions/rust.md
     source_anchor: "#type-system"
-    source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
+    source_hash: sha256:bb90f1b956dede6829b04bf75552c1e0a2f619eefb544b3d7000a0ba62e2b0d4
     backend: ast-grep
     detector: rust.no_unwrap
     patterns:
@@ -42,7 +42,7 @@ rules:
     enforcement: mode
     source_path: ai-ressources/code-conventions/rust.md
     source_anchor: "#type-system"
-    source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
+    source_hash: sha256:bb90f1b956dede6829b04bf75552c1e0a2f619eefb544b3d7000a0ba62e2b0d4
     backend: ast-grep
     detector: rust.no_expect
     patterns:
@@ -74,7 +74,7 @@ rules:
     enforcement: mode
     source_path: ai-ressources/code-conventions/rust.md
     source_anchor: "#error-handling"
-    source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
+    source_hash: sha256:bb90f1b956dede6829b04bf75552c1e0a2f619eefb544b3d7000a0ba62e2b0d4
     backend: ast-grep
     detector: rust.no_panic
     patterns:

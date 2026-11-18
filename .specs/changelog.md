@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-11-18 — [Feature 073] Bugfix: refresh AST catalog source provenance hashes
+
+- Realign `source_hash` in four AST catalogs with the installed AI-RESSOURCES sources; 110 targeted local tests pass, no closure verdict or consumer validation yet. Read [the feature changelog](features/073-conventions-multilang-catalog/changelog.md).
+
 ## 2026-10-16 — [Feature 078] Bugfix: reserve the full Plan before packing review sources
 
 - Avoid unnecessary Cartesian review expansion and preserve exact historical receipt layouts. Read [the validation record](features/078-requirement-evidence-integrity/checks/2026-10-16-plan-packing.md).

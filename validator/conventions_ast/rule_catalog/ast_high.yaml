@@ -10,7 +10,7 @@ rules:
     enforcement: mode
     source_path: ai-ressources/code-conventions/javascript.md
     source_anchor: "#typescript-specifics"
-    source_hash: sha256:9ea7336d3b80963a0740aff3e09526e21e79e40809160d75f2bf2e0241e301bd
+    source_hash: sha256:814cb07e0b6ba3d691ffb4e28d195cef8e47cc584927f80efa2f3b4cf82257f2
     backend: ast-grep
     detector: ts.no_as_any
     patterns:
@@ -42,7 +42,7 @@ rules:
     enforcement: mode
     source_path: ai-ressources/code-conventions/javascript.md
     source_anchor: "#typescript-specifics"
-    source_hash: sha256:9ea7336d3b80963a0740aff3e09526e21e79e40809160d75f2bf2e0241e301bd
+    source_hash: sha256:814cb07e0b6ba3d691ffb4e28d195cef8e47cc584927f80efa2f3b4cf82257f2
     backend: ast-grep
     detector: ts.no_commonjs_require
     patterns:

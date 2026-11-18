@@ -10,7 +10,7 @@ rules:
     enforcement: mode
     source_path: ai-ressources/code-conventions/swift-kotlin.md
     source_anchor: "#type-system"
-    source_hash: sha256:5a65f11d4f54bac0bfdbd50092cd7b3663b353a2e6d7a26fe8b3f6d47387b74a
+    source_hash: sha256:70f9c733a9bb00f2b0166c61003ddd0660ba36d76509e9d2b231e3464b2f5b8e
     backend: ast-grep
     detector: kotlin.no_unchecked_cast
     patterns:
