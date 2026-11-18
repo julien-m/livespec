@@ -14,6 +14,6 @@ Treat [the former certification workflow](certification.md) as an explicit histo
 ## Work
 
 1. Resolve the feature and read its spec, decisions, project constraints and applicable conventions before planning.
-2. Describe the modules/contracts that change, the intended behavior and the useful checks. Keep the plan proportional; do not add a certification pipeline or a mechanism without a product need.
+2. Describe the modules/contracts that change, the intended behavior and the useful checks. Use the shared policy's [project convention procedure](../../../system/review-led-delivery.md#conventions-in-plan-and-final-reviews) to connect the applicable rules to decisions in the existing plan.
 3. Resolve material contradictions and missing functional choices. Reuse an existing plan review; dispatch a separate plan review only when the user asks for it. No JSON ingestion, reviewer identity gate, review receipt or continuity protocol is required.
-4. Save the plan and any available review conclusions. Return them to the parent without extra phase agents or goals.
+4. Save the plan and any available review conclusions, including which rules were checked, where and with what result. Return them to the parent without extra phase agents or goals.

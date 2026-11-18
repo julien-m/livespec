@@ -8,6 +8,7 @@
 | FR-002 | `validator/goal_payload.py`, retained certification.md files | FR-002 | Two compatibility tests pass | 2026-11-13 |
 | FR-003 | `.agent-sync/rules/livespec/`, five system entry points, README | FR-003 | Independently reviewed | 2026-11-13 |
 | FR-004 | `docs/review-led-migration.md` | FR-004 | Plan reviewed; installed pair selected and reloaded in Atlas | 2026-11-13 |
+| FR-005 | [Shared policy](../../../system/review-led-delivery.md#conventions-in-plan-and-final-reviews), [plan skill](../../../.agent-sync/skills/spec-plan/SKILL.md) | FR-005 | Implemented in review instructions | 2026-11-18 |
 
 ## Acceptance Criteria Mapping
 
@@ -22,6 +23,8 @@
 | AC-007 | Read [automatic useful parallelism](../../../system/review-led-delivery.md#automatic-useful-parallelism), [parallel delivery](../../../system/parallel-delivery.md) and [current README](../../../README.md#multi-agent-mode-default) | Shared policy dispatches native workers automatically; final correction review and consumer adoption owned by parent |
 
 ## Files Created/Modified
+
+AC-008 maps to the evidence requirements in the [shared policy](../../../system/review-led-delivery.md#conventions-in-plan-and-final-reviews).
 
 Twelve compact skills, four role prompts,16 original public archives, routing, system introductions, README, migration plan, goal compiler, regression tests and this feature's documents. No private historical specification or unrelated private commit is published.
 

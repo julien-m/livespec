@@ -1,4 +1,4 @@
-<!-- @spec FR-001, FR-003: Default delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
+<!-- @spec FR-001, FR-003, FR-005: Default delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
 # Review led delivery
 
 This is the default delivery policy for init, migrate, feature, specify, plan, implement, fix, test, check, refine, preflight and ship skills, including direct, nested, autonomous and resumed invocations. It replaces their former automatic certification workflow. Read the applicable project conventions and honor the user's scope and decisions.
@@ -42,11 +42,19 @@ flowchart LR
 - Do not manufacture PASS results, delete failing tests, adopt baselines blindly, weaken requirements or claim that an unexecuted interaction occurred. An essential missing observation remains unverified and goes to the reviewer with its impact.
 - A failure in LiveSpec's bookkeeping does not prevent direct product checks or review. Note the issue in the current report and continue; do not start a framework repair mission as a prerequisite to the feature.
 
+## Conventions in plan and final reviews
+
+- Start in the **target project's** root and inspect `.conventions/index.md` and `.conventions/manifest.yaml` when present. Select relevant domains from the actual stack and affected files, respect project exclusions, and follow local and external references, including applicable inherited rules. For AI-RESSOURCES references, resolve the clone with `AIRESOURCES`, then a valid manifest path, then a valid path from the index. The clone supplies the referenced content; the project's index and manifest guide selection.
+- Give the reviewer the project convention entry points, the applicable rule text and its source/section, and any gaps in resolution. Supplement missing coverage from applicable project instructions or mandatory shared rules using the observed stack. If the index, manifest or a referenced source is absent, inaccessible or inconsistent, note the affected coverage and continue with available rules. Never count an unread source as checked.
+- In an existing or explicitly requested **plan review**, compare each selected rule to a concrete decision in the affected module or contract. Cite the plan section and record the intended verification, a missing decision, or a justified exception. Planned verification is distinct from an observed result.
+- In the **final review**, check the same applicable rules against the current diff and related code, configuration and comments. Include newly relevant rules if the change or stack has evolved. Trace relevant failure paths and use existing check results where they prove the rule.
+- In each review's normal prose, name the rules actually checked and give the source/section, plan or code location, and conclusion. Group rules supported by the same evidence. Distinguish confirmed gaps, accepted exceptions and unverified coverage. Missing convention documentation is a coverage limitation; any material product risk it leaves unresolved is judged under the existing review criteria. This adds no tests, certificate, extra review step or machine gate.
+
 ## One independent final review
 
 Reuse an existing plan review as context. Do not create another automatic review before implementation; run a separate plan review only when the user requests it.
 
-- Dispatch one fresh native reviewer without the implementer's conversation history. Give it the user request, current spec/plan, accepted decisions, applicable conventions, complete change and real check outcomes, including failures and unavailable checks. It must inspect relevant existing files as well as the diff. Use the host's generic native reviewer if a project-local named agent still injects the former certification requirements; do not select that obsolete definition for the new workflow.
+- Dispatch one fresh native reviewer without the implementer's conversation history. Give it the user request, current spec/plan, accepted decisions, convention inputs described above, complete change and real check outcomes, including failures and unavailable checks. It must inspect relevant existing files as well as the diff. Use the host's generic native reviewer if a project-local named agent still injects the former certification requirements; do not select that obsolete definition for the new workflow.
 - Review functional correctness, acceptance coverage, file placement, architecture, maintainability and concrete security/data risks. A missing receipt, model declaration, hash, registry marker or test percentage is not a product defect.
 - Return a concise verdict and concrete findings with file references, impact and necessary correction. No strict JSON, raw-transcript ingestion, complete-file enumeration or reviewer identity certificate is required. Keep the host's actual response as the review record.
 - Only a concrete material defect, an essential unverified behavior with material risk, a missing authority or an unresolved functional decision delays delivery. Carry minor findings and irrelevant/pre-existing test failures as reported follow-ups. Do not introduce another whole-feature review or audit by default.

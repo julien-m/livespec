@@ -4,7 +4,7 @@ priority: P1
 feature: 122-review-led-delivery
 status: Implemented
 created: 2026-11-13
-updated: 2026-11-14
+updated: 2026-11-18
 ---
 
 # Feature Spec: Review Led Delivery
@@ -56,6 +56,11 @@ Feature: Review led delivery
     Given a plan-only request or an explicit single-agent restriction
     When the coordinator considers delegation
     Then its tasks preserve that restriction and do not start unauthorized implementation
+  Scenario: Review project conventions
+    Given the target project declares relevant references and exclusions in .conventions
+    When an existing review examines planned decisions or delivered code
+    Then it reports the applicable rules with source, evidence and conclusion
+    And it reports unreadable sources as coverage limits without a new gate
 ```
 
 ```mermaid
@@ -89,6 +94,10 @@ The documented migration preserves consumer-specific fixes, accepted decisions, 
 ### AC-007
 Every feature automatically dispatches useful ready independent work within actual native capacity and authority. Briefs define ownership, inputs, conventions, tools and evidence; the coordinator integrates shared changes and one final review. Independent selected features in an authorized batch or program/goal/backlog may advance together, including in authorized worktrees based on actual accepted source rather than an obsolete Git HEAD. Shared pen.dev work stays in one product canvas with disjoint ownership. Indivisible tasks, missing delegation capabilities, read-only scopes, requested models/roles and actual refusals remain explicit without an agent-count gate.
 
+### AC-008
+
+Both review reports identify the applicable rules actually checked, their sources, the plan or code evidence and the conclusion. Missing sources are disclosed as coverage limits without an automatic test or certification gate.
+
 ## Functional Requirements
 
 ### FR-001
@@ -102,6 +111,10 @@ Update routing, system entry points and documentation so script results inform r
 
 ### FR-004
 Document and verify safe migration without consumer downgrade or retrospective certification. Covers AC-005 and AC-006.
+
+### FR-005
+
+Resolve review conventions from the target project's `.conventions/` first, following relevant references and exclusions. Compare rules to planned decisions in plan reviews and to the delivered change in final reviews. Covers AC-008.
 
 ## Key Entities
 

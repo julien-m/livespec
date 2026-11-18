@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-11-16
+> Last updated: 2026-11-18
 
 ---
+
+## 2026-11-18 — [Feature 122] Project conventions in review
+
+- Plan and final reviews start from the target project's convention index and manifest, follow relevant references and report rules checked with evidence. Read [the review procedure](../system/review-led-delivery.md#conventions-in-plan-and-final-reviews).
 
 ## 2026-11-16 — [Feature 123] Bugfix: discover Markdown requirement definitions
 
