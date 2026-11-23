@@ -4,7 +4,7 @@ priority: P1
 feature: 122-review-led-delivery
 status: Implemented
 created: 2026-11-13
-updated: 2026-11-18
+updated: 2026-11-23
 ---
 
 # Feature Spec: Review Led Delivery
@@ -61,6 +61,18 @@ Feature: Review led delivery
     When an existing review examines planned decisions or delivered code
     Then it reports the applicable rules with source, evidence and conclusion
     And it reports unreadable sources as coverage limits without a new gate
+  Scenario Outline: Implement UI from an approved mockup
+    Given an approved mockup covers the UI change
+    When the coordinator runs <command>
+    Then the affected Penflow frames and states are updated and verified before UI coding
+    And the independent review examines matching Penflow and product captures side by side
+    And visual acceptance waits for the comparison and resolution of material differences
+
+    Examples:
+      | command        |
+      | spec-fix       |
+      | spec-implement |
+      | spec-feature   |
 ```
 
 ```mermaid
@@ -98,6 +110,10 @@ Every feature automatically dispatches useful ready independent work within actu
 
 Both review reports identify the applicable rules actually checked, their sources, the plan or code evidence and the conclusion. Missing sources are disclosed as coverage limits without an automatic test or certification gate.
 
+### AC-009
+
+For UI covered by an approved mockup, the shared workflow records the approved source and verified Penflow frames before UI coding. The independent final review examines side-by-side captures of the affected states. Missing visual evidence keeps acceptance pending, and material differences require correction or explicit user approval. Historical CLI certification remains optional.
+
 ## Functional Requirements
 
 ### FR-001
@@ -115,6 +131,10 @@ Document and verify safe migration without consumer downgrade or retrospective c
 ### FR-005
 
 Resolve review conventions from the target project's `.conventions/` first, following relevant references and exclusions. Compare rules to planned decisions in plan reviews and to the delivered change in final reviews. Covers AC-008.
+
+### FR-006
+
+Apply the approved mockup workflow across projects through the shared delivery policy for direct, delegated and resumed feature and fix work. Covers AC-009.
 
 ## Key Entities
 

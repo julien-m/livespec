@@ -22,6 +22,10 @@
 | AC-006 | Migration plan | Atlas safe checkpoint, supported upgrade and policy reload observed |
 | AC-007 | Read [automatic useful parallelism](../../../system/review-led-delivery.md#automatic-useful-parallelism), [parallel delivery](../../../system/parallel-delivery.md) and [current README](../../../README.md#multi-agent-mode-default) | Shared policy dispatches native workers automatically; final correction review and consumer adoption owned by parent |
 
+## Approved mockup fidelity
+
+FR-006 / AC-009 map to [the shared policy](../../../system/review-led-delivery.md#approved-mockup-fidelity), loaded by [spec-fix](../../../.agent-sync/skills/spec-fix/SKILL.md), [spec-implement](../../../.agent-sync/skills/spec-implement/SKILL.md) and [spec-feature](../../../.agent-sync/skills/spec-feature/SKILL.md). The coordinator gives the approved design and runtime comparison to the existing independent reviewer. Read [the pinned consumer tests](../../../tests/test_runtime_docs.py) for command-to-policy resolution.
+
 ## Files Created/Modified
 
 AC-008 maps to the evidence requirements in the [shared policy](../../../system/review-led-delivery.md#conventions-in-plan-and-final-reviews).
