@@ -1,4 +1,5 @@
 <!-- @spec FR-001, FR-003, FR-005: Default delivery — .specs/features/122-review-led-delivery/spec.md#fr-001 -->
+<!-- @spec FR-006: Approved mockup fidelity — .specs/features/122-review-led-delivery/spec.md#fr-006 -->
 # Review led delivery
 
 This is the default delivery policy for init, migrate, feature, specify, plan, implement, fix, test, check, refine, preflight and ship skills, including direct, nested, autonomous and resumed invocations. It replaces their former automatic certification workflow. Read the applicable project conventions and honor the user's scope and decisions.
@@ -34,6 +35,16 @@ flowchart LR
     C --> B
 ```
 
+## Approved mockup fidelity
+
+Apply this workflow to UI covered by a user-approved mockup. It applies across projects to direct, nested, delegated and resumed work, including `spec-feature`, `spec-fix` and `spec-implement`. Use the approved source regardless of the tool that produced it.
+
+1. **Before changing UI code**, update the affected screens and states in the project's canonical Penflow design. Reuse the existing document and shared components where present. Verify the saved design against the approved source for layout, theme, density and interactions. Link the approved source and exact Penflow frames and states in the feature spec or plan. Give delegated implementers those references before they start. On resume, verify this step before further UI changes.
+2. **Before accepting the UI**, capture the running product and the saved Penflow design at matching viewport sizes, states and comparable content. Put the captures side by side for each affected approved state. Keep the comparison available and link to it from the existing final review record, with the viewport, state and any user-approved deviations. The reviewer checks layout, hierarchy, theme, density and spacing. Resolve material differences and compare fresh captures, or obtain and record the user's explicit acceptance of the differences.
+3. If Penflow, the approved source or the runtime is unavailable, report the precise blocker and continue authorized independent work. Hold affected UI coding until step 1 is satisfied. Keep visual acceptance pending until step 2 is satisfied. Respect any tool access and sharing restrictions.
+
+The comparison is evidence for the existing review. Historical Penflow certification and receipt commands remain optional diagnostics.
+
 ## Checks inform the review
 
 - Run useful tests, builds, typing, lint and runtime observations for the affected behavior. Keep checks proportional and reuse passing results when their relevant inputs are unchanged.
@@ -64,7 +75,7 @@ Reuse an existing plan review as context. Do not create another automatic review
 ## No automatic certification
 
 - Do not render/prove/archive nested LiveSpec goals, ingest semantic review receipts, classify repair patches, generate certifying manifests, run delivery-continuity/revision certificates, or require conventions, visual, Penflow, finalize or verify-output receipts to advance normal delivery.
-- Read relevant design references and observe the real UI when needed. Design tooling stays useful; its certification protocol has no automatic veto over feature delivery.
+- Read relevant design references and observe the real UI when needed. Apply [approved mockup fidelity](#approved-mockup-fidelity) where applicable. Historical visual certification remains an explicit diagnostic.
 - Apply the same rule to inherited hooks, child commands, phase/result wrappers and completion helpers: they cannot silently reintroduce the former certification gates. Explicit external tool refusals and user-imposed authorization limits remain in force.
 - Legacy flags such as `--auto`, `--resume`, `--bugfix` and `--economy` do not reactivate certification. Honor their useful scope/read-only meaning. Read each command's retained `certification.md` only for an explicitly requested historical diagnostic.
 - Existing CLI diagnostics keep their real exit codes and immutable historical interpretation. Do not turn an old BLOCKED into PASS, edit old evidence, reset mission counters or silently move an active mission to another policy. Independent work can continue while the current delivery review reports that history accurately.

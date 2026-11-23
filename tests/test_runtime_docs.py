@@ -154,6 +154,20 @@ def test_linked_skill_references_resolve_inside_snapshot(
     assert targets == {skill: (True, boundary) for skill in LIFECYCLE_SKILLS} and boundary.is_file()
 
 
+@pytest.mark.parametrize("skill", ("spec-fix", "spec-implement", "spec-feature"))
+def test_pinned_delivery_skill_loads_approved_mockup_policy(
+    pinned_consumer: tuple[Path, Path], skill: str
+) -> None:
+    """AC-009: normal delivery resolves the shared approval workflow from a consumer pin."""
+    project, snapshot = pinned_consumer
+    entry_point = (project / ".agent-sync.local/skills" / skill / "SKILL.md").resolve()
+    match = re.search(r"\]\(([^)]*review-led-delivery\.md)\)", entry_point.read_text())
+    assert match is not None
+    policy = (entry_point.parent / match.group(1)).resolve()
+    assert policy == snapshot / "system/review-led-delivery.md"
+    assert "## Approved mockup fidelity" in policy.read_text().splitlines()
+
+
 def test_docs_cover_every_runtime_command() -> None:
     """AC-018: six commands, PATH ordering, fresh machine and one identical migration block."""
     readme = (WORKTREE / "README.md").read_text()

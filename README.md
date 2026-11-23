@@ -63,6 +63,10 @@ A fresh native reviewer examines the complete change, relevant existing code, fi
 
 Read [the default delivery policy](system/review-led-delivery.md) for the complete workflow. Former skill bodies are retained as `certification.md` beside each compact skill for explicit historical diagnostics. `livespec goal`, `validate`, `conventions`, Penflow and other diagnostic CLI commands keep their real exit codes and historical semantics; they are no longer automatic prerequisites of skill delivery. Existing histories are preserved, and active missions are not silently migrated.
 
+### Approved mockups
+
+For UI covered by a user-approved mockup, update and verify the project's Penflow design before changing the UI code. Compare captures of the running product and the saved Penflow design side by side before accepting the UI. This applies to features, fixes and direct implementation across projects using the shared policy. Read [the approved mockup workflow](system/review-led-delivery.md#approved-mockup-fidelity).
+
 ## Historical goal diagnostics
 
 Explicit `livespec goal` diagnostics retain an outcome goal with an executable stop condition and their original receipt contracts. They inspect historical runs on request; standard review-led delivery does not create or prove these goals automatically.
@@ -300,6 +304,8 @@ Auto-implement from plan: code, test, verify, document. Multi-agent by default.
 
 Key flags: `--mono`, `--economy`, `--resume`, `--no-visual`, `--no-save`, `--step`
 
+The [approved mockup workflow](system/review-led-delivery.md#approved-mockup-fidelity) applies even when skipping legacy visual automation with `--no-visual`.
+
 ### `/spec-test`
 
 Audit test coverage against AC, generate missing tests from Gherkin scenarios, execute the full suite, and capture visual baselines.
@@ -442,12 +448,12 @@ Key flags: `--roadmap`, `--features`, `--json`
 
 ---
 
-Read [Penflow certification](system/testing/penflow-contract.md) for the distinction between
+For explicit historical diagnostics, read [Penflow certification](system/testing/penflow-contract.md) for the distinction between
 noncertifying READY inspection and current PASS certification. Workflow callers select
 `--required-profile design|implementation`; implementation also receives an independent
-`--build-manifest` from its runner. Missing evidence or a compatible Penflow CLI blocks closure.
+`--build-manifest` from its runner. This certification requires its evidence and a compatible Penflow CLI.
 
-Visual lifecycle closure also checks the approved FR/AC selection and bound plan-review history automatically; reopening and governed visual retirement remain supported. Read [Penflow workflow](system/testing/penflow-contract.md).
+Historical visual lifecycle closure checks the approved FR/AC selection and bound plan-review history. Read [the standard approved mockup workflow](system/review-led-delivery.md#approved-mockup-fidelity) for current feature delivery.
 
 ## Project Structure Created by `/spec-init`
 
@@ -517,7 +523,7 @@ project has `.specs/`:
 
 <!-- @spec FR-012: Bugfix lane commands — .specs/features/084-bugfix-lane/spec.md#fr-012 -->
 
-`/spec-fix <feature> --bugfix` fixes a confined bug without whole-feature spec and plan reviews, when the CLI proves eligibility; otherwise it falls back to the complete gate with its reasons.
+`/spec-fix <feature> --bugfix` scopes a correction under the [shared delivery policy](system/review-led-delivery.md). The following CLI commands are explicit historical diagnostics.
 
 ```bash
 livespec bugfix capture --feature <slug> --expect red --command "<python> -m pytest tests/test_x.py"

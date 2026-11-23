@@ -428,6 +428,8 @@ A confined bug in an implemented feature can skip whole-feature readiness when `
 
 ### When working with DESIGN mockups
 
+For standard delivery, follow [approved mockup fidelity](../system/review-led-delivery.md#approved-mockup-fidelity). Use the project's existing canonical Penflow document. The numbered procedure below describes the historical visual diagnostics.
+
 <!-- @spec FR-010: Screens table format with selector and aa_tolerance — .specs/features/003-visual-testing-fidelity/spec.md#fr-010 -->
 
 1. Design mockup screenshots are centralized in `.specs/design/screens/`; Penflow projects keep the canonical `.pen` source at `penflow/ui.pen`

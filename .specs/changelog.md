@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-11-18
+> Last updated: 2026-11-23
 
 ---
+
+## 2026-11-23 — [Feature 122] Approved mockup fidelity
+
+- Standard feature and fix workflows apply [the approved mockup workflow](../system/review-led-delivery.md#approved-mockup-fidelity) before UI coding and during final review.
 
 ## 2026-11-18 — [Feature 122] Project conventions in review
 

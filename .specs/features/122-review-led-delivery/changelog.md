@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-23 — Approved mockup fidelity
+
+- FR-006 / AC-009. Read [the shared workflow](../../../system/review-led-delivery.md#approved-mockup-fidelity) for Penflow updates before UI coding and side-by-side visual evidence before acceptance.
+
 ## 2026-11-18 — Project conventions in review
 
 - FR-005 / AC-008: read [the review procedure](../../../system/review-led-delivery.md#conventions-in-plan-and-final-reviews) for project-local convention selection and rule-to-evidence reporting in both reviews. No new tests or certification gates.
