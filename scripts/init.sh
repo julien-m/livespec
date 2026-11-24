@@ -267,6 +267,7 @@ See the available presets for guidance:
   local conventions_pattern=".conventions/"
   local live_patterns=(
     "$conventions_pattern"
+    ".specs/.LOCK"
     ".specs/hooks/*.local.md"
     ".agents/skills/spec-*"
     ".agents/skills/source-command-cli"

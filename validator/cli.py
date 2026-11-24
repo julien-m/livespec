@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-import shutil
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any
@@ -23,6 +22,7 @@ from .engine import validate_all
 from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
 from .git_ops import git_app
+from .hook_install import HookInstallError, install_advisory_hook
 from .hooks_cli import hooks_app, integrations_app
 from .migration_planner import MigrationPlannerError
 from .pipeline import pipeline_app
@@ -1014,47 +1014,14 @@ def install_hook(
     Raises:
         typer.Exit: If the directory is not a git repository or hook installation fails.
     """
-    target = Path(target_dir).resolve()
-    hooks_dir = target / ".git" / "hooks"
-
-    if not hooks_dir.exists():
-        typer.echo(f"Error: {hooks_dir} does not exist. Is this a git repository?", err=True)
-        raise typer.Exit(1)
-
-    # Find our hook source
-    hook_src = Path(__file__).parent / "hooks" / "pre-commit-hook"
-    if not hook_src.exists():
-        typer.echo(f"Error: hook source not found at {hook_src}", err=True)
-        raise typer.Exit(1)
-
-    hook_dst = hooks_dir / "pre-commit"
-
     # @spec FR-003: Migrate the exact generated hook without deleting custom checks
     # — .specs/features/122-review-led-delivery/spec.md#fr-003
-    historical_hook = hook_src.with_name("pre-commit-certification-hook")
-    if (
-        hook_dst.is_file()
-        and not hook_dst.is_symlink()
-        and historical_hook.is_file()
-        and hook_dst.read_bytes() == historical_hook.read_bytes()
-    ):
-        shutil.copy2(hook_src, hook_dst)
-        hook_dst.chmod(0o755)
-        typer.echo("Replaced the original LiveSpec certification hook with the advisory hook.")
-    elif hook_dst.exists():
-        typer.echo(
-            f"Warning: {hook_dst} already exists. Appending LiveSpec hook; "
-            "existing custom checks remain unchanged and require separate inspection.",
-            err=True,
-        )
-        with open(hook_dst, "a") as f:
-            f.write("\n\n# --- LiveSpec validation hook ---\n")
-            f.write(hook_src.read_text())
-    else:
-        shutil.copy2(hook_src, hook_dst)
-        hook_dst.chmod(0o755)
-
-    typer.echo(f"LiveSpec pre-commit hook installed in {hook_dst}")
+    try:
+        message = install_advisory_hook(Path(target_dir).resolve())
+    except (HookInstallError, OSError) as error:
+        typer.echo(f"Error: {error}", err=True)
+        raise typer.Exit(1) from error
+    typer.echo(message)
 
 
 if __name__ == "__main__":

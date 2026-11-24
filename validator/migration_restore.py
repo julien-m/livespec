@@ -26,6 +26,41 @@ KIND_LINK = "symlink"
 KIND_DIRECTORY = "directory"
 KINDS = {KIND_FILE: stat.S_ISREG, KIND_LINK: stat.S_ISLNK, KIND_DIRECTORY: stat.S_ISDIR}
 _SHA256 = re.compile(r"[a-f0-9]{64}")
+_STORE_IGNORE = b"# LiveSpec migration restore store.\n/*\n"
+V22_SCOPE = (
+    ".agent-sync",
+    ".agent-sync.local",
+    ".agents",
+    ".claude",
+    ".codex",
+    ".gitignore",
+    ".ruff_cache",
+    ".specs/conventions",
+    ".specs/conventions-gates.yaml",
+    ".specs/conventions-rulebook.yaml",
+    ".specs/livespec-version",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "pyproject.toml",
+    ".eslintrc.json",
+    ".swiftlint.yml",
+)
+V22_LEGACY_SCOPE = (
+    ".agent-sync",
+    ".agent-sync.local",
+    ".agents",
+    ".claude",
+    ".codex",
+    ".conventions",
+    ".eslintrc.json",
+    ".ruff_cache",
+    ".specs",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "pyproject.toml",
+)
+V23_SCOPE = (".gitignore", ".specs/livespec-version", ".specs/recovery-policy.yaml")
+_SUPPORTED_SCOPES = {22: (V22_SCOPE, V22_LEGACY_SCOPE), 23: (V23_SCOPE,)}
 
 
 class RestorePointError(Exception):
@@ -119,6 +154,12 @@ def _checked_scope(project: Path, scope: Sequence[object]) -> tuple[PurePosixPat
     return roots
 
 
+def _validate_migration_scope(version: int, roots: Sequence[PurePosixPath]) -> None:
+    names = {str(root) for root in roots}
+    if not any(names == set(scope) for scope in _SUPPORTED_SCOPES.get(version, ())):
+        raise RestorePointError(f"restore scope does not match migration {version}")
+
+
 def _walk(project: Path, roots: Sequence[PurePosixPath]) -> Iterator[tuple[PurePosixPath, int]]:
     for root in roots:
         pending = [root]
@@ -171,11 +212,22 @@ def _project_version(project: Path) -> str | None:
     return path.read_text(encoding="utf-8").strip()
 
 
+def _protect_store(parent: Path) -> None:
+    parent.mkdir(exist_ok=True)
+    marker = parent / ".gitignore"
+    try:
+        with marker.open("xb") as file:
+            file.write(_STORE_IGNORE)
+    except FileExistsError as error:
+        mode = _kind(marker)
+        if mode is None or not stat.S_ISREG(mode) or marker.read_bytes() != _STORE_IGNORE:
+            raise RestorePointError(f"refusing to replace custom ignore file: {marker}") from error
+
+
 def record(project: Path, version: int, scope: Sequence[str]) -> Outcome:
     """Record the project state before migration, keeping the first complete backup."""
     roots = _checked_scope(project, scope)
-    if not any(root == VERSION_RELPATH or root in VERSION_RELPATH.parents for root in roots):
-        raise RestorePointError("restore scope must include the project version")
+    _validate_migration_scope(version, roots)
     store = _checked_store(project, version)
     project_version = _project_version(project)
     if store.exists():
@@ -183,13 +235,16 @@ def record(project: Path, version: int, scope: Sequence[str]) -> Outcome:
             raise RestorePointError(
                 f"project version {project_version} cannot run migration {version}"
             )
-        return _keep_point(project, store, version, roots)
+        kept = _keep_point(project, store, version, roots)
+        _protect_store(store.parent)
+        return kept
     if project_version != str(version - 1):
         raise RestorePointError(
             f"migration {version} needs project version {version - 1}, found {project_version}"
         )
 
-    store.parent.mkdir(exist_ok=True)
+    # Staged bytes and the complete backup are ignored even before the root ignore is updated.
+    _protect_store(store.parent)
     # Publish the completed backup as one directory so interrupted retries retain the pre-image.
     with tempfile.TemporaryDirectory(dir=store.parent, prefix=f".{version}-") as scratch:
         staged = Path(scratch) / "point"
@@ -282,6 +337,7 @@ def _load_point(
     if not isinstance(scope, list) or not isinstance(items, list):
         raise RestorePointError(f"{store / MANIFEST_NAME}: expected scope and entries arrays")
     roots = _checked_scope(project, scope)
+    _validate_migration_scope(version, roots)
     entries: dict[PurePosixPath, Entry] = {}
     names: set[str] = set()
     verified: set[str] = set()
@@ -353,6 +409,22 @@ def _put(project: Path, store: Path, entry: Entry) -> None:
         temporary.replace(path)
 
 
+def _discard_point(store: Path) -> None:
+    shutil.rmtree(store)
+    parent = store.parent
+    # A legacy restore may have reset .specs to a read-only mode. In that case
+    # leave the administrative directory and its ignore file in place.
+    if not (parent.parent.stat().st_mode & stat.S_IWUSR):
+        return
+    marker = parent / ".gitignore"
+    if set(parent.iterdir()) == {marker}:
+        mode = _kind(marker)
+        if mode is not None and stat.S_ISREG(mode) and marker.read_bytes() == _STORE_IGNORE:
+            marker.unlink()
+    if not any(parent.iterdir()):
+        parent.rmdir()
+
+
 def restore(project: Path, version: int) -> Outcome:
     """Verify all pre-images, restore the migration's scope and remove the backup."""
     store = _checked_store(project, version)
@@ -365,10 +437,8 @@ def restore(project: Path, version: int) -> Outcome:
     removed = _prepare_paths(project, roots, entries)
     for entry in entries:
         _put(project, store, entry)
-    shutil.rmtree(store)
-    if not any(store.parent.iterdir()):
-        store.parent.rmdir()
     for entry in reversed(entries):
         if entry.kind == KIND_DIRECTORY:
             (project / entry.path).chmod(entry.mode)
+    _discard_point(store)
     return Outcome("restored", len(entries), removed)

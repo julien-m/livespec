@@ -12,7 +12,7 @@
 #
 # Behavior:
 #   - Installs the advisory template as <project>/.git/hooks/pre-commit.
-#   - Preserves other checks in a custom or legacy composite hook.
+#   - Replaces exact historical hooks and preserves custom hooks byte-for-byte.
 #   - Appends `.specs/.runs/` and `.specs/.previews/` to .gitignore if absent.
 
 set -euo pipefail
@@ -31,52 +31,25 @@ else
   exit 1
 fi
 
-HOOK_SRC="${LIVESPEC_DIR}/validator/hooks/pre-commit-hook"
-HISTORICAL_HOOK="${LIVESPEC_DIR}/validator/hooks/pre-commit-certification-hook"
-HOOK_DST="${PROJECT_DIR}/.git/hooks/pre-commit"
-MARKER="# @spec FR-003: Advisory commit hook"
-
-if [[ ! -f "${HOOK_SRC}" ]]; then
-    echo "Error: ${HOOK_SRC} not found." >&2
+GITIGNORE="${PROJECT_DIR}/.gitignore"
+if [[ -L "${GITIGNORE}" ]]; then
+    echo "Error: refusing to write linked .gitignore at ${GITIGNORE}" >&2
     exit 1
 fi
 
-# A project without `.git/` is either a bare checkout or a sub-tree — skip
-# silently so the migration DSL does not break unrelated layouts.
-if [[ ! -d "${PROJECT_DIR}/.git" ]]; then
-    echo "  (no .git/ in ${PROJECT_DIR} — skipping hook install)"
+# Both supported entrances use the same ownership checks. Pass a linked .git
+# path to the helper so it can refuse it rather than treating it as absent.
+if [[ -d "${PROJECT_DIR}/.git" || -L "${PROJECT_DIR}/.git" ]]; then
+    PYTHON_BIN=python3
+    [[ ! -x "${LIVESPEC_DIR}/.venv/bin/python" ]] || PYTHON_BIN="${LIVESPEC_DIR}/.venv/bin/python"
+    "${PYTHON_BIN}" -B "${LIVESPEC_DIR}/validator/hook_install.py" "${PROJECT_DIR}"
 else
-    mkdir -p "${PROJECT_DIR}/.git/hooks"
-
-    if [[ -L "${HOOK_DST}" ]]; then
-        echo "Error: refusing to write linked pre-commit hook at ${HOOK_DST}" >&2
-        exit 1
-    elif [[ -f "${HOOK_DST}" ]] && cmp -s "${HOOK_DST}" "${HISTORICAL_HOOK}"; then
-        cp "${HOOK_SRC}" "${HOOK_DST}"
-        chmod +x "${HOOK_DST}"
-        echo "Replaced the original LiveSpec certification hook with the advisory hook"
-    elif [[ -e "${HOOK_DST}" ]]; then
-        if grep -Fq "${MARKER}" "${HOOK_DST}"; then
-            echo "Hook already installed (${MARKER} marker found). Nothing to do."
-        else
-            echo "Existing pre-commit hook retained. Inspect its checks separately." >&2
-            {
-                printf '\n'
-                cat "${HOOK_SRC}"
-            } >> "${HOOK_DST}"
-            chmod +x "${HOOK_DST}"
-        fi
-    else
-        cp "${HOOK_SRC}" "${HOOK_DST}"
-        chmod +x "${HOOK_DST}"
-        echo "Installed LiveSpec pre-commit hook at ${HOOK_DST}"
-    fi
+    echo "  (no .git/ in ${PROJECT_DIR} — skipping hook install)"
 fi
 
 # .gitignore handling — append `.specs/.runs/` and `.specs/.previews/` if
 # absent. Both are local artefacts produced by `livespec verify-output`
 # (--save) and the run wrapper; neither is ever versioned.
-GITIGNORE="${PROJECT_DIR}/.gitignore"
 ensure_gitignore_line() {
     local pattern="$1"
     local comment="$2"

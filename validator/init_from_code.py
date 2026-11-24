@@ -26,6 +26,8 @@ from .init_recovery import (
     write_atomic,
 )
 from .init_verification import MANIFEST, render_manifest, verify_current_profile
+from .runtime.errors import RuntimeLockError
+from .runtime.home import read_project_version
 
 LIVESPEC_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TIMEOUT_SECONDS = 300.0
@@ -151,6 +153,27 @@ def _ensure_core(root: Path) -> None:
     write_atomic(root, root / ".specs/.livespec-path", str(LIVESPEC_ROOT) + "\n")
 
 
+def _check_existing_format(root: Path) -> None:
+    # An interrupted fresh setup can have .specs/ without a declared format.
+    if not (root / ".specs/livespec-version").exists():
+        return
+    try:
+        project_format = read_project_version(root)
+    except RuntimeLockError as error:
+        raise InitError(f"{error}; repair it before --force") from error
+    runtime_format = int((LIVESPEC_ROOT / "VERSION").read_text(encoding="utf-8"))
+    if project_format < runtime_format:
+        raise InitError(
+            f"project format {project_format} requires /spec-migrate before "
+            f"initialization with runtime format {runtime_format}"
+        )
+    if project_format > runtime_format:
+        raise InitError(
+            f"project format {project_format} is newer than runtime format {runtime_format}; "
+            "use the project's own runtime"
+        )
+
+
 def _generate(
     root: Path,
     options: InitOptions,
@@ -195,7 +218,7 @@ def _generate(
 # @spec FR-003: Autonomous safe selected-target dispatch
 #   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-003
 def initialize_from_code(options: InitOptions) -> ObservedProfile:
-    """Generate verified backend artifacts; command closure remains a separate goal.
+    """Generate and verify the observed project's bootstrap artifacts.
 
     Args:
         options: Validated directory, modes and finite total deadline.
@@ -226,6 +249,7 @@ def initialize_from_code(options: InitOptions) -> ObservedProfile:
         raise InitError(
             ".specs already exists; explicit --force required for noninteractive recovery"
         )
+    _check_existing_format(root)
     if options.force or (root / ".git/hooks/pre-commit").is_file():
         # Preserve a custom hook even during the first installation into a fresh Git project.
         backup_artifacts(root)
@@ -286,7 +310,7 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"Autonomous from-code: enabled\nLiveSpec initialized: {profile.product_name}\n"
             "Penflow Contract Verdict: ABSENT\n"
-            "Backend complete; prove native command goal and archive before command completion."
+            "Backend complete. Verify project integrations and runtime for final review."
         )
     return 0
 

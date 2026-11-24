@@ -16,6 +16,8 @@ Restores the restore point that migration 22 recorded in
 path gets back its bytes, mode or symlink target, the paths the migration
 created inside the recorded scope are removed, the project version file holds
 its value from before the migration again, and the restore point is deleted.
+If the restored `.specs` directory is read-only, its restore container can
+remain with only the Git ignore marker.
 
 Run it after the inverse of migration 23, with the same executor:
 `scripts/migrate.sh migrations/22/inverse.md <project> <livespec>`. It refuses,

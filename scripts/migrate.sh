@@ -101,6 +101,9 @@ while IFS= read -r line || [[ -n "$line" ]]; do
       ;;
     GITIGNORE)
       pattern="$args"
+      probe="${pattern#/}"
+      # Probe the path itself, since a trailing slash also reads nested ignore files.
+      probe="${probe%/}"
       gitignore="$PROJECT_DIR/.gitignore"
       if [[ -L "$gitignore" ]]; then
         echo "ERROR: Refusing to write linked .gitignore" >&2
@@ -108,7 +111,9 @@ while IFS= read -r line || [[ -n "$line" ]]; do
       elif [[ ! -f "$gitignore" ]]; then
         echo "$pattern" > "$gitignore"
         echo "  ✓ GITIGNORE $pattern (created .gitignore)"
-      elif ! grep -qxF "$pattern" "$gitignore"; then
+      elif ! grep -qxF "$pattern" "$gitignore" ||
+        { [[ "$pattern" == /* && -e "$PROJECT_DIR/.git" ]] &&
+          ! git -C "$PROJECT_DIR" check-ignore --no-index -q -- "$probe"; }; then
         # Preserve the last user pattern when the file lacks a terminating newline.
         if [[ -s "$gitignore" && -n "$(tail -c 1 "$gitignore")" ]]; then
           printf '\n' >> "$gitignore"

@@ -1,5 +1,6 @@
 """Official hook installation precedes backend capture and remains idempotent afterward."""
 
+import stat
 import subprocess
 import sys
 import time
@@ -15,7 +16,7 @@ from validator import init_from_code
 from validator.init_profile import InitError
 from validator.init_recovery import conventions_are_valid
 
-CUSTOM_HOOK = '#!/bin/sh\nprintf "custom precommit preserved\\n"\n'
+CUSTOM_HOOK = '#!/usr/bin/env python3\nprint("custom precommit preserved")\n'
 
 
 def assert_conventions_ignored(project: Path) -> None:
@@ -95,7 +96,7 @@ def test_backend_official_hook_then_after_init_skip_then_verify(
     hook = project / ".git/hooks/pre-commit"
     if has_hook:
         hook.write_text(CUSTOM_HOOK)
-        hook.chmod(0o755)
+        hook.chmod(0o750)
     if has_ignore:
         (project / ".gitignore").write_text(
             "USER CUSTOM IGNORE\n.specs/.previews/\n.conventions/\n!.conventions/\n"
@@ -106,13 +107,15 @@ def test_backend_official_hook_then_after_init_skip_then_verify(
     assert_conventions_ignored(project)
     assert_conventions_manifest(project, Path(env["AIRESOURCES"]))
     assert hook.is_file(), "backend must install official hook before capturing integration hashes"
-    assert "this hook runs no automatic certification" in hook.read_text()
     assert "livespec doctor" not in hook.read_text()
     assert ".specs/.previews/" in (project / ".gitignore").read_text().splitlines()
     if has_hook:
-        assert hook.read_text().startswith(CUSTOM_HOOK)
+        assert hook.read_text() == CUSTOM_HOOK
+        assert stat.S_IMODE(hook.stat().st_mode) == 0o750
         backup = next((project / ".livespec-backups").iterdir())
         assert (backup / ".git/hooks/pre-commit").read_text() == CUSTOM_HOOK
+    else:
+        assert "this hook runs no automatic certification" in hook.read_text()
     if has_ignore:
         assert (project / ".gitignore").read_text().startswith("USER CUSTOM IGNORE\n")
     hook_bytes = hook.read_bytes()
@@ -135,7 +138,7 @@ def test_backend_official_hook_then_after_init_skip_then_verify(
         timeout=5,
     )
     assert official.returncode == 0, official.stderr
-    assert "already installed" in official.stdout
+    assert ("retained byte-for-byte" if has_hook else "already installed") in official.stdout
     assert tree(project) == before
     # Apply the after-init valid-conventions branch: existing routing is retained unchanged.
     # The in-process check resolves the same fixture corpus as the backend, not the caller's.

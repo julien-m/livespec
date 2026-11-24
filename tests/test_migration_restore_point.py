@@ -13,7 +13,15 @@ from pathlib import Path
 
 import pytest
 
-from validator.migration_restore import RestorePointError, record, restore, store_of
+from validator.migration_restore import (
+    V22_LEGACY_SCOPE,
+    V22_SCOPE,
+    V23_SCOPE,
+    RestorePointError,
+    record,
+    restore,
+    store_of,
+)
 
 REPO = Path(__file__).resolve().parents[1]
 VERSION = ".specs/livespec-version"
@@ -138,7 +146,7 @@ def test_private_schema_1_scope_restores_modes_and_links(tmp_path: Path) -> None
     external = tmp_path / "external"
     external.write_text("untouched")
     archived.chmod(0o555)
-    assert record(project, 22, [".specs"]).status == "recorded"
+    assert record(project, 22, V22_LEGACY_SCOPE).status == "recorded"
     archived.chmod(0o755)
     protected.unlink()
     (archived / "added").write_text("generated")
@@ -155,11 +163,11 @@ def test_private_schema_1_scope_restores_modes_and_links(tmp_path: Path) -> None
 
 def test_retry_refuses_writes_not_covered_by_the_first_restore_point(tmp_path: Path) -> None:
     project = _project(tmp_path / "project", 21)
-    record(project, 22, [".specs"])
+    record(project, 22, V22_LEGACY_SCOPE)
     manifest, _ = _read_manifest(project, 22)
     before = manifest.read_bytes()
     with pytest.raises(RestorePointError, match="first restore point does not cover"):
-        record(project, 22, [VERSION, ".gitignore"])
+        record(project, 22, V22_SCOPE)
     assert manifest.read_bytes() == before
     assert not (project / ".gitignore").exists()
 
@@ -168,6 +176,7 @@ def test_retry_refuses_writes_not_covered_by_the_first_restore_point(tmp_path: P
     ("corruption", "error"),
     [
         ("path", "unsafe relative"),
+        ("in-repo", "restore scope does not match migration"),
         ("parent", "outside scope or out of order"),
         ("blob", "missing or altered"),
     ],
@@ -178,10 +187,15 @@ def test_invalid_manifest_is_refused_before_project_mutation(
     project = _project(tmp_path / "project", 21)
     sentinel = project / ".specs/sentinel"
     sentinel.write_text("before\n")
-    record(project, 22, [".specs"])
+    record(project, 22, V22_LEGACY_SCOPE)
     manifest, document = _read_manifest(project, 22)
     if corruption == "path":
         document["scope"] = ["../outside"]
+    elif corruption == "in-repo":
+        document["scope"] = [*V22_LEGACY_SCOPE, "src"]
+        source = project / "src/keep.py"
+        source.parent.mkdir()
+        source.write_text("# Cannot be deleted by a forged migration scope.\n")
     elif corruption == "parent":
         # Keep every original digest valid, but insert a write beneath an absent parent.
         entries = document["entries"]
@@ -205,6 +219,8 @@ def test_invalid_manifest_is_refused_before_project_mutation(
         restore(project, 22)
     assert (project / VERSION).read_text() == "22\n"
     assert sentinel.read_text() == "after\n"
+    if corruption == "in-repo":
+        assert (project / "src/keep.py").is_file()
 
 
 def test_linked_restore_store_and_migration_destinations_are_refused(tmp_path: Path) -> None:
@@ -226,3 +242,74 @@ def test_linked_restore_store_and_migration_destinations_are_refused(tmp_path: P
     assert not store.exists()
     assert outside.read_text() == "keep outside\n"
     assert (project / VERSION).read_text() == "22\n"
+
+
+def test_store_is_git_ignored_before_the_root_exclusion_is_repaired(tmp_path: Path) -> None:
+    project = _project(tmp_path / "project", 22)
+    subprocess.run(["git", "init", "-q", str(project)], check=True, timeout=15)
+    root_ignore = project / ".gitignore"
+    previous = b"/.specs/.migration-restore/\n!/.specs/.migration-restore/\n"
+    root_ignore.write_bytes(previous)
+    record(project, 23, V23_SCOPE)
+    untracked = subprocess.check_output(
+        ["git", "-C", str(project), "ls-files", "--others", "--exclude-standard"],
+        text=True,
+        timeout=15,
+    )
+    assert ".specs/.migration-restore" not in untracked
+    assert root_ignore.read_bytes() == previous
+    _check(_migrate(project, 23))
+    assert root_ignore.read_text().splitlines()[-1] == "/.specs/.migration-restore/"
+    _check(_migrate(project, 23, inverse=True))
+    assert root_ignore.read_bytes() == previous
+    assert not store_of(project, 23).parent.exists()
+
+
+def test_legacy_rollback_keeps_read_only_specs_and_user_ignore_file(tmp_path: Path) -> None:
+    project = _project(tmp_path / "project", 21)
+    specs = project / ".specs"
+    point = store_of(project, 22)
+    point.parent.mkdir()
+    specs.chmod(0o555)
+    try:
+        record(project, 22, V22_LEGACY_SCOPE)
+        specs.chmod(0o755)
+        (project / VERSION).write_text("22\n")
+        custom = point.parent / ".gitignore"
+        custom.write_text("# My local rules\n/*\n")
+        _check(_migrate(project, 22, inverse=True))
+        assert (project / VERSION).read_text() == "21\n"
+        assert specs.stat().st_mode & 0o777 == 0o555
+        assert not point.exists()
+        assert custom.read_text() == "# My local rules\n/*\n"
+    finally:
+        specs.chmod(0o755)
+
+
+def test_mode_restore_failure_keeps_the_only_preimage(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _project(tmp_path / "project", 21)
+    specs = project / ".specs"
+    point = store_of(project, 22)
+    point.parent.mkdir()
+    specs.chmod(0o555)
+    record(project, 22, V22_LEGACY_SCOPE)
+    specs.chmod(0o755)
+    (project / VERSION).write_text("22\n")
+    original = Path.chmod
+
+    def chmod(path: Path, mode: int, *, follow_symlinks: bool = True) -> None:
+        if path == specs and mode == 0o555:
+            raise PermissionError("cannot restore recorded mode")
+        original(path, mode, follow_symlinks=follow_symlinks)
+
+    monkeypatch.setattr(Path, "chmod", chmod)
+    with pytest.raises(PermissionError, match="cannot restore recorded mode"):
+        restore(project, 22)
+    assert (point / "manifest.json").is_file()
+    assert any((point / "blobs").iterdir())
+    monkeypatch.undo()
+    assert restore(project, 22).status == "restored"
+    assert not point.exists()
+    specs.chmod(0o755)

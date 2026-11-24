@@ -86,7 +86,7 @@ class TestMigrationV13:
         # Pre-commit hook installed.
         hook = project / ".git" / "hooks" / "pre-commit"
         assert hook.exists()
-        assert "# livespec-expectations" in hook.read_text()
+        assert "this hook runs no automatic certification" in hook.read_text()
         assert os.access(hook, os.X_OK)
         # Gitignore entries appended.
         gitignore = (project / ".gitignore").read_text()

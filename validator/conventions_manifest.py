@@ -3,6 +3,7 @@
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
+from sys import maxsize
 
 import yaml
 
@@ -18,4 +19,5 @@ def render_manifest(
     }
     if resources is not None:
         manifest["ai_resources_path"] = str(resources)
-    return yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True)
+    # Keep machine-local paths on one line for shell convention loaders.
+    return yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True, width=maxsize)
