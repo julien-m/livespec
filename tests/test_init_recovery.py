@@ -86,6 +86,8 @@ def test_ac001_ac004_force_backup_custom_history_source_and_readonly_verify(tmp_
     first = execute(project, env)
     assert first.returncode == 0, first.stderr
     assert "Handy" in first.stdout and "Backend complete" in first.stdout
+    assert "prove native command goal" not in first.stdout
+    assert "goal proof" not in (project / ".specs/bootstrap-recap.md").read_text()
     for path in ("features/custom/spec.md", "hooks/after-init.local.md", ".runs/history.json"):
         target = project / ".specs" / path
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -336,3 +338,23 @@ def test_ac003_nested_escape_refused_before_backup_or_write(tmp_path: Path) -> N
     result = execute(project, env, "--force")
     assert result.returncode != 0 and "escape" in result.stderr
     assert tree(project) == before and not (project / ".livespec-backups").exists()
+
+
+@pytest.mark.parametrize(
+    ("offset", "advice"), [(-2, "requires /spec-migrate"), (1, "use the project's own runtime")]
+)
+def test_force_preserves_a_project_at_another_format(
+    tmp_path: Path, offset: int, advice: str
+) -> None:
+    project = tmp_path / "app"
+    project.mkdir()
+    hybrid(project)
+    (project / ".specs").mkdir()
+    runtime_format = int((ROOT / "VERSION").read_text())
+    (project / ".specs/livespec-version").write_text(f"{runtime_format + offset}\n")
+    original = tree(project)
+
+    result = execute(project, environment(tmp_path), "--force")
+
+    assert result.returncode == 2 and advice in result.stderr
+    assert tree(project) == original

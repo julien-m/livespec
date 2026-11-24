@@ -12,6 +12,7 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 from .ai_resources import resolve_ai_resources_root
+from .conventions_manifest import render_manifest
 from .exceptions import AiResourcesResolutionError
 from .init_profile import InitError, ObservedProfile
 
@@ -182,9 +183,8 @@ def render_conventions(resources: Path, name: str) -> dict[str, str]:
 ## code [code, tests, architecture, Python, Rust, TypeScript]
 → $AIRESOURCES/code-conventions/{", ".join(files)}
 """
-    manifest = (
-        f"ai_resources_path: {resources}\nproject: {name}\ndomains:\n  code:\n    sources:\n"
-        + "".join(f"      - code-conventions/{filename}\n" for filename in files)
+    manifest = render_manifest(
+        name, {"code": [f"code-conventions/{filename}" for filename in files]}, resources
     )
     return {"index.md": index, "manifest.yaml": manifest}
 

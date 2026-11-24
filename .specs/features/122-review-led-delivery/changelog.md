@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-24 — Public format 23
+
+- FR-004 / AC-010. Activate migrations 22 and 23 and retain the review-led defaults. Read [the format-23 adoption procedure](../../../docs/review-led-migration.md#public-format-23).
+
 ## 2026-11-23 — Approved mockup fidelity
 
 - FR-006 / AC-009. Read [the shared workflow](../../../system/review-led-delivery.md#approved-mockup-fidelity) for Penflow updates before UI coding and side-by-side visual evidence before acceptance.

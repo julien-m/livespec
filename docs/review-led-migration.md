@@ -17,7 +17,7 @@ Standard skills now use implementation, useful checks and one independent final 
 2. Upgrade the project pin through the supported runtime selection command. Re-read the actual selected runtime and resolved skill files; updating the global default does not update existing pins.
 3. Resolve shared instructions from the runtime's `system/review-led-delivery.md`. Project copies read `.specs/.livespec-path`; skill symlinks resolve from their real source directory.
 4. Preserve customized agent settings. Use a fresh generic native reviewer if an old mutable agent prompt still injects certification gates; do not overwrite customization silently.
-5. Inspect existing Git hooks. The supported installer replaces an exact original LiveSpec hook with the advisory template. For a composite/custom hook it preserves the original content and appends the advisory reminder; inspect and migrate only the old LiveSpec-owned block manually, preserving other tools and their checks. The original certification hook remains an explicit diagnostic template. Do not bypass an unrelated custom hook.
+5. Inspect existing Git hooks. The installer replaces the exact historical LiveSpec certification hook or standalone Bash dispatcher with the advisory template. Custom and composite hooks keep their original bytes and permissions. Review any embedded historical LiveSpec block manually while preserving other tools and their checks. The historical certification template remains available for explicit diagnostics.
 6. Preserve old mission and goal history. Record explicitly that remaining work follows review-led delivery; do not fabricate archive/proof success for the former contract. Do not let an obsolete goal stop independent product work.
 7. Reload the coordinator and worker instructions at the checkpoint. Resume from the actual implemented feature, accepted decisions and remaining product findings, without restarting completed work.
 
@@ -34,4 +34,12 @@ Select the saved previous runtime through the supported runtime command and rest
 
 ## Bootstrap follow-up
 
-Initialization and format migration now use the same review-led policy; read [initialization](../.agent-sync/skills/spec-init/SKILL.md) and [migration](../.agent-sync/skills/spec-migrate/SKILL.md) for the operational safeguards. Adopt these instruction changes through the selected runtime at a safe checkpoint. This change adds no format migration, continuity service or application installation. Preserve an active consumer pin and its private fixes; public format21 is not a replacement for an existing private format23 runtime.
+Initialization and format migration use the same review-led policy. Read [initialization](../.agent-sync/skills/spec-init/SKILL.md) and [migration](../.agent-sync/skills/spec-migrate/SKILL.md) for the operational safeguards.
+
+## Public format 23
+
+A fresh init writes format 23 and creates local convention routing ignored by Git. A project pinned to 21 stays on that runtime until its owner upgrades the pin and applies the planned migrations. Migration 22 refreshes managed assets and prepares conventions with an advisory verification. Migration 23 records the project recovery policy. Read it with `livespec recovery policy`. Routine fixes use targeted checks and one independent final review.
+
+Compare consumer capabilities and fix provenance before changing an existing format-23 pin. This public runtime supports the project format. A consumer using a separately shipped mission supervisor or recovery actions must retain a compatible pin for that work, including any open mission. Applying the format itself leaves those records in place.
+
+The public migration path records local pre-images for [migration 22](../migrations/22/migrate.md) and [migration 23](../migrations/23/migrate.md). Run their inverses in reverse order using the source that applied them. A format-23 project migrated by an earlier snapshot may have a different rollback procedure. Verify the restore points and preserve later work before any rollback.

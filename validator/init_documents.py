@@ -36,7 +36,7 @@ def render_recap(profile: ObservedProfile) -> str:
     return (
         "---\nstatus: completed\n---\n\n"
         "Backend artifacts and observed tooling verified.\n"
-        "Native command goal proof, after-init hooks and archive remain required.\n"
+        "The selected runtime and project integrations are checked for the final review.\n"
         "Application build/UI/runtime not executed.\n" + _findings(profile)
     )
 

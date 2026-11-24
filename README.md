@@ -107,7 +107,9 @@ Start reviews from the target project's `.conventions/`, when present, and follo
 
 ---
 
-LiveSpec commands are migration-gated: if [`.specs/livespec-version`](.specs/livespec-version) is older than repo [`VERSION`](VERSION), normal commands fail before doing work and instruct the user to run `/spec-migrate` or `livespec migrate`. `/spec-init`, `/spec-migrate`, help output, and internal `livespec goal` control-plane calls remain available for recovery.
+The public runtime supports LiveSpec format 23. Fresh projects start at this format. Existing projects keep their selected runtime until upgraded. Read [the migration and rollback procedure](docs/review-led-migration.md#public-format-23) before moving a project to format 23.
+
+LiveSpec commands are migration-gated: if [`.specs/livespec-version`](.specs/livespec-version) is older than the selected runtime's [`VERSION`](VERSION), normal commands fail before doing work and instruct the user to run `/spec-migrate` or `livespec migrate`. `/spec-init`, `/spec-migrate`, help output, and internal `livespec goal` control-plane calls remain available for recovery.
 
 ---
 
@@ -240,6 +242,8 @@ Run the full pipeline in one command with validation gates between each phase:
 ### `/spec-init`
 
 Initialize LiveSpec through an interactive brainstorm or an observed from-code profile. Autonomous initialization preserves independent native/frontend families, keeps unobserved product facts Unknown and executes actual bounded tooling checks.
+
+Both modes generate the local `.conventions/` index and manifest and exclude them in the project's `.gitignore`, creating it when needed.
 
 ```bash
 /spec-init                       # Full interactive setup

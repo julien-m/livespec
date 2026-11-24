@@ -3,9 +3,17 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-11-23
+> Last updated: 2026-11-24
 
 ---
+
+## 2026-11-24 — [Feature 122] Public format 23 with review-led delivery
+
+- Keep the short initialization, migration and fix workflows while activating formats 22 and 23. Read [the migration and rollback procedure](../docs/review-led-migration.md#public-format-23).
+
+## 2026-11-24 — [Fix 080] Keep generated conventions local during init
+
+- Both init modes generate convention routing and ignore it in Git, including on fresh repositories without a `.gitignore`.
 
 ## 2026-11-23 — [Feature 122] Approved mockup fidelity
 

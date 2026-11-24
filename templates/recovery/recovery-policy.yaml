@@ -1,0 +1,3 @@
+# LiveSpec format-23 marker for explicit recovery tools.
+schema: 1
+stop_rules: amended

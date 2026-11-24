@@ -114,6 +114,10 @@ Both review reports identify the applicable rules actually checked, their source
 
 For UI covered by an approved mockup, the shared workflow records the approved source and verified Penflow frames before UI coding. The independent final review examines side-by-side captures of the affected states. Missing visual evidence keeps acceptance pending, and material differences require correction or explicit user approval. Historical CLI certification remains optional.
 
+### AC-010
+
+A public format-23 runtime initializes a new Git repository with local conventions and can apply a normal fix there using one independent final review. Neither path creates a certification goal or requires a certificate. A format-21 project plans and applies migrations 22 and 23 in order. Their explicit inverses restore their recorded scope. Pins and records for existing missions remain available through their selected runtimes.
+
 ## Functional Requirements
 
 ### FR-001
@@ -126,7 +130,7 @@ Preserve original command/role bodies as explicit certification diagnostics and 
 Update routing, system entry points and documentation so script results inform review instead of automatically blocking progression, and ready independent work does not wait for a manual parallelism opt-in. Covers AC-001, AC-002 and AC-007.
 
 ### FR-004
-Document and verify safe migration without consumer downgrade or retrospective certification. Covers AC-005 and AC-006.
+Ship and verify format-23 initialization, ordered migration and explicit rollback. Preserve consumer pins and mission history while keeping the standard workflow review led. Covers AC-005, AC-006 and AC-010.
 
 ### FR-005
 

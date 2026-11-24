@@ -1,5 +1,10 @@
 # Changelog - 080-autonomous-from-code-recovery
 
+## 2026-11-24 — Keep generated conventions local during init
+
+- Both installation paths generate the conventions bundle and add its Git exclusion even when `.gitignore` is missing.
+- Interactive setup generates the bundle from the chosen stack as an explicit installation step. Regression coverage checks both generated paths with Git (AC-005).
+
 ## 2026-10-12 — [Bugfix]: Unsupported manifests recorded, missing package manager warns (FR-001 decision)
 
 - **Type:** Bugfix + Spec Update

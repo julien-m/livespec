@@ -22,7 +22,7 @@ feature: 080-autonomous-from-code-recovery
 | AC-002 | tests/test_init_profile.py, test_init_recovery.py | Observed targeted PASS |
 | AC-003 | tests/test_init_probes.py, test_init_recovery.py | Observed targeted PASS |
 | AC-004 | tests/test_init_recovery.py, test_init_agent_isolation.py | Observed targeted PASS |
-| AC-005 | tests/test_init_recovery.py, test_init_agent_isolation.py | Observed targeted PASS |
+| AC-005 | tests/test_init_recovery.py, test_init_agent_isolation.py, test_init_hook_pipeline.py | Observed targeted PASS |
 | AC-006 | tests/test_init_goal_profiles.py, test_goal_contracts.py | Observed targeted PASS |
 | AC-007 | tests/test_init_profile.py, test_init_documents.py, test_init_recovery.py | Observed targeted PASS |
 
