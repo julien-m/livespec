@@ -294,7 +294,7 @@ All resolution and consumer tests build fake corpora in temporary directories an
 - **`AIRESOURCES` points to a missing directory:** it still wins (explicit operator intent, no silent switch to a Recorded path); Consumers then report their existing missing-source errors naming that path (for example `conventions source not found`).
 - **Manifest and index disagree:** the manifest path wins when it exists; the index declaration is used only when the manifest path is absent or rejected.
 - **Recorded path is a file, not a directory:** rejected like a nonexistent path.
-- **Project scaffolded by `livespec conventions refresh`:** its `index.md` has no declaration and its manifest no `ai_resources_path`; it works with `AIRESOURCES` set and otherwise raises the Resolution error (previously `conventions compile` required the declaration).
+- **Project scaffolded by `livespec conventions refresh`:** when a corpus root resolves, the manifest and index record it for subsequent builds. Without a configured root, refresh still writes portable routing. Commands requiring the local corpus report the usual resolution error until a root is configured.
 - **Malformed manifest YAML or non-string key:** ignored as a source of Recorded path; resolution continues with the index declaration.
 - **`ai-ressources/` logical identifiers in catalogs:** unchanged; only their mapping to disk goes through the Shared resolution.
 - **This repository's own `.conventions/`:** records no path, so local runs need `AIRESOURCES`; CI already sets it at job level.

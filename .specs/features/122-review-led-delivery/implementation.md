@@ -21,6 +21,7 @@
 | AC-005 | Official isolated provider projection from local source | 24 isolated entry points inspected;20 live project skills and4global bootstrap links verified |
 | AC-006 | Migration plan | Atlas safe checkpoint, supported upgrade and policy reload observed |
 | AC-007 | Read [automatic useful parallelism](../../../system/review-led-delivery.md#automatic-useful-parallelism), [parallel delivery](../../../system/parallel-delivery.md) and [current README](../../../README.md#multi-agent-mode-default) | Shared policy dispatches native workers automatically; final correction review and consumer adoption owned by parent |
+| AC-010 | Read [format adoption](../../../docs/review-led-migration.md#public-format-23), [init and hook coverage](../../../tests/test_init_hook_pipeline.py), [migration and inverse tests](../../../tests/test_migration_restore_point.py) and [policy inspection tests](../../../tests/test_recovery_policy_cmd.py) | Version 23, backed-up migration and scoped rollback, advisory hook and unchanged default review path |
 
 ## Approved mockup fidelity
 

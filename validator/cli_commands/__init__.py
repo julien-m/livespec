@@ -31,6 +31,7 @@ from . import (
     mutation_cmd,
     penflow_contract_cmd,
     preflight_cmd,
+    recovery_policy_cmd,
     runtime_cmd,
     test_cmd,
     ui_runner_cmd,
@@ -66,6 +67,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     finalize_cmd.register(app)
     verify_output_cmd.register(app)
     runtime_cmd.register(app)
+    recovery_policy_cmd.register(app)
 
 
 __all__ = ["register_unified_commands"]

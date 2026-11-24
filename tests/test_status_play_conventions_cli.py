@@ -15,6 +15,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+import yaml
 from typer.testing import CliRunner
 
 from validator.cli import app
@@ -105,7 +106,9 @@ def test_conventions_refresh_generates_web_design_domains(tmp_path: Path) -> Non
 
     assert result.exit_code == 0, result.output
     index = (tmp_path / ".conventions" / "index.md").read_text(encoding="utf-8")
-    manifest = (tmp_path / ".conventions" / "manifest.yaml").read_text(encoding="utf-8")
+    manifest = yaml.safe_load(
+        (tmp_path / ".conventions" / "manifest.yaml").read_text(encoding="utf-8")
+    )
     for domain in (
         "design-tokens",
         "design-components",
@@ -113,7 +116,7 @@ def test_conventions_refresh_generates_web_design_domains(tmp_path: Path) -> Non
         "design-quality",
     ):
         assert f"## {domain}" in index
-        assert f"- name: {domain}" in manifest
+        assert manifest["domains"][domain]["sources"]
 
 
 def test_conventions_scaffold_applies_python_ruff_template(tmp_path: Path) -> None:

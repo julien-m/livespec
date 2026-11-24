@@ -1,10 +1,12 @@
 """Official hook installation precedes backend capture and remains idempotent afterward."""
 
 import subprocess
+import sys
 import time
 from pathlib import Path
 
 import pytest
+import yaml
 
 from tests.init_clock_support import FakeClock, install_deadline_seams
 from tests.test_init_profile import hybrid
@@ -14,6 +16,67 @@ from validator.init_profile import InitError
 from validator.init_recovery import conventions_are_valid
 
 CUSTOM_HOOK = '#!/bin/sh\nprintf "custom precommit preserved\\n"\n'
+
+
+def assert_conventions_ignored(project: Path) -> None:
+    """Verify both generated files match the target's Git exclusion."""
+    files = (".conventions/index.md", ".conventions/manifest.yaml")
+    assert all((project / file).is_file() for file in files)
+    for file in files:
+        subprocess.run(
+            ["git", "-c", "core.excludesFile=/dev/null", "check-ignore", "-q", "--", file],
+            cwd=project,
+            timeout=5,
+            check=True,
+        )
+    result = subprocess.run(
+        ["git", "-c", "core.excludesFile=/dev/null", "check-ignore", "-v", "--", *files],
+        cwd=project,
+        capture_output=True,
+        text=True,
+        timeout=5,
+        check=True,
+    )
+    assert [line.split("\t", 1)[0].split(":")[0] for line in result.stdout.splitlines()] == [
+        ".gitignore",
+        ".gitignore",
+    ]
+
+
+def test_interactive_install_generates_ignored_conventions(tmp_path: Path) -> None:
+    project = tmp_path / "interactive project"
+    project.mkdir()
+    subprocess.run(["git", "init", "-q", str(project)], check=True, timeout=5)
+    assert not (project / ".gitignore").exists()
+    env = environment(tmp_path)
+    env["PYTHONPATH"] = str(ROOT)
+    subprocess.run(
+        ["bash", str(ROOT / "scripts/init.sh"), str(project)],
+        env=env,
+        check=True,
+        timeout=30,
+    )
+    # Apply the documented fresh-project version and the interview's stack choice.
+    (project / ".specs/livespec-version").write_bytes((ROOT / "VERSION").read_bytes())
+    (project / ".specs/stacks/_default.md").write_text("# Stack\n\nPython CLI\n")
+    subprocess.run(
+        [sys.executable, "-B", "-m", "validator.cli", "conventions", "refresh", "--repo", "."],
+        cwd=project,
+        env=env,
+        check=True,
+        timeout=30,
+    )
+    assert_conventions_ignored(project)
+    assert_conventions_manifest(project, Path(env["AIRESOURCES"]))
+
+
+def assert_conventions_manifest(project: Path, resources: Path) -> None:
+    """Verify the normal refresh workflow can use the generated manifest."""
+    manifest = yaml.safe_load((project / ".conventions/manifest.yaml").read_text())
+    assert manifest["ai_resources_path"] == str(resources)
+    assert manifest["generated"]
+    sources = manifest["domains"]["code"]["sources"]
+    assert sources and all((resources / source).is_file() for source in sources)
 
 
 @pytest.mark.parametrize(
@@ -34,17 +97,24 @@ def test_backend_official_hook_then_after_init_skip_then_verify(
         hook.write_text(CUSTOM_HOOK)
         hook.chmod(0o755)
     if has_ignore:
-        (project / ".gitignore").write_text("USER CUSTOM IGNORE\n.specs/.previews/\n")
+        (project / ".gitignore").write_text(
+            "USER CUSTOM IGNORE\n.specs/.previews/\n.conventions/\n!.conventions/\n"
+        )
     env = environment(tmp_path)
     initialized = execute(project, env)
     assert initialized.returncode == 0, initialized.stderr
+    assert_conventions_ignored(project)
+    assert_conventions_manifest(project, Path(env["AIRESOURCES"]))
     assert hook.is_file(), "backend must install official hook before capturing integration hashes"
-    assert "# livespec-expectations" in hook.read_text()
+    assert "this hook runs no automatic certification" in hook.read_text()
+    assert "livespec doctor" not in hook.read_text()
     assert ".specs/.previews/" in (project / ".gitignore").read_text().splitlines()
     if has_hook:
         assert hook.read_text().startswith(CUSTOM_HOOK)
         backup = next((project / ".livespec-backups").iterdir())
         assert (backup / ".git/hooks/pre-commit").read_text() == CUSTOM_HOOK
+    if has_ignore:
+        assert (project / ".gitignore").read_text().startswith("USER CUSTOM IGNORE\n")
     hook_bytes = hook.read_bytes()
     ignore_bytes = (project / ".gitignore").read_bytes()
     convention_bytes = tree(project / ".conventions")

@@ -34,4 +34,12 @@ Select the saved previous runtime through the supported runtime command and rest
 
 ## Bootstrap follow-up
 
-Initialization and format migration now use the same review-led policy; read [initialization](../.agent-sync/skills/spec-init/SKILL.md) and [migration](../.agent-sync/skills/spec-migrate/SKILL.md) for the operational safeguards. Adopt these instruction changes through the selected runtime at a safe checkpoint. This change adds no format migration, continuity service or application installation. Preserve an active consumer pin and its private fixes; public format21 is not a replacement for an existing private format23 runtime.
+Initialization and format migration use the same review-led policy. Read [initialization](../.agent-sync/skills/spec-init/SKILL.md) and [migration](../.agent-sync/skills/spec-migrate/SKILL.md) for the operational safeguards.
+
+## Public format 23
+
+A fresh init writes format 23 and creates local convention routing ignored by Git. A project pinned to 21 stays on that runtime until its owner upgrades the pin and applies the planned migrations. Migration 22 refreshes managed assets and prepares conventions with an advisory verification. Migration 23 records the project recovery policy. Read it with `livespec recovery policy`. Routine fixes use targeted checks and one independent final review.
+
+Compare consumer capabilities and fix provenance before changing an existing format-23 pin. This public runtime supports the project format. A consumer using a separately shipped mission supervisor or recovery actions must retain a compatible pin for that work, including any open mission. Applying the format itself leaves those records in place.
+
+The public migration path records local pre-images for [migration 22](../migrations/22/migrate.md) and [migration 23](../migrations/23/migrate.md). Run their inverses in reverse order using the source that applied them. A format-23 project migrated by an earlier snapshot may have a different rollback procedure. Verify the restore points and preserve later work before any rollback.

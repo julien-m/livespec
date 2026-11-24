@@ -66,7 +66,9 @@ bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "${INIT_ARGS[@]}"
 
 - Generate the relevant preflight manifest from the observed stack and [its template](../../../system/templates/preflight-manifest-template.md). Keep `.specs/preflight-report.md` local and ignored; commit only authorized project documents.
 - Inspect token references without exposing secrets. Run only authorized tool checks; do not start OAuth, providers, hosts or services automatically. Group actual missing authority/functional choices for the user; an unrelated unavailable tool is a finding, not a pipeline gate.
+- In interactive mode, after writing the chosen stack and completing Step 3.12, run `livespec conventions refresh --repo "$TARGET_DIR"` from the target using the selected LiveSpec runtime or checkout. Run this installation step even without after-init hooks. If only one convention file exists, retain it and report the incomplete bundle until an authorized, backed-up repair can regenerate the pair. The autonomous backend generates its own bundle.
 - Preserve valid convention routing whose referenced sources actually resolve. Back up invalid generated routing before a requested repair; never infer execution from the backend exit alone or silently overwrite user routing.
+- Verify `.conventions/index.md`, `.conventions/manifest.yaml` and the `.conventions/` entry in the target's `.gitignore` in both modes. The installer creates `.gitignore` when absent. For each generated path in a Git checkout, require `git -C "$TARGET_DIR" check-ignore -q --no-index -- <path>` to exit successfully. Preserve existing tracked files and report any tracking separately.
 - Design/visual helper scaffolding is relevant only to an actual selected platform/tool. Preserve unavailable observations and do not invent UI execution or authenticated design ancestry.
 
 ## Step D.7 — Mission supervisor and prerequisites

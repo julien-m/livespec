@@ -69,8 +69,17 @@ def _prepare_documents(profile: ObservedProfile, root: Path) -> dict[str, str]:
     if not conventions_are_valid(root):
         rendered = render_conventions(_ai_resources_for_init(root), profile.product_name)
         documents.update({f".conventions/{path}": text for path, text in rendered.items()})
+    policy = ".specs/recovery-policy.yaml"
+    template = LIVESPEC_ROOT / "templates/recovery/recovery-policy.yaml"
+    fresh = not (root / ".specs/livespec-version").exists()
+    if fresh and not (root / policy).exists() and template.is_file():
+        documents[policy] = template.read_text(encoding="utf-8")
     for filename in ("AGENTS.md", "CLAUDE.md"):
         documents[filename] = merge_integration(_read_if_exists(root / filename))
+    return documents
+
+
+def _backend_gitignore(root: Path) -> str:
     patterns = (
         ".specs/.livespec-path",
         ".specs/.runs/",
@@ -78,12 +87,11 @@ def _prepare_documents(profile: ObservedProfile, root: Path) -> dict[str, str]:
         ".livespec-backups/",
     )
     ignore = _read_if_exists(root / ".gitignore")
-    documents[".gitignore"] = (
+    return (
         ignore
         + ("\n" if ignore and not ignore.endswith("\n") else "")
         + "".join(pattern + "\n" for pattern in patterns if pattern not in ignore.splitlines())
     )
-    return documents
 
 
 # @spec FR-003: No init fallback, FR-005: Init ERROR exit 2 before any write
@@ -160,6 +168,8 @@ def _generate(
     )
     _install(root, options, deadline)
     _ensure_core(root)
+    # Extend the installer's Git exclusions rather than overlaying their pre-install state.
+    documents[".gitignore"] = _backend_gitignore(root)
     for relative, content in documents.items():
         write_atomic(root, root / relative, content)
     # Hooks append ignore lines: complete their mutations before snapshotting integrations.

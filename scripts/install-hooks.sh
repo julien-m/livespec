@@ -2,7 +2,7 @@
 # LiveSpec traceability anchors
 # @spec(FR-009)
 
-# Install the LiveSpec pre-commit `last_reviewed` hook.
+# Install the review-led advisory pre-commit hook.
 #
 # @spec FR-009: hook installer — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-009
 #
@@ -11,10 +11,8 @@
 #   scripts/install-hooks.sh <project-dir> <livespec>  # install in downstream project (migrate/init)
 #
 # Behavior:
-#   - Installs <livespec>/hooks/livespec-last-reviewed.py as <project>/.git/hooks/pre-commit
-#   - If a pre-commit hook already exists, appends a dispatcher block
-#     keyed off the marker line `# livespec-expectations` (idempotent
-#     re-install supported).
+#   - Installs the advisory template as <project>/.git/hooks/pre-commit.
+#   - Preserves other checks in a custom or legacy composite hook.
 #   - Appends `.specs/.runs/` and `.specs/.previews/` to .gitignore if absent.
 
 set -euo pipefail
@@ -33,9 +31,10 @@ else
   exit 1
 fi
 
-HOOK_SRC="${LIVESPEC_DIR}/hooks/livespec-last-reviewed.py"
+HOOK_SRC="${LIVESPEC_DIR}/validator/hooks/pre-commit-hook"
+HISTORICAL_HOOK="${LIVESPEC_DIR}/validator/hooks/pre-commit-certification-hook"
 HOOK_DST="${PROJECT_DIR}/.git/hooks/pre-commit"
-MARKER="# livespec-expectations"
+MARKER="# @spec FR-003: Advisory commit hook"
 
 if [[ ! -f "${HOOK_SRC}" ]]; then
     echo "Error: ${HOOK_SRC} not found." >&2
@@ -49,26 +48,26 @@ if [[ ! -d "${PROJECT_DIR}/.git" ]]; then
 else
     mkdir -p "${PROJECT_DIR}/.git/hooks"
 
-    if [[ -e "${HOOK_DST}" ]]; then
-        if grep -q "${MARKER}" "${HOOK_DST}" 2>/dev/null; then
+    if [[ -L "${HOOK_DST}" ]]; then
+        echo "Error: refusing to write linked pre-commit hook at ${HOOK_DST}" >&2
+        exit 1
+    elif [[ -f "${HOOK_DST}" ]] && cmp -s "${HOOK_DST}" "${HISTORICAL_HOOK}"; then
+        cp "${HOOK_SRC}" "${HOOK_DST}"
+        chmod +x "${HOOK_DST}"
+        echo "Replaced the original LiveSpec certification hook with the advisory hook"
+    elif [[ -e "${HOOK_DST}" ]]; then
+        if grep -Fq "${MARKER}" "${HOOK_DST}"; then
             echo "Hook already installed (${MARKER} marker found). Nothing to do."
         else
-            echo "Existing pre-commit hook detected — appending LiveSpec dispatcher."
+            echo "Existing pre-commit hook retained. Inspect its checks separately." >&2
             {
-                echo ""
-                echo "${MARKER}"
-            echo "python3 \"${HOOK_SRC}\" || exit 1"
-            echo "livespec doctor --format json >/dev/null || exit 1"
+                printf '\n'
+                cat "${HOOK_SRC}"
             } >> "${HOOK_DST}"
             chmod +x "${HOOK_DST}"
         fi
     else
-        cat > "${HOOK_DST}" <<EOF
-#!/usr/bin/env bash
-${MARKER}
-python3 "${HOOK_SRC}" || exit 1
-livespec doctor --format json >/dev/null || exit 1
-EOF
+        cp "${HOOK_SRC}" "${HOOK_DST}"
         chmod +x "${HOOK_DST}"
         echo "Installed LiveSpec pre-commit hook at ${HOOK_DST}"
     fi

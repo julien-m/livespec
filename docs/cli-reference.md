@@ -21,6 +21,7 @@ livespec mutation          # run mutation testing
 livespec preflight         # verify (or --fix) the preflight manifest
 livespec device proof      # capture Agent Device proof bound to a LiveSpec UDID
 livespec runtime ...       # install, pin, upgrade, dev, status, defect
+livespec recovery policy   # read the project's recovery-policy marker
 ```
 
 Command-specific defaults and overrides are documented below. Errors of the
@@ -529,6 +530,15 @@ idempotently, and under `.specs/.LOCK`.
     (`verify_finalize_receipt()` re-validates schema, hashes, feature, command,
     and verdict).
   * Exit `0` (PASS) or `10` (FAIL).
+
+## `livespec recovery policy`
+
+`livespec recovery policy [--project <dir>] [--json]` reads the selected project's
+format-23 recovery marker. It reports `amended` for a valid marker and
+`original` when the marker is absent or invalid. JSON includes the marker source
+and any validation problem. Exit `0` means inspection completed, and exit `1`
+means a project could not be found. The command writes no project files and runs
+no certification or mission action.
 
 ## `livespec runtime`
 

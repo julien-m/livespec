@@ -44,13 +44,9 @@ from ..conventions_gates import (
 )
 from ..conventions_receipt import write_conventions_receipt
 from ..conventions_rules import RulebookStaleError, compile_conventions_rulebook
+from ..init_profile import InitError
 from ..llm_provider import LLMProviderNotConfigured
-from .conventions_scaffold import (
-    is_web_ui_stack,
-    render_conventions_index,
-    render_conventions_manifest,
-    scaffold_linter_configs,
-)
+from .conventions_scaffold import refresh_conventions_bundle, scaffold_linter_configs
 
 REPO_OPTION = typer.Option(Path("."), "--repo", help="Project repository root.")
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
@@ -85,28 +81,17 @@ conventions_app.add_typer(gates_app, name="gates")
 def refresh_conventions_command(repo: Path = REPO_OPTION, full: bool = FULL_OPTION) -> None:
     """Refresh the project conventions bundle."""
     repo_root = repo.resolve()
-    stack_path = repo_root / ".specs" / "stacks" / "_default.md"
-    if not stack_path.is_file():
-        typer.echo("Error: .specs/stacks/_default.md not found", err=True)
-        raise typer.Exit(2)
-    conventions_dir = repo_root / ".conventions"
-    index_path = conventions_dir / "index.md"
-    manifest_path = conventions_dir / "manifest.yaml"
-    if index_path.is_file() and manifest_path.is_file() and not full:
+    try:
+        updated = refresh_conventions_bundle(repo_root, full=full)
+    except (InitError, OSError) as error:
+        typer.echo(f"Error: {error}", err=True)
+        raise typer.Exit(2) from error
+    if updated is None:
         typer.echo("conventions already present")
-        raise typer.Exit(0)
-
-    conventions_dir.mkdir(parents=True, exist_ok=True)
-    stack_text = stack_path.read_text(encoding="utf-8").lower()
-    domains = ["code"]
-    if is_web_ui_stack(stack_text):
-        domains += ["design-tokens", "design-components", "design-views", "design-quality"]
-    index_path.write_text(render_conventions_index(repo_root.name, domains), encoding="utf-8")
-    manifest_path.write_text(render_conventions_manifest(domains, stack_text), encoding="utf-8")
+        return
     typer.echo("conventions refreshed")
-    typer.echo(f"  updated  {index_path.relative_to(repo_root)}")
-    typer.echo(f"  updated  {manifest_path.relative_to(repo_root)}")
-    raise typer.Exit(0)
+    for path in updated:
+        typer.echo(f"  updated  {path.relative_to(repo_root)}")
 
 
 @gates_app.command("init")

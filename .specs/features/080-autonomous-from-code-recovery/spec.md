@@ -130,6 +130,8 @@ A force rerun saves prior specs, conventions and integration documents in a uniq
 ### AC-005
 
 Fresh and legacy linked mutable-agent builds use local copies and leave shared-source hashes unchanged; valid convention sources remain intact and repaired convention sources resolve to actual ai-ressources files.
+
+In a fresh Git repository, both interview-based and observed-code initialization generate the convention index and manifest. Their project-level `.gitignore` ignores both files, including when init has to create it. Existing ignore rules are preserved.
 ### AC-006
 
 Autonomous from-code goal inventory excludes interview/stack confirmation but retains installation, generated-profile validation, integration verification, hooks and archive. Interactive initialization retains its interview obligations; historical immutable goals are unchanged.

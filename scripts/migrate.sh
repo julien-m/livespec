@@ -102,10 +102,17 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     GITIGNORE)
       pattern="$args"
       gitignore="$PROJECT_DIR/.gitignore"
-      if [[ ! -f "$gitignore" ]]; then
+      if [[ -L "$gitignore" ]]; then
+        echo "ERROR: Refusing to write linked .gitignore" >&2
+        exit 1
+      elif [[ ! -f "$gitignore" ]]; then
         echo "$pattern" > "$gitignore"
         echo "  ✓ GITIGNORE $pattern (created .gitignore)"
       elif ! grep -qxF "$pattern" "$gitignore"; then
+        # Preserve the last user pattern when the file lacks a terminating newline.
+        if [[ -s "$gitignore" && -n "$(tail -c 1 "$gitignore")" ]]; then
+          printf '\n' >> "$gitignore"
+        fi
         echo "$pattern" >> "$gitignore"
         echo "  ✓ GITIGNORE $pattern"
       else

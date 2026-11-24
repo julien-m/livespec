@@ -264,7 +264,9 @@ See the available presets for guidance:
   # Add LiveSpec local-only files to .gitignore
   header "Updating .gitignore..."
   local gitignore="$PROJECT_DIR/.gitignore"
+  local conventions_pattern=".conventions/"
   local live_patterns=(
+    "$conventions_pattern"
     ".specs/hooks/*.local.md"
     ".agents/skills/spec-*"
     ".agents/skills/source-command-cli"
@@ -290,8 +292,14 @@ See the available presets for guidance:
     local missing_patterns=()
     local pattern
     for pattern in "${live_patterns[@]}"; do
-      if ! grep -qF "$pattern" "$gitignore"; then
+      if ! grep -qxF "$pattern" "$gitignore"; then
         missing_patterns+=("$pattern")
+      elif [[ "$pattern" == "$conventions_pattern" && -e "$PROJECT_DIR/.git" ]]; then
+        # A later negation can override the earlier exclusion despite an exact line match.
+        if ! git -C "$PROJECT_DIR" check-ignore -q --no-index -- .conventions/index.md ||
+          ! git -C "$PROJECT_DIR" check-ignore -q --no-index -- .conventions/manifest.yaml; then
+          missing_patterns+=("$pattern")
+        fi
       fi
     done
     if [[ "${#missing_patterns[@]}" -gt 0 ]]; then
