@@ -213,7 +213,7 @@ def _project_version(project: Path) -> str | None:
 
 
 def _protect_store(parent: Path) -> None:
-    parent.mkdir(exist_ok=True)
+    parent.mkdir(mode=0o700, exist_ok=True)
     marker = parent / ".gitignore"
     try:
         with marker.open("xb") as file:
@@ -248,7 +248,9 @@ def record(project: Path, version: int, scope: Sequence[str]) -> Outcome:
     # Publish the completed backup as one directory so interrupted retries retain the pre-image.
     with tempfile.TemporaryDirectory(dir=store.parent, prefix=f".{version}-") as scratch:
         staged = Path(scratch) / "point"
-        (staged / BLOBS_NAME).mkdir(parents=True)
+        # The point keeps its permissions when renamed out of the staging directory.
+        staged.mkdir(mode=0o700)
+        (staged / BLOBS_NAME).mkdir(mode=0o700)
         entries = [_capture(project, staged, rel, mode) for rel, mode in _walk(project, roots)]
         document = {
             "schema": SCHEMA,

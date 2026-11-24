@@ -40,6 +40,7 @@ def _migrate(
     *,
     inverse: bool = False,
     env: dict[str, str] | None = None,
+    umask: int = -1,
 ) -> subprocess.CompletedProcess[str]:
     document = REPO / "migrations" / str(version) / ("inverse.md" if inverse else "migrate.md")
     return subprocess.run(
@@ -49,6 +50,7 @@ def _migrate(
         timeout=60,
         check=False,
         env=env,
+        umask=umask,
     )
 
 
@@ -135,6 +137,21 @@ def test_format_23_preserves_the_original_policy_and_preimage_on_retry(tmp_path:
     assert policy.read_bytes() == b"# Keep my policy\nschema: 1\nstop_rules: original\n"
     assert (project / VERSION).read_text() == "22\n"
     assert not (project / ".gitignore").exists()
+
+
+def test_published_preimage_stays_private_with_default_umask(tmp_path: Path) -> None:
+    project = _project(tmp_path / "project", 22)
+    policy = project / POLICY
+    policy.write_text("# Local policy\nschema: 1\nstop_rules: amended\n")
+    policy.chmod(0o600)
+
+    _check(_migrate(project, 23, umask=0o022))
+
+    point = store_of(project, 23)
+    for private_directory in (point.parent, point, point / "blobs"):
+        assert private_directory.stat().st_mode & 0o777 == 0o700
+    _check(_migrate(project, 23, inverse=True))
+    assert policy.stat().st_mode & 0o777 == 0o600
 
 
 def test_private_schema_1_scope_restores_modes_and_links(tmp_path: Path) -> None:
